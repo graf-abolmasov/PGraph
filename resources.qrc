@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/" >
+        <file>images/arc.png</file>
+        <file>images/build.png</file>
+        <file>images/compile.png</file>
+        <file>images/delete.png</file>
+        <file>images/linepointer.png</file>
+        <file>images/pointer.png</file>
+        <file>images/textpointer.png</file>
+        <file>images/top.png</file>
+    </qresource>
+</RCC>
