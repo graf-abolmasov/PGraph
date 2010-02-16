@@ -118,7 +118,7 @@
     <value type="QString">-r</value>
    </valuelist>
    <value key="abstractProcess.command" type="QString">c:/qt/2009.05/qt/bin/qmake.exe</value>
-   <value key="abstractProcess.enabled" type="bool">false</value>
+   <value key="abstractProcess.enabled" type="bool">true</value>
    <value key="abstractProcess.workingDirectory" type="QString">C:/new</value>
   </valuemap>
  </data>
