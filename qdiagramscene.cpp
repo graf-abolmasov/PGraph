@@ -322,6 +322,10 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
         top->setX(top->x() + dx);
         top->setY(top->y() + dy);
 
+        foreach (TArc *arc, top->allArcs()){
+            arc->realloc();
+        }
+
         /*QGraphicsSceneMouseEvent *newEvent =
                 new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMousePress);
         newEvent->setAccepted(true);

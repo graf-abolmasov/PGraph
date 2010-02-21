@@ -162,13 +162,13 @@ TArc::~TArc()
 
 QRectF TArc::boundingRect() const
 {
-   /* QRectF rec(myStartTop->pos(), myEndTop->pos());
-    rec = rec.normalized();
-    foreach (TArcLine *line, lines){
-    rec = rec.united(line->boundingRect()).normalized();
-    }
-    return rec;*/
-    return scene()->sceneRect();
+    qreal extra = (pen().width() + 20) / 2.0;
+
+    return QRectF(line().p1(), QSizeF(line().p2().x() - line().p1().x(),
+                                      line().p2().y() - line().p1().y()))
+        .normalized()
+        .adjusted(-extra, -extra, extra, extra);
+
 }
 
    /* qreal extra = (pen().width() + 20) / 2.0;
@@ -181,13 +181,13 @@ QRectF TArc::boundingRect() const
 
 QPainterPath TArc::shape() const
 {
-    QPainterPath path = QGraphicsLineItem::shape();
+    QPainterPath path;
     path.addPolygon(arcHead);
     foreach (TArcLine *line, lines){
-       path.addRect(line->boundingRect());
+       path.addPath(line->shape());
     }
-    path.addRect(arcTop->boundingRect());
-    //path.addRect(scene()->sceneRect());
+    path.addPath(arcTop->shape());
+
     return path;
 }
 
@@ -458,16 +458,16 @@ bool TArc::realloc(){
     QPointF endP;
     QLineF startTopBorder;
     QLineF endTopBorder;
-    QPointF intersectPoint;
 
     //подогнать начальную и конечную точки дуги к краю вершины
     if ((myStartTop != NULL) && (myEndTop != NULL)) {
         startTopBorder = myStartTop->getIntersectBound(lines.first()->line());
         endTopBorder   = myEndTop->getIntersectBound(lines.last()->line());
-        startTopBorder.intersect(lines.first()->line(), &intersectPoint);
-        lines.first()->setLine(QLineF(intersectPoint, lines.first()->line().p2()));
-        endTopBorder.intersect(lines.last()->line(), &intersectPoint);
-        lines.last()->setLine(QLineF(lines.last()->line().p1(), intersectPoint));
+        startTopBorder.intersect(lines.first()->line(), &startP);
+        lines.first()->setLine(QLineF(startP, lines.first()->line().p2()));
+        endTopBorder.intersect(lines.last()->line(), &endP);
+        lines.last()->setLine(QLineF(lines.last()->line().p1(), endP));
+        setLine(QLineF(startP, endP));
     }
 }
 
