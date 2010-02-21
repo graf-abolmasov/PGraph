@@ -453,7 +453,7 @@ TArcLine* TArc::newLine(QPointF p1, QPointF p2){
     return currentLine;
 }
 
-bool TArc::realloc(){
+void TArc::realloc(){
     QPointF startP;
     QPointF endP;
     QLineF startTopBorder;

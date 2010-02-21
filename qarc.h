@@ -70,6 +70,7 @@ private:
 
 class TArc : public QGraphicsLineItem
 {
+
 public:
     enum { Type = ARC_TYPE };
     int width;
@@ -108,7 +109,7 @@ public:
 
     void remake(TTop *, int, int);
     void rebuild(TTop *, int, int);
-    bool realloc();
+    void realloc();
 public slots:
     void updatePosition();
 
