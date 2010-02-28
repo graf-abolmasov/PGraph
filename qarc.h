@@ -48,6 +48,8 @@ public:
 
 protected:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+               QWidget *widget = 0);
 
 private:
     QMenu *myContextMenu;
@@ -70,7 +72,7 @@ private:
 
 class TArc : public QGraphicsLineItem
 {
-
+    //Q_OBJECT
 public:
     enum { Type = ARC_TYPE };
     int width;
@@ -90,6 +92,8 @@ public:
         { return Type; }
     void setColor(const QColor &color)
         { myColor = color; }
+    QColor color() const
+        { return myColor; }
     void setPriority(int w);
     void setStartTop(TTop* startTop){
         myStartTop = startTop;
@@ -107,7 +111,7 @@ public:
          else return NULL;
     }
 
-    void remake(TTop *, int, int);
+    bool remake(TTop *, float dx, float dy);
     void rebuild(TTop *, int, int);
     void realloc();
 public slots:

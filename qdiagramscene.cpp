@@ -22,7 +22,7 @@ void QDiagramScene::setLineColor(const QColor &color)
     myLineColor = color;
     if (isItemChange(TArc::Type)) {
         TArc *item =
-            qgraphicsitem_cast<TArc *>(selectedItems().first());
+                qgraphicsitem_cast<TArc *>(selectedItems().first());
         item->setColor(myLineColor);
         update();
     }
@@ -33,7 +33,7 @@ void QDiagramScene::setTextColor(const QColor &color)
     myTextColor = color;
     if (isItemChange(TComment::Type)) {
         TComment *item =
-            qgraphicsitem_cast<TComment *>(selectedItems().first());
+                qgraphicsitem_cast<TComment *>(selectedItems().first());
         item->setDefaultTextColor(myTextColor);
     }
 }
@@ -43,7 +43,7 @@ void QDiagramScene::setItemColor(const QColor &color)
     myItemColor = color;
     if (isItemChange(TTop::Type)) {
         TTop *item =
-            qgraphicsitem_cast<TTop *>(selectedItems().first());
+                qgraphicsitem_cast<TTop *>(selectedItems().first());
         item->setBrush(myItemColor);
     }
 }
@@ -54,7 +54,7 @@ void QDiagramScene::setFont(const QFont &font)
 
     if (isItemChange(TComment::Type)) {
         QGraphicsTextItem *item =
-            qgraphicsitem_cast<TComment *>(selectedItems().first());
+                qgraphicsitem_cast<TComment *>(selectedItems().first());
         //At this point the selection can change so the first selected item might not be a DiagramTextItem
         if (item)
             item->setFont(myFont);
@@ -90,35 +90,35 @@ void QDiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
     TTop* item = new TTop(myItemType, myItemMenu);
     switch (myMode) {
-        case InsertItem:
-            //item->setBrush(QBrush(Qt::white,Qt::SolidPattern));
-            item->setBrush(myItemColor);
-            addItem(item);
-            item->setPos(mouseEvent->scenePos());
-            emit itemInserted(item);
-            break;
+    case InsertItem:
+        //item->setBrush(QBrush(Qt::white,Qt::SolidPattern));
+        item->setBrush(myItemColor);
+        addItem(item);
+        item->setPos(mouseEvent->scenePos());
+        emit itemInserted(item);
+        break;
 
-        case InsertLine:
-            if (newArc == NULL) 
-                newArc = new TArc(NULL, NULL, myArcMenu, 0, this);
-            line = newArc->newLine(mouseEvent->scenePos(), mouseEvent->scenePos());
-            //futureLine = new QGraphicsLineItem(QLineF(mouseEvent->scenePos(), mouseEvent->scenePos()), 0, this);
-            //futureLine->setPen(QPen(QBrush(Qt::black,Qt::SolidPattern), 2, Qt::DotLine));
-            break;
+    case InsertLine:
+        if (newArc == NULL)
+            newArc = new TArc(NULL, NULL, myArcMenu, 0, this);
+        line = newArc->newLine(mouseEvent->scenePos(), mouseEvent->scenePos());
+        //futureLine = new QGraphicsLineItem(QLineF(mouseEvent->scenePos(), mouseEvent->scenePos()), 0, this);
+        //futureLine->setPen(QPen(QBrush(Qt::black,Qt::SolidPattern), 2, Qt::DotLine));
+        break;
 
-        case InsertText:
-            textItem = new TComment(myCommentMenu);
-            textItem->setFont(myFont);
-            textItem->setTextInteractionFlags(Qt::TextEditorInteraction);
-            textItem->setZValue(1000.0);
-            connect(textItem, SIGNAL(lostFocus(TComment *)),
-                    this, SLOT(editorLostFocus(TComment *)));
-            connect(textItem, SIGNAL(selectedChange(QGraphicsItem *)),
-                    this, SIGNAL(itemSelected(QGraphicsItem *)));
-            addItem(textItem);
-            textItem->setDefaultTextColor(myTextColor);
-            textItem->setPos(mouseEvent->scenePos());
-            emit textInserted(textItem);
+    case InsertText:
+        textItem = new TComment(myCommentMenu);
+        textItem->setFont(myFont);
+        textItem->setTextInteractionFlags(Qt::TextEditorInteraction);
+        textItem->setZValue(1000.0);
+        connect(textItem, SIGNAL(lostFocus(TComment *)),
+                this, SLOT(editorLostFocus(TComment *)));
+        connect(textItem, SIGNAL(selectedChange(QGraphicsItem *)),
+                this, SIGNAL(itemSelected(QGraphicsItem *)));
+        addItem(textItem);
+        textItem->setDefaultTextColor(myTextColor);
+        textItem->setPos(mouseEvent->scenePos());
+        emit textInserted(textItem);
 
     default:
         ;
@@ -128,7 +128,7 @@ void QDiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
 void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
-    //Ñ€ÐµÐ¶Ð¸Ð¼ Ñ€Ð¸ÑÐ¾Ð²Ð°Ð½Ð¸Ñ Ð´ÑƒÐ³Ð¸
+    //ðåæèì ðèñîâàíèÿ äóãè
     if (myMode == InsertLine && line != NULL && mouseEvent->buttons() == Qt::LeftButton) {
         QLineF vector(line->line().p1(), mouseEvent->scenePos());
         float dx = vector.dx();
@@ -136,27 +136,27 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
         int angel = int(vector.angle() / 45.0);
         QLineF newLine;
         switch (angel) {
-            case 0:;
-            case 7:;
-            case 3:;
-            case 4:
-                newLine.setP1(vector.p1());
-                newLine.setP2(QPointF(vector.p1().x() + dx, vector.p1().y()));
-                break;
-            case 1:;
-            case 2:;
-            case 5:;
-            case 6:
-                newLine.setP1(vector.p1());
-                newLine.setP2(QPointF(vector.p1().x(), vector.p1().y() + dy));
-                break;
-            default:
-                ;
+        case 0:;
+        case 7:;
+        case 3:;
+        case 4:
+            newLine.setP1(vector.p1());
+            newLine.setP2(QPointF(vector.p1().x() + dx, vector.p1().y()));
+            break;
+        case 1:;
+        case 2:;
+        case 5:;
+        case 6:
+            newLine.setP1(vector.p1());
+            newLine.setP2(QPointF(vector.p1().x(), vector.p1().y() + dy));
+            break;
+        default:
+            ;
         }
         line->setLine(newLine);
         //futureLine->setLine(QLineF(newLine.p2(), mouseEvent->scenePos()));
     }
-    //Ñ€ÐµÐ¶Ð¸Ð¼ Ð¿ÐµÑ€ÐµÑ‚Ð°ÑÐºÐ¸Ð²Ð°Ð½Ð¸Ñ Ð´ÑƒÐ³Ð¸
+    //ðåæèì ïåðåòàñêèâàíèÿ äóãè
     else if ((myMode == MoveItem) && (mouseEvent->buttons() == Qt::LeftButton) &&
              (selectedItems().count() == 1) && (selectedItems().first()->type() == TArcLine::Type)) {
         TArcLine *selectedLine = qgraphicsitem_cast<TArcLine *>(selectedItems().first());
@@ -166,13 +166,17 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
         float dx = vector.dx();
         float dy = vector.dy();
 
-        //Ð½Ðµ Ñ€Ð°Ð·Ñ€ÐµÑˆÐ°Ñ‚ÑŒ Ð´Ð²Ð¸Ð³Ð°Ñ‚ÑŒ Ð½Ð°Ñ‡Ð°Ð»ÑŒÐ½ÑƒÑŽ Ð¸ ÐºÐ¾Ð½ÐµÑ‡Ð½ÑƒÑŽ Ð´ÑƒÐ³Ð¸ (Ð¿Ð¾ÐºÐ°)
+        //íå ðàçðåøàòü äâèãàòü íà÷àëüíóþ è êîíå÷íûé êóñî÷åê äóãè (ïîêà)
         if (!((arc->lines.first() == selectedLine) || (arc->lines.last() == selectedLine))){
             TArcLine *prevLine = arc->lines.at(arc->lines.indexOf(selectedLine) - 1);
             TArcLine *nextLine = arc->lines.at(arc->lines.indexOf(selectedLine) + 1);
 
-            //Ð²Ð¿Ñ€Ð°Ð²Ð¾-Ð²Ð»ÐµÐ²Ð¾ Ð¼Ð¾Ð¶Ð½Ð¾ Ð´Ð²Ð¸Ð³Ð°Ñ‚ÑŒ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ Ð²ÐµÑ€Ñ‚Ð¸ÐºÐ°Ð»ÑŒÐ½Ñ‹Ðµ Ð»Ð¸Ð½Ð¸Ð¸ (Ð¿Ð¾ÐºÐ°)
+            //âïðàâî-âëåâî ìîæíî äâèãàòü òîëüêî âåðòèêàëüíûå ëèíèè (ïîêà)
             if (selectedLine->line().p1().x() == selectedLine->line().p2().x()){
+                //if (((arc->lines.first()->line().length() < 60) && (prevLine == arc->lines.first())) ||
+                //    ((arc->lines.last()->line().length() < 60) && (nextLine == arc->lines.last())))
+                //    dx = 0;
+
                 prevLine->setLine(QLineF(prevLine->line().p1(),
                                          QPointF(prevLine->line().p2().x() + dx,
                                                  prevLine->line().p1().y())
@@ -191,8 +195,11 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
                                       );
             }
 
-            //Ð²Ð²ÐµÑ€Ñ…-Ð²Ð½Ð¸Ð· Ð¼Ð¾Ð¶Ð½Ð¾ Ð´Ð²Ð¸Ð³Ð°Ñ‚ÑŒ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ Ð³Ð¾Ñ€Ð¸Ð·Ð¾Ð½Ñ‚Ð°Ð»ÑŒÐ½Ñ‹Ðµ Ð»Ð¸Ð½Ð¸Ð¸ (Ð¿Ð¾ÐºÐ°)
+            //ââåðõ-âíèç ìîæíî äâèãàòü òîëüêî ãîðèçîíòàëüíûå ëèíèè (ïîêà)
             if (selectedLine->line().p1().y() == selectedLine->line().p2().y()){
+                //if (((arc->lines.first()->line().length() < 60) && (prevLine == arc->lines.first())) ||
+                //    ((arc->lines.last()->line().length() < 60) && (nextLine == arc->lines.last())))
+                //    dy = 0;
                 prevLine->setLine(QLineF(prevLine->line().p1(),
                                          QPointF(prevLine->line().p2().x(),
                                                  prevLine->line().p2().y() + dy)
@@ -213,136 +220,40 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
         }
 
     }
-    //Ñ€ÐµÐ¶Ð¸Ð¼ Ð¿ÐµÑ€ÐµÑ‚Ð°ÑÐºÐ¸Ð²Ð°Ð½Ð¸Ñ Ð²ÐµÑ€ÑˆÐ¸Ð½Ñ‹
+    //ðåæèì ïåðåòàñêèâàíèÿ âåðøèíû
     else if ((myMode == MoveItem) && (mouseEvent->buttons() == Qt::LeftButton) &&
              (selectedItems().count() == 1) && (selectedItems().first()->type() == TTop::Type)) {
-        bool allowMove = false;
         TTop *top = qgraphicsitem_cast<TTop *>(selectedItems().first());
-        QPointF old_pos = mouseEvent->lastScenePos(); //top->scenePos();
-        //!!QGraphicsScene::mouseMoveEvent(mouseEvent);
-        QPointF new_pos = mouseEvent->scenePos();//top->scenePos();
+        QPointF old_pos = mouseEvent->lastScenePos();
+        QPointF new_pos = mouseEvent->scenePos();
 
         QLineF vector(old_pos, new_pos);
         float dx = vector.dx();
         float dy = vector.dy();
+        //float newDX, newDY;
 
+        bool allowMove = true;
+
+        QList<TArc *> movedLines; //ñïèñîê áóäåò ñîäåðæàòü îáðàáîòàííûå äóãè
         foreach (TArc *arc, top->allArcs()){
-            //Ð´Ð»Ñ Ñ‚ÐµÑ… Ñƒ ÐºÐ¾Ð³Ð¾ ÑÑ‚Ð° Ð²ÐµÑ€ÑˆÐ¸Ð½Ð° - Ð½Ð°Ñ‡Ð°Ð»Ð¾
-            if (arc->startItem() == top){
-                //Ð²ÐµÑ€Ñ‚Ð¸ÐºÐ°Ð»ÑŒÐ½ÑƒÑŽ Ð»Ð¸Ð½Ð¸ÑŽ Ð´Ð²Ð¸Ð³Ð°ÐµÐ¼ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ Ð²Ð¿Ñ€Ð°Ð²Ð¾/Ð²Ð»ÐµÐ²Ð¾ Ð¸Ð»Ð¸ ÑƒÐ´Ð»Ð¸Ð½Ð½ÑÐµÐ¼/ÑƒÐºÐ¾Ñ€Ð°Ñ‡Ð¸Ð²Ð°ÐµÐ¼
-                if (arc->lines.first()->line().p1().x() == arc->lines.first()->line().p2().x()){
-                    //Ð¼Ð¾Ð¶Ð½Ð¾ Ð´Ð²Ð¸Ð³Ð°Ñ‚ÑŒ Ð¿Ð¾ÐºÐ° Ð¾ÑÑ‚Ð°ÐµÑ‚ÑÑ Ð¼ÐµÑÑ‚Ð¾ Ð´Ð»Ñ ÑÐµÑ€Ð¾Ð³Ð¾ ÐºÐ²Ð°Ð´Ñ€Ð°Ñ‚Ð¸ÐºÐ°
-                    if (arc->lines.first()->line().length() < 60)
-                        dy = 0;
-                    {
-                        arc->lines.first()->setLine(QLineF(QPointF(arc->lines.first()->line().p1().x() + dx,
-                                                                   arc->lines.first()->line().p1().y() + dy),
-                                                           QPointF(arc->lines.first()->line().p2().x() + dx,
-                                                                   arc->lines.first()->line().p2().y())
-                                                           )
-                                                    );
-                        //Ð¿ÐµÑ€ÐµÑ€Ð¸ÑÑƒÐµÐ¼ ÑÐ»ÐµÐ´ÑƒÑŽÑ‰Ð¸Ð¹ ÐºÑƒÑÐ¾Ñ‡ÐµÐº Ñ‚Ð¾Ð¶Ðµ (ÐµÑÐ»Ð¸ Ð¾Ð½ ÐµÑÑ‚ÑŒ)
-                        if (arc->lines.count() > 1)
-                            arc->lines.at(1)->setLine(QLineF(QPointF(arc->lines.at(1)->line().p1().x() + dx,
-                                                                     arc->lines.at(1)->line().p1().y()),
-                                                             arc->lines.at(1)->line().p2()
-                                                             )
-                                                      );
-                    }
-                }
-                //Ð³Ð¾Ñ€Ð¸Ð·Ð¾Ð½Ñ‚Ð°Ð»ÑŒÐ½ÑƒÑŽ Ð»Ð¸Ð½Ð¸ÑŽ Ð¼Ð¾Ð¶ÐµÐ¼ Ð´Ð²Ð¸Ð³Ð°Ñ‚ÑŒ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ Ð²Ð²ÐµÑ€Ñ…/Ð²Ð½Ð¸Ð· Ð¸Ð»Ð¸ ÑƒÐ´Ð»Ð¸Ð½Ð½ÑÑ‚ÑŒ/ÑƒÐºÐ¾Ñ€Ð°Ñ‡Ð¸Ð²Ð°Ñ‚ÑŒ
-                if (arc->lines.first()->line().p1().y() == arc->lines.first()->line().p2().y()){
-                    if (arc->lines.first()->line().length() < 60)
-                        dx = 0;
-                    {
-                        arc->lines.first()->setLine(QLineF(QPointF(arc->lines.first()->line().p1().x() + dx,
-                                                                   arc->lines.first()->line().p1().y() + dy),
-                                                           QPointF(arc->lines.first()->line().p2().x(),
-                                                                   arc->lines.first()->line().p2().y() + dy)
-                                                           )
-                                                    );
-                        //Ð¿ÐµÑ€ÐµÑ€Ð¸ÑÑƒÐµÐ¼ ÑÐ»ÐµÐ´ÑƒÑŽÑ‰Ð¸Ð¹ ÐºÑƒÑÐ¾Ñ‡ÐµÐº Ñ‚Ð¾Ð¶Ðµ (ÐµÑÐ»Ð¸ Ð¾Ð½ ÐµÑÑ‚ÑŒ)
-                        if (arc->lines.count() > 1)
-                            arc->lines.at(1)->setLine(QLineF(QPointF(arc->lines.at(1)->line().p1().x(),
-                                                                     arc->lines.at(1)->line().p1().y() + dy),
-                                                             arc->lines.at(1)->line().p2()
-                                                             )
-                                                      );
-                    }
-                }
-            }
-            //Ð´Ð»Ñ Ñ‚ÐµÑ… Ñƒ ÐºÐ¾Ð³Ð¾ ÑÑ‚Ð° Ð²ÐµÑ€ÑˆÐ¸Ð½Ð° - ÐºÐ¾Ð½ÐµÑ†
-            if (arc->endItem() == top){
-                //Ð²ÐµÑ€Ñ‚Ð¸ÐºÐ°Ð»ÑŒÐ½ÑƒÑŽ Ð»Ð¸Ð½Ð¸ÑŽ Ð´Ð²Ð¸Ð³Ð°ÐµÐ¼ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ Ð²Ð¿Ñ€Ð°Ð²Ð¾/Ð²Ð»ÐµÐ²Ð¾ Ð¸Ð»Ð¸ ÑƒÐ´Ð»Ð¸Ð½Ð½ÑÐµÐ¼/ÑƒÐºÐ¾Ñ€Ð°Ñ‡Ð¸Ð²Ð°ÐµÐ¼
-                if (arc->lines.last()->line().p1().x() == arc->lines.last()->line().p2().x()){
-                    if (arc->lines.last()->line().length() < 60)
-                        dy = 0;
-                    {
-                        arc->lines.last()->setLine(QLineF(QPointF(arc->lines.last()->line().p1().x() + dx,
-                                                                  arc->lines.last()->line().p1().y()),
-                                                          QPointF(arc->lines.last()->line().p2().x() + dx,
-                                                                  arc->lines.last()->line().p2().y() + dy)
-                                                          )
-                                                   );
-                        //Ð¿ÐµÑ€ÐµÑ€Ð¸ÑÑƒÐµÐ¼ ÑÐ»ÐµÐ´ÑƒÑŽÑ‰Ð¸Ð¹ ÐºÑƒÑÐ¾Ñ‡ÐµÐº Ñ‚Ð¾Ð¶Ðµ (ÐµÑÐ»Ð¸ Ð¾Ð½ ÐµÑÑ‚ÑŒ)
-                        if (arc->lines.count() > 1)
-                            arc->lines.at(arc->lines.count()-2)->setLine(QLineF(arc->lines.at(arc->lines.count()-2)->line().p1(),
-                                                                                QPointF(arc->lines.at(arc->lines.count()-2)->line().p2().x() + dx,
-                                                                                        arc->lines.at(arc->lines.count()-2)->line().p2().y())
-                                                                                )
-                                                                         );
-                    }
-                }
-                //Ð³Ð¾Ñ€Ð¸Ð·Ð¾Ð½Ñ‚Ð°Ð»ÑŒÐ½ÑƒÑŽ Ð»Ð¸Ð½Ð¸ÑŽ Ð¼Ð¾Ð¶ÐµÐ¼ Ð´Ð²Ð¸Ð³Ð°Ñ‚ÑŒ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ Ð²Ð²ÐµÑ€Ñ…/Ð²Ð½Ð¸Ð· Ð¸Ð»Ð¸ ÑƒÐ´Ð»Ð¸Ð½Ð½ÑÑ‚ÑŒ/ÑƒÐºÐ¾Ñ€Ð°Ñ‡Ð¸Ð²Ð°Ñ‚ÑŒ
-                if (arc->lines.last()->line().p1().y() == arc->lines.last()->line().p2().y()){
-                    if (arc->lines.last()->line().length() < 60)
-                        dx = 0;
-                    {
-                        allowMove = true;
-                        arc->lines.last()->setLine(QLineF(QPointF(arc->lines.last()->line().p1().x(),
-                                                                  arc->lines.last()->line().p1().y() + dy),
-                                                          QPointF(arc->lines.last()->line().p2().x() + dx,
-                                                                  arc->lines.last()->line().p2().y() + dy)
-                                                          )
-                                                   );
-                        //Ð¿ÐµÑ€ÐµÑ€Ð¸ÑÑƒÐµÐ¼ ÑÐ»ÐµÐ´ÑƒÑŽÑ‰Ð¸Ð¹ ÐºÑƒÑÐ¾Ñ‡ÐµÐº Ñ‚Ð¾Ð¶Ðµ (ÐµÑÐ»Ð¸ Ð¾Ð½ ÐµÑÑ‚ÑŒ)
-                        if (arc->lines.count() > 1)
-                            arc->lines.at(arc->lines.count()-2)->setLine(QLineF(arc->lines.at(arc->lines.count()-2)->line().p1(),
-                                                                                QPointF(arc->lines.at(arc->lines.count()-2)->line().p2().x(),
-                                                                                        arc->lines.at(arc->lines.count()-2)->line().p2().y() + dy)
-                                                                                )
-                                                                         );
-                    }
-                }
+           allowMove &= arc->remake(top, dx, dy);
+           if (!allowMove) break;
+           movedLines.append(arc);
+        }
+
+        if (allowMove){
+            top->setX(top->x() + dx);
+            top->setY(top->y() + dy);
+        } else {
+            foreach (TArc *arc, movedLines){
+                arc->remake(top, -dx, -dy);
             }
         }
-        //!!old_pos.setX(old_pos.x() + dx);
-        //!!old_pos.setY(old_pos.y() + dy);
 
-        top->setX(top->x() + dx);
-        top->setY(top->y() + dy);
-
+        //íåîáõîäèìî äëÿ ïðàâèëüíîé ïåðåðèñîâêè.
         foreach (TArc *arc, top->allArcs()){
             arc->realloc();
         }
-
-        /*QGraphicsSceneMouseEvent *newEvent =
-                new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMousePress);
-        newEvent->setAccepted(true);
-        newEvent->setPos(mouseEvent->pos());
-        newEvent->setScenePos(mouseEvent->scenePos());
-        newEvent->setScreenPos(mouseEvent->screenPos());
-        newEvent->setButtonDownPos(Qt::LeftButton,
-                                     mouseEvent->buttonDownPos(Qt::LeftButton));
-        newEvent->setButtonDownScreenPos(Qt::LeftButton,
-                                           mouseEvent->buttonDownScreenPos(Qt::LeftButton));
-        newEvent->setButtonDownScenePos(Qt::LeftButton,
-                                          mouseEvent->buttonDownScenePos(Qt::LeftButton));
-        newEvent->setWidget(mouseEvent->widget());
-
-
-        QGraphicsScene::mouseMoveEvent(newEvent);
-        delete newEvent;*/
     }
 }
 
@@ -350,7 +261,7 @@ void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
     if (line != NULL && newArc != NULL && myMode == InsertLine) {
         //delete futureLine;
-        //Ð´ÑƒÐ³Ð° Ð´Ð¾Ð»Ð¶Ð½Ð° Ð½Ð°Ñ‡Ð¸Ð½Ð°Ñ‚ÑŒÑÑ Ñ Ð²ÐµÑ€ÑˆÐ¸Ð½Ñ‹!
+        //äóãà äîëæíà íà÷èíàòüñÿ ñ âåðøèíû!
         if (newArc->startItem() == NULL){
             QList<QGraphicsItem *> startItems = items(line->line().p1());
             while (startItems.count() > 0 && startItems.first()->type() != TTop::Type)
@@ -367,7 +278,7 @@ void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
             }
         }
 
-        //Ð´ÑƒÐ³Ð° Ð´Ð¾Ð»Ð¶Ð½Ð° Ð·Ð°ÐºÐ°Ð½Ñ‡Ð¸Ð²Ð°Ñ‚ÑŒÑÑ Ð²ÐµÑ€ÑˆÐ¸Ð½Ð¾Ð¹
+        //äóãà äîëæíà çàêàí÷èâàòüñÿ âåðøèíîé
         if ((newArc != NULL) && (newArc->endItem() == NULL) && (newArc->prevLine() != NULL)){
             QList<QGraphicsItem *> endItems = items(line->line().p2());
             while (endItems.count() > 0 && endItems.first()->type() != TTop::Type)
@@ -378,7 +289,7 @@ void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
                 newArc->addLine(line);
             }
         }
-        //Ð¿Ð»Ð¾Ñ…Ð°Ñ ÑÐ¸Ñ‚ÑƒÐ°Ñ†Ð¸Ñ, ÐºÐ¾Ð³Ð´Ð° Ð½Ð°Ñ‡Ð°Ð»Ð¾ Ð¸ ÐºÐ¾Ð½ÐµÑ† ÑÐ¾Ð²Ð¿Ð°Ð´Ð°ÑŽÑ‚, Ð½Ð¾ Ð´ÑƒÐ³Ð° Ð¸Ð¼ÐµÐµÑ‚ ÑÐ²Ð½Ð¾ Ð½ÐµÐ¿Ñ€Ð°Ð²Ð¸Ð»Ð½ÑƒÑŽ Ñ„Ð¾Ñ€Ð¼Ñƒ
+        //ïëîõàÿ ñèòóàöèÿ, êîãäà íà÷àëî è êîíåö ñîâïàäàþò, íî äóãà èìååò ÿâíî íåïðàâèëíóþ ôîðìó
         if ((newArc != NULL) && (newArc->endItem() != NULL) && (newArc->startItem() != NULL) &&
             newArc->startItem()->collidesWithItem(newArc->endItem()) && (newArc->lines.count() == 1)){
             delete newArc;
@@ -386,7 +297,7 @@ void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
             line = NULL;
         }
 
-        //ÑƒÑÐ»Ð¾Ð²Ð¸Ðµ Ð²Ñ‹Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÑÑ ÐºÐ¾Ð³Ð´Ð° Ñƒ Ð´ÑƒÐ³Ð¸ Ð±ÑƒÐ´ÐµÑ‚ Ð½Ð°Ñ‡Ð°Ð»Ð¾ Ð¸ ÐºÐ¾Ð½ÐµÑ†!
+        //óñëîâèå âûïîëíèòñÿ êîãäà ó äóãè áóäåò íà÷àëî è êîíåö!
         if ((newArc != NULL) && (newArc->endItem() != NULL) && (newArc->startItem() != NULL)){
             foreach(TArc *arc, newArc->startItem()->outArcs()){
                 arc->setPriority(arc->width+1);
@@ -441,5 +352,4 @@ void QDiagramScene::setCommentMenu(QMenu *menu)
 {
     myCommentMenu = menu;
 }
-
 

@@ -52,89 +52,161 @@ void TArc::rebuild(TTop* aMovedTop, int deltaX, int deltaY)
     DrawWin->BeginArc(aTopFrom,ptBeg);
     while (!DrawWin->BuildArc(ptEnd,anArc));
     DrawWin->EndArc();
-    otr=anArc->otr;
+    otr=anotr;
     for (i=0; i<=otr; i++) pts[i]=anArc->pts[i];
     delete anArc;*/
 }
 
-void TArc::remake(TTop* aMovedTop, int deltaX, int deltaY)
+bool TArc::remake(TTop* aMovedTop, float dx, float dy)
 {
-/*    int mx,my;
-    QPointF pnts[4];
-    int j;
-    bool flag; //РІС‹СЃС€РёР№ РїРёР»РѕС‚Р°Р¶ РЅР°Р·РІР°С‚СЊ РїРµСЂРµРјРµРЅРЅСѓСЋ flag!!!!!!!!!!!!!!!!!!!!
-    int lgdir,lgolddir;
-
-    if (myStartTop==aMovedTop && myEndTop==aMovedTop) {
-        for (j =0; j<=otr; j++)
-            pts[j] += QPointF(deltaX, deltaY);
-    } else {
-        bool fMovedTo = (aMovedTop==myEndTop);
-        if (fMovedTo)
-            for (j=0; j<=otr; j++)
-                pnts[j] = pts[j];
-        else
-            for (j=0; j<=otr; j++)
-                pnts[otr-j] = pts[j];
-        flag = TRUE;
-        switch (otr) {
-            case 1:
-                lgolddir = dvec2log(pnts[1].x() - pnts[0].x(), pnts[1].y() - pnts[0].y());
-                lgdir    = dvec2log(pnts[1].x() + deltaX - pnts[0].x(), pnts[1].y() + deltaY - pnts[0].y());
-                if (lgolddir & lgdir) {
-                    if (!(pnts[1].x() - pnts[0].x()) && !deltaX ||
-                        !(pnts[1].y() - pnts[0].y()) && !deltaY) {
-                        pnts[1] += QPointF(deltaX, deltaY);
-                    } else {
-                        pnts[3].setX(pnts[1].x() + deltaX);
-                        pnts[3].setY(pnts[1].y() + deltaY);
-                        pnts[1].setX(pnts[0].x() + !(!(pnts[1].x() - pnts[0].x())) * (pnts[3].x() - pnts[0].x())*(4 - fMovedTo)/7);
-                        pnts[1].setY(pnts[0].y() + !(!(pnts[1].y() - pnts[0].y())) * (pnts[3].y() - pnts[0].y())*(4 - fMovedTo)/7);
-                        if ((lgdir^lgolddir) & (LEFT | RIGHT))
-                        { mx=1; my=0; }
-                        else { mx=0; my=1; }
-                        pnts[2].x=pnts[1].x+deltaX*mx; pnts[2].y=pnts[1].y+deltaY*my;
-                        otr=3;
-                    }
-                }
-                else flag=FALSE;
-                break;
-            case 2:
-                lgolddir=dvec2log(pnts[2].x-pnts[0].x,pnts[2].y-pnts[0].y);
-                lgdir=dvec2log(pnts[2].x+deltaX-pnts[0].x,
-                               pnts[2].y+deltaY-pnts[0].y);
-                if (lgolddir==lgdir)
-                {
-                    pnts[1].x+=deltaX*!(!(pnts[1].x-pnts[0].x));
-                    pnts[1].y+=deltaY*!(!(pnts[1].y-pnts[0].y));
-                    pnts[2].x+=deltaX; pnts[2].y+=deltaY;
-                }
-                else flag=FALSE;
-                break;
-            case 3:
-                lgolddir=dvec2log(pnts[3].x-pnts[2].x,pnts[3].y-pnts[2].y);
-                lgdir=dvec2log(pnts[3].x+deltaX-pnts[1].x,
-                               pnts[3].y+deltaY-pnts[1].y);
-                if (lgolddir & lgdir)
-                {
-                    pnts[2].x+=deltaX*!(!(pnts[2].x-pnts[1].x));
-                    pnts[2].y+=deltaY*!(!(pnts[2].y-pnts[1].y));
-                    pnts[3].x+=deltaX; pnts[3].y+=deltaY;
-                    if (pnts[1].x==pnts[2].x && pnts[1].y==pnts[2].y)
-                    {
-                        pnts[1]=pnts[3]; otr=1;
-                    }
-                }
-                else flag=FALSE;
-                break;
+    bool result = false;
+    
+    //если передвинутая вершина - начало
+    if (aMovedTop == myStartTop){
+        //вертикальную линию двигаем только вправо/влево или удлинняем/укорачиваем
+        if (lines.first()->line().p1().x() == lines.first()->line().p2().x()){
+            //можно двигать пока остается место для серого квадратика
+            if ((lines.first()->line().length() < 60) || (lines.last()->line().length() < 60)){
+                return false;
             }
-        if (flag)
-            if (fMovedTo)
-                for (j=0; j<=otr; j++) pts[j]=pnts[j];
-        else for (j=0; j<=otr; j++) pts[j]=pnts[otr-j];
-        else Rebuild(aMovedTop,deltaX,deltaY);
+            lines.first()->setLine(QLineF(QPointF(lines.first()->line().p1().x() + dx,
+                                                  lines.first()->line().p1().y() + dy),
+                                          QPointF(lines.first()->line().p2().x() + dx,
+                                                  lines.first()->line().p2().y())
+                                          )
+                                   );
+            //перерисуем следующий кусочек тоже (если он есть)
+            if (lines.count() > 1){
+                lines.at(1)->setLine(QLineF(QPointF(lines.at(1)->line().p1().x() + dx,
+                                                    lines.at(1)->line().p1().y()),
+                                            lines.at(1)->line().p2()
+                                            )
+                                     );
+            //если дуга соединяет вершины напрямую, то ограничим перемещение шириной конечной вершины
+            } else {
+                if ((lines.first()->line().p2().x() < myEndTop->sceneBoundingRect().bottomLeft().x()) ||
+                    (lines.first()->line().p2().x() > myEndTop->sceneBoundingRect().bottomRight().x())){
+                    lines.first()->setLine(QLineF(QPointF(lines.first()->line().p1().x() - dx,
+                                                          lines.first()->line().p1().y() - dy),
+                                                  QPointF(lines.first()->line().p2().x() - dx,
+                                                          lines.first()->line().p2().y())
+                                                  )
+                                           );
+                    return false;
+                }
+            }
+
+            return true;
+        }
+        //горизонтальную линию можем двигать только вверх/вниз или удлиннять/укорачивать
+        if (lines.first()->line().p1().y() == lines.first()->line().p2().y()){
+            if ((lines.first()->line().length() < 60) || (lines.last()->line().length() < 60)){
+                return false;
+            }
+
+            lines.first()->setLine(QLineF(QPointF(lines.first()->line().p1().x() + dx,
+                                                  lines.first()->line().p1().y() + dy),
+                                          QPointF(lines.first()->line().p2().x(),
+                                                  lines.first()->line().p2().y() + dy)
+                                          )
+                                   );
+            //перерисуем следующий кусочек тоже (если он есть)
+            if (lines.count() > 1){
+                lines.at(1)->setLine(QLineF(QPointF(lines.at(1)->line().p1().x(),
+                                                    lines.at(1)->line().p1().y() + dy),
+                                            lines.at(1)->line().p2()
+                                            )
+                                     );
+            //если дуга соединяет вершины напрямую, то ограничим перемещение шириной конечной вершины
+            } else {
+                if ((lines.first()->line().p2().y() > myEndTop->sceneBoundingRect().bottomLeft().y()) ||
+                    (lines.first()->line().p2().y() < myEndTop->sceneBoundingRect().topLeft().y())){
+                    lines.first()->setLine(QLineF(QPointF(lines.first()->line().p1().x() - dx,
+                                                          lines.first()->line().p1().y() - dy),
+                                                  QPointF(lines.first()->line().p2().x(),
+                                                          lines.first()->line().p2().y() - dy)
+                                                  )
+                                           );
+                    return false;
+                }
+            }
+            return true;
+        }
     }
-    DrawWin->Invalidate();*/
+    //для тех у кого эта вершина - конец
+    if (aMovedTop == myEndTop){
+        //вертикальную линию двигаем только вправо/влево или удлинняем/укорачиваем
+        if (lines.last()->line().p1().x() == lines.last()->line().p2().x()){
+            if ((lines.first()->line().length() < 60) || (lines.last()->line().length() < 60)){
+                return false;
+            }
+
+            lines.last()->setLine(QLineF(QPointF(lines.last()->line().p1().x() + dx,
+                                                 lines.last()->line().p1().y()),
+                                         QPointF(lines.last()->line().p2().x() + dx,
+                                                 lines.last()->line().p2().y() + dy)
+                                         )
+                                  );
+            //перерисуем следующий кусочек тоже (если он есть)
+            if (lines.count() > 1){
+                lines.at(lines.count()-2)->setLine(QLineF(lines.at(lines.count()-2)->line().p1(),
+                                                          QPointF(lines.at(lines.count()-2)->line().p2().x() + dx,
+                                                                  lines.at(lines.count()-2)->line().p2().y())
+                                                          )
+                                                   );
+            //если дуга соединяет вершины напрямую, то ограничим перемещение шириной начальной вершины
+            } else {
+                if ((lines.last()->line().p2().x() < myStartTop->sceneBoundingRect().bottomLeft().x()) ||
+                    (lines.last()->line().p2().x() > myStartTop->sceneBoundingRect().bottomRight().x())){
+                    lines.last()->setLine(QLineF(QPointF(lines.last()->line().p1().x() - dx,
+                                                         lines.last()->line().p1().y()),
+                                                 QPointF(lines.last()->line().p2().x() - dx,
+                                                         lines.last()->line().p2().y() - dy)
+                                                 )
+                                          );
+                    return false;
+                }
+            }
+            return true;
+        }
+        //горизонтальную линию можем двигать только вверх/вниз или удлиннять/укорачивать
+        if (lines.last()->line().p1().y() == lines.last()->line().p2().y()){
+            if ((lines.first()->line().length() < 60) || (lines.last()->line().length() < 60)){
+                return false;
+            }
+
+            lines.last()->setLine(QLineF(QPointF(lines.last()->line().p1().x(),
+                                                 lines.last()->line().p1().y() + dy),
+                                         QPointF(lines.last()->line().p2().x() + dx,
+                                                 lines.last()->line().p2().y() + dy)
+                                         )
+                                  );
+            //перерисуем следующий кусочек тоже (если он есть)
+            if (lines.count() > 1){
+                lines.at(lines.count()-2)->setLine(QLineF(lines.at(lines.count()-2)->line().p1(),
+                                                          QPointF(lines.at(lines.count()-2)->line().p2().x(),
+                                                                  lines.at(lines.count()-2)->line().p2().y() + dy)
+                                                          )
+                                                   );
+            //если дуга соединяет вершины напрямую, то ограничим перемещение шириной начальной вершины
+            } else {
+                if ((lines.last()->line().p2().y() > myStartTop->sceneBoundingRect().bottomLeft().y()) ||
+                    (lines.last()->line().p2().y() < myStartTop->sceneBoundingRect().topLeft().y())){
+                    lines.last()->setLine(QLineF(QPointF(lines.last()->line().p1().x(),
+                                                         lines.last()->line().p1().y() - dy),
+                                                 QPointF(lines.last()->line().p2().x() - dx,
+                                                         lines.last()->line().p2().y() - dy)
+                                                 )
+                                          );
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+    //если мы попали сюда, то что то не так!!!!
+    //вернем-ка false на всякий случай
+    return false;
 }
 
 /********************************************************************/
@@ -162,7 +234,7 @@ TArc::~TArc()
 
 QRectF TArc::boundingRect() const
 {
-    qreal extra = (pen().width() + 20) / 2.0;
+    qreal extra = width*(pen().width() + 20) / 2.0;
 
     return QRectF(line().p1(), QSizeF(line().p2().x() - line().p1().x(),
                                       line().p2().y() - line().p1().y()))
@@ -170,14 +242,6 @@ QRectF TArc::boundingRect() const
         .adjusted(-extra, -extra, extra, extra);
 
 }
-
-   /* qreal extra = (pen().width() + 20) / 2.0;
-
-    if ((myStartTop != NULL) && (myEndTop != NULL))
-        return QRectF(myStartTop->pos(), myEndTop->pos())
-        .normalized()
-        .adjusted(-extra, -extra, extra, extra);
-}*/
 
 QPainterPath TArc::shape() const
 {
@@ -459,7 +523,6 @@ void TArc::realloc(){
     QLineF startTopBorder;
     QLineF endTopBorder;
 
-    //РїРѕРґРѕРіРЅР°С‚СЊ РЅР°С‡Р°Р»СЊРЅСѓСЋ Рё РєРѕРЅРµС‡РЅСѓСЋ С‚РѕС‡РєРё РґСѓРіРё Рє РєСЂР°СЋ РІРµСЂС€РёРЅС‹
     if ((myStartTop != NULL) && (myEndTop != NULL)) {
         startTopBorder = myStartTop->getIntersectBound(lines.first()->line());
         endTopBorder   = myEndTop->getIntersectBound(lines.last()->line());
@@ -500,6 +563,27 @@ TArcTop::TArcTop(QMenu *contextMenu, QGraphicsItem *parent, QGraphicsScene *scen
     setFlag(QGraphicsItem::ItemIsMovable, false);
     setBrush(QBrush(Qt::gray, Qt::SolidPattern));
     setPolygon(myPolygon);
+}
+
+void TArcTop::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+                    QWidget *widget)
+{
+    QGraphicsPolygonItem::paint(painter, option, widget);
+
+    TArc* arc;
+    arc = qgraphicsitem_cast<TArc *>(parentItem());
+
+    if (isSelected()) {
+        foreach(TArcLine *arcLine, arc->lines)
+        {
+            painter->setPen(QPen(Qt::black, 2, Qt::DashLine));
+            QLineF myLine = arcLine->line();
+            myLine.translate(4.0, 4.0);
+            painter->drawLine(myLine);
+            myLine.translate(-8.0,-8.0);
+            painter->drawLine(myLine);
+        }
+    }
 }
 
 TArcLine::TArcLine(TArc *owner, QLineF line, QGraphicsItem *parent, QGraphicsScene *scene)
