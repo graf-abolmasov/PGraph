@@ -405,7 +405,10 @@ void TArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
             line->update();
         }
         //отображаем серый квадратик
-        arcTop->setPos(lines.first()->line().p1() + QPointF(cos(lines.first()->line().angle() * Pi / 180) * 60, -sin(lines.first()->line().angle() * Pi / 180) * 60));
+        QPointF intersectPoint;
+        myStartTop->getIntersectBound(lines.first()->line()).intersect(lines.first()->line(), &intersectPoint);
+        float koeff = QLineF(lines.first()->line().p1(), intersectPoint).length() + 15; //��� =)
+        arcTop->setPos(lines.first()->line().p1() + QPointF(cos(lines.first()->line().angle() * Pi / 180) * koeff, -sin(lines.first()->line().angle() * Pi / 180) * koeff));
         arcTop->show();
         //рисуем стрелку
         QPen myPen = pen();
@@ -413,9 +416,9 @@ void TArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
         painter->setPen(myPen);
         painter->setBrush(myColor);
         double angle = ((myEndTop->getIntersectBound(lines.last()->line()).normalVector().angle()) + 180) * Pi / 180;
-        QPointF arcP1 = lines.last()->line().p2() + QPointF(sin(angle + Pi / 3) * 6*width,
+        QPointF arcP1 = lines.last()->line().p2() + QPointF(sin(angle + Pi / 3) * 4*width,
                                               cos(angle + Pi / 3) * 4*width);
-        QPointF arcP2 = lines.last()->line().p2() + QPointF(sin(angle + Pi - Pi / 3) * 6*width,
+        QPointF arcP2 = lines.last()->line().p2() + QPointF(sin(angle + Pi - Pi / 3) * 4*width,
                                               cos(angle + Pi - Pi / 3) * 4*width);
 
         arcHead.clear();
