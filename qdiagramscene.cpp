@@ -187,7 +187,7 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
             }
         }
         //проверим чтобы начальная точка не вылезла из вершины!
-        if (!(arc->endItem()->sceneBoundingRect().contains(arc->lines.last()->line().p2()) &&
+        if ((arc->endItem()->sceneBoundingRect().contains(arc->lines.last()->line().p2()) &&
               arc->startItem()->sceneBoundingRect().contains(arc->lines.first()->line().p1()))){
 
             //вправо-влево можно двигать только вертикальные линии (пока)

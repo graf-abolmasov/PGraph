@@ -51,8 +51,6 @@ void TArc::rebuild(TTop* aMovedTop, float deltaX, float deltaY)
 }
 
 bool TArc::autoBuild(){
-    float newX, newY, deltaX, deltaY;
-    bool flag = false;
 
     foreach(TArcLine* line, lines){
         delete line;
