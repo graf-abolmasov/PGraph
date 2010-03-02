@@ -91,8 +91,9 @@ void QDiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
     TTop* item = new TTop(myItemType, myItemMenu);
     switch (myMode) {
     case InsertItem:
-        //item->setBrush(QBrush(Qt::white,Qt::SolidPattern));
-        item->setBrush(myItemColor);
+        item->setBrush(QBrush(Qt::gray,Qt::SolidPattern));
+        //item->setBrush(myItemColor); //прозрачный цвет
+        item->setZValue(1000);
         addItem(item);
         item->setPos(mouseEvent->scenePos());
         emit itemInserted(item);
@@ -166,27 +167,43 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
         float dx = vector.dx();
         float dy = vector.dy();
 
-        //не разрешать двигать начальную и конечный кусочек дуги (пока)
-        if (!((arc->lines.first() == selectedLine) || (arc->lines.last() == selectedLine))){
-            TArcLine *prevLine = arc->lines.at(arc->lines.indexOf(selectedLine) - 1);
-            TArcLine *nextLine = arc->lines.at(arc->lines.indexOf(selectedLine) + 1);
+        /*//не разрешать двигать начальную и конечный кусочек дуги (пока)
+        if (!((arc->lines.first() == selectedLine) || (arc->lines.last() == selectedLine))){*/
+        TArcLine *prevLine;
+        TArcLine *nextLine;
+        if (arc->lines.count() == 1){
+            prevLine = NULL;
+            nextLine = NULL;
+        } else {
+            if (selectedLine == arc->lines.first()){
+                nextLine = prevLine = arc->lines.at(1);
+                prevLine = NULL;
+            } else if (selectedLine == arc->lines.last()){
+                prevLine = arc->lines.at(arc->lines.indexOf(selectedLine) - 1);
+                nextLine = NULL;
+            } else {
+                prevLine = arc->lines.at(arc->lines.indexOf(selectedLine) - 1);
+                nextLine = arc->lines.at(arc->lines.indexOf(selectedLine) + 1);
+            }
+        }
+        //проверим чтобы начальная точка не вылезла из вершины!
+        if (!(arc->endItem()->sceneBoundingRect().contains(arc->lines.last()->line().p2()) &&
+              arc->startItem()->sceneBoundingRect().contains(arc->lines.first()->line().p1()))){
 
             //вправо-влево можно двигать только вертикальные линии (пока)
             if (selectedLine->line().p1().x() == selectedLine->line().p2().x()){
-                //if (((arc->lines.first()->line().length() < 60) && (prevLine == arc->lines.first())) ||
-                //    ((arc->lines.last()->line().length() < 60) && (nextLine == arc->lines.last())))
-                //    dx = 0;
-
-                prevLine->setLine(QLineF(prevLine->line().p1(),
-                                         QPointF(prevLine->line().p2().x() + dx,
-                                                 prevLine->line().p1().y())
-                                         )
-                                  );
-                nextLine->setLine(QLineF(QPointF(nextLine->line().p1().x() + dx,
-                                                 nextLine->line().p1().y()
-                                                 ),
-                                         nextLine->line().p2())
-                                  );
+                if (prevLine != NULL)
+                    prevLine->setLine(QLineF(prevLine->line().p1(),
+                                             QPointF(prevLine->line().p2().x() + dx,
+                                                     prevLine->line().p1().y())
+                                             )
+                                      );
+                if (nextLine != NULL)
+                    nextLine->setLine(QLineF(QPointF(nextLine->line().p1().x() + dx,
+                                                     nextLine->line().p1().y()
+                                                     ),
+                                             nextLine->line().p2())
+                                      );
                 selectedLine->setLine(QLineF(QPointF(selectedLine->line().p1().x() + dx,
                                                      selectedLine->line().p1().y()),
                                              QPointF(selectedLine->line().p2().x() + dx,
@@ -197,19 +214,18 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
             //вверх-вниз можно двигать только горизонтальные линии (пока)
             if (selectedLine->line().p1().y() == selectedLine->line().p2().y()){
-                //if (((arc->lines.first()->line().length() < 60) && (prevLine == arc->lines.first())) ||
-                //    ((arc->lines.last()->line().length() < 60) && (nextLine == arc->lines.last())))
-                //    dy = 0;
-                prevLine->setLine(QLineF(prevLine->line().p1(),
-                                         QPointF(prevLine->line().p2().x(),
-                                                 prevLine->line().p2().y() + dy)
-                                         )
-                                  );
-                nextLine->setLine(QLineF(QPointF(nextLine->line().p1().x(),
-                                                 nextLine->line().p1().y() + dy),
-                                         nextLine->line().p2()
-                                         )
-                                  );
+                if (prevLine != NULL)
+                    prevLine->setLine(QLineF(prevLine->line().p1(),
+                                             QPointF(prevLine->line().p2().x(),
+                                                     prevLine->line().p2().y() + dy)
+                                             )
+                                      );
+                if (nextLine != NULL)
+                    nextLine->setLine(QLineF(QPointF(nextLine->line().p1().x(),
+                                                     nextLine->line().p1().y() + dy),
+                                             nextLine->line().p2()
+                                             )
+                                      );
                 selectedLine->setLine(QLineF(QPointF(selectedLine->line().p1().x(),
                                                      selectedLine->line().p1().y() + dy),
                                              QPointF(selectedLine->line().p2().x(),
@@ -218,7 +234,7 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
                                       );
             }
         }
-
+        arc->updateBounds();
     }
     //режим перетаскивания вершины
     else if ((myMode == MoveItem) && (mouseEvent->buttons() == Qt::LeftButton) &&
@@ -230,29 +246,26 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
         QLineF vector(old_pos, new_pos);
         float dx = vector.dx();
         float dy = vector.dy();
-        //float newDX, newDY;
 
-        bool allowMove = true;
+        bool isOK = false; //false - если дугу надо полностью переделать
 
-        QList<TArc *> movedLines; //список будет содержать обработанные дуги
+        QList<TArc *> brokenLines; //список будет содержать обработанные дуги
         foreach (TArc *arc, top->allArcs()){
-           allowMove &= arc->remake(top, dx, dy);
-           if (!allowMove) break;
-           movedLines.append(arc);
+           isOK = arc->remake(top, dx, dy);
+           if (!isOK)
+               brokenLines.append(arc);
         }
 
-        if (allowMove){
-            top->setX(top->x() + dx);
-            top->setY(top->y() + dy);
-        } else {
-            foreach (TArc *arc, movedLines){
-                arc->remake(top, -dx, -dy);
+        top->setX(top->x() + dx);
+        top->setY(top->y() + dy);
+
+        foreach (TArc *arc, brokenLines){
+                arc->autoBuild();
             }
-        }
 
         //необходимо для правильной перерисовки.
         foreach (TArc *arc, top->allArcs()){
-            arc->realloc();
+            arc->updateBounds();
         }
     }
 }
@@ -304,8 +317,10 @@ void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
             }
             newArc->startItem()->addArc(newArc);
             newArc->endItem()->addArc(newArc);
-            newArc->realloc();
+            //newArc->realloc();
+            newArc->updateBounds();
             update();
+            newArc->currentLine = NULL;
             newArc = NULL;
             line = NULL;
         }

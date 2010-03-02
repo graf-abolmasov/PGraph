@@ -1,6 +1,7 @@
 #include <QtGui>
 #include "qarc.h"
 #include <math.h>
+#include <time.h>
 
 const qreal Pi = 3.14;
 const int MINDELTA = 40;
@@ -8,28 +9,20 @@ const int MINDELTA = 40;
 /**********************************************************************
 *			 Misc functions 			      *
 **********************************************************************/
-/*РєР°СЂР°РЅС‚РёРЅ************************************************************/
 //from arc.cpp
-int dvec2log(int dx,int dy)
+int dvec2log(float dx, float dy)
 {
-    int res=0;
+    int res = 0;
 
-    if (dx>0) res |= RIGHT;
-    else if (dx<0) res |= LEFT;
-    if (dy>0) res |= DOWN;
-    else if (dy<0) res |= UP;
+    if (dx > 0) res |= RIGHT;
+    else if (dx < 0) res |= LEFT;
+    if (dy > 0) res |= DOWN;
+    else if (dy < 0) res |= UP;
     return res;
 }
 
-inline int Sign(float d)
-{
-    return (!d) ? 0 : (d>0) ? 1 : -1;
-}
 
-inline int min(int x, int y) { return (x<y) ? x : y; }
-inline int max(int x, int y) { return (x>y) ? x : y; }
-
-void TArc::rebuild(TTop* aMovedTop, int deltaX, int deltaY)
+void TArc::rebuild(TTop* aMovedTop, float deltaX, float deltaY)
 {
     /*int i;
     QPointF ptBeg, ptEnd;
@@ -57,16 +50,154 @@ void TArc::rebuild(TTop* aMovedTop, int deltaX, int deltaY)
     delete anArc;*/
 }
 
+bool TArc::autoBuild(){
+    float newX, newY, deltaX, deltaY;
+    bool flag = false;
+
+    foreach(TArcLine* line, lines){
+        delete line;
+        line = NULL;
+    }
+    lines.clear();
+
+/*  double x = double(rand())/RAND_MAX;// rand();
+
+    QPointF startP = QPointF(x*(myStartTop->sceneBoundingRect().topRight().x() - myStartTop->sceneBoundingRect().topLeft().x()) + myStartTop->sceneBoundingRect().topLeft().x(),
+                             x*(myStartTop->sceneBoundingRect().bottomRight().y() - myStartTop->sceneBoundingRect().topRight().y()) + myStartTop->sceneBoundingRect().topRight().y());
+
+    QPointF endP = QPointF(x*(myEndTop->sceneBoundingRect().topRight().x() - myEndTop->sceneBoundingRect().topLeft().x()) + myEndTop->sceneBoundingRect().topLeft().x(),
+                           x*(myEndTop->sceneBoundingRect().bottomRight().y() - myEndTop->sceneBoundingRect().topRight().y()) + myEndTop->sceneBoundingRect().topRight().y());
+
+    QLineF startLine = QLineF(startP, QPointF(startP.x(), endP.y()));
+    QLineF endLine = QLineF(QPointF(startP.x(), endP.y()), endP);
+*/
+    QLineF endLine = QLineF(QPointF(myStartTop->scenePos().x(), myEndTop->scenePos().y()), myEndTop->scenePos());
+    QLineF startLine = QLineF(myStartTop->scenePos(), QPointF(myStartTop->scenePos().x(), myEndTop->scenePos().y()));
+
+    newLine(startLine.p1(), startLine.p2());
+    newLine(endLine.p1(), endLine.p2());
+    addLine(currentLine);
+
+    currentLine = NULL;
+}
+
 bool TArc::remake(TTop* aMovedTop, float dx, float dy)
 {
-    bool result = false;
+    bool result = true;
+
+    int mx, my, j;
+    QPointF pnts[4];
+    bool flag; //false - если надо все напрочь переделать
+    int lgdir, lgolddir;
+
+    if (lines.count() < 4){
+        //старый алгоритм
+        //переработано, дополнено, прокоментировано
+        //заполняем структуры, необходимые для старого алгоритма
+        int otr = lines.count();
+        QPointF pts[4];
+        for(int i = 0; i < otr; i++){
+            pts[i] = lines.at(i)->line().p1();
+            pts[i+1] = lines.at(i)->line().p2();
+        }
+
+        if ((myStartTop == aMovedTop) && (myEndTop == aMovedTop)){
+            for (j = 0; j <= otr; j++)
+                pts[j] += QPointF(dx, dy);
+        } else {
+            bool fMovedTo = (aMovedTop == myEndTop);
+            if (fMovedTo) //двигали конечную вершину
+                for (j = 0; j <= otr; j++)
+                    pnts[j] = pts[j];
+            else //двигали начальную вершину
+                for (j = 0; j <= otr; j++)
+                    pnts[otr-j] = pts[j];
+            flag = true;
+            switch(otr) {
+            case 1:
+                lgolddir = dvec2log(pnts[1].x() - pnts[0].x(), pnts[1].y() - pnts[0].y());
+                lgdir    = dvec2log(pnts[1].x() + dx - pnts[0].x(), pnts[1].y() + dy - pnts[0].y());
+                if (lgolddir & lgdir){
+                    if (!(pnts[1].x() - pnts[0].x()) && !dx ||
+                        !(pnts[1].y() - pnts[0].y()) && !dy){
+                        pnts[1] += QPointF(dx, dy);
+                    } else {
+                        pnts[3] = pnts[1] + QPointF(dx, dy);
+                        pnts[1].setX(pnts[0].x() + !(!(pnts[1].x() - pnts[0].x()))*(pnts[3].x() - pnts[0].x())*(4-fMovedTo)/7);
+                        pnts[1].setY(pnts[0].y() + !(!(pnts[1].y() - pnts[0].y()))*(pnts[3].y() - pnts[0].y())*(4-fMovedTo)/7);
+                        if ((lgdir^lgolddir) & (LEFT | RIGHT)){
+                            mx=1;
+                            my=0;
+                        } else {
+                            mx=0;
+                            my=1;
+                        }
+                        pnts[2] = pnts[1] + QPointF(dx*mx, dy*my);
+                        otr=3;
+                    }
+                }
+                else flag = false;
+                break;
+            case 2:
+                lgolddir = dvec2log(pnts[2].x() - pnts[0].x(), pnts[2].y() - pnts[0].y());
+                lgdir    = dvec2log(pnts[2].x() + dx - pnts[0].x(), pnts[2].y() + dy - pnts[0].y());
+                if (lgolddir == lgdir){
+                    pnts[1] += QPointF(dx*!(!(pnts[1].x() - pnts[0].x())), dy*!(!(pnts[1].y()-pnts[0].y())));
+                    pnts[2] += QPointF(dx, dy);
+                }
+                else flag = false;
+                break;
+            case 3:
+                lgolddir = dvec2log(pnts[3].x() - pnts[2].x(), pnts[3].y() - pnts[2].y());
+                lgdir    = dvec2log(pnts[3].x() + dx - pnts[1].x(), pnts[3].y() + dy - pnts[1].y());
+                if (lgolddir & lgdir){
+                    pnts[2] += QPointF(dx*!(!(pnts[2].x() - pnts[1].x())), dy*!(!(pnts[2].y() - pnts[1].y())));
+                    pnts[3] += QPointF(dx, dy);
+                    if (pnts[1].x() == pnts[2].x() && pnts[1].y() == pnts[2].y()){
+                        pnts[1] = pnts[3];
+                        otr = 1;
+                    }
+                }
+                else flag = false;
+                break;
+            }
+            if (flag) {
+                if (fMovedTo){
+                    for (j = 0; j <= otr; j++)
+                        pts[j] = pnts[j];
+                } else {
+                    for (j = 0; j <= otr; j++)
+                        pts[j] = pnts[otr-j];
+                }
+            } else {
+                //нужна полная перерисвка
+                result = false;
+                //otr = 0;
+            }
+        }
+
+        //теперь в pts новые точки =) якобы. проверим это.
+        foreach(TArcLine* line, lines){
+            delete line;
+            line = NULL;
+        }
+        lines.clear();
+        currentLine = NULL;
+        for (j = 0; j < otr; j++){
+            newLine(pts[j], pts[j+1]);
+        }
+        addLine(currentLine);
+        currentLine = NULL;
+
+        return result;
+    }
     
     //если передвинутая вершина - начало
     if (aMovedTop == myStartTop){
         //вертикальную линию двигаем только вправо/влево или удлинняем/укорачиваем
         if (lines.first()->line().p1().x() == lines.first()->line().p2().x()){
             //можно двигать пока остается место для серого квадратика
-            if ((lines.first()->line().length() < 60) || (lines.last()->line().length() < 60)){
+            if ((lines.first()->line().length() < MINDELTA) || (lines.last()->line().length() < MINDELTA)){
                 return false;
             }
             lines.first()->setLine(QLineF(QPointF(lines.first()->line().p1().x() + dx,
@@ -100,7 +231,7 @@ bool TArc::remake(TTop* aMovedTop, float dx, float dy)
         }
         //горизонтальную линию можем двигать только вверх/вниз или удлиннять/укорачивать
         if (lines.first()->line().p1().y() == lines.first()->line().p2().y()){
-            if ((lines.first()->line().length() < 60) || (lines.last()->line().length() < 60)){
+            if ((lines.first()->line().length() < MINDELTA) || (lines.last()->line().length() < MINDELTA)){
                 return false;
             }
 
@@ -137,7 +268,7 @@ bool TArc::remake(TTop* aMovedTop, float dx, float dy)
     if (aMovedTop == myEndTop){
         //вертикальную линию двигаем только вправо/влево или удлинняем/укорачиваем
         if (lines.last()->line().p1().x() == lines.last()->line().p2().x()){
-            if ((lines.first()->line().length() < 60) || (lines.last()->line().length() < 60)){
+            if ((lines.first()->line().length() < MINDELTA) || (lines.last()->line().length() < MINDELTA)){
                 return false;
             }
 
@@ -171,7 +302,7 @@ bool TArc::remake(TTop* aMovedTop, float dx, float dy)
         }
         //горизонтальную линию можем двигать только вверх/вниз или удлиннять/укорачивать
         if (lines.last()->line().p1().y() == lines.last()->line().p2().y()){
-            if ((lines.first()->line().length() < 60) || (lines.last()->line().length() < 60)){
+            if ((lines.first()->line().length() < MINDELTA) || (lines.last()->line().length() < MINDELTA)){
                 return false;
             }
 
@@ -276,7 +407,7 @@ void TArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
             line->update();
         }
         //РѕС‚РѕР±СЂР°Р¶Р°РµРј СЃРµСЂС‹Р№ РєРІР°РґСЂР°С‚РёРє
-        arcTop->setPos(lines.first()->line().p1() + QPointF(cos(lines.first()->line().angle() * Pi / 180) * 20, -sin(lines.first()->line().angle() * Pi / 180) * 20));
+        arcTop->setPos(lines.first()->line().p1() + QPointF(cos(lines.first()->line().angle() * Pi / 180) * 60, -sin(lines.first()->line().angle() * Pi / 180) * 60));
         arcTop->show();
         //СЂРёСЃСѓРµРј СЃС‚СЂРµР»РєСѓ
         QPen myPen = pen();
@@ -530,8 +661,13 @@ void TArc::realloc(){
         lines.first()->setLine(QLineF(startP, lines.first()->line().p2()));
         endTopBorder.intersect(lines.last()->line(), &endP);
         lines.last()->setLine(QLineF(lines.last()->line().p1(), endP));
-        setLine(QLineF(startP, endP));
     }
+}
+
+void TArc::updateBounds(){
+    //setLine(QLineF(myStartTop->scenePos(),myEndTop->scenePos()));
+    if (lines.count() > 0)
+        setLine(QLineF(lines.first()->line().p1(), lines.last()->line().p2()));
 }
 
 void TArc::setPriority(int w){

@@ -118,6 +118,35 @@ QList<TArc *> TTop::getArcsAtBound(QLineF bound)
     return result;
 }
 
+void TTop::autoArrangeArcsAtBound(QLineF bound){
+
+    QList<TArc*> arcs = getArcsAtBound(bound);
+    float dist = bound.length()/(arcs.count() + 1);
+    int i = 1;
+    
+    foreach (TArc* arc, arcs){
+        if (arc->startItem() == this){
+            if (arc->lines.first()->line().y1() == arc->lines.first()->line().y2()){
+                arc->lines.first()->setLine(arc->lines.first()->line().p1().x(), sceneBoundingRect().topLeft().y() + i*dist, arc->lines.first()->line().p2().x(), sceneBoundingRect().topLeft().y() + i*dist);
+            }
+
+            if (arc->lines.first()->line().x1() == arc->lines.first()->line().x2()){
+                arc->lines.first()->setLine(sceneBoundingRect().topLeft().x() + i*dist, arc->lines.first()->line().p1().y(), sceneBoundingRect().topLeft().x() + i*dist, arc->lines.first()->line().p2().y());
+            }
+        }
+        if (arc->endItem() == this){
+            if (arc->lines.last()->line().y1() == arc->lines.last()->line().y2()){
+                arc->lines.last()->setLine(arc->lines.last()->line().p1().x(), sceneBoundingRect().topLeft().y() + i*dist, arc->lines.last()->line().p2().x(), sceneBoundingRect().topLeft().y() + i*dist);
+            }
+
+            if (arc->lines.last()->line().x1() == arc->lines.last()->line().x2()){
+                arc->lines.last()->setLine(sceneBoundingRect().topLeft().x() + i*dist, arc->lines.last()->line().p1().y(), sceneBoundingRect().topLeft().x() + i*dist, arc->lines.last()->line().p2().y());
+            }
+        }
+        i++;
+    }
+}
+
 /*
   возвращает границу по которой пересекается с линией
   line - линия

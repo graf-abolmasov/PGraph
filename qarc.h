@@ -112,8 +112,10 @@ public:
     }
 
     bool remake(TTop *, float dx, float dy);
-    void rebuild(TTop *, int, int);
+    void rebuild(TTop *, float dx, float dy); //!! deprecated
     void realloc();
+    bool autoBuild();
+    void updateBounds();
 public slots:
     void updatePosition();
 

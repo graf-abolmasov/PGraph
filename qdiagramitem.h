@@ -35,6 +35,7 @@ public:
     QList<TArc *> getArcsAtBound(int i);
     QList<TArc *> getArcsAtBound(QLineF bound);
     QLineF getIntersectBound(QLineF line);
+    void autoArrangeArcsAtBound(QLineF bound);
     DiagramType diagramType() const
         { return myDiagramType; }
     QPolygonF polygon() const
