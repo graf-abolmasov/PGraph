@@ -407,7 +407,7 @@ void TArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
         //отображаем серый квадратик
         QPointF intersectPoint;
         myStartTop->getIntersectBound(lines.first()->line()).intersect(lines.first()->line(), &intersectPoint);
-        float koeff = QLineF(lines.first()->line().p1(), intersectPoint).length() + 15; //��� =)
+        float koeff = QLineF(lines.first()->line().p1(), intersectPoint).length() + 15 > lines.first()->line().length() ? lines.first()->line().length() : QLineF(lines.first()->line().p1(), intersectPoint).length() + 15; //��� =)
         arcTop->setPos(lines.first()->line().p1() + QPointF(cos(lines.first()->line().angle() * Pi / 180) * koeff, -sin(lines.first()->line().angle() * Pi / 180) * koeff));
         arcTop->show();
         //рисуем стрелку
@@ -416,10 +416,10 @@ void TArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
         painter->setPen(myPen);
         painter->setBrush(myColor);
         double angle = ((myEndTop->getIntersectBound(lines.last()->line()).normalVector().angle()) + 180) * Pi / 180;
-        QPointF arcP1 = lines.last()->line().p2() + QPointF(sin(angle + Pi / 3) * 4*width,
-                                              cos(angle + Pi / 3) * 4*width);
-        QPointF arcP2 = lines.last()->line().p2() + QPointF(sin(angle + Pi - Pi / 3) * 4*width,
-                                              cos(angle + Pi - Pi / 3) * 4*width);
+        QPointF arcP1 = lines.last()->line().p2() + QPointF(sin(angle + Pi / 3) * 3*width,
+                                              cos(angle + Pi / 3) * 3*width);
+        QPointF arcP2 = lines.last()->line().p2() + QPointF(sin(angle + Pi - Pi / 3) * 3*width,
+                                              cos(angle + Pi - Pi / 3) * 3*width);
 
         arcHead.clear();
         arcHead << lines.last()->line().p2() << arcP1 << arcP2;
@@ -637,10 +637,10 @@ bool TArc::addLine(TArcLine *line){
 
 TArcLine* TArc::newLine(QPointF p1, QPointF p2){
     if (currentLine == NULL)
-        currentLine = new TArcLine(this, QLineF(p1, p2), this, scene());
+        currentLine = new TArcLine( /*this,*/ QLineF(p1, p2), this, scene());
     else {
         addLine(currentLine);
-        currentLine = new TArcLine(this, QLineF(prevLine()->line().p2(), p2), this, scene());
+        currentLine = new TArcLine(/*this,*/ QLineF(prevLine()->line().p2(), p2), this, scene());
     }
     currentLine->setPen(QPen(QBrush(Qt::black,Qt::SolidPattern),2,Qt::SolidLine));
     currentLine->setFlag(QGraphicsItem::ItemIsMovable, true);
@@ -685,7 +685,7 @@ void TArcTop::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
     scene()->clearSelection();
     setSelected(true);
-    myContextMenu->exec(event->screenPos());
+    myContextMenu->popup(event->screenPos());
 }
 
 TArcTop::TArcTop(QMenu *contextMenu, QGraphicsItem *parent, QGraphicsScene *scene)
@@ -723,8 +723,39 @@ void TArcTop::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
     }
 }
 
-TArcLine::TArcLine(TArc *owner, QLineF line, QGraphicsItem *parent, QGraphicsScene *scene)
+void TArcTop::mousePressEvent(QGraphicsSceneMouseEvent *event){
+    /*TArc* arc;
+    arc = qgraphicsitem_cast<TArc *>(parentItem());
+    if (event->buttons() == Qt::LeftButton){
+        QGraphicsPolygonItem::mousePressEvent(event);
+        event->ignore();
+    }
+    else*/
+    QGraphicsPolygonItem::mousePressEvent(event);
+}
+
+void TArcTop::mouseMoveEvent(QGraphicsSceneMouseEvent *event){
+    /*TArc* arc;
+    arc = qgraphicsitem_cast<TArc *>(parentItem());
+    if (event->buttons() == Qt::LeftButton)
+        arc->lines.first()->mouseMoveEvent(event);
+    event->ignore();*/
+    QGraphicsPolygonItem::mouseMoveEvent(event);
+}
+void TArcTop::mouseReleaseEvent(QGraphicsSceneMouseEvent *event){
+    /*TArc* arc;
+    arc = qgraphicsitem_cast<TArc *>(parentItem());
+    if (event->buttons() == Qt::LeftButton)
+        arc->lines.first()->mouseReleaseEvent(event);
+    if (event->buttons() == Qt::LeftButton){
+        QGraphicsPolygonItem::mousePressEvent(event);
+        event->ignore();}
+    else*/
+    QGraphicsPolygonItem::mousePressEvent(event);
+}
+
+TArcLine::TArcLine(/*TArc *owner,*/ QLineF line, QGraphicsItem *parent, QGraphicsScene *scene)
     : QGraphicsLineItem(line, parent, scene)
 {
-    myOwner = owner;
+    /*myOwner = owner;*/
 }

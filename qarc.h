@@ -50,6 +50,10 @@ protected:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                QWidget *widget = 0);
+    void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+
 
 private:
     QMenu *myContextMenu;
@@ -60,14 +64,14 @@ class TArcLine : public QGraphicsLineItem
 public:
     enum { Type = ARC_LINE_TYPE };
 
-    TArcLine(TArc *owner, QLineF line, QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
+    TArcLine(/*TArc *owner,*/ QLineF line, QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
     int type() const
     { return Type;}
     TArc* owner() const
-    { return myOwner; }
+    { return qgraphicsitem_cast<TArc *>(parentItem());}
 
 private:
-    TArc *myOwner;
+    //TArc *myOwner;
 };
 
 class TArc : public QGraphicsLineItem

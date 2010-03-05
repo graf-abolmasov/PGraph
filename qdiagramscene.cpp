@@ -130,7 +130,7 @@ void QDiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
     //режим рисования дуги
-    if (myMode == InsertLine && line != NULL && mouseEvent->buttons() == Qt::LeftButton) {
+    if (myMode == InsertLine && line != NULL /*&& mouseEvent->buttons() == Qt::LeftButton*/) {
         QLineF vector(line->line().p1(), mouseEvent->scenePos());
         float dx = vector.dx();
         float dy = vector.dy();
@@ -298,7 +298,7 @@ void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
                 endItems.removeFirst();
             if ((endItems.count() > 0) && (endItems.first()->type() == TTop::Type)){
                 TTop *endItem = qgraphicsitem_cast<TTop *>(endItems.first());
-                newArc->setEndTop(endItem);
+                newArc->setEndTop(endItem);              
                 newArc->addLine(line);
             }
         }

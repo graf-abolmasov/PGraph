@@ -29,9 +29,19 @@ void TTop::removeArc(TArc *arc)
 {
     int index = arcs.indexOf(arc);
 
-    if (index != -1)
+    if (index != -1) {
         arcs.removeAt(index);
 
+        QList<TArc *> outArcsList = outArcs();
+
+        if (arc->startItem() == this){
+            for (int i = 0; i < outArcsList.count(); i++){
+                if (outArcsList.at(i)->width > arc->width){
+                    outArcsList.at(i)->setPriority(outArcsList.at(i)->width - 1);
+                }
+            }
+        }
+    }
 }
 
 void TTop::removeArcs()
@@ -65,7 +75,7 @@ void TTop::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
     scene()->clearSelection();
     setSelected(true);
-    myContextMenu->exec(event->screenPos());
+    myContextMenu->popup(event->screenPos());
 }
 
 QVariant TTop::itemChange(GraphicsItemChange change,

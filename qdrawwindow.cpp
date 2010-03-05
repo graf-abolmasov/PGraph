@@ -87,6 +87,8 @@ void TDrawWindow::deleteArc()
                 scene->removeItem(line);
             }
             scene->removeItem(arc);
+            delete arc;
+            arc = NULL;
         }        
     }
     emit sceneChanged();
