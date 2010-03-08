@@ -1,6 +1,9 @@
 #include <QtGui>
 #include "qdrawwindow.h"
 #include "qarc.h"
+#include "toppropertydialog.h"
+ #include <QCoreApplication>
+
 
 TDrawWindow::TDrawWindow()
 {
@@ -49,7 +52,7 @@ void TDrawWindow::createActions()
 
     Action2 = new QAction(tr("Действие 2"), this);
     Action2->setStatusTip(tr("Действие 2"));
-    connect(Action2, SIGNAL(triggered()), this, SLOT(doAction2()));
+    connect(Action2, SIGNAL(triggered()), this, SLOT(showTopPropDialog()));
 
     deleteAction = new QAction(QIcon(";/images/delete.png"), tr("Удалить"), this);
     deleteAction->setStatusTip(tr("Удаляет объект"));
@@ -151,6 +154,24 @@ void TDrawWindow::setItemIcon()
         }
     }
     emit sceneChanged();
+}
+
+void TDrawWindow::showTopPropDialog(){
+    TopPropertyDialog dlg;
+    TTop* top = qgraphicsitem_cast<TTop *>(scene->selectedItems().first());
+    dlg.prepareForm(top);
+    dlg.show();
+    while (dlg.isVisible())
+        QCoreApplication::processEvents();
+    if (dlg.result() == dlg.Accepted) {
+        QPolygonF myPolygon;
+        int w = dlg.getWidth();
+        int h = dlg.getHeight();
+        myPolygon << QPointF(-w/2, h/2) << QPointF(w/2, h/2)
+                << QPointF(w/2,-h/2) << QPointF(-w/2, -h/2)
+                << QPointF(-w/2, h/2);
+        top->setPolygon(myPolygon);
+    }
 }
 
 void TDrawWindow::saveAsImage(QString filename)

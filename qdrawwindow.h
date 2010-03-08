@@ -72,7 +72,7 @@ signals:
 
 private slots:
     void setItemIcon();
-    void doAction2(){}
+    void showTopPropDialog();
     void deleteItem();
     void deleteArc();
     void deleteComment();

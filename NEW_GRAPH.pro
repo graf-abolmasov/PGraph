@@ -10,12 +10,14 @@ SOURCES += main.cpp \
     qdiagramitem.cpp \
     qdiagramscene.cpp \
     qarc.cpp \
-    qcomment.cpp
+    qcomment.cpp \
+    toppropertydialog.cpp
 HEADERS += qmywindow.h \
     qdrawwindow.h \
     qdiagramitem.h \
     qdiagramscene.h \
     qarc.h \
-    qcomment.h
+    qcomment.h \
+    toppropertydialog.h
 RESOURCES += resources.qrc
-FORMS += 
+FORMS += toppropertydialog.ui

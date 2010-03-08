@@ -48,6 +48,10 @@ public:
     { return arcs; }
     QList<TArc *> inArcs();
     QList<TArc *> outArcs();
+    void setPolygon ( const QPolygonF & polygon ){
+        QGraphicsPolygonItem::setPolygon(polygon);
+    }
+
 
 protected:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);

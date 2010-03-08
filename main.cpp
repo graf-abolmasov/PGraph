@@ -2,6 +2,7 @@
 #include "qmywindow.h"
 #include <QTextCodec>
 #include <time.h>
+#include "toppropertydialog.h"
 
 int main(int argc, char *argv[])
 {  	
@@ -10,5 +11,6 @@ int main(int argc, char *argv[])
     TMyWindow w;
     srand(time(NULL));
     w.show();
+
     return a.exec();
 }
