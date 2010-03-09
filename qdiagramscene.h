@@ -27,7 +27,10 @@ public:
     void setArcMenu(QMenu *menu);
     void setItemMenu(QMenu *menu);
     void setCommentMenu(QMenu *menu);
+    void setRootTop(TTop* top);
 
+    TTop* rootTop()
+        { return myRootTop; }
     QFont font() const
         { return myFont; }
     QColor textColor() const
@@ -59,7 +62,8 @@ protected:
 
 private:
     Mode myMode;
-    bool drawNewArc;
+
+    TTop* myRootTop;
 
     TComment *textItem;
     TArc *newArc;
@@ -74,7 +78,6 @@ private:
     QMenu *myCommentMenu;
 
     QFont myFont;
-
 
     QColor myTextColor;
     QColor myItemColor;

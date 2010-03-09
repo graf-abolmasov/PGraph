@@ -1,8 +1,8 @@
-#include <QtGui>
+﻿#include <QtGui>
 #include "qdrawwindow.h"
 #include "qarc.h"
 #include "toppropertydialog.h"
- #include <QCoreApplication>
+#include <QCoreApplication>
 
 
 TDrawWindow::TDrawWindow()
@@ -36,6 +36,7 @@ void TDrawWindow::createMenus()
     itemMenu->addSeparator();
     itemMenu->addAction(Action1);
     itemMenu->addAction(Action2);
+    itemMenu->addAction(makeAsRootAction);
 
     arcMenu = new QMenu();
     arcMenu->addAction(deleteArcAction);
@@ -50,9 +51,13 @@ void TDrawWindow::createActions()
     Action1->setStatusTip(tr("Устанавливает иконку"));
     connect(Action1, SIGNAL(triggered()), this, SLOT(setItemIcon()));
 
-    Action2 = new QAction(tr("Действие 2"), this);
-    Action2->setStatusTip(tr("Действие 2"));
+    Action2 = new QAction(tr("Свойства"), this);
+    Action2->setStatusTip(tr("Свойства веришны"));
     connect(Action2, SIGNAL(triggered()), this, SLOT(showTopPropDialog()));
+
+    makeAsRootAction = new QAction(tr("Сделать корневой"), this);
+    makeAsRootAction->setStatusTip(tr("Свойства веришны"));
+    connect(makeAsRootAction, SIGNAL(triggered()), this, SLOT(makeAsRoot()));
 
     deleteAction = new QAction(QIcon(";/images/delete.png"), tr("Удалить"), this);
     deleteAction->setStatusTip(tr("Удаляет объект"));
@@ -121,7 +126,16 @@ void TDrawWindow::itemInserted(TTop *item)
 
 void TDrawWindow::itemSelected(QGraphicsItem *item)
 {
-    setWindowTitle("sdfdasf");
+    if (item->type() == TArcTop::Type){
+        TArcTop* arcTop = qgraphicsitem_cast<TArcTop* >(item);
+        TArc* arc = qgraphicsitem_cast<TArc* >(arcTop->parentItem());
+        foreach (TArcLine* line, arc->lines){
+            QPen pen = line->pen();
+            pen.setColor(Qt::green);
+            line->setPen(pen);
+        }
+    }
+    //setWindowTitle("sdfdasf");
 }
 
 void TDrawWindow::textInserted(TComment *)
@@ -160,10 +174,13 @@ void TDrawWindow::showTopPropDialog(){
     TopPropertyDialog dlg;
     TTop* top = qgraphicsitem_cast<TTop *>(scene->selectedItems().first());
     dlg.prepareForm(top);
-    dlg.show();
-    while (dlg.isVisible())
+    /*dlg.show();
+    dlg.setWindowModality(Qt::ApplicationModal);
+    while (dlg.isVisible()){
         QCoreApplication::processEvents();
-    if (dlg.result() == dlg.Accepted) {
+    }
+    if (dlg.result() == dlg.Accepted) {*/
+    if (dlg.exec()){
         QPolygonF myPolygon;
         int w = dlg.getWidth();
         int h = dlg.getHeight();
@@ -184,4 +201,8 @@ void TDrawWindow::saveAsImage(QString filename)
         scene->render(&painter);
         Image.save(filename);
     }
+}
+
+void TDrawWindow::makeAsRoot(){
+    scene->setRootTop(qgraphicsitem_cast<TTop* >(scene->selectedItems().first()));
 }

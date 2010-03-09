@@ -23,6 +23,7 @@ TTop::TTop(DiagramType diagramType, QMenu *contextMenu,
     setPolygon(myPolygon);
     setFlag(QGraphicsItem::ItemIsMovable, true);
     setFlag(QGraphicsItem::ItemIsSelectable, true);
+    setAsRoot(false);
 }
 
 void TTop::removeArc(TArc *arc)
@@ -36,8 +37,8 @@ void TTop::removeArc(TArc *arc)
 
         if (arc->startItem() == this){
             for (int i = 0; i < outArcsList.count(); i++){
-                if (outArcsList.at(i)->width > arc->width){
-                    outArcsList.at(i)->setPriority(outArcsList.at(i)->width - 1);
+                if (outArcsList.at(i)->priority() > arc->priority()){
+                    outArcsList.at(i)->setPriority(outArcsList.at(i)->priority() - 1);
                 }
             }
         }
@@ -195,6 +196,19 @@ void TTop::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
         } else {
             painter->drawImage(-myIcon.width()/2, -myIcon.height()/2, myIcon);
         }
+    }
+}
+
+void TTop::setAsRoot(bool flag){
+    isRoot = flag;
+    if (isRoot){
+        QPen p = pen();// painter->pen();
+        p.setWidth(5);
+        setPen(p);
+    } else {
+        QPen p = pen();// painter->pen();
+        p.setWidth(2);
+        setPen(p);
     }
 }
 

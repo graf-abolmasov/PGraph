@@ -27,6 +27,7 @@ private:
     QAction *deleteAction;
     QAction *Action1;
     QAction *Action2;
+    QAction *makeAsRootAction;
 
     QAction *deleteArcAction;
 
@@ -73,6 +74,7 @@ signals:
 private slots:
     void setItemIcon();
     void showTopPropDialog();
+    void makeAsRoot();
     void deleteItem();
     void deleteArc();
     void deleteComment();

@@ -21,35 +21,6 @@ int dvec2log(float dx, float dy)
     return res;
 }
 
-
-void TArc::rebuild(TTop* aMovedTop, float deltaX, float deltaY)
-{
-    /*int i;
-    QPointF ptBeg, ptEnd;
-    TArc* anArc;
-
-    ptBeg.setX(pts[0].x() - Sign(pts[1].x() - pts[0].x()) * min(Trans.Prior<<3, (int)myStartTop->boundingRect().width()>>1));
-    ptBeg.setY(pts[0].y() - Sign(pts[1].y() - pts[0].y()) * min(Trans.Prior<<3, (int)myStartTop->boundingRect().height()>>1));
-    ptEnd.setX(pts[otr].x() - Sign(pts[otr-1].x() - pts[otr].x()) * min(Trans.Prior<<3, (int)myEndTop->boundingRect().width()>>1));
-    ptEnd.setY(pts[otr].y() - Sign(pts[otr-1].y() - pts[otr].y()) * min(Trans.Prior<<3, (int)myEndTop->boundingRect().height()>>1));
-
-    if (aMovedTop==myStartTop)
-    {
-        ptBeg+=QPointF(deltaX, deltaY);
-    }
-    else
-    {
-        ptEnd+=QPointF(deltaX, deltaY);
-    }
-
-    DrawWin->BeginArc(aTopFrom,ptBeg);
-    while (!DrawWin->BuildArc(ptEnd,anArc));
-    DrawWin->EndArc();
-    otr=anotr;
-    for (i=0; i<=otr; i++) pts[i]=anArc->pts[i];
-    delete anArc;*/
-}
-
 bool TArc::autoBuild(){
 
     foreach(TArcLine* line, lines){
@@ -88,6 +59,13 @@ bool TArc::remake(TTop* aMovedTop, float dx, float dy)
     bool flag; //false - если надо все напрочь переделать
     int lgdir, lgolddir;
 
+    if ((myStartTop == aMovedTop) && (myEndTop == aMovedTop)){
+        foreach (TArcLine* line, lines){
+            line->setLine(line->line().translated(dx/2, dy/2));
+        }
+        return true;
+    }
+
     if (lines.count() < 4){
         //старый алгоритм
         //переработано, дополнено, прокоментировано
@@ -99,79 +77,74 @@ bool TArc::remake(TTop* aMovedTop, float dx, float dy)
             pts[i+1] = lines.at(i)->line().p2();
         }
 
-        if ((myStartTop == aMovedTop) && (myEndTop == aMovedTop)){
+        bool fMovedTo = (aMovedTop == myEndTop);
+        if (fMovedTo) //двигали конечную вершину
             for (j = 0; j <= otr; j++)
-                pts[j] += QPointF(dx, dy);
-        } else {
-            bool fMovedTo = (aMovedTop == myEndTop);
-            if (fMovedTo) //двигали конечную вершину
-                for (j = 0; j <= otr; j++)
-                    pnts[j] = pts[j];
-            else //двигали начальную вершину
-                for (j = 0; j <= otr; j++)
-                    pnts[otr-j] = pts[j];
-            flag = true;
-            switch(otr) {
-            case 1:
-                lgolddir = dvec2log(pnts[1].x() - pnts[0].x(), pnts[1].y() - pnts[0].y());
-                lgdir    = dvec2log(pnts[1].x() + dx - pnts[0].x(), pnts[1].y() + dy - pnts[0].y());
-                if (lgolddir & lgdir){
-                    if (!(pnts[1].x() - pnts[0].x()) && !dx ||
-                        !(pnts[1].y() - pnts[0].y()) && !dy){
-                        pnts[1] += QPointF(dx, dy);
-                    } else {
-                        pnts[3] = pnts[1] + QPointF(dx, dy);
-                        pnts[1].setX(pnts[0].x() + !(!(pnts[1].x() - pnts[0].x()))*(pnts[3].x() - pnts[0].x())*(4-fMovedTo)/7);
-                        pnts[1].setY(pnts[0].y() + !(!(pnts[1].y() - pnts[0].y()))*(pnts[3].y() - pnts[0].y())*(4-fMovedTo)/7);
-                        if ((lgdir^lgolddir) & (LEFT | RIGHT)){
-                            mx=1;
-                            my=0;
-                        } else {
-                            mx=0;
-                            my=1;
-                        }
-                        pnts[2] = pnts[1] + QPointF(dx*mx, dy*my);
-                        otr=3;
-                    }
-                }
-                else flag = false;
-                break;
-            case 2:
-                lgolddir = dvec2log(pnts[2].x() - pnts[0].x(), pnts[2].y() - pnts[0].y());
-                lgdir    = dvec2log(pnts[2].x() + dx - pnts[0].x(), pnts[2].y() + dy - pnts[0].y());
-                if (lgolddir == lgdir){
-                    pnts[1] += QPointF(dx*!(!(pnts[1].x() - pnts[0].x())), dy*!(!(pnts[1].y()-pnts[0].y())));
-                    pnts[2] += QPointF(dx, dy);
-                }
-                else flag = false;
-                break;
-            case 3:
-                lgolddir = dvec2log(pnts[3].x() - pnts[2].x(), pnts[3].y() - pnts[2].y());
-                lgdir    = dvec2log(pnts[3].x() + dx - pnts[1].x(), pnts[3].y() + dy - pnts[1].y());
-                if (lgolddir & lgdir){
-                    pnts[2] += QPointF(dx*!(!(pnts[2].x() - pnts[1].x())), dy*!(!(pnts[2].y() - pnts[1].y())));
-                    pnts[3] += QPointF(dx, dy);
-                    if (pnts[1].x() == pnts[2].x() && pnts[1].y() == pnts[2].y()){
-                        pnts[1] = pnts[3];
-                        otr = 1;
-                    }
-                }
-                else flag = false;
-                break;
-            }
-            if (flag) {
-                if (fMovedTo){
-                    for (j = 0; j <= otr; j++)
-                        pts[j] = pnts[j];
+                pnts[j] = pts[j];
+        else //двигали начальную вершину
+            for (j = 0; j <= otr; j++)
+                pnts[otr-j] = pts[j];
+        flag = true;
+        switch(otr) {
+        case 1:
+            lgolddir = dvec2log(pnts[1].x() - pnts[0].x(), pnts[1].y() - pnts[0].y());
+            lgdir    = dvec2log(pnts[1].x() + dx - pnts[0].x(), pnts[1].y() + dy - pnts[0].y());
+            if (lgolddir & lgdir){
+                if (!(pnts[1].x() - pnts[0].x()) && !dx ||
+                    !(pnts[1].y() - pnts[0].y()) && !dy){
+                    pnts[1] += QPointF(dx, dy);
                 } else {
-                    for (j = 0; j <= otr; j++)
-                        pts[j] = pnts[otr-j];
+                    pnts[3] = pnts[1] + QPointF(dx, dy);
+                    pnts[1].setX(pnts[0].x() + !(!(pnts[1].x() - pnts[0].x()))*(pnts[3].x() - pnts[0].x())*(4-fMovedTo)/7);
+                    pnts[1].setY(pnts[0].y() + !(!(pnts[1].y() - pnts[0].y()))*(pnts[3].y() - pnts[0].y())*(4-fMovedTo)/7);
+                    if ((lgdir^lgolddir) & (LEFT | RIGHT)){
+                        mx=1;
+                        my=0;
+                    } else {
+                        mx=0;
+                        my=1;
+                    }
+                    pnts[2] = pnts[1] + QPointF(dx*mx, dy*my);
+                    otr=3;
                 }
-            } else {
-                //нужна полная перерисвка
-                result = false;
-                //otr = 0;
             }
+            else flag = false;
+            break;
+            case 2:
+            lgolddir = dvec2log(pnts[2].x() - pnts[0].x(), pnts[2].y() - pnts[0].y());
+            lgdir    = dvec2log(pnts[2].x() + dx - pnts[0].x(), pnts[2].y() + dy - pnts[0].y());
+            if (lgolddir == lgdir){
+                pnts[1] += QPointF(dx*!(!(pnts[1].x() - pnts[0].x())), dy*!(!(pnts[1].y()-pnts[0].y())));
+                pnts[2] += QPointF(dx, dy);
+            }
+            else flag = false;
+            break;
+            case 3:
+            lgolddir = dvec2log(pnts[3].x() - pnts[2].x(), pnts[3].y() - pnts[2].y());
+            lgdir    = dvec2log(pnts[3].x() + dx - pnts[1].x(), pnts[3].y() + dy - pnts[1].y());
+            if (lgolddir & lgdir){
+                pnts[2] += QPointF(dx*!(!(pnts[2].x() - pnts[1].x())), dy*!(!(pnts[2].y() - pnts[1].y())));
+                pnts[3] += QPointF(dx, dy);
+                if (pnts[1].x() == pnts[2].x() && pnts[1].y() == pnts[2].y()){
+                    pnts[1] = pnts[3];
+                    otr = 1;
+                }
+            }
+            else flag = false;
+            break;
+        }
+        if (flag) {
+            if (fMovedTo){
+                for (j = 0; j <= otr; j++)
+                    pts[j] = pnts[j];
+            } else {
+                for (j = 0; j <= otr; j++)
+                    pts[j] = pnts[otr-j];
+            }
+        } else {
+            //нужна полная перерисвка
+            result = false;
+            //otr = 0;
         }
 
         //теперь в pts новые точки =) якобы. проверим это.
@@ -365,10 +338,18 @@ QRectF TArc::boundingRect() const
 {
     qreal extra = width*(pen().width() + 20) / 2.0;
 
+    QRectF rect;
+
+    foreach (TArcLine* line, lines){
+        rect = rect.united(line->boundingRect());
+    }
+
+    return rect.normalized().adjusted(-extra, -extra, extra, extra);
+    /*
     return QRectF(line().p1(), QSizeF(line().p2().x() - line().p1().x(),
                                       line().p2().y() - line().p1().y()))
         .normalized()
-        .adjusted(-extra, -extra, extra, extra);
+        .adjusted(-extra, -extra, extra, extra);*/
 
 }
 
@@ -400,10 +381,10 @@ void TArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
 
     } else {
         //СЂРµР¶РёРј РѕС‚СЂРёСЃРѕРІРєРё Р·Р°РІРµСЂС€РµРЅРЅРѕР№ РґСѓРіРё
-        foreach (QGraphicsLineItem *line, lines){
+        /*foreach (TArcLine *line, lines){
             line->setPen(QPen(QBrush(Qt::black,Qt::SolidPattern), width, Qt::SolidLine));
-            line->update();
-        }
+            //line->update();
+        }*/
         //РѕС‚РѕР±СЂР°Р¶Р°РµРј СЃРµСЂС‹Р№ РєРІР°РґСЂР°С‚РёРє
         QPointF intersectPoint;
         myStartTop->getIntersectBound(lines.first()->line()).intersect(lines.first()->line(), &intersectPoint);
@@ -415,14 +396,17 @@ void TArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
         myPen.setColor(myColor);
         painter->setPen(myPen);
         painter->setBrush(myColor);
+        myEndTop->getIntersectBound(lines.last()->line()).intersect(lines.last()->line(), &intersectPoint);
+        float koeff2 = QLineF(lines.last()->line().p2(), intersectPoint).length(); //ЫЫЫ =)
+        QPointF t = lines.last()->line().p2() - QPointF(cos(lines.last()->line().angle() * Pi / 180) * koeff2, -sin(lines.last()->line().angle() * Pi / 180) * koeff2);
         double angle = ((myEndTop->getIntersectBound(lines.last()->line()).normalVector().angle()) + 180) * Pi / 180;
-        QPointF arcP1 = lines.last()->line().p2() + QPointF(sin(angle + Pi / 3) * 3*width,
+        QPointF arcP1 = t + QPointF(sin(angle + Pi / 3) * 3*width,
                                               cos(angle + Pi / 3) * 3*width);
-        QPointF arcP2 = lines.last()->line().p2() + QPointF(sin(angle + Pi - Pi / 3) * 3*width,
+        QPointF arcP2 = t + QPointF(sin(angle + Pi - Pi / 3) * 3*width,
                                               cos(angle + Pi - Pi / 3) * 3*width);
 
         arcHead.clear();
-        arcHead << lines.last()->line().p2() << arcP1 << arcP2;
+        arcHead << t << arcP1 << arcP2;
         painter->drawPolygon(arcHead);
    }
 
@@ -637,10 +621,10 @@ bool TArc::addLine(TArcLine *line){
 
 TArcLine* TArc::newLine(QPointF p1, QPointF p2){
     if (currentLine == NULL)
-        currentLine = new TArcLine( /*this,*/ QLineF(p1, p2), this, scene());
+        currentLine = new TArcLine(QLineF(p1, p2), this, scene());
     else {
         addLine(currentLine);
-        currentLine = new TArcLine(/*this,*/ QLineF(prevLine()->line().p2(), p2), this, scene());
+        currentLine = new TArcLine(QLineF(prevLine()->line().p2(), p2), this, scene());
     }
     currentLine->setPen(QPen(QBrush(Qt::black,Qt::SolidPattern),2,Qt::SolidLine));
     currentLine->setFlag(QGraphicsItem::ItemIsMovable, true);
@@ -666,7 +650,6 @@ void TArc::realloc(){
 }
 
 void TArc::updateBounds(){
-    //setLine(QLineF(myStartTop->scenePos(),myEndTop->scenePos()));
     if (lines.count() > 0)
         setLine(QLineF(lines.first()->line().p1(), lines.last()->line().p2()));
 }
@@ -707,7 +690,7 @@ void TArcTop::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 {
     QGraphicsPolygonItem::paint(painter, option, widget);
 
-    TArc* arc;
+    /*TArc* arc;
     arc = qgraphicsitem_cast<TArc *>(parentItem());
 
     if (isSelected()) {
@@ -720,7 +703,7 @@ void TArcTop::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
             myLine.translate(-8.0,-8.0);
             painter->drawLine(myLine);
         }
-    }
+    }*/
 }
 
 void TArcTop::mousePressEvent(QGraphicsSceneMouseEvent *event){
@@ -754,8 +737,13 @@ void TArcTop::mouseReleaseEvent(QGraphicsSceneMouseEvent *event){
     QGraphicsPolygonItem::mousePressEvent(event);
 }
 
-TArcLine::TArcLine(/*TArc *owner,*/ QLineF line, QGraphicsItem *parent, QGraphicsScene *scene)
+TArcLine::TArcLine(QLineF line, QGraphicsItem *parent, QGraphicsScene *scene)
     : QGraphicsLineItem(line, parent, scene)
 {
-    /*myOwner = owner;*/
+}
+
+QPainterPath TArcLine::shape() const {
+    QPainterPath path;
+    path.addRect(QGraphicsLineItem::shape().boundingRect().adjusted(-2, -2, 2, 2));
+    return path;
 }

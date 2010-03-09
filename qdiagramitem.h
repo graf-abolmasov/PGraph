@@ -3,6 +3,7 @@
 
 #include <QGraphicsPixmapItem>
 #include <QList>
+//#include "qdiagramscene.h"
 
 QT_BEGIN_NAMESPACE
 class QPixmap;
@@ -22,6 +23,8 @@ class TArc;
 
 class TTop : public QGraphicsPolygonItem
 {
+    friend class QDiagramScene;
+
 public:
     enum { Type = UserType + 15 };
     enum DiagramType {Top};
@@ -51,6 +54,7 @@ public:
     void setPolygon ( const QPolygonF & polygon ){
         QGraphicsPolygonItem::setPolygon(polygon);
     }
+    void setAsRoot(bool flag);
 
 
 protected:
@@ -60,6 +64,7 @@ protected:
                QWidget *widget = 0);
 private:
     DiagramType myDiagramType;
+    bool isRoot;
     QPolygonF myPolygon;
     QMenu *myContextMenu;
     QList<TArc *> arcs;

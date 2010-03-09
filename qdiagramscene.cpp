@@ -15,6 +15,8 @@ QDiagramScene::QDiagramScene(QObject *parent)
     myItemColor = Qt::white;
     myTextColor = Qt::black;
     myLineColor = Qt::black;
+
+    myRootTop = NULL;
 }
 
 void QDiagramScene::setLineColor(const QColor &color)
@@ -130,7 +132,7 @@ void QDiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
     //режим рисования дуги
-    if (myMode == InsertLine && line != NULL /*&& mouseEvent->buttons() == Qt::LeftButton*/) {
+    if (myMode == InsertLine && line != NULL && mouseEvent->buttons() == Qt::LeftButton) {
         QLineF vector(line->line().p1(), mouseEvent->scenePos());
         float dx = vector.dx();
         float dy = vector.dy();
@@ -249,7 +251,7 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
         bool isOK = false; //false - если дугу надо полностью переделать
 
-        QList<TArc *> brokenLines; //список будет содержать обработанные дуги
+        QList<TArc *> brokenLines; //список содержит дуги, нуждающиеся в полной переделке
         foreach (TArc *arc, top->allArcs()){
            isOK = arc->remake(top, dx, dy);
            if (!isOK)
@@ -313,7 +315,7 @@ void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
         //условие выполнится когда у дуги будет начало и конец!
         if ((newArc != NULL) && (newArc->endItem() != NULL) && (newArc->startItem() != NULL)){
             foreach(TArc *arc, newArc->startItem()->outArcs()){
-                arc->setPriority(arc->width+1);
+                arc->setPriority(arc->priority() + 1);
             }
             newArc->startItem()->addArc(newArc);
             newArc->endItem()->addArc(newArc);
@@ -367,4 +369,12 @@ void QDiagramScene::setCommentMenu(QMenu *menu)
 {
     myCommentMenu = menu;
 }
+
+void QDiagramScene::setRootTop(TTop* top){
+    if (myRootTop != NULL)
+        myRootTop->setAsRoot(false);
+    myRootTop = top;
+    top->setAsRoot(true);
+}
+
 

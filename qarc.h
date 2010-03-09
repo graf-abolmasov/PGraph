@@ -17,25 +17,10 @@ QT_END_NAMESPACE
 #define ARC_TOP_TYPE  UserType+5
 #define ARC_TYPE      UserType+4
 #define ARC_LINE_TYPE UserType+6
-
-/*ÐºÐ°Ñ€Ð°Ð½Ñ‚Ð¸Ð½************************************************************/
 #define UP	0x80
 #define LEFT	0x20
 #define DOWN	0x08
 #define RIGHT	0x02
-
-//from struct.h
-#define	OBJNAMELEN	9
-#define EXTNAMELEN	255
-
-struct TArcTransferStruct
- {
-  char ObjName[OBJNAMELEN];
-  char ExtName[EXTNAMELEN];
-  int Prior;
-  bool CritSection;
- };
-/*ÐºÐ°Ñ€Ð°Ð½Ñ‚Ð¸Ð½************************************************************/
 
 class TArcTop : public QGraphicsPolygonItem
 {
@@ -64,14 +49,15 @@ class TArcLine : public QGraphicsLineItem
 public:
     enum { Type = ARC_LINE_TYPE };
 
-    TArcLine(/*TArc *owner,*/ QLineF line, QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
+    TArcLine(QLineF line, QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
     int type() const
     { return Type;}
     TArc* owner() const
-    { return qgraphicsitem_cast<TArc *>(parentItem());}
+    { return qgraphicsitem_cast<TArc *>(parentItem()); }
+    QPainterPath shape() const;
 
 private:
-    //TArc *myOwner;
+
 };
 
 class TArc : public QGraphicsLineItem
@@ -79,7 +65,6 @@ class TArc : public QGraphicsLineItem
     //Q_OBJECT
 public:
     enum { Type = ARC_TYPE };
-    int width;
     QList<TArcLine *> lines;
 
     TArc(TTop *startItem, TTop *endItem, QMenu *contextMenu,
@@ -98,13 +83,12 @@ public:
         { myColor = color; }
     QColor color() const
         { return myColor; }
-    void setPriority(int w);
-    void setStartTop(TTop* startTop){
-        myStartTop = startTop;
-    }
-    void setEndTop(TTop* endTop){
-        myEndTop = endTop;
-    }
+    int priority()
+        { return width; }
+    void setStartTop(TTop* startTop)
+        { myStartTop = startTop; }
+    void setEndTop(TTop* endTop)
+        { myEndTop = endTop; }
     TTop *startItem() const
         { return myStartTop; }
     TTop *endItem() const
@@ -114,9 +98,9 @@ public:
             return lines.last();
          else return NULL;
     }
+    void setPriority(int w);
 
     bool remake(TTop *, float dx, float dy);
-    void rebuild(TTop *, float dx, float dy); //!! deprecated
     void realloc();
     bool autoBuild();
     void updateBounds();
@@ -134,6 +118,7 @@ private:
     QPolygonF arcHead;
     TArcTop *arcTop;
     QMenu *myContextMenu;
+    int width;  //ïðèîðèòåò
 };
 
 #endif
