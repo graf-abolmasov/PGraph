@@ -28,6 +28,7 @@ void TopPropertyDialog::changeEvent(QEvent *e)
 void TopPropertyDialog::prepareForm(TTop* top){
     ui->spnBoxHeight->setProperty("value", top->boundingRect().height());
     ui->spnBoxWidth->setProperty("value", top->boundingRect().width());
+
 }
 
 int TopPropertyDialog::getWidth(){
