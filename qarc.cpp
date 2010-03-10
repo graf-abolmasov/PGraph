@@ -668,7 +668,7 @@ void TArcTop::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
     scene()->clearSelection();
     setSelected(true);
-    myContextMenu->popup(event->screenPos());
+    myContextMenu->exec(event->screenPos());
 }
 
 TArcTop::TArcTop(QMenu *contextMenu, QGraphicsItem *parent, QGraphicsScene *scene)
@@ -744,6 +744,6 @@ TArcLine::TArcLine(QLineF line, QGraphicsItem *parent, QGraphicsScene *scene)
 
 QPainterPath TArcLine::shape() const {
     QPainterPath path;
-    path.addRect(QGraphicsLineItem::shape().boundingRect().adjusted(-2, -2, 2, 2));
+    path.addRect(QGraphicsLineItem::shape().boundingRect().adjusted(-5, -5, 5, 5));
     return path;
 }
