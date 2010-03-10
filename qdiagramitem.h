@@ -44,7 +44,6 @@ public:
     QPolygonF polygon() const
         { return myPolygon; }
     void addArc(TArc *arc);
-    QPixmap image() const;
     int type() const
         { return Type; }
     QList<TArc *> allArcs()
