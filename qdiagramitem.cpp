@@ -76,7 +76,7 @@ void TTop::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
     scene()->clearSelection();
     setSelected(true);
-    myContextMenu->popup(event->screenPos());
+    myContextMenu->exec(event->screenPos());
 }
 
 QVariant TTop::itemChange(GraphicsItemChange change,
