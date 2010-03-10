@@ -44,6 +44,8 @@ public:
     void addItem(TTop::DiagramType type);
     void setMode(QDiagramScene::Mode mode);
     QDiagramScene::Mode mode(){return myMode;}
+    QList<TTop* > allTops();
+
     /*virtual bool CanClose();                    // Возвращает TRUE, если можно закрыть окно
     virtual void SetupWindow();                 // Инициализация окна и таймера
     virtual void CleanupWindow();               // Очистка окна, удаление таймера
