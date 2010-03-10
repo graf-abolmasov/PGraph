@@ -54,22 +54,13 @@ void TTop::removeArcs()
         delete arc;
     }
 }
-
+/*!
+  Добавляет дугу в список дуг текущей вершины
+  @Param arc - дуга
+*/
 void TTop::addArc(TArc *arc)
 {
     arcs.append(arc);
-}
-
-QPixmap TTop::image() const
-{
-    QPixmap pixmap(250, 250);
-    pixmap.fill(Qt::transparent);
-    QPainter painter(&pixmap);
-    painter.setPen(QPen(Qt::black, 8));
-    painter.translate(125, 125);
-    painter.drawPolyline(myPolygon);
-
-    return pixmap;
 }
 
 void TTop::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
@@ -90,7 +81,7 @@ QVariant TTop::itemChange(GraphicsItemChange change,
 
     return value;
 }
-/*
+/*!
   РІРѕР·РІСЂР°С‰Р°РµС‚ СЃРїРёСЃРѕРє РґСѓРі, РїСЂРёР»РµРїР»РµРЅРЅС‹С… Рє РґР°РЅРЅРѕР№ РіСЂР°РЅРёС†Рµ.
   i - РЅРѕРјРµСЂ РІРµСЂС€РёРЅС‹ РїРѕР»РёРіРѕРЅР°, РєРѕРЅРµС‡РЅР°СЏ С‚РѕС‡РєР° РѕС‚СЂРµР·РєР°
 */
@@ -111,7 +102,7 @@ QList<TArc *> TTop::getArcsAtBound(int i)
     return result;
 }
 
-/*
+/*!
   РІРѕР·РІСЂР°С‰Р°РµС‚ СЃРїРёСЃРѕРє РґСѓРі, РїСЂРёР»РµРїР»РµРЅРЅС‹С… Рє РґР°РЅРЅРѕР№ РіСЂР°РЅРёС†Рµ.
   bound - РіСЂР°РЅРёС†Р°
 */
@@ -158,7 +149,7 @@ void TTop::autoArrangeArcsAtBound(QLineF bound){
     }
 }
 
-/*
+/*!
   РІРѕР·РІСЂР°С‰Р°РµС‚ РіСЂР°РЅРёС†Сѓ РїРѕ РєРѕС‚РѕСЂРѕР№ РїРµСЂРµСЃРµРєР°РµС‚СЃСЏ СЃ Р»РёРЅРёРµР№
   line - Р»РёРЅРёСЏ
 */
@@ -179,7 +170,10 @@ QLineF TTop::getIntersectBound(QLineF line)
         }
    return result;
 }
-
+/*!
+  Устанавливает иконку.
+  @Param icon - иконка
+*/
 void TTop::setIcon(QImage icon)
 {
     myIcon = icon;
@@ -199,6 +193,10 @@ void TTop::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
     }
 }
 
+/*!
+  Устанавливает флаг корневой вершины.
+  @Param flag - true если корневая
+*/
 void TTop::setAsRoot(bool flag){
     isRoot = flag;
     if (isRoot){
@@ -211,7 +209,9 @@ void TTop::setAsRoot(bool flag){
         setPen(p);
     }
 }
-
+/*!
+  Возвращает список исходящих дуг
+*/
 QList<TArc *> TTop::inArcs(){
     QList<TArc *> result;
     foreach(TArc *arc, arcs){
@@ -221,6 +221,9 @@ QList<TArc *> TTop::inArcs(){
     return result;
 }
 
+/*!
+  Возвращяет список входящих дуг
+*/
 QList<TArc *> TTop::outArcs(){
     QList<TArc *> result;
     foreach(TArc *arc, arcs){
