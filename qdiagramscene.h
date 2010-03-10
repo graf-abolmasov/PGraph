@@ -60,6 +60,7 @@ protected:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent);
     void keyReleaseEvent (QKeyEvent *keyEvent);
 
+
 private:
     Mode myMode;
 
