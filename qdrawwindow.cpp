@@ -206,3 +206,13 @@ void TDrawWindow::saveAsImage(QString filename)
 void TDrawWindow::makeAsRoot(){
     scene->setRootTop(qgraphicsitem_cast<TTop* >(scene->selectedItems().first()));
 }
+
+QList<TTop* > TDrawWindow::allTops(){
+    QList<TTop* > topList;
+    for (int i = 0; i < scene->items().count(); i++){
+        if (scene->items().at(i)->type() == TTop::Type){
+            topList.append(qgraphicsitem_cast<TTop* >(scene->items().at(i)));
+        }
+    }
+    return topList;
+}

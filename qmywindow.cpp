@@ -96,8 +96,8 @@ void TMyWindow::createActions()
     saveStructAct->setStatusTip(tr("Запись структуры"));
     connect(saveStructAct, SIGNAL(triggered()), this, SLOT(CMSaveStruct()));
 
-    manualInputAct = new QAction(tr("Режим ручного ввода данных"), this);
-    manualInputAct->setStatusTip(tr("Режим ручного ввода данных"));
+    manualInputAct = new QAction(tr("� ежим ручного ввода данных"), this);
+    manualInputAct->setStatusTip(tr("� ежим ручного ввода данных"));
     connect(manualInputAct, SIGNAL(triggered()), this, SLOT(CMDoUserDialog()));
 
     //LeftToolBar
