@@ -29,6 +29,7 @@ public:
     void setCommentMenu(QMenu *menu);
     void setRootTop(TTop* top);
 
+    //!”казатель на корневую вершину
     TTop* rootTop()
         { return myRootTop; }
     QFont font() const
@@ -46,7 +47,6 @@ public:
 
 public slots:
     void setMode(Mode mode);
-    void setItemType(TTop::DiagramType type);
     void editorLostFocus(TComment *item);
 
 signals:
@@ -60,7 +60,6 @@ protected:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent);
     void keyReleaseEvent (QKeyEvent *keyEvent);
 
-
 private:
     Mode myMode;
 
@@ -73,7 +72,6 @@ private:
 
     bool isItemChange(int type);
 
-    TTop::DiagramType myItemType;
     QMenu *myItemMenu;
     QMenu *myArcMenu;
     QMenu *myCommentMenu;

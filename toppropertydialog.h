@@ -1,7 +1,7 @@
 #ifndef TOPPROPERTYDIALOG_H
 #define TOPPROPERTYDIALOG_H
 
-#include <QDialog>
+#include "qdialog.h"
 #include "qdiagramitem.h"
 
 namespace Ui {

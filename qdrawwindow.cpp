@@ -112,9 +112,11 @@ void TDrawWindow::deleteComment()
     emit sceneChanged();
 }
 
-void TDrawWindow::addItem(TTop::DiagramType type)
+/*!
+  Переводит сцену в режим добавления вершины.
+*/
+void TDrawWindow::addItem()
 {
-    scene->setItemType(type);
     scene->setMode(QDiagramScene::InsertItem);
 }
 
@@ -144,12 +146,18 @@ void TDrawWindow::textInserted(TComment *)
     emit sceneChanged();
 }
 
+/*!
+  Установить режим сцены
+*/
 void TDrawWindow::setMode(QDiagramScene::Mode mode)
 {
     scene->setMode(mode);
     myMode = mode;
 }
 
+/*!
+  Реакция на нажатие пункта меню: Загрузить иконку
+*/
 void TDrawWindow::setItemIcon()
 {
     QString fileName = QFileDialog::getOpenFileName(0,
@@ -170,16 +178,13 @@ void TDrawWindow::setItemIcon()
     emit sceneChanged();
 }
 
+/*!
+  Реакция на нажатие пункта меню: Свойства
+*/
 void TDrawWindow::showTopPropDialog(){
     TopPropertyDialog dlg;
     TTop* top = qgraphicsitem_cast<TTop *>(scene->selectedItems().first());
     dlg.prepareForm(top);
-    /*dlg.show();
-    dlg.setWindowModality(Qt::ApplicationModal);
-    while (dlg.isVisible()){
-        QCoreApplication::processEvents();
-    }
-    if (dlg.result() == dlg.Accepted) {*/
     if (dlg.exec()){
         QPolygonF myPolygon;
         int w = dlg.getWidth();
@@ -191,6 +196,9 @@ void TDrawWindow::showTopPropDialog(){
     }
 }
 
+/*!
+  Реакция на нажатие пункта меню: Сохранить как картинку
+*/
 void TDrawWindow::saveAsImage(QString filename)
 {
     if (scene != NULL){
@@ -203,10 +211,16 @@ void TDrawWindow::saveAsImage(QString filename)
     }
 }
 
+/*!
+  Реакция на нажатие пункта меню: Сделать корневой
+*/
 void TDrawWindow::makeAsRoot(){
     scene->setRootTop(qgraphicsitem_cast<TTop* >(scene->selectedItems().first()));
 }
 
+/*!
+  Возвращает список всех вершиен лежащих на сцене
+*/
 QList<TTop* > TDrawWindow::allTops(){
     QList<TTop* > topList;
     for (int i = 0; i < scene->items().count(); i++){

@@ -3,29 +3,30 @@
 #include "qdiagramitem.h"
 #include "qarc.h"
 
-TTop::TTop(DiagramType diagramType, QMenu *contextMenu,
+int TTop::counter = 0;
+
+TTop::TTop(QMenu *contextMenu,
              QGraphicsItem *parent, QGraphicsScene *scene)
     : QGraphicsPolygonItem(parent, scene)
 {
-    myDiagramType = diagramType;
     myContextMenu = contextMenu;
 
     QPainterPath path;
-    switch (myDiagramType) {
-        case Top:
-            myPolygon << QPointF(-40, 30) << QPointF(40, 30)
-                      << QPointF(40,-30) << QPointF(-40, -30)
-                      << QPointF(-40, 30);
-            break;
-        default:
-            break;
-    }
+    myPolygon << QPointF(-40, 30) << QPointF(40, 30)
+            << QPointF(40,-30) << QPointF(-40, -30)
+            << QPointF(-40, 30);
+
     setPolygon(myPolygon);
     setFlag(QGraphicsItem::ItemIsMovable, true);
     setFlag(QGraphicsItem::ItemIsSelectable, true);
     setAsRoot(false);
+    number = counter++;
 }
 
+/*!
+  Удаляет дугу. Совсем.
+  @param arc - дуга
+*/
 void TTop::removeArc(TArc *arc)
 {
     int index = arcs.indexOf(arc);
@@ -45,6 +46,9 @@ void TTop::removeArc(TArc *arc)
     }
 }
 
+/*!
+  Удаляет все дуги, входящие и выходящие из вершины
+*/
 void TTop::removeArcs()
 {
     foreach (TArc *arc, arcs) {
@@ -56,7 +60,7 @@ void TTop::removeArcs()
 }
 /*!
   Добавляет дугу в список дуг текущей вершины
-  @Param arc - дуга
+  @param arc - дуга
 */
 void TTop::addArc(TArc *arc)
 {
@@ -70,21 +74,16 @@ void TTop::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
     myContextMenu->exec(event->screenPos());
 }
 
-QVariant TTop::itemChange(GraphicsItemChange change,
-                     const QVariant &value)
-{
-    if (change == QGraphicsItem::ItemPositionChange) {
+QVariant TTop::itemChange(GraphicsItemChange change, const QVariant &value){
+    /*if (change == QGraphicsItem::ItemPositionChange) {
         foreach (TArc *arc, arcs) {
             arc->updatePosition();
         }
-    }
+    }*/
 
     return value;
 }
-/*!
-  РІРѕР·РІСЂР°С‰Р°РµС‚ СЃРїРёСЃРѕРє РґСѓРі, РїСЂРёР»РµРїР»РµРЅРЅС‹С… Рє РґР°РЅРЅРѕР№ РіСЂР°РЅРёС†Рµ.
-  i - РЅРѕРјРµСЂ РІРµСЂС€РёРЅС‹ РїРѕР»РёРіРѕРЅР°, РєРѕРЅРµС‡РЅР°СЏ С‚РѕС‡РєР° РѕС‚СЂРµР·РєР°
-*/
+
 QList<TArc *> TTop::getArcsAtBound(int i)
 {
     QList<TArc *> result;
@@ -102,10 +101,6 @@ QList<TArc *> TTop::getArcsAtBound(int i)
     return result;
 }
 
-/*!
-  РІРѕР·РІСЂР°С‰Р°РµС‚ СЃРїРёСЃРѕРє РґСѓРі, РїСЂРёР»РµРїР»РµРЅРЅС‹С… Рє РґР°РЅРЅРѕР№ РіСЂР°РЅРёС†Рµ.
-  bound - РіСЂР°РЅРёС†Р°
-*/
 QList<TArc *> TTop::getArcsAtBound(QLineF bound)
 {
     QPointF intersectPoint;
@@ -150,8 +145,8 @@ void TTop::autoArrangeArcsAtBound(QLineF bound){
 }
 
 /*!
-  РІРѕР·РІСЂР°С‰Р°РµС‚ РіСЂР°РЅРёС†Сѓ РїРѕ РєРѕС‚РѕСЂРѕР№ РїРµСЂРµСЃРµРєР°РµС‚СЃСЏ СЃ Р»РёРЅРёРµР№
-  line - Р»РёРЅРёСЏ
+  Возвращает границу вершины с которой пересекается линия
+  @param line - линия
 */
 QLineF TTop::getIntersectBound(QLineF line)
 {
@@ -172,7 +167,7 @@ QLineF TTop::getIntersectBound(QLineF line)
 }
 /*!
   Устанавливает иконку.
-  @Param icon - иконка
+  @param icon - иконка
 */
 void TTop::setIcon(QImage icon)
 {
@@ -195,7 +190,7 @@ void TTop::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 
 /*!
   Устанавливает флаг корневой вершины.
-  @Param flag - true если корневая
+  @param flag - true если корневая
 */
 void TTop::setAsRoot(bool flag){
     isRoot = flag;

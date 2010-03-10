@@ -34,14 +34,12 @@ private:
     QAction *deleteCommentAction;
 
     QDiagramScene::Mode myMode;
-    /*TRegisterStruct reg;                        // Структ. с EXTNAME графа и наим. файла с его иконкой
-    int DropIdx;                                // Номер дуги, на которую бросили предикат (Drag&Drop)*/
 
 public:
     TDrawWindow();
     void newFile(){}
     void saveAsImage(QString filename);
-    void addItem(TTop::DiagramType type);
+    void addItem();
     void setMode(QDiagramScene::Mode mode);
     QDiagramScene::Mode mode(){return myMode;}
     QList<TTop* > allTops();

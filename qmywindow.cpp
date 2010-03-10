@@ -102,14 +102,6 @@ void TMyWindow::createActions()
 
     //LeftToolBar
 
-    /*addTopAct = new QAction(QIcon(":/images/top.png"), tr("&Добавить вершину"), this);
-    addTopAct->setStatusTip(tr("Добавляет вершину"));
-    connect(addTopAct, SIGNAL(triggered()), this, SLOT(addTop()));
-
-    addCommentAct = new QAction(QIcon(":/images/textpointer.png"), tr("&Добавить вершину"), this);
-    addCommentAct->setStatusTip(tr("Добавляет вершину"));
-    connect(addCommentAct, SIGNAL(triggered()), this, SLOT(addComment()));*/
-
     addTopButton = new QToolButton;
     addTopButton->setCheckable(true);
     addTopButton->setIcon(QIcon(":/images/top.png"));
@@ -180,11 +172,6 @@ void TMyWindow::switchLayoutDirection()
         qApp->setLayoutDirection(Qt::LeftToRight);
 }
 
-void TMyWindow::addTop()
-{
-    activeDrawWindow()->addItem(TTop::Top);
-}
-
 void TMyWindow::addComment()
 {
     activeDrawWindow()->setMode(QDiagramScene::InsertText);
@@ -192,7 +179,6 @@ void TMyWindow::addComment()
 
 void TMyWindow::pointerGroupClicked(int)
 {
-    //!!if (pointerTypeGroup->checkedId() == int(QDiagramScene::InsertItem)) activeDrawWindow()->addItem(TTop::Top);
     activeDrawWindow()->setMode(QDiagramScene::Mode(pointerTypeGroup->checkedId()));
 }
 

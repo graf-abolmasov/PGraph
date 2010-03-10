@@ -1,8 +1,8 @@
 #ifndef QCOMMENT_H
 #define QCOMMENT_H
 
-#include <QGraphicsTextItem>
-#include <QPen>
+#include "qgraphicsitem.h"
+#include "qpen.h"
 
 QT_BEGIN_NAMESPACE
 class QFocusEvent;

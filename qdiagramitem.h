@@ -1,9 +1,8 @@
 #ifndef QDIAGRAMITEM_H
 #define QDIAGRAMITEM_H
 
-#include <QGraphicsPixmapItem>
-#include <QList>
-//#include "qdiagramscene.h"
+#include <qgraphicsitem.h>
+#include "qlist.h"
 
 QT_BEGIN_NAMESPACE
 class QPixmap;
@@ -27,47 +26,36 @@ class TTop : public QGraphicsPolygonItem
 
 public:
     enum { Type = UserType + 15 };
-    enum DiagramType {Top};
-
-    TTop(DiagramType diagramType, QMenu *contextMenu,
-        QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
-
+    TTop(QMenu *contextMenu, QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
+    int number;
     void removeArc(TArc *arc);
     void removeArcs();
     void setIcon(QImage icon);
-    QList<TArc *> getArcsAtBound(int i);
-    QList<TArc *> getArcsAtBound(QLineF bound);
-    QLineF getIntersectBound(QLineF line);
     void autoArrangeArcsAtBound(QLineF bound);
-    DiagramType diagramType() const
-        { return myDiagramType; }
+    void addArc(TArc *arc);
+    void setAsRoot(bool flag);
+    QLineF getIntersectBound(QLineF line);
     QPolygonF polygon() const
         { return myPolygon; }
-    void addArc(TArc *arc);
     int type() const
         { return Type; }
     QList<TArc *> allArcs()
-    { return arcs; }
+        { return arcs; }
     QList<TArc *> inArcs();
     QList<TArc *> outArcs();
-    void setPolygon ( const QPolygonF & polygon ){
-        QGraphicsPolygonItem::setPolygon(polygon);
-    }
-    void setAsRoot(bool flag);
-
-
 protected:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-               QWidget *widget = 0);
 private:
-    DiagramType myDiagramType;
     bool isRoot;
-    QPolygonF myPolygon;
-    QMenu *myContextMenu;
     QList<TArc *> arcs;
+    QMenu *myContextMenu;
     QImage myIcon;
+    QPolygonF myPolygon;
+    QList<TArc *> getArcsAtBound(int i);
+    QList<TArc *> getArcsAtBound(QLineF bound);
+    static int counter;
 };
 
 #endif

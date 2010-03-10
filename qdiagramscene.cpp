@@ -6,7 +6,6 @@ QDiagramScene::QDiagramScene(QObject *parent)
     : QGraphicsScene(parent)
 {
     myMode = MoveItem;
-    myItemType = TTop::Top;
 
     line = 0;
     textItem = 0;
@@ -68,11 +67,6 @@ void QDiagramScene::setMode(Mode mode)
     myMode = mode;
 }
 
-void QDiagramScene::setItemType(TTop::DiagramType type)
-{
-    myItemType = type;
-}
-
 void QDiagramScene::editorLostFocus(TComment *item)
 {
     QTextCursor cursor = item->textCursor();
@@ -90,9 +84,10 @@ void QDiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
     if (mouseEvent->button() != Qt::LeftButton)
         return;
 
-    TTop* item = new TTop(myItemType, myItemMenu);
+    TTop* item;
     switch (myMode) {
     case InsertItem:
+        item = new TTop(myItemMenu);
         item->setBrush(QBrush(Qt::gray,Qt::SolidPattern));
         //item->setBrush(myItemColor); //прозрачный цвет
         item->setZValue(1000);

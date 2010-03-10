@@ -1,8 +1,6 @@
 #ifndef QARC_H
 #define QARC_H
 
-#include <QGraphicsLineItem>
-
 #include "qdiagramitem.h"
 
 QT_BEGIN_NAMESPACE
@@ -26,20 +24,11 @@ class TArcTop : public QGraphicsPolygonItem
 {
 public:
     enum { Type = ARC_TOP_TYPE };
-
     TArcTop(QMenu *contextMenu, QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
     int type() const
-    { return Type;}
-
+        { return Type;}
 protected:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-               QWidget *widget = 0);
-    void mousePressEvent(QGraphicsSceneMouseEvent *event);
-    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
-
-
 private:
     QMenu *myContextMenu;
 };
@@ -48,35 +37,32 @@ class TArcLine : public QGraphicsLineItem
 {
 public:
     enum { Type = ARC_LINE_TYPE };
-
     TArcLine(QLineF line, QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
-    int type() const
-    { return Type;}
-    TArc* owner() const
-    { return qgraphicsitem_cast<TArc *>(parentItem()); }
     QPainterPath shape() const;
-
-private:
-
+    int type() const
+        { return Type;}
+    TArc* owner() const
+        { return qgraphicsitem_cast<TArc *>(parentItem()); }
 };
 
 class TArc : public QGraphicsLineItem
 {
-    //Q_OBJECT
+    friend class QDiagramScene;
 public:
     enum { Type = ARC_TYPE };
     QList<TArcLine *> lines;
-
+    TArcLine* currentLine;
     TArc(TTop *startItem, TTop *endItem, QMenu *contextMenu,
       QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
     ~TArc();
-
-    QRectF boundingRect() const;
-    QPainterPath shape() const;
     bool addLine(TArcLine *line);
     TArcLine* newLine(QPointF p1, QPointF p2);
-    TArcLine* currentLine;
-
+    QRectF boundingRect() const;
+    QPainterPath shape() const;
+    void setPriority(int w);
+    void updateBounds();
+    bool remake(TTop *, float dx, float dy);
+    bool autoBuild();
     int type() const
         { return Type; }
     void setColor(const QColor &color)
@@ -98,19 +84,9 @@ public:
             return lines.last();
          else return NULL;
     }
-    void setPriority(int w);
-
-    bool remake(TTop *, float dx, float dy);
-    void realloc();
-    bool autoBuild();
-    void updateBounds();
-public slots:
-    void updatePosition();
-
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                QWidget *widget = 0);
-
 private:
     TTop *myStartTop;
     TTop *myEndTop;
