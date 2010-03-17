@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'toppropertydialog.ui'
 **
-** Created: Mon 8. Mar 21:58:16 2010
+** Created: Thu 18. Mar 00:51:48 2010
 **      by: Qt User Interface Compiler version 4.6.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -33,7 +33,7 @@ public:
     QListView *listView;
     QPushButton *moveUpButton;
     QPushButton *moveDownButton;
-    QWidget *widget;
+    QWidget *layoutWidget;
     QHBoxLayout *_2;
     QLabel *lblWidth;
     QSpinBox *spnBoxWidth;
@@ -59,31 +59,33 @@ public:
         moveDownButton = new QPushButton(TopPropertyDialog);
         moveDownButton->setObjectName(QString::fromUtf8("moveDownButton"));
         moveDownButton->setGeometry(QRect(350, 90, 41, 61));
-        widget = new QWidget(TopPropertyDialog);
-        widget->setObjectName(QString::fromUtf8("widget"));
-        widget->setGeometry(QRect(10, 160, 361, 22));
-        _2 = new QHBoxLayout(widget);
+        layoutWidget = new QWidget(TopPropertyDialog);
+        layoutWidget->setObjectName(QString::fromUtf8("layoutWidget"));
+        layoutWidget->setGeometry(QRect(10, 160, 361, 22));
+        _2 = new QHBoxLayout(layoutWidget);
         _2->setObjectName(QString::fromUtf8("_2"));
         _2->setContentsMargins(0, 0, 0, 0);
-        lblWidth = new QLabel(widget);
+        lblWidth = new QLabel(layoutWidget);
         lblWidth->setObjectName(QString::fromUtf8("lblWidth"));
         lblWidth->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
         _2->addWidget(lblWidth);
 
-        spnBoxWidth = new QSpinBox(widget);
+        spnBoxWidth = new QSpinBox(layoutWidget);
         spnBoxWidth->setObjectName(QString::fromUtf8("spnBoxWidth"));
+        spnBoxWidth->setSingleStep(10);
 
         _2->addWidget(spnBoxWidth);
 
-        lblHeight = new QLabel(widget);
+        lblHeight = new QLabel(layoutWidget);
         lblHeight->setObjectName(QString::fromUtf8("lblHeight"));
         lblHeight->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
         _2->addWidget(lblHeight);
 
-        spnBoxHeight = new QSpinBox(widget);
+        spnBoxHeight = new QSpinBox(layoutWidget);
         spnBoxHeight->setObjectName(QString::fromUtf8("spnBoxHeight"));
+        spnBoxHeight->setSingleStep(10);
 
         _2->addWidget(spnBoxHeight);
 
@@ -91,6 +93,8 @@ public:
         retranslateUi(TopPropertyDialog);
         QObject::connect(buttonBox, SIGNAL(accepted()), TopPropertyDialog, SLOT(accept()));
         QObject::connect(buttonBox, SIGNAL(rejected()), TopPropertyDialog, SLOT(reject()));
+        QObject::connect(spnBoxWidth, SIGNAL(valueChanged(int)), TopPropertyDialog, SLOT(widthChanged(int)));
+        QObject::connect(spnBoxHeight, SIGNAL(valueChanged(int)), TopPropertyDialog, SLOT(heightChanged(int)));
 
         QMetaObject::connectSlotsByName(TopPropertyDialog);
     } // setupUi
