@@ -11,55 +11,7 @@ QDiagramScene::QDiagramScene(QObject *parent)
     textItem = 0;
     newArc = 0;
 
-    myItemColor = Qt::white;
-    myTextColor = Qt::black;
-    myLineColor = Qt::black;
-
     myRootTop = NULL;
-}
-
-void QDiagramScene::setLineColor(const QColor &color)
-{
-    myLineColor = color;
-    if (isItemChange(TArc::Type)) {
-        TArc *item =
-                qgraphicsitem_cast<TArc *>(selectedItems().first());
-        item->setColor(myLineColor);
-        update();
-    }
-}
-
-void QDiagramScene::setTextColor(const QColor &color)
-{
-    myTextColor = color;
-    if (isItemChange(TComment::Type)) {
-        TComment *item =
-                qgraphicsitem_cast<TComment *>(selectedItems().first());
-        item->setDefaultTextColor(myTextColor);
-    }
-}
-
-void QDiagramScene::setItemColor(const QColor &color)
-{
-    myItemColor = color;
-    if (isItemChange(TTop::Type)) {
-        TTop *item =
-                qgraphicsitem_cast<TTop *>(selectedItems().first());
-        item->setBrush(myItemColor);
-    }
-}
-
-void QDiagramScene::setFont(const QFont &font)
-{
-    myFont = font;
-
-    if (isItemChange(TComment::Type)) {
-        QGraphicsTextItem *item =
-                qgraphicsitem_cast<TComment *>(selectedItems().first());
-        //At this point the selection can change so the first selected item might not be a DiagramTextItem
-        if (item)
-            item->setFont(myFont);
-    }
 }
 
 void QDiagramScene::setMode(Mode mode)
@@ -100,13 +52,10 @@ void QDiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
         if (newArc == NULL)
             newArc = new TArc(NULL, NULL, myArcMenu, 0, this);
         line = newArc->newLine(mouseEvent->scenePos(), mouseEvent->scenePos());
-        //futureLine = new QGraphicsLineItem(QLineF(mouseEvent->scenePos(), mouseEvent->scenePos()), 0, this);
-        //futureLine->setPen(QPen(QBrush(Qt::black,Qt::SolidPattern), 2, Qt::DotLine));
         break;
 
     case InsertText:
         textItem = new TComment(myCommentMenu);
-        textItem->setFont(myFont);
         textItem->setTextInteractionFlags(Qt::TextEditorInteraction);
         textItem->setZValue(1000.0);
         connect(textItem, SIGNAL(lostFocus(TComment *)),
@@ -114,7 +63,6 @@ void QDiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
         connect(textItem, SIGNAL(selectedChange(QGraphicsItem *)),
                 this, SIGNAL(itemSelected(QGraphicsItem *)));
         addItem(textItem);
-        textItem->setDefaultTextColor(myTextColor);
         textItem->setPos(mouseEvent->scenePos());
         emit textInserted(textItem);
 
@@ -152,7 +100,6 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
             ;
         }
         line->setLine(newLine);
-        //futureLine->setLine(QLineF(newLine.p2(), mouseEvent->scenePos()));
     }
     //режим перетаскивания дуги
     else if ((myMode == MoveItem) && (mouseEvent->buttons() == Qt::LeftButton) &&
@@ -294,7 +241,6 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
     if (line != NULL && newArc != NULL && myMode == InsertLine) {
-        //delete futureLine;
         //дуга должна начинаться с вершины!
         if (newArc->startItem() == NULL){
             QList<QGraphicsItem *> startItems = items(line->line().p1());

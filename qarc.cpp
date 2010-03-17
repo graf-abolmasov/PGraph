@@ -402,6 +402,12 @@ bool TArc::remake(TTop* aMovedTop, float dx, float dy)
     return false;
 }
 
+void TArc::setPen(const QPen &pen){
+    foreach (TArcLine* arcLine, lines)
+        arcLine->setPen(pen);
+    QGraphicsLineItem::setPen(pen);
+}
+
 /*!
   Конструктор
   @param startItem - указатель на начальную вершину. м.б. NULL
@@ -415,8 +421,7 @@ TArc::TArc(TTop *startItem, TTop *endItem, QMenu *contextMenu,
 {
     myStartTop = startItem;
     myEndTop = endItem;
-    myColor = Qt::black;
-    setPen(QPen(myColor, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+    setPen(QPen(Qt::black, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
     arcTop = new TArcTop(contextMenu, this, scene);
     width = 2;
     currentLine = NULL;
@@ -477,9 +482,8 @@ void TArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
         arcTop->show();
         //СЂРёСЃСѓРµРј СЃС‚СЂРµР»РєСѓ
         QPen myPen = pen();
-        myPen.setColor(myColor);
         painter->setPen(myPen);
-        painter->setBrush(myColor);
+        painter->setBrush(myPen.color());
         myEndTop->getIntersectBound(lines.last()->line()).intersect(lines.last()->line(), &intersectPoint);
         float koeff2 = QLineF(lines.last()->line().p2(), intersectPoint).length(); //ЫЫЫ =)
         QPointF t = lines.last()->line().p2() - QPointF(cos(lines.last()->line().angle() * Pi / 180) * koeff2, -sin(lines.last()->line().angle() * Pi / 180) * koeff2);
@@ -492,7 +496,6 @@ void TArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
         arcHead.clear();
         arcHead << t << arcP1 << arcP2;
         painter->drawPolygon(arcHead);
-        //painter->drawLine(line());
    }
 
    return;
@@ -552,12 +555,9 @@ void TArc::updateBounds(){
 */
 void TArc::setPriority(int w){
     width = w;
-    QPen old_pen;
-    foreach(TArcLine *line, lines){
-        old_pen = line->pen();
-        old_pen.setWidth(w);
-        line->setPen(old_pen);
-    }
+    QPen old_pen = pen();
+    old_pen.setWidth(w);
+    setPen(old_pen);
 }
 
 void TArcTop::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
@@ -583,6 +583,20 @@ TArcTop::TArcTop(QMenu *contextMenu, QGraphicsItem *parent, QGraphicsScene *scen
 
 QRectF TArcTop::boundingRect() const {
     return QGraphicsPolygonItem::boundingRect().adjusted(-2, -2, 2, 2);
+}
+
+QVariant TArcTop::itemChange(GraphicsItemChange change, const QVariant &value){
+    if (change == QGraphicsItem::ItemSelectedHasChanged) {
+        TArc* arc = qgraphicsitem_cast<TArc* >(parentItem());
+        QPen pen = arc->pen();
+        if (isSelected())
+            pen.setColor(Qt::green);
+        else
+            pen.setColor(Qt::black);
+        arc->setPen(pen);
+    }
+
+    return value;
 }
 
 TArcLine::TArcLine(QLineF line, QGraphicsItem *parent, QGraphicsScene *scene)

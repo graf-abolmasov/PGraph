@@ -30,6 +30,7 @@ public:
     QRectF boundingRect() const;
 protected:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
+    QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 private:
     QMenu *myContextMenu;
 };
@@ -64,10 +65,6 @@ public:
     void updateBounds();
     int type() const
         { return Type; }
-    void setColor(const QColor &color)
-        { myColor = color; }
-    QColor color() const
-        { return myColor; }
     int priority()
         { return width; }
     void setStartTop(TTop* startTop)
@@ -83,15 +80,16 @@ public:
             return lines.last();
          else return NULL;
     }
+    void setPen(const QPen &pen);
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                QWidget *widget = 0);
+
 private:
     TTop *myStartTop;
     TTop *myEndTop;
-    QColor myColor;
-    QPolygonF arcHead;
     TArcTop *arcTop;
+    QPolygonF arcHead;
     QMenu *myContextMenu;
     int width;  //приоритет
     bool autoBuild(TTop* top, float dx, float dy);

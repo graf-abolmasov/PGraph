@@ -128,15 +128,6 @@ void TDrawWindow::itemInserted(TTop *item)
 
 void TDrawWindow::itemSelected(QGraphicsItem *item)
 {
-    if (item->type() == TArcTop::Type){
-        TArcTop* arcTop = qgraphicsitem_cast<TArcTop* >(item);
-        TArc* arc = qgraphicsitem_cast<TArc* >(arcTop->parentItem());
-        foreach (TArcLine* line, arc->lines){
-            QPen pen = line->pen();
-            pen.setColor(Qt::green);
-            line->setPen(pen);
-        }
-    }
     //setWindowTitle("sdfdasf");
 }
 
