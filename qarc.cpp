@@ -19,7 +19,16 @@ int dvec2log(float dx, float dy){
 /*!
   ”прощенный алгоритм перестройки дуги
 */
-bool TArc::autoBuild(){
+bool TArc::autoBuild(TTop* top, float dx, float dy){
+    QPointF startPoint;
+    QPointF endPoint;
+    if (top == startItem()){
+        startPoint = lines.first()->line().p1() + QPointF(dx, dy);
+        endPoint = lines.last()->line().p2();
+    } else {
+        startPoint = lines.first()->line().p1();
+        endPoint = lines.last()->line().p2() + QPointF(dx, dy);
+    }
 
     foreach(TArcLine* line, lines){
         delete line;
@@ -27,14 +36,84 @@ bool TArc::autoBuild(){
     }
     lines.clear();
 
-    QLineF endLine = QLineF(QPointF(myStartTop->scenePos().x(), myEndTop->scenePos().y()), myEndTop->scenePos());
-    QLineF startLine = QLineF(myStartTop->scenePos(), QPointF(myStartTop->scenePos().x(), myEndTop->scenePos().y()));
+    /*высчитываем главный вектор дуги*/
+    QLineF centerLine(startPoint, endPoint);
 
-    newLine(startLine.p1(), startLine.p2());
-    newLine(endLine.p1(), endLine.p2());
+    QPointF startIntersectPoint;
+    QLineF polyLineStart;
+    for (int i = 1; i < 5; i++){
+        QPointF p1 = startItem()->polygon().at(i-1) + startItem()->scenePos();
+        QPointF p2 = startItem()->polygon().at(i) + startItem()->scenePos();
+        polyLineStart = QLineF(p1, p2);
+        QLineF::IntersectType intersectType = polyLineStart.intersect(centerLine, &startIntersectPoint);
+        if (intersectType == QLineF::BoundedIntersection)
+            break;
+    }
+    QPointF endIntersectPoint;
+    QLineF polyLineEnd;
+    for (int i = 1; i < 5; i++){
+        QPointF p1 = endItem()->polygon().at(i-1) + endItem()->scenePos();
+        QPointF p2 = endItem()->polygon().at(i) + endItem()->scenePos();
+        polyLineEnd = QLineF(p1, p2);
+        QLineF::IntersectType intersectType = polyLineEnd.intersect(centerLine, &endIntersectPoint);
+        if (intersectType == QLineF::BoundedIntersection)
+            break;
+    }
+
+    double deltaY = endPoint.y() - startPoint.y();
+    double deltaX = endPoint.x() - startPoint.x();
+    QPointF P1, P2;
+    //vertical border start
+    if ((polyLineStart.angle() == 90) ||
+        (polyLineStart.angle() == 270)) {
+
+        //parallel border end
+        if ((polyLineEnd.angleTo(polyLineStart) == 0) ||
+            (polyLineEnd.angleTo(polyLineStart) == 180)) {
+            P1.setX(startPoint.x() + deltaX/2);
+            P1.setY(startPoint.y());
+            P2.setX(P1.x());
+            P2.setY(endPoint.y());
+            newLine(startPoint, P1);
+            newLine(P1, P2);
+            newLine(P2, endPoint);
+        }
+        //perpendicular border end
+        if ((polyLineEnd.angleTo(polyLineStart) == 90) ||
+            (polyLineEnd.angleTo(polyLineStart) == 270)) {
+            P1.setX(endPoint.x());
+            P1.setY(startPoint.y());
+            newLine(startPoint, P1);
+            newLine(P1, endPoint);
+        }
+    }
+    //horizontal border start
+    if ((polyLineStart.angle() == 0) ||
+        (polyLineStart.angle() == 180)) {
+        //perpendicular border end
+        if ((polyLineEnd.angleTo(polyLineStart) == 90) ||
+            (polyLineEnd.angleTo(polyLineStart) == 270)) {
+            P1.setX(startPoint.x());
+            P1.setY(endPoint.y());
+            newLine(startPoint, P1);
+            newLine(P1, endPoint);
+        }
+        //parallel border end
+        if ((polyLineEnd.angleTo(polyLineStart) == 0) ||
+            (polyLineEnd.angleTo(polyLineStart) == 180)) {
+            P1.setX(startPoint.x());
+            P1.setY(startPoint.y() + deltaY/2);
+            P2.setX(endPoint.x());
+            P2.setY(P1.y());
+            newLine(startPoint, P1);
+            newLine(P1, P2);
+            newLine(P2, endPoint);
+        }
+    }
     addLine(currentLine);
 
     currentLine = NULL;
+    return true;
 }
 
 /*!
@@ -65,10 +144,26 @@ bool TArc::remake(TTop* aMovedTop, float dx, float dy)
         //заполн€ем структуры, необходимые дл€ старого алгоритма
         int otr = lines.count();
         QPointF pts[4];
-        for(int i = 0; i < otr; i++){
+        int i;
+        for(i =0; i < otr; i++){
             pts[i] = lines.at(i)->line().p1();
             pts[i+1] = lines.at(i)->line().p2();
         }
+
+        QLineF startBorder = startItem()->getIntersectBound(lines.first()->line());
+        QLineF endBorder = endItem()->getIntersectBound(lines.last()->line());
+
+        QPointF startIntersectPoint;
+        QPointF endIntersectPoint;
+
+        startBorder.intersect(lines.first()->line(), &startIntersectPoint);
+        endBorder.intersect(lines.last()->line(), &endIntersectPoint);
+
+        QPointF deltaStartPoint = lines.first()->line().p1() - startIntersectPoint;
+        QPointF deltaEndPoint = lines.last()->line().p2() - endIntersectPoint;
+
+        pts[0] = startIntersectPoint;
+        pts[i] = endIntersectPoint;
 
         bool fMovedTo = (aMovedTop == myEndTop);
         if (fMovedTo) //двигали конечную вершину
@@ -147,9 +242,12 @@ bool TArc::remake(TTop* aMovedTop, float dx, float dy)
         }
         lines.clear();
         currentLine = NULL;
-        for (j = 0; j < otr; j++){
+
+        newLine(pts[0] + deltaStartPoint, pts[1]);
+        for (j = 1; j < otr - 1; j++){
             newLine(pts[j], pts[j+1]);
         }
+        newLine(pts[otr-1], pts[otr] + deltaEndPoint);
         addLine(currentLine);
         currentLine = NULL;
 
@@ -394,9 +492,10 @@ void TArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
         arcHead.clear();
         arcHead << t << arcP1 << arcP2;
         painter->drawPolygon(arcHead);
+        //painter->drawLine(line());
    }
 
-    return;
+   return;
 }
 
 /*!
@@ -480,6 +579,10 @@ TArcTop::TArcTop(QMenu *contextMenu, QGraphicsItem *parent, QGraphicsScene *scen
     setFlag(QGraphicsItem::ItemIsMovable, false);
     setBrush(QBrush(Qt::gray, Qt::SolidPattern));
     setPolygon(myPolygon);
+}
+
+QRectF TArcTop::boundingRect() const {
+    return QGraphicsPolygonItem::boundingRect().adjusted(-2, -2, 2, 2);
 }
 
 TArcLine::TArcLine(QLineF line, QGraphicsItem *parent, QGraphicsScene *scene)

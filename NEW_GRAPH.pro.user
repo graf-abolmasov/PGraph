@@ -86,12 +86,14 @@
     <value type="QString">FP_NO_HOST_CHECK=NO</value>
     <value type="QString">HOMEDRIVE=C:</value>
     <value type="QString">HOMEPATH=\Users\Граф</value>
+    <value type="QString">KMP_DUPLICATE_LIB_OK=TRUE</value>
     <value type="QString">LOCALAPPDATA=C:\Users\Граф\AppData\Local</value>
     <value type="QString">LOGONSERVER=\\FUZZYLOGIC</value>
+    <value type="QString">MKL_SERIAL=YES</value>
     <value type="QString">NUMBER_OF_PROCESSORS=2</value>
     <value type="QString">OPENRDA_INI=C:\Program Files\CA\ERwin Data Modeler r7.3\OpenAccess\bin\iwinnt\openrda.ini</value>
     <value type="QString">OS=Windows_NT</value>
-    <value type="QString">PATH=C:\Qt\4.6.0_OpenSource\mingw\bin;C:\Qt\4.6.0_OpenSource\qt\bin;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Program Files\TortoiseSVN\bin;C:\Program Files\MySQL\MySQL Server 5.1\bin;"C:\Program Files\MySQL\Connector JDBC 5.1.12\mysql-connector-java-5.1.12-bin";C:\glassfishv3\glassfish\bin;C:\Program Files\CMake 2.8\bin;C:\Qt\4.6.0_OpenSource\mingw\bin;C:\Program Files\doxygen\bin;C:\Qt\4.6.0_OpenSource\qt\include;C:\Qt\4.6.0_OpenSource\qt\bin</value>
+    <value type="QString">PATH=C:\Qt\4.6.0_OpenSource\mingw\bin;C:\Qt\4.6.0_OpenSource\qt\bin;C:\Program Files\MiKTeX 2.8\miktex\bin;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Program Files\TortoiseSVN\bin;;"C:\Program Files\MySQL\Connector JDBC 5.1.12\mysql-connector-java-5.1.12-bin";C:\glassfishv3\glassfish\bin;C:\Program Files\CMake 2.8\bin;C:\Qt\4.6.0_OpenSource\mingw\bin;C:\Program Files\doxygen\bin;C:\Qt\4.6.0_OpenSource\qt\include;C:\Qt\4.6.0_OpenSource\qt\bin;C:\Program Files\MySQL\MySQL Server 5.1\bin</value>
     <value type="QString">PATHEXT=.COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC</value>
     <value type="QString">PROCESSOR_ARCHITECTURE=x86</value>
     <value type="QString">PROCESSOR_IDENTIFIER=x86 Family 6 Model 23 Stepping 6, GenuineIntel</value>
@@ -137,12 +139,14 @@
     <value type="QString">FP_NO_HOST_CHECK=NO</value>
     <value type="QString">HOMEDRIVE=C:</value>
     <value type="QString">HOMEPATH=\Users\Граф</value>
+    <value type="QString">KMP_DUPLICATE_LIB_OK=TRUE</value>
     <value type="QString">LOCALAPPDATA=C:\Users\Граф\AppData\Local</value>
     <value type="QString">LOGONSERVER=\\FUZZYLOGIC</value>
+    <value type="QString">MKL_SERIAL=YES</value>
     <value type="QString">NUMBER_OF_PROCESSORS=2</value>
     <value type="QString">OPENRDA_INI=C:\Program Files\CA\ERwin Data Modeler r7.3\OpenAccess\bin\iwinnt\openrda.ini</value>
     <value type="QString">OS=Windows_NT</value>
-    <value type="QString">PATH=C:\Qt\4.6.0_OpenSource\mingw\bin;C:\Qt\4.6.0_OpenSource\qt\bin;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Program Files\TortoiseSVN\bin;C:\Program Files\MySQL\MySQL Server 5.1\bin;"C:\Program Files\MySQL\Connector JDBC 5.1.12\mysql-connector-java-5.1.12-bin";C:\glassfishv3\glassfish\bin;C:\Program Files\CMake 2.8\bin;C:\Qt\4.6.0_OpenSource\mingw\bin;C:\Program Files\doxygen\bin;C:\Qt\4.6.0_OpenSource\qt\include;C:\Qt\4.6.0_OpenSource\qt\bin</value>
+    <value type="QString">PATH=C:\Qt\4.6.0_OpenSource\mingw\bin;C:\Qt\4.6.0_OpenSource\qt\bin;C:\Program Files\MiKTeX 2.8\miktex\bin;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Program Files\TortoiseSVN\bin;;"C:\Program Files\MySQL\Connector JDBC 5.1.12\mysql-connector-java-5.1.12-bin";C:\glassfishv3\glassfish\bin;C:\Program Files\CMake 2.8\bin;C:\Qt\4.6.0_OpenSource\mingw\bin;C:\Program Files\doxygen\bin;C:\Qt\4.6.0_OpenSource\qt\include;C:\Qt\4.6.0_OpenSource\qt\bin;C:\Program Files\MySQL\MySQL Server 5.1\bin</value>
     <value type="QString">PATHEXT=.COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC</value>
     <value type="QString">PROCESSOR_ARCHITECTURE=x86</value>
     <value type="QString">PROCESSOR_IDENTIFIER=x86 Family 6 Model 23 Stepping 6, GenuineIntel</value>
@@ -179,18 +183,21 @@
    <valuelist key="abstractProcess.Environment" type="QVariantList">
     <value type="QString">ALLUSERSPROFILE=C:\ProgramData</value>
     <value type="QString">APPDATA=C:\Users\Граф\AppData\Roaming</value>
+    <value type="QString">CLASSPATH=C:\Program Files\MySQL\Connector JDBC 5.1.12\mysql-connector-java-5.1.12-bin.jar</value>
     <value type="QString">COMMONPROGRAMFILES=C:\Program Files\Common Files</value>
     <value type="QString">COMPUTERNAME=FUZZYLOGIC</value>
     <value type="QString">COMSPEC=C:\Windows\system32\cmd.exe</value>
     <value type="QString">FP_NO_HOST_CHECK=NO</value>
     <value type="QString">HOMEDRIVE=C:</value>
     <value type="QString">HOMEPATH=\Users\Граф</value>
+    <value type="QString">KMP_DUPLICATE_LIB_OK=TRUE</value>
     <value type="QString">LOCALAPPDATA=C:\Users\Граф\AppData\Local</value>
     <value type="QString">LOGONSERVER=\\FUZZYLOGIC</value>
+    <value type="QString">MKL_SERIAL=YES</value>
     <value type="QString">NUMBER_OF_PROCESSORS=2</value>
     <value type="QString">OPENRDA_INI=C:\Program Files\CA\ERwin Data Modeler r7.3\OpenAccess\bin\iwinnt\openrda.ini</value>
     <value type="QString">OS=Windows_NT</value>
-    <value type="QString">PATH=C:\Qt\4.6.0_OpenSource\mingw\bin;C:\Qt\4.6.0_OpenSource\qt\bin;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Program Files\TortoiseSVN\bin;C:\Program Files\MySQL\MySQL Server 5.1\bin;"C:\Program Files\MySQL\Connector JDBC 5.1.12\mysql-connector-java-5.1.12-bin"</value>
+    <value type="QString">PATH=C:\Qt\4.6.0_OpenSource\mingw\bin;C:\Qt\4.6.0_OpenSource\qt\bin;C:\Program Files\MiKTeX 2.8\miktex\bin;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Program Files\TortoiseSVN\bin;;"C:\Program Files\MySQL\Connector JDBC 5.1.12\mysql-connector-java-5.1.12-bin";C:\glassfishv3\glassfish\bin;C:\Program Files\CMake 2.8\bin;C:\Qt\4.6.0_OpenSource\mingw\bin;C:\Program Files\doxygen\bin;C:\Qt\4.6.0_OpenSource\qt\include;C:\Qt\4.6.0_OpenSource\qt\bin;C:\Program Files\MySQL\MySQL Server 5.1\bin</value>
     <value type="QString">PATHEXT=.COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC</value>
     <value type="QString">PROCESSOR_ARCHITECTURE=x86</value>
     <value type="QString">PROCESSOR_IDENTIFIER=x86 Family 6 Model 23 Stepping 6, GenuineIntel</value>

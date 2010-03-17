@@ -23,6 +23,7 @@ class TArc;
 class TTop : public QGraphicsPolygonItem
 {
     friend class QDiagramScene;
+    friend class TArc;
 
 public:
     enum { Type = UserType + 15 };
@@ -32,17 +33,19 @@ public:
     void removeArcs();
     void setIcon(QImage icon);
     void autoArrangeArcsAtBound(QLineF bound);
+    void autoArrangeArcs(QList<TArc* > brokenLines);
     void addArc(TArc *arc);
     void setAsRoot(bool flag);
+    float getMinWidth();
+    float getMinHeight();
     QLineF getIntersectBound(QLineF line);
-    QPolygonF polygon() const
-        { return myPolygon; }
     int type() const
         { return Type; }
     QList<TArc *> allArcs()
         { return arcs; }
     QList<TArc *> inArcs();
     QList<TArc *> outArcs();
+    QRectF boundingRect() const;
 protected:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
@@ -52,7 +55,6 @@ private:
     QList<TArc *> arcs;
     QMenu *myContextMenu;
     QImage myIcon;
-    QPolygonF myPolygon;
     QList<TArc *> getArcsAtBound(int i);
     QList<TArc *> getArcsAtBound(QLineF bound);
     static int counter;

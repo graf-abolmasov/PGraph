@@ -20,8 +20,13 @@ public:
 protected:
     void changeEvent(QEvent *e);
 
+public slots:
+    void widthChanged(int w);
+    void heightChanged(int h);
+
 private:
     Ui::TopPropertyDialog *ui;
+    TTop* myTop;
 };
 
 #endif // TOPPROPERTYDIALOG_H

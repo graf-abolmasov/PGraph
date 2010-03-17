@@ -90,7 +90,7 @@ void QDiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
         item = new TTop(myItemMenu);
         item->setBrush(QBrush(Qt::gray,Qt::SolidPattern));
         //item->setBrush(myItemColor); //прозрачный цвет
-        item->setZValue(1000);
+        item->setZValue(1);
         addItem(item);
         item->setPos(mouseEvent->scenePos());
         emit itemInserted(item);
@@ -184,8 +184,9 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
             }
         }
         //проверим чтобы начальная точка не вылезла из вершины!
-        if ((arc->endItem()->sceneBoundingRect().contains(arc->lines.last()->line().p2()) &&
-              arc->startItem()->sceneBoundingRect().contains(arc->lines.first()->line().p1()))){
+        if ((arc->endItem()->sceneBoundingRect().adjusted(8, 8, -8, -8).contains(arc->lines.last()->line().p2() + QPointF(dx, dy)) &&
+              arc->startItem()->sceneBoundingRect().adjusted(8, 8, -8, -8).contains(arc->lines.first()->line().p1() + QPointF(dx, dy))) &&
+             (arc->contains(arc->mapFromScene(mouseEvent->lastScenePos())))){
 
             //вправо-влево можно двигать только вертикальные линии (пока)
             if (selectedLine->line().p1().x() == selectedLine->line().p2().x()){
@@ -230,12 +231,14 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
                                              )
                                       );
             }
-        }
+        };
+
         arc->updateBounds();
     }
     //режим перетаскивания вершины
     else if ((myMode == MoveItem) && (mouseEvent->buttons() == Qt::LeftButton) &&
-             (selectedItems().count() == 1) && (selectedItems().first()->type() == TTop::Type)) {
+             (selectedItems().count() == 1) && (selectedItems().first()->type() == TTop::Type) &&
+             (selectedItems().first()->contains(selectedItems().first()->mapFromScene(mouseEvent->lastScenePos())))) {
         TTop *top = qgraphicsitem_cast<TTop *>(selectedItems().first());
         QPointF old_pos = mouseEvent->lastScenePos();
         QPointF new_pos = mouseEvent->scenePos();
@@ -243,6 +246,19 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
         QLineF vector(old_pos, new_pos);
         float dx = vector.dx();
         float dy = vector.dy();
+
+        top->setX(top->x() + dx);
+        top->setY(top->y() + dy);
+
+        QList<QGraphicsItem* > itemList = collidingItems(top, Qt::IntersectsItemBoundingRect);
+        foreach(QGraphicsItem* item, itemList){
+            if (item->type() == TTop::Type){
+                top->setX(top->x() - dx);
+                top->setY(top->y() - dy);
+                mouseEvent->ignore();
+                return;
+            }
+        }
 
         bool isOK = false; //false - если дугу надо полностью переделать
 
@@ -253,17 +269,25 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
                brokenLines.append(arc);
         }
 
-        top->setX(top->x() + dx);
-        top->setY(top->y() + dy);
+        foreach (TArc *arc, brokenLines)
+            arc->autoBuild(top, dx, dy);
 
+
+        /*QList<TTop* > brokenTopList;
         foreach (TArc *arc, brokenLines){
-                arc->autoBuild();
-            }
+            if (!brokenTopList.contains(arc->startItem()))
+                brokenTopList.append(arc->startItem());
+            if (!brokenTopList.contains(arc->endItem()))
+                brokenTopList.append(arc->endItem());
+        }
+        foreach (TTop* top, brokenTopList){
+            top->autoArrangeArcs(brokenLines);
+        }*/
 
         //необходимо для правильной перерисовки.
-        foreach (TArc *arc, top->allArcs()){
+        foreach (TArc *arc, top->allArcs())
             arc->updateBounds();
-        }
+
     }
 }
 
@@ -314,7 +338,6 @@ void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
             }
             newArc->startItem()->addArc(newArc);
             newArc->endItem()->addArc(newArc);
-            //newArc->realloc();
             newArc->updateBounds();
             update();
             newArc->currentLine = NULL;

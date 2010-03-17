@@ -27,6 +27,7 @@ public:
     TArcTop(QMenu *contextMenu, QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
     int type() const
         { return Type;}
+    QRectF boundingRect() const;
 protected:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 private:
@@ -61,8 +62,6 @@ public:
     QPainterPath shape() const;
     void setPriority(int w);
     void updateBounds();
-    bool remake(TTop *, float dx, float dy);
-    bool autoBuild();
     int type() const
         { return Type; }
     void setColor(const QColor &color)
@@ -95,6 +94,8 @@ private:
     TArcTop *arcTop;
     QMenu *myContextMenu;
     int width;  //приоритет
+    bool autoBuild(TTop* top, float dx, float dy);
+    bool remake(TTop *, float dx, float dy);
 };
 
 #endif
