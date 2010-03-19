@@ -534,7 +534,7 @@ TArcLine* TArc::newLine(QPointF p1, QPointF p2){
         addLine(currentLine);
         currentLine = new TArcLine(QLineF(prevLine()->line().p2(), p2), this, scene());
     }
-    currentLine->setPen(QPen(QBrush(Qt::black,Qt::SolidPattern),2,Qt::SolidLine));
+    currentLine->setPen(pen());
     currentLine->setFlag(QGraphicsItem::ItemIsMovable, true);
     currentLine->setFlag(QGraphicsItem::ItemIsSelectable, true);
     currentLine->setZValue(-1000);

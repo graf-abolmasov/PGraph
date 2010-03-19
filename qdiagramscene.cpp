@@ -219,18 +219,6 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
         foreach (TArc *arc, brokenLines)
             arc->autoBuild(top, dx, dy);
 
-
-        /*QList<TTop* > brokenTopList;
-        foreach (TArc *arc, brokenLines){
-            if (!brokenTopList.contains(arc->startItem()))
-                brokenTopList.append(arc->startItem());
-            if (!brokenTopList.contains(arc->endItem()))
-                brokenTopList.append(arc->endItem());
-        }
-        foreach (TTop* top, brokenTopList){
-            top->autoArrangeArcs(brokenLines);
-        }*/
-
         //необходимо для правильной перерисовки.
         foreach (TArc *arc, top->allArcs())
             arc->updateBounds();
