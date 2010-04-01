@@ -5,7 +5,7 @@
 
 int main(int argc, char *argv[])
 {  	
-    QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF8"));
+    QTextCodec::setCodecForTr(QTextCodec::codecForName("windows-1251"));
     QApplication a(argc, argv);
     TMyWindow w;
     srand(time(NULL));

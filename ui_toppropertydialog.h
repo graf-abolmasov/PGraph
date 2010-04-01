@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'toppropertydialog.ui'
 **
-** Created: Mon 29. Mar 22:48:20 2010
+** Created: Thu 1. Apr 20:47:56 2010
 **      by: Qt User Interface Compiler version 4.6.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!

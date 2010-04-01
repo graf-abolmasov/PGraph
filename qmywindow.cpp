@@ -1,4 +1,5 @@
 #include "qmywindow.h"
+#include "qobjecteditor.h"
 
 TMyWindow::TMyWindow()
 {
@@ -15,20 +16,20 @@ TMyWindow::~TMyWindow()
 
 void TMyWindow::createMenus()
 {
-    fileMenu = menuBar()->addMenu(tr("Р“СЂР°С„"));
+    fileMenu = menuBar()->addMenu(tr("Файл"));
     fileMenu->addAction(newGraphAct);
     fileMenu->addAction(openGraphAct);
     fileMenu->addAction(saveGraphAct);
     fileMenu->addAction(saveAsGraphAct);
     fileMenu->addAction(saveAsImageGraphAct);
 
-    objectMenu = menuBar()->addMenu(tr("РћР±СЉРµРєС‚"));
-    objectMenu->addAction(viewContentAct);
-    objectMenu->addAction(viewGarbageAct);
+    objectMenu = menuBar()->addMenu(tr("Объект"));
     objectMenu->addAction(openObjectEditorAct);
     objectMenu->addAction(registerUnitAct);
+    objectMenu->addAction(viewContentAct);
+    objectMenu->addAction(viewGarbageAct);
 
-    buildMenu = menuBar()->addMenu(tr("Р—Р°РїСѓСЃРє"));
+    buildMenu = menuBar()->addMenu(tr("Запуск"));
     buildMenu->addAction(runAct);
     buildMenu->addAction(compileAct);
     buildMenu->addAction(saveStructAct);
@@ -39,47 +40,47 @@ void TMyWindow::createActions()
 {
     //Р“СЂР°С„
 
-    newGraphAct = new QAction(tr("РЎРѕР·РґР°С‚СЊ"), this);
+    newGraphAct = new QAction(tr("Создать"), this);
     newGraphAct->setShortcuts(QKeySequence::New);
-    newGraphAct->setStatusTip(tr("РЎРѕР·РґР°С‚СЊ С„Р°Р№Р»"));
+    newGraphAct->setStatusTip(tr("Создать пустой граф"));
     connect(newGraphAct, SIGNAL(triggered()), this, SLOT(CMGNew()));
 
-    openGraphAct = new QAction(tr("РћС‚РєСЂС‹С‚СЊ"), this);
+    openGraphAct = new QAction(tr("Открыть"), this);
     openGraphAct->setShortcuts(QKeySequence::Open);
-    openGraphAct->setStatusTip(tr("РћС‚РєСЂС‹С‚СЊ С„Р°Р№Р»"));
+    openGraphAct->setStatusTip(tr("ОТкрыть из базы"));
     connect(openGraphAct, SIGNAL(triggered()), this, SLOT(CMGOpen()));
 
-    saveGraphAct = new QAction(tr("РЎРѕС…СЂР°РЅРёС‚СЊ"), this);
+    saveGraphAct = new QAction(tr("Сохранить"), this);
     saveGraphAct->setShortcuts(QKeySequence::Save);
-    saveGraphAct->setStatusTip(tr("РЎРѕС…СЂР°РЅРёС‚СЊ РІ С„Р°Р№Р»"));
+    saveGraphAct->setStatusTip(tr("Сохранить в базу"));
     connect(saveGraphAct, SIGNAL(triggered()), this, SLOT(CMGSave()));
 
-    saveAsGraphAct = new QAction(tr("РЎРѕС…СЂР°РЅРёС‚СЊ РєР°Рє"), this);
+    saveAsGraphAct = new QAction(tr("Сохранить как"), this);
     saveAsGraphAct->setShortcuts(QKeySequence::SaveAs);
-    saveAsGraphAct->setStatusTip(tr("РЎРѕС…СЂР°РЅРёС‚СЊ РІ РЅРѕРІС‹Р№ С„Р°Р№Р»"));
+    saveAsGraphAct->setStatusTip(tr("Сохраняет в базу"));
     connect(saveAsGraphAct, SIGNAL(triggered()), this, SLOT(CMGSaveAs()));
 
-    saveAsImageGraphAct = new QAction(tr("РЎРѕС…СЂР°РЅРёС‚СЊ РєР°Рє РєР°СЂС‚РёРЅРєСѓ"), this);
+    saveAsImageGraphAct = new QAction(tr("Сохранить как картинку"), this);
     saveAsImageGraphAct->setShortcuts(QKeySequence::SaveAs);
-    saveAsImageGraphAct->setStatusTip(tr("РЎРѕС…СЂР°РЅРёС‚СЊ РєР°Рє png С„Р°Р№Р»"));
+    saveAsImageGraphAct->setStatusTip(tr("Схраняет как картинку"));
     connect(saveAsImageGraphAct, SIGNAL(triggered()), this, SLOT(CMGSaveAsImage()));
 
     //РћР±СЉРµРєС‚
 
-    viewContentAct = new QAction(tr("Р”РµСЂРµРІРѕ РѕР±СЉРµРєС‚РѕРІ"), this);
-    viewContentAct->setStatusTip(tr("РџСЂРѕСЃРјРѕС‚СЂ РґРµСЂРµРІР° РѕР±СЉРµРєС‚РѕРІ"));
+    viewContentAct = new QAction(tr("Дерево объектов"), this);
+    viewContentAct->setStatusTip(tr("Дерево объектов"));
     connect(viewContentAct, SIGNAL(triggered()), this, SLOT(CMContent()));
 
-    viewGarbageAct = new QAction(tr("РќРµРёСЃРїРѕР»СЊР·СѓРµРјС‹Рµ РѕР±СЉРµРєС‚С‹"), this);
-    viewGarbageAct->setStatusTip(tr("РџСЂРѕСЃРјРѕС‚СЂ РЅРµРёСЃРїРѕР»СЊР·СѓРµРјС‹С… РѕР±СЉРµРєС‚РѕРІ"));
+    viewGarbageAct = new QAction(tr("Неиспользуемые объекты"), this);
+    viewGarbageAct->setStatusTip(tr("Неиспользуемые объекты"));
     connect(viewGarbageAct, SIGNAL(triggered()), this, SLOT(CMShowGarbage()));
 
-    registerUnitAct = new QAction(tr("Р—Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°С‚СЊ РјРѕРґСѓР»СЊ"), this);
-    registerUnitAct->setStatusTip(tr("Р—Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°С‚СЊ РјРѕРґСѓР»СЊ"));
+    registerUnitAct = new QAction(tr("Зарегистрировать модуль"), this);
+    registerUnitAct->setStatusTip(tr("Зарегистрировать модуль"));
     connect(registerUnitAct, SIGNAL(triggered()), this, SLOT(CMNewModule()));
 
-    openObjectEditorAct = new QAction(tr("Р—Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°С‚СЊ РјРѕРґСѓР»СЊ"), this);
-    openObjectEditorAct->setStatusTip(tr("Р—Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°С‚СЊ РјРѕРґСѓР»СЊ"));
+    openObjectEditorAct = new QAction(tr("Редактор объектов"), this);
+    openObjectEditorAct->setStatusTip(tr("Редактор объектов"));
     connect(openObjectEditorAct, SIGNAL(triggered()), this, SLOT(CMObjList()));
 
     //Р—Р°РїСѓСЃРє
@@ -202,4 +203,12 @@ void TMyWindow::CMGSaveAsImage()
 void TMyWindow::CMGSaveAs()
 {
 
+}
+
+void TMyWindow::CMObjList()
+{
+    QObjectEditor editor;
+    if (editor.exec()){
+
+    }
 }
