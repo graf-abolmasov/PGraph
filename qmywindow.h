@@ -35,6 +35,7 @@ private:
     QAction *compileAct;
     QAction *saveStructAct;
     QAction *manualInputAct;
+
     //LeftToolBar
     QToolButton *pointerButton;
     QToolButton *addArcButton;
@@ -69,7 +70,7 @@ private slots:
     void CMContent(){}		// +Объект->Дерево объектов
     void CMShowGarbage(){}	// +Объект->Неиспользуемые объекты
     void CMNewModule(){}	// +Объект->Зарегистрировать модуль
-    void CMObjList(){}		// +Объект->� едактор объектов
+    void CMObjList();		// +Объект->� едактор объектов
     void CMEdtVar(){}		// Данные->Словарь данных
     void CMEdtType(){}		// Данные->Список типов
     void CMGspUser(){}		// Данные->Gspuser.h

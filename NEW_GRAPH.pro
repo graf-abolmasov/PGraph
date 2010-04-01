@@ -14,7 +14,8 @@ SOURCES += main.cpp \
     toppropertydialog.cpp \
     qsyncarc.cpp \
     qarcline.cpp \
-    qarctop.cpp
+    qarctop.cpp \
+    qobjecteditor.cpp
 HEADERS += qmywindow.h \
     qdrawwindow.h \
     qdiagramitem.h \
@@ -24,6 +25,8 @@ HEADERS += qmywindow.h \
     toppropertydialog.h \
     qsyncarc.h \
     qarcline.h \
-    qarctop.h
+    qarctop.h \
+    qobjecteditor.h
 RESOURCES += resources.qrc
-FORMS += toppropertydialog.ui
+FORMS += toppropertydialog.ui \
+    qobjecteditor.ui
