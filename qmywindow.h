@@ -36,12 +36,11 @@ private:
     QAction *saveStructAct;
     QAction *manualInputAct;
     //LeftToolBar
-    //!!QAction *addTopAct;
-    //!!QAction *addCommentAct;
     QToolButton *pointerButton;
-    QToolButton *linePointerButton;
+    QToolButton *addArcButton;
     QToolButton *addCommentButton;
     QToolButton *addTopButton;
+    QToolButton *addSyncArcButton;
     QButtonGroup *pointerTypeGroup;
 
     QToolBar *mainToolBar;

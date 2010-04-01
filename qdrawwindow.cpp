@@ -1,9 +1,8 @@
-ï»¿#include <QtGui>
-#include "qdrawwindow.h"
-#include "qarc.h"
-#include "toppropertydialog.h"
+#include <QtGui>
 #include <QCoreApplication>
-
+#include <QPointF>
+#include "qdrawwindow.h"
+#include "qdiagramitem.h"
 
 TDrawWindow::TDrawWindow()
 {
@@ -16,6 +15,7 @@ TDrawWindow::TDrawWindow()
     scene->setBackgroundBrush(QBrush(Qt::white));
     scene->setArcMenu(arcMenu);
     scene->setCommentMenu(commentMenu);
+    scene->setSyncArcMenu(syncArcMenu);
     scene->setSceneRect(-800, -600, 800, 600);
     connect(scene, SIGNAL(itemInserted(TTop *)),
             this, SLOT(itemInserted(TTop *)));
@@ -40,6 +40,9 @@ void TDrawWindow::createMenus()
 
     arcMenu = new QMenu();
     arcMenu->addAction(deleteArcAction);
+
+    syncArcMenu = new QMenu();
+    syncArcMenu->addAction(deleteSyncAction);
 
     commentMenu = new QMenu();
     commentMenu->addAction(deleteCommentAction);
@@ -67,6 +70,10 @@ void TDrawWindow::createActions()
     deleteArcAction->setStatusTip(tr("Ð£Ð´Ð°Ð»ÑÐµÑ‚ Ð¾Ð±ÑŠÐµÐºÑ‚"));
     connect(deleteArcAction, SIGNAL(triggered()), this, SLOT(deleteArc()));
 
+    deleteSyncAction = new QAction(QIcon(";/images/delete.png"), tr("Ð£Ð´Ð°Ð»Ð¸Ñ‚ÑŒ"), this);
+    deleteSyncAction->setStatusTip(tr("Ð£Ð´Ð°Ð»ÑÐµÑ‚ Ð¾Ð±ÑŠÐµÐºÑ‚"));
+    connect(deleteSyncAction, SIGNAL(triggered()), this, SLOT(deleteSync()));
+
     deleteCommentAction = new QAction(QIcon(";/images/delete.png"), tr("Ð£Ð´Ð°Ð»Ð¸Ñ‚ÑŒ"), this);
     deleteCommentAction->setStatusTip(tr("Ð£Ð´Ð°Ð»ÑÐµÑ‚ Ð¾Ð±ÑŠÐµÐºÑ‚"));
     connect(deleteCommentAction, SIGNAL(triggered()), this, SLOT(deleteComment()));
@@ -77,6 +84,7 @@ void TDrawWindow::deleteItem()
     foreach (QGraphicsItem *item, scene->selectedItems()) {
         if (item->type() == TTop::Type) {
             qgraphicsitem_cast<TTop *>(item)->removeArcs();
+            qgraphicsitem_cast<TTop *>(item)->removeSyncs();
         }
         scene->removeItem(item);
     }
@@ -86,7 +94,7 @@ void TDrawWindow::deleteItem()
 void TDrawWindow::deleteArc()
 {
     foreach (QGraphicsItem *item, scene->selectedItems()) {
-        if (item->type() ==  TArcTop::Type) {
+        if (item->type() ==  QArcTop::Type) {
             TArc *arc = qgraphicsitem_cast<TArc *>(item->parentItem());
             arc->startItem()->removeArc(arc);
             arc->endItem()->removeArc(arc);
@@ -102,6 +110,21 @@ void TDrawWindow::deleteArc()
     emit sceneChanged();
 }
 
+void TDrawWindow::deleteSync()
+{
+    foreach (QGraphicsItem *item, scene->selectedItems()) {
+        if (item->type() ==  QSyncArc::Type) {
+            QSyncArc *arc = qgraphicsitem_cast<QSyncArc *>(item);
+            arc->startItem()->removeSync(arc);
+            arc->endItem()->removeSync(arc);
+            scene->removeItem(item);
+            delete arc;
+            arc = NULL;
+        }
+    }
+    emit sceneChanged();
+}
+
 void TDrawWindow::deleteComment()
 {
     foreach (QGraphicsItem *item, scene->selectedItems()) {
@@ -110,14 +133,6 @@ void TDrawWindow::deleteComment()
         }
     }
     emit sceneChanged();
-}
-
-/*!
-  Ïåðåâîäèò ñöåíó â ðåæèì äîáàâëåíèÿ âåðøèíû.
-*/
-void TDrawWindow::addItem()
-{
-    scene->setMode(QDiagramScene::InsertItem);
 }
 
 void TDrawWindow::itemInserted(TTop *item)
@@ -166,6 +181,7 @@ void TDrawWindow::setItemIcon()
             }
         }
     }
+
     emit sceneChanged();
 }
 

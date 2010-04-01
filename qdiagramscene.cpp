@@ -1,6 +1,5 @@
 #include <QtGui>
 #include "qdiagramscene.h"
-#include "qarc.h"
 
 QDiagramScene::QDiagramScene(QObject *parent)
     : QGraphicsScene(parent)
@@ -65,6 +64,11 @@ void QDiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
         addItem(textItem);
         textItem->setPos(mouseEvent->scenePos());
         emit textInserted(textItem);
+    case InsertSync:
+        line = new QArcLine(QLineF(mouseEvent->scenePos(),
+                                    mouseEvent->scenePos()));
+        addItem(line);
+        break;
 
     default:
         ;
@@ -103,9 +107,9 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
     }
     //режим перетаскивания дуги
     else if ((myMode == MoveItem) && (mouseEvent->buttons() == Qt::LeftButton) &&
-             (selectedItems().count() == 1) && (selectedItems().first()->type() == TArcLine::Type)) {
-        TArcLine *selectedLine = qgraphicsitem_cast<TArcLine *>(selectedItems().first());
-        TArc *arc = selectedLine->owner();
+             (selectedItems().count() == 1) && (selectedItems().first()->type() == QArcLine::Type)) {
+        QArcLine *selectedLine = qgraphicsitem_cast<QArcLine *>(selectedItems().first());
+        TArc *arc = qgraphicsitem_cast<TArc *>(selectedLine->parentItem());
 
         QLineF vector(mouseEvent->lastScenePos(), mouseEvent->scenePos());
         float dx = vector.dx();
@@ -113,8 +117,8 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
         /*//не разрешать двигать начальную и конечный кусочек дуги (пока)
         if (!((arc->lines.first() == selectedLine) || (arc->lines.last() == selectedLine))){*/
-        TArcLine *prevLine;
-        TArcLine *nextLine;
+        QArcLine *prevLine;
+        QArcLine *nextLine;
         if (arc->lines.count() == 1){
             prevLine = NULL;
             nextLine = NULL;
@@ -224,6 +228,10 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
             arc->updateBounds();
 
     }
+    else if (myMode == InsertSync && line != NULL) {
+        QLineF newLine(line->line().p1(), mouseEvent->scenePos());
+        line->setLine(newLine);
+    }
 }
 
 void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
@@ -278,7 +286,35 @@ void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
             newArc = NULL;
             line = NULL;
         }
+    } else if (line != NULL && myMode == InsertSync) {
+        QList<QGraphicsItem *> startItems = items(line->line().p1());
+        if (startItems.count() && startItems.first() == line)
+            startItems.removeFirst();
+        QList<QGraphicsItem *> endItems = items(line->line().p2());
+        if (endItems.count() && endItems.first() == line)
+            endItems.removeFirst();
+
+        removeItem(line);
+        delete line;
+
+        if (startItems.count() > 0 && endItems.count() > 0 &&
+            startItems.first()->type() == TTop::Type &&
+            endItems.first()->type() == TTop::Type &&
+            startItems.first() != endItems.first()) {
+            TTop *startItem =
+                qgraphicsitem_cast<TTop *>(startItems.first());
+            TTop *endItem =
+                qgraphicsitem_cast<TTop *>(endItems.first());
+            QSyncArc *arrow = new QSyncArc(startItem, endItem, mySyncArcMenu);
+            startItem->addSync(arrow);
+            endItem->addSync(arrow);
+            arrow->setZValue(-1000.0);
+            addItem(arrow);
+            arrow->updatePosition();
+        }
+        line = 0;
     }
+
     QGraphicsScene::mouseReleaseEvent(mouseEvent);
 }
 
@@ -286,7 +322,7 @@ void QDiagramScene::keyReleaseEvent (QKeyEvent *keyEvent){
     if ((newArc != NULL) && (keyEvent->key() == Qt::Key_Escape)) {
         delete line;
         if (newArc->lines.count() > 1){
-            foreach (TArcLine *line, newArc->lines){
+            foreach (QArcLine *line, newArc->lines){
                 delete line;
             }
         }
@@ -320,6 +356,11 @@ void QDiagramScene::setArcMenu(QMenu *menu)
 void QDiagramScene::setCommentMenu(QMenu *menu)
 {
     myCommentMenu = menu;
+}
+
+void QDiagramScene::setSyncArcMenu(QMenu *menu)
+{
+    mySyncArcMenu = menu;
 }
 
 void QDiagramScene::setRootTop(TTop* top){

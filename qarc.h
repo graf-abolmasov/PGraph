@@ -1,64 +1,34 @@
 #ifndef QARC_H
 #define QARC_H
 
+#include <QtGui>
+#include <QtCore>
 #include "qdiagramitem.h"
+#include "qarcline.h"
+#include "qarctop.h"
 
-QT_BEGIN_NAMESPACE
-class QGraphicsPolygonItem;
-class QGraphicsLineItem;
-class QGraphicsScene;
-class QRectF;
-class QGraphicsSceneMouseEvent;
-class QPainterPath;
-QT_END_NAMESPACE
-
-#define ARC_TOP_TYPE  UserType+5
 #define ARC_TYPE      UserType+4
-#define ARC_LINE_TYPE UserType+6
 #define UP	0x80
 #define LEFT	0x20
 #define DOWN	0x08
 #define RIGHT	0x02
 
-class TArcTop : public QGraphicsPolygonItem
-{
-public:
-    enum { Type = ARC_TOP_TYPE };
-    TArcTop(QMenu *contextMenu, QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
-    int type() const
-        { return Type;}
-    QRectF boundingRect() const;
-protected:
-    void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
-    QVariant itemChange(GraphicsItemChange change, const QVariant &value);
-private:
-    QMenu *myContextMenu;
-};
-
-class TArcLine : public QGraphicsLineItem
-{
-public:
-    enum { Type = ARC_LINE_TYPE };
-    TArcLine(QLineF line, QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
-    QPainterPath shape() const;
-    int type() const
-        { return Type;}
-    TArc* owner() const
-        { return qgraphicsitem_cast<TArc *>(parentItem()); }
-};
+class TTop;
+class QArcLine;
+class QArcTop;
 
 class TArc : public QGraphicsLineItem
 {
     friend class QDiagramScene;
 public:
     enum { Type = ARC_TYPE };
-    QList<TArcLine *> lines;
-    TArcLine* currentLine;
+    QList<QArcLine *> lines;
+    QArcLine* currentLine;
     TArc(TTop *startItem, TTop *endItem, QMenu *contextMenu,
       QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
     ~TArc();
-    bool addLine(TArcLine *line);
-    TArcLine* newLine(QPointF p1, QPointF p2);
+    bool addLine(QArcLine *line);
+    QArcLine* newLine(QPointF p1, QPointF p2);
     QRectF boundingRect() const;
     QPainterPath shape() const;
     void setPriority(int w);
@@ -75,7 +45,7 @@ public:
         { return myStartTop; }
     TTop *endItem() const
         { return myEndTop; }
-    TArcLine* prevLine(){
+    QArcLine* prevLine(){
         if (lines.count() > 0)
             return lines.last();
          else return NULL;
@@ -88,7 +58,7 @@ protected:
 private:
     TTop *myStartTop;
     TTop *myEndTop;
-    TArcTop *arcTop;
+    QArcTop *arcTop;
     QPolygonF arcHead;
     QMenu *myContextMenu;
     int width;  //приоритет

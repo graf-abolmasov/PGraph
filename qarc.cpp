@@ -1,7 +1,7 @@
 #include <QtGui>
 #include "qarc.h"
-#include "math.h"
-#include "time.h"
+#include <math.h>
+#include <time.h>
 
 const qreal Pi = 3.14;
 const int MINDELTA = 40;
@@ -30,7 +30,7 @@ bool TArc::autoBuild(TTop* top, float dx, float dy){
         endPoint = lines.last()->line().p2() + QPointF(dx, dy);
     }
 
-    foreach(TArcLine* line, lines){
+    foreach(QArcLine* line, lines){
         delete line;
         line = NULL;
     }
@@ -122,8 +122,7 @@ bool TArc::autoBuild(TTop* top, float dx, float dy){
   @param dx - перемещение по X
   @param dy - перемещение по Y
 */
-bool TArc::remake(TTop* aMovedTop, float dx, float dy)
-{
+bool TArc::remake(TTop* aMovedTop, float dx, float dy){
     bool result = true;
 
     int mx, my, j;
@@ -132,7 +131,7 @@ bool TArc::remake(TTop* aMovedTop, float dx, float dy)
     int lgdir, lgolddir;
 
     if ((myStartTop == aMovedTop) && (myEndTop == aMovedTop)){
-        foreach (TArcLine* line, lines){
+        foreach (QArcLine* line, lines){
             line->setLine(line->line().translated(dx/2, dy/2));
         }
         return true;
@@ -236,7 +235,7 @@ bool TArc::remake(TTop* aMovedTop, float dx, float dy)
         }
 
         //теперь в pts новые точки =) якобы. проверим это.
-        foreach(TArcLine* line, lines){
+        foreach(QArcLine* line, lines){
             delete line;
             line = NULL;
         }
@@ -403,7 +402,7 @@ bool TArc::remake(TTop* aMovedTop, float dx, float dy)
 }
 
 void TArc::setPen(const QPen &pen){
-    foreach (TArcLine* arcLine, lines)
+    foreach (QArcLine* arcLine, lines)
         arcLine->setPen(pen);
     QGraphicsLineItem::setPen(pen);
 }
@@ -417,19 +416,17 @@ void TArc::setPen(const QPen &pen){
 */
 TArc::TArc(TTop *startItem, TTop *endItem, QMenu *contextMenu,
          QGraphicsItem *parent, QGraphicsScene *scene)
-    : QGraphicsLineItem(parent, scene)
-{
+    : QGraphicsLineItem(parent, scene){
     myStartTop = startItem;
     myEndTop = endItem;
     setPen(QPen(Qt::black, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-    arcTop = new TArcTop(contextMenu, this, scene);
+    arcTop = new QArcTop(contextMenu, this, scene);
     width = 2;
     currentLine = NULL;
     arcTop->hide();
 }
 
-TArc::~TArc()
-{
+TArc::~TArc(){
     foreach (QGraphicsLineItem *line, lines){
        delete line;
     }
@@ -438,11 +435,10 @@ TArc::~TArc()
 /*!
   Возвращает прямоугольник включающий все отрезки дуги. необходимо для правильной отрисовки.
 */
-QRectF TArc::boundingRect() const
-{
+QRectF TArc::boundingRect() const{
     qreal extra = width*(pen().width() + 20) / 2.0;
     QRectF rect;
-    foreach (TArcLine* line, lines){
+    foreach (QArcLine* line, lines){
         rect = rect.united(line->boundingRect());
     }
     return rect.normalized().adjusted(-extra, -extra, extra, extra);
@@ -451,11 +447,10 @@ QRectF TArc::boundingRect() const
 /*!
   Работает не правильно.
 */
-QPainterPath TArc::shape() const
-{
+QPainterPath TArc::shape() const{
     QPainterPath path;
     path.addPolygon(arcHead);
-    foreach (TArcLine *line, lines){
+    foreach (QArcLine *line, lines){
        path.addPath(line->shape());
     }
     path.addPath(arcTop->shape());
@@ -463,9 +458,7 @@ QPainterPath TArc::shape() const
     return path;
 }
 
-void TArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
-          QWidget *)
-{
+void TArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *){
     if (lines.count() == 0) return;
 
     if ((myStartTop == NULL) || (myEndTop == NULL)) {
@@ -503,10 +496,10 @@ void TArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
 
 /*!
   Добавляет отрезок дуги в список отрезков
-  @param line - указатель на объект типа TArcLine
+  @param line - указатель на объект типа QArcLine
   @return true если добавилось
 */
-bool TArc::addLine(TArcLine *line){
+bool TArc::addLine(QArcLine *line){
     if ((prevLine() != NULL) &&
         (prevLine()->line().p2() == line->line().p1()) &&
         (prevLine() != line) &&
@@ -525,14 +518,14 @@ bool TArc::addLine(TArcLine *line){
   Создает новый отрезок дуги.
   @param p1 - начальная точка
   @param p2 - конечная точка
-  @return указатель на объект типа TArcLine
+  @return указатель на объект типа QArcLine
 */
-TArcLine* TArc::newLine(QPointF p1, QPointF p2){
+QArcLine* TArc::newLine(QPointF p1, QPointF p2){
     if (currentLine == NULL)
-        currentLine = new TArcLine(QLineF(p1, p2), this, scene());
+        currentLine = new QArcLine(QLineF(p1, p2), this, scene());
     else {
         addLine(currentLine);
-        currentLine = new TArcLine(QLineF(prevLine()->line().p2(), p2), this, scene());
+        currentLine = new QArcLine(QLineF(prevLine()->line().p2(), p2), this, scene());
     }
     currentLine->setPen(pen());
     currentLine->setFlag(QGraphicsItem::ItemIsMovable, true);
@@ -558,52 +551,4 @@ void TArc::setPriority(int w){
     QPen old_pen = pen();
     old_pen.setWidth(w);
     setPen(old_pen);
-}
-
-void TArcTop::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
-{
-    scene()->clearSelection();
-    setSelected(true);
-    myContextMenu->exec(event->screenPos());
-}
-
-TArcTop::TArcTop(QMenu *contextMenu, QGraphicsItem *parent, QGraphicsScene *scene)
-    : QGraphicsPolygonItem(parent, scene)
-{
-    myContextMenu = contextMenu;
-    QPolygonF myPolygon;
-    myPolygon << QPointF(-8, 8) << QPointF(8, 8)
-              << QPointF(8,-8) << QPointF(-8, -8)
-              << QPointF(-8, 8);
-    setFlag(QGraphicsItem::ItemIsSelectable, true);
-    setFlag(QGraphicsItem::ItemIsMovable, false);
-    setBrush(QBrush(Qt::gray, Qt::SolidPattern));
-    setPolygon(myPolygon);
-}
-
-QRectF TArcTop::boundingRect() const {
-    return QGraphicsPolygonItem::boundingRect().adjusted(-2, -2, 2, 2);
-}
-
-QVariant TArcTop::itemChange(GraphicsItemChange change, const QVariant &value){
-    if (change == QGraphicsItem::ItemSelectedHasChanged) {
-        TArc* arc = qgraphicsitem_cast<TArc* >(parentItem());
-        QPen pen = arc->pen();
-        if (isSelected())
-            pen.setColor(Qt::green);
-        else
-            pen.setColor(Qt::black);
-        arc->setPen(pen);
-    }
-
-    return value;
-}
-
-TArcLine::TArcLine(QLineF line, QGraphicsItem *parent, QGraphicsScene *scene)
-    : QGraphicsLineItem(line, parent, scene){};
-
-QPainterPath TArcLine::shape() const {
-    QPainterPath path;
-    path.addRect(QGraphicsLineItem::shape().boundingRect().adjusted(-5, -5, 5, 5));
-    return path;
 }

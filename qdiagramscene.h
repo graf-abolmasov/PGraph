@@ -5,6 +5,7 @@
 #include "qdiagramitem.h"
 #include "qcomment.h"
 #include "qarc.h"
+#include "qsyncarc.h"
 
 QT_BEGIN_NAMESPACE
 class QGraphicsSceneMouseEvent;
@@ -16,17 +17,22 @@ class QGraphicsTextItem;
 class QColor;
 QT_END_NAMESPACE
 
+class TTop;
+class TArc;
+class QSyncArc;
+
 class QDiagramScene : public QGraphicsScene
 {
     Q_OBJECT
 
 public:
-    enum Mode { InsertItem, InsertLine, InsertText, MoveItem };
+    enum Mode { InsertItem, InsertLine, InsertText, InsertSync, MoveItem};
 
     QDiagramScene(QObject *parent = 0);
     void setArcMenu(QMenu *menu);
     void setItemMenu(QMenu *menu);
     void setCommentMenu(QMenu *menu);
+    void setSyncArcMenu(QMenu *menu);
     void setRootTop(TTop* top);
 
     //!”казатель на корневую вершину
@@ -55,14 +61,14 @@ private:
 
     TComment *textItem;
     TArc *newArc;
-    TArcLine *line;
-    TArcLine *futureLine;
+    QArcLine *line;
 
     bool isItemChange(int type);
 
     QMenu *myItemMenu;
     QMenu *myArcMenu;
     QMenu *myCommentMenu;
+    QMenu *mySyncArcMenu;
 };
 
 #endif

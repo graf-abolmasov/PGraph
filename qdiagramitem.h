@@ -1,8 +1,10 @@
 #ifndef QDIAGRAMITEM_H
 #define QDIAGRAMITEM_H
 
-#include <qgraphicsitem.h>
-#include "qlist.h"
+#include <QGraphicsItem>
+#include <QList>
+#include "qsyncarc.h"
+#include "qarc.h"
 
 QT_BEGIN_NAMESPACE
 class QPixmap;
@@ -19,11 +21,12 @@ class QPolygonF;
 QT_END_NAMESPACE
 
 class TArc;
+class QSyncArc;
 
-class TTop : public QGraphicsPolygonItem
-{
+class TTop : public QGraphicsPolygonItem{
     friend class QDiagramScene;
     friend class TArc;
+    friend class QSyncArc;
 
 public:
     enum { Type = UserType + 15 };
@@ -31,10 +34,11 @@ public:
     int number;
     void removeArc(TArc *arc);
     void removeArcs();
+    void removeSync(QSyncArc *arc);
+    void removeSyncs();
     void setIcon(QImage icon);
-    void autoArrangeArcsAtBound(QLineF bound);
-    void autoArrangeArcs(QList<TArc* > brokenLines);
     void addArc(TArc *arc);
+    void addSync(QSyncArc *arc);
     void setAsRoot(bool flag);
     float getMinWidth();
     float getMinHeight();
@@ -53,6 +57,7 @@ protected:
 private:
     bool isRoot;
     QList<TArc *> arcs;
+    QList<QSyncArc *> sync;
     QMenu *myContextMenu;
     QImage myIcon;
     QList<TArc *> getArcsAtBound(int i);

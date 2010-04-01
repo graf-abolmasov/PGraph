@@ -1,7 +1,5 @@
 #include "toppropertydialog.h"
 #include "ui_toppropertydialog.h"
-#include "qarc.h"
-#include "qdiagramitem.h"
 
 TopPropertyDialog::TopPropertyDialog(QWidget *parent) :
     QDialog(parent),

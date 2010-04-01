@@ -115,9 +115,13 @@ void TMyWindow::createActions()
     pointerButton->setChecked(true);
     pointerButton->setIcon(QIcon(":/images/pointer.png"));
 
-    linePointerButton = new QToolButton;
-    linePointerButton->setCheckable(true);
-    linePointerButton->setIcon(QIcon(":/images/linepointer.png"));
+    addArcButton = new QToolButton;
+    addArcButton->setCheckable(true);
+    addArcButton->setIcon(QIcon(":/images/linepointer.png"));
+
+    addSyncArcButton = new QToolButton;
+    addSyncArcButton->setCheckable(true);
+    addSyncArcButton->setIcon(QIcon(":/images/syncarc.png"));
 }
 
 TDrawWindow* TMyWindow::createDrawWindow()
@@ -139,23 +143,23 @@ void TMyWindow::createToolBar()
     pointerTypeGroup->addButton(addTopButton, int(QDiagramScene::InsertItem));
     pointerTypeGroup->addButton(addCommentButton, int(QDiagramScene::InsertText));
     pointerTypeGroup->addButton(pointerButton, int(QDiagramScene::MoveItem));
-    pointerTypeGroup->addButton(linePointerButton, int(QDiagramScene::InsertLine));
+    pointerTypeGroup->addButton(addArcButton, int(QDiagramScene::InsertLine));
+    pointerTypeGroup->addButton(addSyncArcButton, int(QDiagramScene::InsertSync));
     connect(pointerTypeGroup, SIGNAL(buttonClicked(int)), this, SLOT(pointerGroupClicked(int)));
 
     leftToolBar = new QToolBar(tr("Инструменты"), this);
     addToolBar(Qt::LeftToolBarArea, leftToolBar);
-    //!!leftToolBar->addAction(addTopAct);
-    //!!leftToolBar->addAction(addCommentAct);
     leftToolBar->addWidget(addTopButton);
     leftToolBar->addWidget(addCommentButton);
     leftToolBar->addWidget(pointerButton);
-    leftToolBar->addWidget(linePointerButton);
+    leftToolBar->addWidget(addArcButton);
+    leftToolBar->addWidget(addSyncArcButton);
 }
 
 void TMyWindow::CMGNew()
 {
     TDrawWindow *newDrawWindow = createDrawWindow();
-    newDrawWindow->newFile();
+    //newDrawWindow->newFile();
     newDrawWindow->showMaximized();
 }
 
@@ -197,4 +201,5 @@ void TMyWindow::CMGSaveAsImage()
 
 void TMyWindow::CMGSaveAs()
 {
+
 }

@@ -1,7 +1,6 @@
 #include <QtGui>
 
 #include "qdiagramitem.h"
-#include "qarc.h"
 
 int TTop::counter = 0;
 
@@ -28,13 +27,29 @@ QRectF TTop::boundingRect() const{
     return QGraphicsPolygonItem::boundingRect().adjusted(-5, -5, 5, 5);
 }
 
+/*!
+  Добавляет дугу синхронизации
+*/
+
+void TTop::addSync(QSyncArc *arc){
+    sync.append(arc);
+}
+
+/*!
+  Удаляет дугу cby[hjybpfwbb. Совсем.
+  @param arc - дуга
+*/
+void TTop::removeSync(QSyncArc *arc){
+    int index = sync.indexOf(arc);
+    if (index != -1)
+        sync.removeAt(index);
+}
 
 /*!
   Удаляет дугу. Совсем.
   @param arc - дуга
 */
-void TTop::removeArc(TArc *arc)
-{
+void TTop::removeArc(TArc *arc){
     int index = arcs.indexOf(arc);
 
     if (index != -1) {
@@ -55,8 +70,7 @@ void TTop::removeArc(TArc *arc)
 /*!
   Удаляет все дуги, входящие и выходящие из вершины
 */
-void TTop::removeArcs()
-{
+void TTop::removeArcs(){
     foreach (TArc *arc, arcs) {
         arc->startItem()->removeArc(arc);
         arc->endItem()->removeArc(arc);
@@ -64,28 +78,39 @@ void TTop::removeArcs()
         delete arc;
     }
 }
+
+/*!
+  Удаляет все дуги синхронизации, входящие и выходящие из вершины
+*/
+void TTop::removeSyncs(){
+    foreach (QSyncArc *arc, sync) {
+        arc->startItem()->removeSync(arc);
+        arc->endItem()->removeSync(arc);
+        scene()->removeItem(arc);
+        delete arc;
+    }
+}
+
 /*!
   Добавляет дугу в список дуг текущей вершины
   @param arc - дуга
 */
-void TTop::addArc(TArc *arc)
-{
+void TTop::addArc(TArc *arc){
     arcs.append(arc);
 }
 
-void TTop::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
-{
+void TTop::contextMenuEvent(QGraphicsSceneContextMenuEvent *event){
     scene()->clearSelection();
     setSelected(true);
     myContextMenu->exec(event->screenPos());
 }
 
 QVariant TTop::itemChange(GraphicsItemChange change, const QVariant &value){
-    /*if (change == QGraphicsItem::ItemPositionChange) {
-        foreach (TArc *arc, arcs) {
+    if (change == QGraphicsItem::ItemPositionChange) {
+        foreach (QSyncArc *arc, sync) {
             arc->updatePosition();
         }
-    }*/
+    }
 
     return value;
 }
@@ -170,8 +195,7 @@ float TTop::getMinHeight(){
     return yMax > yMin ? yMax*2 : yMin*2;
 }
 
-QList<TArc *> TTop::getArcsAtBound(int i)
-{
+QList<TArc *> TTop::getArcsAtBound(int i){
     QList<TArc *> result;
     QPointF p1 = polygon().at(i-1) + pos();
     QPointF p2 = polygon().at(i) + pos();
@@ -194,8 +218,7 @@ QList<TArc *> TTop::getArcsAtBound(int i)
     return result;
 }
 
-QList<TArc *> TTop::getArcsAtBound(QLineF bound)
-{
+QList<TArc *> TTop::getArcsAtBound(QLineF bound){
     QPointF intersectPoint;
     QList<TArc *> result;
     foreach (TArc *arc, arcs) {
@@ -214,154 +237,11 @@ QList<TArc *> TTop::getArcsAtBound(QLineF bound)
     return result;
 }
 
-void TTop::autoArrangeArcsAtBound(QLineF bound){
-
-    QList<TArc*> arcs = getArcsAtBound(bound);
-    float dist = bound.length()/(arcs.count() + 1);
-    int i = 1;
-    
-    foreach (TArc* arc, arcs){
-        if (arc->startItem() == this){
-            if (arc->lines.first()->line().y1() == arc->lines.first()->line().y2()){
-                arc->lines.first()->setLine(arc->lines.first()->line().p1().x(), sceneBoundingRect().topLeft().y() + i*dist, arc->lines.first()->line().p2().x(), sceneBoundingRect().topLeft().y() + i*dist);
-            }
-
-            if (arc->lines.first()->line().x1() == arc->lines.first()->line().x2()){
-                arc->lines.first()->setLine(sceneBoundingRect().topLeft().x() + i*dist, arc->lines.first()->line().p1().y(), sceneBoundingRect().topLeft().x() + i*dist, arc->lines.first()->line().p2().y());
-            }
-        }
-        if (arc->endItem() == this){
-            if (arc->lines.last()->line().y1() == arc->lines.last()->line().y2()){
-                arc->lines.last()->setLine(arc->lines.last()->line().p1().x(), sceneBoundingRect().topLeft().y() + i*dist, arc->lines.last()->line().p2().x(), sceneBoundingRect().topLeft().y() + i*dist);
-            }
-
-            if (arc->lines.last()->line().x1() == arc->lines.last()->line().x2()){
-                arc->lines.last()->setLine(sceneBoundingRect().topLeft().x() + i*dist, arc->lines.last()->line().p1().y(), sceneBoundingRect().topLeft().x() + i*dist, arc->lines.last()->line().p2().y());
-            }
-        }
-        i++;
-    }
-}
-
-/*!
-  Равномерно распределяет дуги вдоль границ
-*/
-void TTop::autoArrangeArcs(QList<TArc* > brokenLines){
-
-    for (int i = 1; i < 5; i++){
-        QList<TArc* > arcList;
-        QList<TArc* > arcsAtBoundList = getArcsAtBound(i);
-        foreach (TArc* arc, arcsAtBoundList){
-            if (brokenLines.contains(arc))
-                arcList.append(arc);
-        };
-
-        QLineF bound =  QLineF(polygon().at(i-1) + scenePos(), polygon().at(i) + scenePos());
-        float dist = bound.length() / (arcList.count() + 1);
-        //если i нечетная - то горизонтальная
-        //иначе вертикальная граница
-        int j = 0;
-        QPointF intersectPoint;
-        switch(i){
-        case 3://верхняя граница
-            foreach (TArc* arc, arcList){
-                j++;
-                if (arc->startItem() == this){
-                    arc->lines.first()->setLine(QLineF(QPointF(bound.x1(), arc->lines.first()->line().y1()) - QPointF(dist*j, 0),
-                                                       QPointF(bound.x1(), arc->lines.first()->line().y2()) - QPointF(dist*j, 0)));
-                    if (arc->lines.count() > 1){
-                        arc->lines.first()->line().intersect(arc->lines.at(1)->line(), &intersectPoint);
-                        arc->lines.first()->setLine(QLineF(arc->lines.first()->line().p1(), intersectPoint));
-                        arc->lines.at(1)->setLine(QLineF(intersectPoint, arc->lines.at(1)->line().p2()));
-                    }
-                } else {
-                    arc->lines.last()->setLine(QLineF(QPointF(bound.x1(), arc->lines.last()->line().y1()) - QPointF(dist*j, 0),
-                                                      QPointF(bound.x1(), arc->lines.last()->line().y2()) - QPointF(dist*j, 0)));
-                    if (arc->lines.count() > 1){
-                        arc->lines.last()->line().intersect(arc->lines.at(arc->lines.count()-1)->line(), &intersectPoint);
-                        arc->lines.last()->setLine(QLineF(intersectPoint, arc->lines.last()->line().p2()));
-                        arc->lines.at(arc->lines.count()-1)->setLine(QLineF(arc->lines.at(arc->lines.count()-1)->line().p1(), intersectPoint));
-                    }
-                }
-
-            }
-            break;
-        case 2://правая граница
-            foreach (TArc* arc, arcList){
-                j++;
-                if (arc->startItem() == this){
-                    arc->lines.first()->setLine(QLineF(QPointF(arc->lines.first()->line().x1(), bound.y2()) + QPointF(0, dist*j),
-                                                       QPointF(arc->lines.first()->line().x2(), bound.y2()) + QPointF(0, dist*j)));
-                    if (arc->lines.count() > 1){
-                        arc->lines.first()->line().intersect(arc->lines.at(1)->line(), &intersectPoint);
-                        arc->lines.first()->setLine(QLineF(arc->lines.first()->line().p1(), intersectPoint));
-                        arc->lines.at(1)->setLine(QLineF(intersectPoint, arc->lines.at(1)->line().p2()));
-                    }
-                } else {
-                    arc->lines.last()->setLine(QLineF(QPointF(arc->lines.last()->line().x1(), bound.y2()) + QPointF(0, dist*j),
-                                                      QPointF(arc->lines.last()->line().x2(), bound.y2()) + QPointF(0, dist*j)));
-                    if (arc->lines.count() > 1){
-                        arc->lines.last()->line().intersect(arc->lines.at(arc->lines.count()-1)->line(), &intersectPoint);
-                        arc->lines.last()->setLine(QLineF(intersectPoint, arc->lines.last()->line().p2()));
-                        arc->lines.at(arc->lines.count()-1)->setLine(QLineF(arc->lines.at(arc->lines.count()-1)->line().p1(), intersectPoint));
-                    }
-                }
-            }
-            break;
-        case 1://нижняя граница
-            foreach (TArc* arc, arcList){
-                j++;
-                if (arc->startItem() == this){
-                    arc->lines.first()->setLine(QLineF(QPointF(bound.x1(), arc->lines.first()->line().y1()) + QPointF(dist*j, 0),
-                                                       QPointF(bound.x1(), arc->lines.first()->line().y2()) + QPointF(dist*j, 0)));
-                    if (arc->lines.count() > 1){
-                        arc->lines.first()->line().intersect(arc->lines.at(1)->line(), &intersectPoint);
-                        arc->lines.first()->setLine(QLineF(arc->lines.first()->line().p1(), intersectPoint));
-                        arc->lines.at(1)->setLine(QLineF(intersectPoint, arc->lines.at(1)->line().p2()));
-                    }
-                } else {
-                    arc->lines.last()->setLine(QLineF(QPointF(bound.x1(), arc->lines.last()->line().y1()) + QPointF(dist*j, 0),
-                                                      QPointF(bound.x1(), arc->lines.last()->line().y2()) + QPointF(dist*j, 0)));
-                    if (arc->lines.count() > 1){
-                        arc->lines.last()->line().intersect(arc->lines.at(arc->lines.count()-1)->line(), &intersectPoint);
-                        arc->lines.last()->setLine(QLineF(intersectPoint, arc->lines.last()->line().p2()));
-                        arc->lines.at(arc->lines.count()-1)->setLine(QLineF(arc->lines.at(arc->lines.count()-1)->line().p1(), intersectPoint));
-                    }
-                }
-            }
-            break;
-        case 4://левая граница
-            foreach (TArc* arc, arcList){
-                j++;
-                if (arc->startItem() == this){
-                    arc->lines.first()->setLine(QLineF(QPointF(arc->lines.first()->line().x1(), bound.y2()) - QPointF(0, dist*j),
-                                                       QPointF(arc->lines.first()->line().x2(), bound.y2()) - QPointF(0, dist*j)));
-                    if (arc->lines.count() > 1){
-                        arc->lines.first()->line().intersect(arc->lines.at(1)->line(), &intersectPoint);
-                        arc->lines.first()->setLine(QLineF(arc->lines.first()->line().p1(), intersectPoint));
-                        arc->lines.at(1)->setLine(QLineF(intersectPoint, arc->lines.at(1)->line().p2()));
-                    }
-                } else {
-                    arc->lines.last()->setLine(QLineF(QPointF(arc->lines.last()->line().x1(), bound.y2()) - QPointF(0, dist*j),
-                                                      QPointF(arc->lines.last()->line().x2(), bound.y2()) - QPointF(0, dist*j)));
-                    if (arc->lines.count() > 1){
-                        arc->lines.last()->line().intersect(arc->lines.at(arc->lines.count()-1)->line(), &intersectPoint);
-                        arc->lines.last()->setLine(QLineF(intersectPoint, arc->lines.last()->line().p2()));
-                        arc->lines.at(arc->lines.count()-1)->setLine(QLineF(arc->lines.at(arc->lines.count()-1)->line().p1(), intersectPoint));
-                    }
-                }
-            }
-            break;
-        }
-    }
-}
-
 /*!
   Возвращает границу с которой пересекается линия
   @param line - линия
 */
-QLineF TTop::getIntersectBound(QLineF line)
-{
+QLineF TTop::getIntersectBound(QLineF line){
     int i;
     QLineF result;
     QPointF intersectPoint;
@@ -378,18 +258,16 @@ QLineF TTop::getIntersectBound(QLineF line)
         }
    return result;
 }
+
 /*!
   Устанавливает иконку.
   @param icon - иконка
 */
-void TTop::setIcon(QImage icon)
-{
+void TTop::setIcon(QImage icon){
     myIcon = icon;
 }
 
-void TTop::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-          QWidget *widget)
-{
+void TTop::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget){
     QGraphicsPolygonItem::paint(painter, option, widget);
     if (!myIcon.isNull()) {
         if ((myIcon.width() >= boundingRect().width()) ||
@@ -417,6 +295,7 @@ void TTop::setAsRoot(bool flag){
         setPen(p);
     }
 }
+
 /*!
   Возвращает список исходящих дуг
 */

@@ -8,6 +8,9 @@
 #include <QWheelEvent>
 #include "qdiagramscene.h"
 #include "qdiagramitem.h"
+#include "qcomment.h"
+#include "ui_toppropertydialog.h"
+#include "toppropertydialog.h"
 
 class TDrawWindow : public QMainWindow
 {
@@ -23,6 +26,7 @@ private:
     QMenu *itemMenu;
     QMenu *arcMenu;
     QMenu *commentMenu;
+    QMenu *syncArcMenu;
 
     QAction *deleteAction;
     QAction *Action1;
@@ -31,43 +35,21 @@ private:
 
     QAction *deleteArcAction;
 
+    QAction *deleteSyncAction;
+
     QAction *deleteCommentAction;
 
     QDiagramScene::Mode myMode;
 
 public:
     TDrawWindow();
-    void newFile(){}
     void saveAsImage(QString filename);
-    void addItem();
     void setMode(QDiagramScene::Mode mode);
     QDiagramScene::Mode mode(){return myMode;}
     QList<TTop* > allTops();
-
-    /*virtual bool CanClose();                    // Возвращает TRUE, если можно закрыть окно
-    virtual void SetupWindow();                 // Инициализация окна и таймера
-    virtual void CleanupWindow();               // Очистка окна, удаление таймера
-    LRESULT WMDropObject(WPARAM, LPARAM);       // Обработчик "бросания" объекта изменяет предикат дуги
-    LRESULT WMQueryDropObject(WPARAM, LPARAM);  // Проверка перед "бросанием" объекта
-    virtual void Paint(TDC&,bool,TRect&);*/
-
-    /*void Open();
-    bool Read(LPSTR);
-    bool Save();
-    bool SaveAs();
-    void DoSaveBMP();
-    void ChangeIcon();
-    void _SetIcon();
-    bool CanWriteStruct();
-    bool SaveStruct();
-    bool Compile();
-    bool Run();
-    void SetFileName(LPSTR);
-    bool Write(pstate);
-    bool CanClear();	// Возвращает TRUE, если можно очистить окно
-    void Clear();
-    void CMProperties();			// Обработка выбора меню «Свойства»
-    bool IsDrawing;*/
+    QDiagramScene* getScene(){
+        return this->scene;
+    }
 signals:
     void sceneChanged();
 
@@ -77,6 +59,7 @@ private slots:
     void makeAsRoot();
     void deleteItem();
     void deleteArc();
+    void deleteSync();
     void deleteComment();
     void itemInserted(TTop *item);
     void itemSelected(QGraphicsItem *item);

@@ -1,8 +1,7 @@
 #include <QtGui/QApplication>
-#include "qmywindow.h"
 #include <QTextCodec>
 #include <time.h>
-#include "toppropertydialog.h"
+#include "qmywindow.h"
 
 int main(int argc, char *argv[])
 {  	
