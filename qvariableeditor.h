@@ -18,7 +18,7 @@ public:
     QVariableEditor(Mode mode, QWidget *parent = 0);
     ~QVariableEditor();
 
-    void prepareForm(Variable var);
+    bool prepareForm(Variable *var);
 
 protected:
     void changeEvent(QEvent *e);

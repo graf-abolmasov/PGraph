@@ -1,6 +1,7 @@
 #include "qdatatypedialog.h"
 #include "ui_qdatatypedialog.h"
 #include "qdatatypeeditor.h"
+#include <QtCore>
 
 QDataTypeDialog::QDataTypeDialog(QWidget *parent) :
     QDialog(parent),
@@ -48,4 +49,5 @@ bool QDataTypeDialog::prepareForm()
 {
    bool result = true;
    return result;
+}
 

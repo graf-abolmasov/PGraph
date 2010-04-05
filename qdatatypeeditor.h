@@ -18,7 +18,7 @@ public:
      QDataTypeEditor(Mode mode, QWidget *parent = 0);
     ~QDataTypeEditor();
 
-    bool prepareForm(DataType type);
+    bool prepareForm(DataType *type);
 
 protected:
     void changeEvent(QEvent *e);

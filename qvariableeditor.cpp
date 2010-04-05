@@ -40,7 +40,7 @@ QVariableEditor::QVariableEditor(Mode mode, QWidget *parent) :
 void QVariableEditor::on_pushButton_clicked()
 {
     QDataTypeEditor *editor = new QDataTypeEditor(QDataTypeEditor::wizard);
-    editor->prepareForm();
+    editor->prepareForm(NULL);
     if (editor->exec()){
 
     }
@@ -48,13 +48,13 @@ void QVariableEditor::on_pushButton_clicked()
 
 void QVariableEditor::updateInterface()
 {
-    if (myMode = editor){
+    if (myMode == editor){
         ui->nameEdit->setEnabled(false);
         ui->typeEdit->setEnabled(false);
     }
 }
 
-bool QVariableEditor::prepareForm(Variable var)
+bool QVariableEditor::prepareForm(Variable *var)
 {
     bool result = true;
     return result;

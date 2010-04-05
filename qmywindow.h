@@ -24,6 +24,7 @@ private:
     QAction *saveGraphAct;
     QAction *saveAsGraphAct;
     QAction *saveAsImageGraphAct;
+
     //Объект
     QAction *viewContentAct;
     QAction *viewGarbageAct;
@@ -35,6 +36,10 @@ private:
     QAction *compileAct;
     QAction *saveStructAct;
     QAction *manualInputAct;
+
+    //Данные
+    QAction *variablesAct;
+    QAction *dataTypeAct;
 
     //LeftToolBar
     QToolButton *pointerButton;
@@ -70,9 +75,9 @@ private slots:
     void CMContent(){}		// +Объект->Дерево объектов
     void CMShowGarbage(){}	// +Объект->Неиспользуемые объекты
     void CMNewModule(){}	// +Объект->Зарегистрировать модуль
-    void CMObjList();		// +Объект->� едактор объектов
-    void CMEdtVar(){}		// Данные->Словарь данных
-    void CMEdtType(){}		// Данные->Список типов
+    void CMObjList();		// +Объект->Редактор объектов
+    void CMEdtVar();		// +Данные->Словарь данных
+    void CMEdtType();		// +Данные->Список типов
     void CMGspUser(){}		// Данные->Gspuser.h
     void CMLibraries(){}	// Данные->Библиотеки
     void CMThickArcs(){}	// Настройки->Приоритеты дуг
@@ -82,11 +87,11 @@ private slots:
     void CMPredTabl(){}		// Настройки->Таблица предикатов
     void CMFSaveBMP(){}		// Настройки->Сохранять BMP
     void CMDoCountMar(){}	// Настройки->Подсчет числа маршрутов
-    void CMDirectories(){}	// Настройки->� азмещение...
+    void CMDirectories(){}	// Настройки->Πазмещение...
     void CMBuildOpt(){}		// Настройки->Построение...
     void CMFont(){}		// Настройки->Шрифт
     void CMSaveSetup(){}  	// Настройки->Сохранить
-    void CMDoUserDialog(){}	// +Запуск->� ежим ручного ввода данных
+    void CMDoUserDialog(){}	// +Запуск->Πежим ручного ввода данных
     void CMSaveStruct(){}       // +Запуск->Запись структуры
     void CMCompile(){}          // +Запуск->Компиляция
     void CMRun(){}              // +Запуск->Построение и запуск

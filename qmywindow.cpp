@@ -1,5 +1,7 @@
 #include "qmywindow.h"
 #include "qobjecteditor.h"
+#include "qvariabledialog.h"
+#include "qdatatypedialog.h"
 
 TMyWindow::TMyWindow()
 {
@@ -28,6 +30,10 @@ void TMyWindow::createMenus()
     objectMenu->addAction(registerUnitAct);
     objectMenu->addAction(viewContentAct);
     objectMenu->addAction(viewGarbageAct);
+
+    objectMenu = menuBar()->addMenu(tr("Данне"));
+    objectMenu->addAction(variablesAct);
+    objectMenu->addAction(dataTypeAct);
 
     buildMenu = menuBar()->addMenu(tr("Запуск"));
     buildMenu->addAction(runAct);
@@ -76,9 +82,15 @@ void TMyWindow::createActions()
     registerUnitAct->setStatusTip(tr("Зарегистрировать модуль"));
     connect(registerUnitAct, SIGNAL(triggered()), this, SLOT(CMNewModule()));
 
-    openObjectEditorAct = new QAction(tr("� едактор объектов"), this);
-    openObjectEditorAct->setStatusTip(tr("� едактор объектов"));
+    openObjectEditorAct = new QAction(tr("Редактор объектов"), this);
+    openObjectEditorAct->setStatusTip(tr("Редактор объектов"));
     connect(openObjectEditorAct, SIGNAL(triggered()), this, SLOT(CMObjList()));
+
+    variablesAct = new QAction(tr("Словарь данных"), this);
+    connect(variablesAct, SIGNAL(triggered()), this, SLOT(CMEdtVar()));
+
+    dataTypeAct = new QAction(tr("Список типов"), this);
+    connect(dataTypeAct, SIGNAL(triggered()), this, SLOT(CMEdtType()));
 
     runAct = new QAction(QIcon(":/images/build.png"), tr("Запуск"), this);
     connect(runAct, SIGNAL(triggered()), this, SLOT(CMRun()));
@@ -89,7 +101,7 @@ void TMyWindow::createActions()
     saveStructAct = new QAction(tr("Записать структуру"), this);
     connect(saveStructAct, SIGNAL(triggered()), this, SLOT(CMSaveStruct()));
 
-    manualInputAct = new QAction(tr("� учной ввод данных"), this);
+    manualInputAct = new QAction(tr("Ручной ввод данных"), this);
     connect(manualInputAct, SIGNAL(triggered()), this, SLOT(CMDoUserDialog()));
 
     //LeftToolBar
@@ -202,4 +214,21 @@ void TMyWindow::CMObjList()
     if (editor.exec()){
 
     }
+}
+
+void TMyWindow::CMEdtVar()
+{
+    QVariableDialog editor;
+    if (editor.exec()){
+
+    }
+}
+
+void TMyWindow::CMEdtType()
+{
+    QDataTypeDialog editor;
+    if (editor.exec()){
+
+    }
+
 }
