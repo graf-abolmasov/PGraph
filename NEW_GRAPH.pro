@@ -15,7 +15,10 @@ SOURCES += main.cpp \
     qsyncarc.cpp \
     qarcline.cpp \
     qarctop.cpp \
-    qobjecteditor.cpp
+    qobjecteditor.cpp \
+    actor.cpp \
+    predicate.cpp \
+    qactoreditor.cpp
 HEADERS += qmywindow.h \
     qdrawwindow.h \
     qdiagramitem.h \
@@ -26,7 +29,11 @@ HEADERS += qmywindow.h \
     qsyncarc.h \
     qarcline.h \
     qarctop.h \
-    qobjecteditor.h
+    qobjecteditor.h \
+    actor.h \
+    predicate.h \
+    qactoreditor.h
 RESOURCES += resources.qrc
 FORMS += toppropertydialog.ui \
-    qobjecteditor.ui
+    qobjecteditor.ui \
+    qactoreditor.ui

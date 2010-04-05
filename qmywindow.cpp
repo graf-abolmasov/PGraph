@@ -16,20 +16,20 @@ TMyWindow::~TMyWindow()
 
 void TMyWindow::createMenus()
 {
-    fileMenu = menuBar()->addMenu(tr("Ôàéë"));
+    fileMenu = menuBar()->addMenu(tr("Ð¤Ð°Ð¹Ð»"));
     fileMenu->addAction(newGraphAct);
     fileMenu->addAction(openGraphAct);
     fileMenu->addAction(saveGraphAct);
     fileMenu->addAction(saveAsGraphAct);
     fileMenu->addAction(saveAsImageGraphAct);
 
-    objectMenu = menuBar()->addMenu(tr("Îáúåêò"));
+    objectMenu = menuBar()->addMenu(tr("ÐžÐ±ÑŠÐµÐºÑ‚"));
     objectMenu->addAction(openObjectEditorAct);
     objectMenu->addAction(registerUnitAct);
     objectMenu->addAction(viewContentAct);
     objectMenu->addAction(viewGarbageAct);
 
-    buildMenu = menuBar()->addMenu(tr("Çàïóñê"));
+    buildMenu = menuBar()->addMenu(tr("Ð—Ð°Ð¿ÑƒÑÐº"));
     buildMenu->addAction(runAct);
     buildMenu->addAction(compileAct);
     buildMenu->addAction(saveStructAct);
@@ -38,67 +38,62 @@ void TMyWindow::createMenus()
 
 void TMyWindow::createActions()
 {
-    //Ð“Ñ€Ð°Ñ„
 
-    newGraphAct = new QAction(tr("Ñîçäàòü"), this);
+    newGraphAct = new QAction(tr("Ð¡Ð¾Ð·Ð´Ð°Ñ‚ÑŒ"), this);
     newGraphAct->setShortcuts(QKeySequence::New);
-    newGraphAct->setStatusTip(tr("Ñîçäàòü ïóñòîé ãðàô"));
+    newGraphAct->setStatusTip(tr("Ð¡Ð¾Ð·Ð´Ð°Ñ‚ÑŒ Ð¿ÑƒÑÑ‚Ð¾Ð¹ Ð³Ñ€Ð°Ñ„"));
     connect(newGraphAct, SIGNAL(triggered()), this, SLOT(CMGNew()));
 
-    openGraphAct = new QAction(tr("Îòêðûòü"), this);
+    openGraphAct = new QAction(tr("ÐžÑ‚ÐºÑ€Ñ‹Ñ‚ÑŒ"), this);
     openGraphAct->setShortcuts(QKeySequence::Open);
-    openGraphAct->setStatusTip(tr("ÎÒêðûòü èç áàçû"));
+    openGraphAct->setStatusTip(tr("ÐžÐ¢ÐºÑ€Ñ‹Ñ‚ÑŒ Ð¸Ð· Ð±Ð°Ð·Ñ‹"));
     connect(openGraphAct, SIGNAL(triggered()), this, SLOT(CMGOpen()));
 
-    saveGraphAct = new QAction(tr("Ñîõðàíèòü"), this);
+    saveGraphAct = new QAction(tr("Ð¡Ð¾Ñ…Ñ€Ð°Ð½Ð¸Ñ‚ÑŒ"), this);
     saveGraphAct->setShortcuts(QKeySequence::Save);
-    saveGraphAct->setStatusTip(tr("Ñîõðàíèòü â áàçó"));
+    saveGraphAct->setStatusTip(tr("Ð¡Ð¾Ñ…Ñ€Ð°Ð½Ð¸Ñ‚ÑŒ Ð² Ð±Ð°Ð·Ñƒ"));
     connect(saveGraphAct, SIGNAL(triggered()), this, SLOT(CMGSave()));
 
-    saveAsGraphAct = new QAction(tr("Ñîõðàíèòü êàê"), this);
+    saveAsGraphAct = new QAction(tr("Ð¡Ð¾Ñ…Ñ€Ð°Ð½Ð¸Ñ‚ÑŒ ÐºÐ°Ðº"), this);
     saveAsGraphAct->setShortcuts(QKeySequence::SaveAs);
-    saveAsGraphAct->setStatusTip(tr("Ñîõðàíÿåò â áàçó"));
+    saveAsGraphAct->setStatusTip(tr("Ð¡Ð¾Ñ…Ñ€Ð°Ð½ÑÐµÑ‚ Ð² Ð±Ð°Ð·Ñƒ"));
     connect(saveAsGraphAct, SIGNAL(triggered()), this, SLOT(CMGSaveAs()));
 
-    saveAsImageGraphAct = new QAction(tr("Ñîõðàíèòü êàê êàðòèíêó"), this);
+    saveAsImageGraphAct = new QAction(tr("Ð¡Ð¾Ñ…Ñ€Ð°Ð½Ð¸Ñ‚ÑŒ ÐºÐ°Ðº ÐºÐ°Ñ€Ñ‚Ð¸Ð½ÐºÑƒ"), this);
     saveAsImageGraphAct->setShortcuts(QKeySequence::SaveAs);
-    saveAsImageGraphAct->setStatusTip(tr("Ñõðàíÿåò êàê êàðòèíêó"));
+    saveAsImageGraphAct->setStatusTip(tr("Ð¡Ñ…Ñ€Ð°Ð½ÑÐµÑ‚ ÐºÐ°Ðº ÐºÐ°Ñ€Ñ‚Ð¸Ð½ÐºÑƒ"));
     connect(saveAsImageGraphAct, SIGNAL(triggered()), this, SLOT(CMGSaveAsImage()));
 
-    //ÐžÐ±ÑŠÐµÐºÑ‚
-
-    viewContentAct = new QAction(tr("Äåðåâî îáúåêòîâ"), this);
-    viewContentAct->setStatusTip(tr("Äåðåâî îáúåêòîâ"));
+    viewContentAct = new QAction(tr("Ð”ÐµÑ€ÐµÐ²Ð¾ Ð¾Ð±ÑŠÐµÐºÑ‚Ð¾Ð²"), this);
+    viewContentAct->setStatusTip(tr("Ð”ÐµÑ€ÐµÐ²Ð¾ Ð¾Ð±ÑŠÐµÐºÑ‚Ð¾Ð²"));
     connect(viewContentAct, SIGNAL(triggered()), this, SLOT(CMContent()));
 
-    viewGarbageAct = new QAction(tr("Íåèñïîëüçóåìûå îáúåêòû"), this);
-    viewGarbageAct->setStatusTip(tr("Íåèñïîëüçóåìûå îáúåêòû"));
+    viewGarbageAct = new QAction(tr("ÐÐµÐ¸ÑÐ¿Ð¾Ð»ÑŒÐ·ÑƒÐµÐ¼Ñ‹Ðµ Ð¾Ð±ÑŠÐµÐºÑ‚Ñ‹"), this);
+    viewGarbageAct->setStatusTip(tr("ÐÐµÐ¸ÑÐ¿Ð¾Ð»ÑŒÐ·ÑƒÐµÐ¼Ñ‹Ðµ Ð¾Ð±ÑŠÐµÐºÑ‚Ñ‹"));
     connect(viewGarbageAct, SIGNAL(triggered()), this, SLOT(CMShowGarbage()));
 
-    registerUnitAct = new QAction(tr("Çàðåãèñòðèðîâàòü ìîäóëü"), this);
-    registerUnitAct->setStatusTip(tr("Çàðåãèñòðèðîâàòü ìîäóëü"));
+    registerUnitAct = new QAction(tr("Ð—Ð°Ñ€ÐµÐ³Ð¸ÑÑ‚Ñ€Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ Ð¼Ð¾Ð´ÑƒÐ»ÑŒ"), this);
+    registerUnitAct->setStatusTip(tr("Ð—Ð°Ñ€ÐµÐ³Ð¸ÑÑ‚Ñ€Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ Ð¼Ð¾Ð´ÑƒÐ»ÑŒ"));
     connect(registerUnitAct, SIGNAL(triggered()), this, SLOT(CMNewModule()));
 
-    openObjectEditorAct = new QAction(tr("Ðåäàêòîð îáúåêòîâ"), this);
-    openObjectEditorAct->setStatusTip(tr("Ðåäàêòîð îáúåêòîâ"));
+    openObjectEditorAct = new QAction(tr("Ð ÐµÐ´Ð°ÐºÑ‚Ð¾Ñ€ Ð¾Ð±ÑŠÐµÐºÑ‚Ð¾Ð²"), this);
+    openObjectEditorAct->setStatusTip(tr("Ð ÐµÐ´Ð°ÐºÑ‚Ð¾Ñ€ Ð¾Ð±ÑŠÐµÐºÑ‚Ð¾Ð²"));
     connect(openObjectEditorAct, SIGNAL(triggered()), this, SLOT(CMObjList()));
 
-    //Ð—Ð°Ð¿ÑƒÑÐº
-
-    runAct = new QAction(QIcon(":/images/build.png"), tr("ÐŸÐ¾ÑÑ‚Ñ€Ð¾ÐµÐ½Ð¸Ðµ Ð¸ Ð·Ð°Ð¿ÑƒÑÐº"), this);
-    runAct->setStatusTip(tr("Ð’Ñ‹Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÑŒ Ð¿Ñ€Ð¾Ð³Ñ€Ð°Ð¼Ð¼Ñƒ"));
+    runAct = new QAction(QIcon(":/images/build.png"), tr("Ð ÑŸÐ Ñ•Ð¡ÐƒÐ¡â€šÐ¡Ð‚Ð Ñ•Ð ÂµÐ Ð…Ð Ñ‘Ð Âµ Ð Ñ‘ Ð Â·Ð Â°Ð Ñ—Ð¡Ñ“Ð¡ÐƒÐ Ñ”"), this);
+    runAct->setStatusTip(tr("Ð â€™Ð¡â€¹Ð Ñ—Ð Ñ•Ð Â»Ð Ð…Ð Ñ‘Ð¡â€šÐ¡ÐŠ Ð Ñ—Ð¡Ð‚Ð Ñ•Ð Ñ–Ð¡Ð‚Ð Â°Ð Ñ˜Ð Ñ˜Ð¡Ñ“"));
     connect(runAct, SIGNAL(triggered()), this, SLOT(CMRun()));
 
-    compileAct = new QAction(QIcon(":/images/compile.png"), tr("ÐšÐ¾Ð¼Ð¿Ð¸Ð»Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ"), this);
-    compileAct->setStatusTip(tr("Ð¡ÐºÐ¾Ð¼Ð¿Ð¸Ð»Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ Ð¿Ñ€Ð¾Ð³Ñ€Ð°Ð¼Ð¼Ñƒ"));
+    compileAct = new QAction(QIcon(":/images/compile.png"), tr("Ð Ñ™Ð Ñ•Ð Ñ˜Ð Ñ—Ð Ñ‘Ð Â»Ð Ñ‘Ð¡Ð‚Ð Ñ•Ð Ð†Ð Â°Ð¡â€šÐ¡ÐŠ"), this);
+    compileAct->setStatusTip(tr("Ð ÐŽÐ Ñ”Ð Ñ•Ð Ñ˜Ð Ñ—Ð Ñ‘Ð Â»Ð Ñ‘Ð¡Ð‚Ð Ñ•Ð Ð†Ð Â°Ð¡â€šÐ¡ÐŠ Ð Ñ—Ð¡Ð‚Ð Ñ•Ð Ñ–Ð¡Ð‚Ð Â°Ð Ñ˜Ð Ñ˜Ð¡Ñ“"));
     connect(compileAct, SIGNAL(triggered()), this, SLOT(CMCompile()));
 
-    saveStructAct = new QAction(tr("Ð—Ð°Ð¿Ð¸ÑÑŒ ÑÑ‚Ñ€ÑƒÐºÑ‚ÑƒÑ€Ñ‹"), this);
-    saveStructAct->setStatusTip(tr("Ð—Ð°Ð¿Ð¸ÑÑŒ ÑÑ‚Ñ€ÑƒÐºÑ‚ÑƒÑ€Ñ‹"));
+    saveStructAct = new QAction(tr("Ð â€”Ð Â°Ð Ñ—Ð Ñ‘Ð¡ÐƒÐ¡ÐŠ Ð¡ÐƒÐ¡â€šÐ¡Ð‚Ð¡Ñ“Ð Ñ”Ð¡â€šÐ¡Ñ“Ð¡Ð‚Ð¡â€¹"), this);
+    saveStructAct->setStatusTip(tr("Ð â€”Ð Â°Ð Ñ—Ð Ñ‘Ð¡ÐƒÐ¡ÐŠ Ð¡ÐƒÐ¡â€šÐ¡Ð‚Ð¡Ñ“Ð Ñ”Ð¡â€šÐ¡Ñ“Ð¡Ð‚Ð¡â€¹"));
     connect(saveStructAct, SIGNAL(triggered()), this, SLOT(CMSaveStruct()));
 
-    manualInputAct = new QAction(tr("Ð ÐµÐ¶Ð¸Ð¼ Ñ€ÑƒÑ‡Ð½Ð¾Ð³Ð¾ Ð²Ð²Ð¾Ð´Ð° Ð´Ð°Ð½Ð½Ñ‹Ñ…"), this);
-    manualInputAct->setStatusTip(tr("Ð ÐµÐ¶Ð¸Ð¼ Ñ€ÑƒÑ‡Ð½Ð¾Ð³Ð¾ Ð²Ð²Ð¾Ð´Ð° Ð´Ð°Ð½Ð½Ñ‹Ñ…"));
+    manualInputAct = new QAction(tr("Ð  Ð ÂµÐ Â¶Ð Ñ‘Ð Ñ˜ Ð¡Ð‚Ð¡Ñ“Ð¡â€¡Ð Ð…Ð Ñ•Ð Ñ–Ð Ñ• Ð Ð†Ð Ð†Ð Ñ•Ð Ò‘Ð Â° Ð Ò‘Ð Â°Ð Ð…Ð Ð…Ð¡â€¹Ð¡â€¦"), this);
+    manualInputAct->setStatusTip(tr("Ð  Ð ÂµÐ Â¶Ð Ñ‘Ð Ñ˜ Ð¡Ð‚Ð¡Ñ“Ð¡â€¡Ð Ð…Ð Ñ•Ð Ñ–Ð Ñ• Ð Ð†Ð Ð†Ð Ñ•Ð Ò‘Ð Â° Ð Ò‘Ð Â°Ð Ð…Ð Ð…Ð¡â€¹Ð¡â€¦"));
     connect(manualInputAct, SIGNAL(triggered()), this, SLOT(CMDoUserDialog()));
 
     //LeftToolBar
@@ -136,7 +131,7 @@ TDrawWindow* TMyWindow::createDrawWindow()
 
 void TMyWindow::createToolBar()
 {
-    mainToolBar = addToolBar(tr("Ð—Ð°Ð¿ÑƒÑÐº"));
+    mainToolBar = addToolBar(tr("Ð˜Ð½ÑÑ‚Ñ€ÑƒÐ¼ÐµÐ½Ñ‚Ñ‹"));
     mainToolBar->addAction(runAct);
     mainToolBar->addAction(compileAct);
 
@@ -148,7 +143,7 @@ void TMyWindow::createToolBar()
     pointerTypeGroup->addButton(addSyncArcButton, int(QDiagramScene::InsertSync));
     connect(pointerTypeGroup, SIGNAL(buttonClicked(int)), this, SLOT(pointerGroupClicked(int)));
 
-    leftToolBar = new QToolBar(tr("Ð˜Ð½ÑÑ‚Ñ€ÑƒÐ¼ÐµÐ½Ñ‚Ñ‹"), this);
+    leftToolBar = new QToolBar(tr("Ð Â˜Ð Ð…Ð¡ÐƒÐ¡â€šÐ¡Ð‚Ð¡Ñ“Ð Ñ˜Ð ÂµÐ Ð…Ð¡â€šÐ¡â€¹"), this);
     addToolBar(Qt::LeftToolBarArea, leftToolBar);
     leftToolBar->addWidget(addTopButton);
     leftToolBar->addWidget(addCommentButton);

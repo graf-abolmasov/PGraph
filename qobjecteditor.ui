@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+п»ї<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>QObjectEditor</class>
  <widget class="QDialog" name="QObjectEditor">
@@ -39,12 +39,12 @@
      </widget>
      <widget class="QWidget" name="tab_3">
       <attribute name="title">
-       <string>Страница</string>
+       <string>РЎС‚СЂР°РЅРёС†Р°</string>
       </attribute>
      </widget>
      <widget class="QWidget" name="tab_4">
       <attribute name="title">
-       <string>Страница</string>
+       <string>РЎС‚СЂР°РЅРёС†Р°</string>
       </attribute>
      </widget>
     </widget>
