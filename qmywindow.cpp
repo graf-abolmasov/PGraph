@@ -46,7 +46,7 @@ void TMyWindow::createActions()
 
     openGraphAct = new QAction(tr("Открыть"), this);
     openGraphAct->setShortcuts(QKeySequence::Open);
-    openGraphAct->setStatusTip(tr("ОТкрыть из базы"));
+    openGraphAct->setStatusTip(tr("Открыть из базы"));
     connect(openGraphAct, SIGNAL(triggered()), this, SLOT(CMGOpen()));
 
     saveGraphAct = new QAction(tr("Сохранить"), this);
@@ -54,14 +54,14 @@ void TMyWindow::createActions()
     saveGraphAct->setStatusTip(tr("Сохранить в базу"));
     connect(saveGraphAct, SIGNAL(triggered()), this, SLOT(CMGSave()));
 
-    saveAsGraphAct = new QAction(tr("Сохранить как"), this);
+    saveAsGraphAct = new QAction(tr("Cохранить как"), this);
     saveAsGraphAct->setShortcuts(QKeySequence::SaveAs);
-    saveAsGraphAct->setStatusTip(tr("Сохраняет в базу"));
+    saveAsGraphAct->setStatusTip(tr("Cохраняет в базу"));
     connect(saveAsGraphAct, SIGNAL(triggered()), this, SLOT(CMGSaveAs()));
 
-    saveAsImageGraphAct = new QAction(tr("Сохранить как картинку"), this);
+    saveAsImageGraphAct = new QAction(tr("Cохранить как картинку"), this);
     saveAsImageGraphAct->setShortcuts(QKeySequence::SaveAs);
-    saveAsImageGraphAct->setStatusTip(tr("Схраняет как картинку"));
+    saveAsImageGraphAct->setStatusTip(tr("Cхраняет как картинку"));
     connect(saveAsImageGraphAct, SIGNAL(triggered()), this, SLOT(CMGSaveAsImage()));
 
     viewContentAct = new QAction(tr("Дерево объектов"), this);
@@ -80,20 +80,16 @@ void TMyWindow::createActions()
     openObjectEditorAct->setStatusTip(tr("� едактор объектов"));
     connect(openObjectEditorAct, SIGNAL(triggered()), this, SLOT(CMObjList()));
 
-    runAct = new QAction(QIcon(":/images/build.png"), tr("� џ� ѕСЃС‚СЂ� ѕ� µ� Ѕ� ё� µ � ё � ·� °� їСѓСЃ� є"), this);
-    runAct->setStatusTip(tr("� ’С‹� ї� ѕ� »� Ѕ� ёС‚СЊ � їСЂ� ѕ� іСЂ� °� ј� јСѓ"));
+    runAct = new QAction(QIcon(":/images/build.png"), tr("Запуск"), this);
     connect(runAct, SIGNAL(triggered()), this, SLOT(CMRun()));
 
-    compileAct = new QAction(QIcon(":/images/compile.png"), tr("� љ� ѕ� ј� ї� ё� »� ёСЂ� ѕ� І� °С‚СЊ"), this);
-    compileAct->setStatusTip(tr("� Ў� є� ѕ� ј� ї� ё� »� ёСЂ� ѕ� І� °С‚СЊ � їСЂ� ѕ� іСЂ� °� ј� јСѓ"));
+    compileAct = new QAction(QIcon(":/images/compile.png"), tr("Компилировать"), this);
     connect(compileAct, SIGNAL(triggered()), this, SLOT(CMCompile()));
 
-    saveStructAct = new QAction(tr("� —� °� ї� ёСЃСЊ СЃС‚СЂСѓ� єС‚СѓСЂС‹"), this);
-    saveStructAct->setStatusTip(tr("� —� °� ї� ёСЃСЊ СЃС‚СЂСѓ� єС‚СѓСЂС‹"));
+    saveStructAct = new QAction(tr("Записать структуру"), this);
     connect(saveStructAct, SIGNAL(triggered()), this, SLOT(CMSaveStruct()));
 
-    manualInputAct = new QAction(tr("�  � µ� ¶� ё� ј СЂСѓС‡� Ѕ� ѕ� і� ѕ � І� І� ѕ� ґ� ° � ґ� °� Ѕ� ЅС‹С…"), this);
-    manualInputAct->setStatusTip(tr("�  � µ� ¶� ё� ј СЂСѓС‡� Ѕ� ѕ� і� ѕ � І� І� ѕ� ґ� ° � ґ� °� Ѕ� ЅС‹С…"));
+    manualInputAct = new QAction(tr("� учной ввод данных"), this);
     connect(manualInputAct, SIGNAL(triggered()), this, SLOT(CMDoUserDialog()));
 
     //LeftToolBar
@@ -131,7 +127,7 @@ TDrawWindow* TMyWindow::createDrawWindow()
 
 void TMyWindow::createToolBar()
 {
-    mainToolBar = addToolBar(tr("Инструменты"));
+    mainToolBar = addToolBar(tr("Инструменты"));
     mainToolBar->addAction(runAct);
     mainToolBar->addAction(compileAct);
 
@@ -143,7 +139,7 @@ void TMyWindow::createToolBar()
     pointerTypeGroup->addButton(addSyncArcButton, int(QDiagramScene::InsertSync));
     connect(pointerTypeGroup, SIGNAL(buttonClicked(int)), this, SLOT(pointerGroupClicked(int)));
 
-    leftToolBar = new QToolBar(tr("� � ЅСЃС‚СЂСѓ� ј� µ� ЅС‚С‹"), this);
+    leftToolBar = new QToolBar(tr("Палитра инструментов"), this);
     addToolBar(Qt::LeftToolBarArea, leftToolBar);
     leftToolBar->addWidget(addTopButton);
     leftToolBar->addWidget(addCommentButton);

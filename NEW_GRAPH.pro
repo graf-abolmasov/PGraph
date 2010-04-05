@@ -18,7 +18,13 @@ SOURCES += main.cpp \
     qobjecteditor.cpp \
     actor.cpp \
     predicate.cpp \
-    qactoreditor.cpp
+    qactoreditor.cpp \
+    qdatatypeeditor.cpp \
+    qdatatypedialog.cpp \
+    datatype.cpp \
+    qvariableeditor.cpp \
+    qvariabledialog.cpp \
+    variable.cpp
 HEADERS += qmywindow.h \
     qdrawwindow.h \
     qdiagramitem.h \
@@ -32,8 +38,18 @@ HEADERS += qmywindow.h \
     qobjecteditor.h \
     actor.h \
     predicate.h \
-    qactoreditor.h
+    qactoreditor.h \
+    qdatatypeeditor.h \
+    qdatatypedialog.h \
+    datatype.h \
+    qvariableeditor.h \
+    qvariabledialog.h \
+    variable.h
 RESOURCES += resources.qrc
 FORMS += toppropertydialog.ui \
     qobjecteditor.ui \
-    qactoreditor.ui
+    qactoreditor.ui \
+    qdatatypeeditor.ui \
+    qdatatypedialog.ui \
+    qvariableeditor.ui \
+    qvariabledialog.ui

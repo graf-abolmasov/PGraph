@@ -5,6 +5,7 @@
 #include <QList>
 #include "actor.h"
 #include "qactoreditor.h"
+#include "QtCore"
 
 QObjectEditor::QObjectEditor(QWidget *parent) :
     QDialog(parent),
@@ -38,6 +39,7 @@ QObjectEditor::QObjectEditor(QWidget *parent) :
     connect(editButton, SIGNAL(clicked()), this, SLOT(editButtonClicked()));
     connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteButtonClicked()));
 
+    prepareForm();
 }
 
 QObjectEditor::~QObjectEditor()
@@ -63,7 +65,8 @@ void QObjectEditor::changeEvent(QEvent *e)
 */
 bool QObjectEditor::prepareForm()
 {
-
+    bool result = true;
+    return result;
 }
 
 /*!
@@ -84,6 +87,7 @@ void QObjectEditor::newButtonClicked()
         break;
     case 2: //I-акторы
         actorEditor = new QActorEditor(QActorEditor::inlineWizard);
+        actorEditor->prepareForm(NULL);
         if (actorEditor->exec()){
 
         }
@@ -99,6 +103,7 @@ void QObjectEditor::editButtonClicked()
     switch (ui->tab->currentIndex()){
     case 0: //Акторы
         actorEditor = new QActorEditor(QActorEditor::normalEditor);
+        actorEditor->prepareForm(NULL);
         if (actorEditor->exec()){
 
         }
@@ -107,6 +112,7 @@ void QObjectEditor::editButtonClicked()
         break;
     case 2: //I-акторы
         actorEditor = new QActorEditor(QActorEditor::inlineEditor);
+        actorEditor->prepareForm(NULL);
         if (actorEditor->exec()){
 
         }

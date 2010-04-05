@@ -44,7 +44,13 @@ void QActorEditor::updateInterface()
     ui->normalWizardStep1Widget->setVisible(false);
     ui->normalWizardStep2Widget->setVisible(false);
     ui->normalWizardStep3Widget->setVisible(false);
+
     switch (myMode){
+    case normalEditor:
+        ui->normalEditorWidget->setVisible(true);
+        ui->prevButton->setVisible(false);
+        ui->nextButton->setVisible(false);
+        break;
     case normalWizard:
         switch (step){
         case 1:
@@ -100,4 +106,10 @@ void QActorEditor::on_prevButton_clicked()
 {
     step--;
     updateInterface();
+}
+
+bool QActorEditor::prepareForm(Actor *actor)
+{
+    bool result = true;
+    return result;
 }
