@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+п»ї<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>QActorEditor</class>
  <widget class="QDialog" name="QActorEditor">
@@ -31,276 +31,6 @@
    <property name="standardButtons">
     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
    </property>
-  </widget>
-  <widget class="QWidget" name="normalEditorWidget" native="true">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>531</width>
-     <height>471</height>
-    </rect>
-   </property>
-   <widget class="QWidget" name="horizontalLayoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>380</y>
-      <width>511</width>
-      <height>81</height>
-     </rect>
-    </property>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <item>
-      <widget class="QFrame" name="frame_3">
-       <property name="frameShape">
-        <enum>QFrame::StyledPanel</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
-       </property>
-       <widget class="QLabel" name="descParamsEditorLabel">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>10</y>
-          <width>231</width>
-          <height>61</height>
-         </rect>
-        </property>
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>10</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>Описание параметров модуля</string>
-        </property>
-        <property name="scaledContents">
-         <bool>true</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-        </property>
-        <property name="wordWrap">
-         <bool>true</bool>
-        </property>
-        <property name="textInteractionFlags">
-         <set>Qt::TextSelectableByMouse</set>
-        </property>
-       </widget>
-      </widget>
-     </item>
-     <item>
-      <widget class="QFrame" name="frame_4">
-       <property name="frameShape">
-        <enum>QFrame::StyledPanel</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
-       </property>
-       <widget class="QLabel" name="moduleDescEditorLabel">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>10</y>
-          <width>231</width>
-          <height>61</height>
-         </rect>
-        </property>
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>10</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>Описание модуля</string>
-        </property>
-        <property name="scaledContents">
-         <bool>true</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-        </property>
-        <property name="wordWrap">
-         <bool>true</bool>
-        </property>
-        <property name="textInteractionFlags">
-         <set>Qt::TextSelectableByMouse</set>
-        </property>
-       </widget>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-   <widget class="QFrame" name="frame">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>10</y>
-      <width>511</width>
-      <height>71</height>
-     </rect>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::StyledPanel</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Raised</enum>
-    </property>
-    <widget class="QLabel" name="moduleNameEditorLabel">
-     <property name="geometry">
-      <rect>
-       <x>120</x>
-       <y>20</y>
-       <width>371</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>10</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>TextLabel</string>
-     </property>
-     <property name="textFormat">
-      <enum>Qt::PlainText</enum>
-     </property>
-     <property name="scaledContents">
-      <bool>true</bool>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-     <property name="textInteractionFlags">
-      <set>Qt::LinksAccessibleByMouse|Qt::TextEditable|Qt::TextEditorInteraction|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label">
-     <property name="geometry">
-      <rect>
-       <x>30</x>
-       <y>20</y>
-       <width>79</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>10</pointsize>
-      </font>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
-     </property>
-     <property name="text">
-      <string>Имя объекта:</string>
-     </property>
-     <property name="textFormat">
-      <enum>Qt::AutoText</enum>
-     </property>
-     <property name="scaledContents">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </widget>
-   <widget class="QFrame" name="frame_2">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>110</y>
-      <width>511</width>
-      <height>261</height>
-     </rect>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::StyledPanel</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Raised</enum>
-    </property>
-    <widget class="QTableWidget" name="tableWidget">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>11</y>
-       <width>491</width>
-       <height>241</height>
-      </rect>
-     </property>
-     <property name="selectionMode">
-      <enum>QAbstractItemView::SingleSelection</enum>
-     </property>
-     <property name="selectionBehavior">
-      <enum>QAbstractItemView::SelectRows</enum>
-     </property>
-     <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
-      <bool>true</bool>
-     </attribute>
-     <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
-      <bool>true</bool>
-     </attribute>
-     <column>
-      <property name="text">
-       <string>Новый столбец</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Параметр</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Данное ПО</string>
-      </property>
-     </column>
-    </widget>
-   </widget>
-   <widget class="QLabel" name="label_3">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>90</y>
-      <width>104</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>10</pointsize>
-     </font>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::NoFrame</enum>
-    </property>
-    <property name="text">
-     <string>Паспорт объекта:</string>
-    </property>
-    <property name="textFormat">
-     <enum>Qt::AutoText</enum>
-    </property>
-    <property name="scaledContents">
-     <bool>true</bool>
-    </property>
-   </widget>
   </widget>
   <widget class="QWidget" name="inlineWizardStep1Widget" native="true">
    <property name="geometry">
@@ -336,7 +66,7 @@
      </font>
     </property>
     <property name="text">
-     <string>Введите текст модуля</string>
+     <string>Р’РІРµРґРёС‚Рµ С‚РµРєСЃС‚ РјРѕРґСѓР»СЏ</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_6">
@@ -354,10 +84,10 @@
      </font>
     </property>
     <property name="text">
-     <string>Иконка</string>
+     <string>РРєРѕРЅРєР°</string>
     </property>
    </widget>
-   <widget class="QGraphicsView" name="inlineActorIcon">
+   <widget class="QGraphicsView" name="actorIconInline">
     <property name="geometry">
      <rect>
       <x>20</x>
@@ -367,7 +97,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QPushButton" name="loadInlineIconButton">
+   <widget class="QPushButton" name="loadIconInlineButton">
     <property name="geometry">
      <rect>
       <x>130</x>
@@ -377,10 +107,10 @@
      </rect>
     </property>
     <property name="text">
-     <string>Загрузить</string>
+     <string>Р—Р°РіСЂСѓР·РёС‚СЊ</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="clearInlineIconButton">
+   <widget class="QPushButton" name="clearIconInlineButton">
     <property name="geometry">
      <rect>
       <x>130</x>
@@ -390,7 +120,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Удалить</string>
+     <string>РЈРґР°Р»РёС‚СЊ</string>
     </property>
    </widget>
   </widget>
@@ -403,7 +133,7 @@
      <height>471</height>
     </rect>
    </property>
-   <widget class="QTableWidget" name="parameterInline">
+   <widget class="QTableWidget" name="parametersTableInline">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -414,17 +144,17 @@
     </property>
     <column>
      <property name="text">
-      <string>Параметр</string>
+      <string>РџР°СЂР°РјРµС‚СЂ</string>
      </property>
     </column>
     <column>
      <property name="text">
-      <string>Тип</string>
+      <string>РўРёРї</string>
      </property>
     </column>
     <column>
      <property name="text">
-      <string>Класс</string>
+      <string>РљР»Р°СЃСЃ</string>
      </property>
     </column>
    </widget>
@@ -464,87 +194,131 @@
      <height>471</height>
     </rect>
    </property>
-   <widget class="QLabel" name="label_4">
+   <widget class="QFrame" name="frame_3">
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>30</y>
-      <width>23</width>
-      <height>16</height>
+      <y>20</y>
+      <width>491</width>
+      <height>61</height>
      </rect>
     </property>
-    <property name="font">
-     <font>
-      <pointsize>10</pointsize>
-     </font>
+    <property name="frameShape">
+     <enum>QFrame::WinPanel</enum>
     </property>
-    <property name="text">
-     <string>Имя</string>
+    <property name="frameShadow">
+     <enum>QFrame::Sunken</enum>
     </property>
+    <property name="lineWidth">
+     <number>3</number>
+    </property>
+    <property name="midLineWidth">
+     <number>1</number>
+    </property>
+    <widget class="QLabel" name="label_4">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>23</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>РРјСЏ</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="actorNameNormalEdit">
+     <property name="geometry">
+      <rect>
+       <x>40</x>
+       <y>20</y>
+       <width>441</width>
+       <height>20</height>
+      </rect>
+     </property>
+    </widget>
    </widget>
-   <widget class="QLineEdit" name="normalActorNameEdit">
-    <property name="geometry">
-     <rect>
-      <x>50</x>
-      <y>30</y>
-      <width>451</width>
-      <height>20</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_5">
+   <widget class="QFrame" name="frame_4">
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>70</y>
-      <width>41</width>
-      <height>16</height>
+      <y>110</y>
+      <width>491</width>
+      <height>191</height>
      </rect>
     </property>
-    <property name="font">
-     <font>
-      <pointsize>10</pointsize>
-     </font>
+    <property name="frameShape">
+     <enum>QFrame::WinPanel</enum>
     </property>
-    <property name="text">
-     <string>Иконка</string>
+    <property name="frameShadow">
+     <enum>QFrame::Sunken</enum>
     </property>
-   </widget>
-   <widget class="QGraphicsView" name="normalActorIcon">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>100</y>
-      <width>100</width>
-      <height>90</height>
-     </rect>
+    <property name="lineWidth">
+     <number>3</number>
     </property>
-   </widget>
-   <widget class="QPushButton" name="loadNormalIconButton">
-    <property name="geometry">
-     <rect>
-      <x>140</x>
-      <y>100</y>
-      <width>75</width>
-      <height>23</height>
-     </rect>
+    <property name="midLineWidth">
+     <number>1</number>
     </property>
-    <property name="text">
-     <string>Загрузить</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="clearNormalIconButton">
-    <property name="geometry">
-     <rect>
-      <x>140</x>
-      <y>130</y>
-      <width>75</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Удалить</string>
-    </property>
+    <widget class="QGraphicsView" name="actorIconNormal">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>40</y>
+       <width>100</width>
+       <height>90</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_5">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>41</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>РРєРѕРЅРєР°</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="clearIconNormalButton">
+     <property name="geometry">
+      <rect>
+       <x>130</x>
+       <y>70</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>РЈРґР°Р»РёС‚СЊ</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="loadIconNormalButton">
+     <property name="geometry">
+      <rect>
+       <x>130</x>
+       <y>40</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Р—Р°РіСЂСѓР·РёС‚СЊ</string>
+     </property>
+    </widget>
    </widget>
   </widget>
   <widget class="QWidget" name="normalWizardStep2Widget" native="true">
@@ -556,29 +330,11 @@
      <height>471</height>
     </rect>
    </property>
-   <widget class="QLabel" name="objectNameLabel">
-    <property name="geometry">
-     <rect>
-      <x>30</x>
-      <y>30</y>
-      <width>74</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>10</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>Имя объекта</string>
-    </property>
-   </widget>
    <widget class="QLabel" name="label_8">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>70</y>
+      <x>10</x>
+      <y>80</y>
       <width>83</width>
       <height>16</height>
      </rect>
@@ -589,26 +345,26 @@
      </font>
     </property>
     <property name="text">
-     <string>Выбор модуля</string>
+     <string>Р’С‹Р±РѕСЂ РјРѕРґСѓР»СЏ</string>
     </property>
    </widget>
-   <widget class="QListWidget" name="moduleList">
+   <widget class="QListWidget" name="moduleListNormalWizard">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>90</y>
+      <y>100</y>
       <width>511</width>
-      <height>261</height>
+      <height>251</height>
      </rect>
     </property>
    </widget>
-   <widget class="QLabel" name="moduleDescLabel">
+   <widget class="QLabel" name="moduleDescNormalWizardLabel">
     <property name="geometry">
      <rect>
-      <x>22</x>
-      <y>370</y>
-      <width>491</width>
-      <height>81</height>
+      <x>10</x>
+      <y>360</y>
+      <width>511</width>
+      <height>101</height>
      </rect>
     </property>
     <property name="font">
@@ -616,8 +372,20 @@
       <pointsize>10</pointsize>
      </font>
     </property>
+    <property name="frameShape">
+     <enum>QFrame::WinPanel</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Sunken</enum>
+    </property>
+    <property name="lineWidth">
+     <number>3</number>
+    </property>
+    <property name="midLineWidth">
+     <number>1</number>
+    </property>
     <property name="text">
-     <string>Описание модуля</string>
+     <string>РћРїРёСЃР°РЅРёРµ РјРѕРґСѓР»СЏ</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -629,11 +397,70 @@
      <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
     </property>
    </widget>
-   <zorder>objectNameLabel</zorder>
-   <zorder>label_8</zorder>
-   <zorder>moduleList</zorder>
-   <zorder>moduleDescLabel</zorder>
-   <zorder>normalWizardStep3Widget</zorder>
+   <widget class="QFrame" name="frame_5">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>20</y>
+      <width>491</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
+    </property>
+    <widget class="QLabel" name="label_9">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>79</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>РРјСЏ РѕР±СЉРµРєС‚Р°:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="objectNameNormaLabel">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>10</y>
+       <width>391</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>TextLabel</string>
+     </property>
+     <property name="scaledContents">
+      <bool>true</bool>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+     <property name="textInteractionFlags">
+      <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+     </property>
+    </widget>
+   </widget>
   </widget>
   <widget class="QWidget" name="normalWizardStep3Widget" native="true">
    <property name="geometry">
@@ -671,13 +498,13 @@
      <number>1</number>
     </property>
     <property name="text">
-     <string>Паспорт</string>
+     <string>РџР°СЃРїРѕСЂС‚</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
-   <widget class="QLabel" name="actorNameWizardLabel">
+   <widget class="QLabel" name="actorNameNormalWizardLabel">
     <property name="geometry">
      <rect>
       <x>30</x>
@@ -707,7 +534,7 @@
      <number>1</number>
     </property>
     <property name="text">
-     <string>Имя объекта</string>
+     <string>РРјСЏ РѕР±СЉРµРєС‚Р°</string>
     </property>
     <property name="scaledContents">
      <bool>true</bool>
@@ -722,7 +549,7 @@
      <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
     </property>
    </widget>
-   <widget class="QTableWidget" name="parametersWizardTable">
+   <widget class="QTableWidget" name="parametersTableNormalWizard">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -733,17 +560,17 @@
     </property>
     <column>
      <property name="text">
-      <string>Параметр</string>
+      <string>РџР°СЂР°РјРµС‚СЂ</string>
      </property>
     </column>
     <column>
      <property name="text">
-      <string>Тип</string>
+      <string>РўРёРї</string>
      </property>
     </column>
     <column>
      <property name="text">
-      <string>Данное ПО</string>
+      <string>Р”Р°РЅРЅРѕРµ РџРћ</string>
      </property>
     </column>
    </widget>
@@ -758,7 +585,7 @@
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QLabel" name="moduleDescWizardLabel">
+      <widget class="QLabel" name="moduleDescNormalWizardLabel_2">
        <property name="font">
         <font>
          <pointsize>10</pointsize>
@@ -777,7 +604,7 @@
         <number>1</number>
        </property>
        <property name="text">
-        <string>Описание параметра базового модуля</string>
+        <string>РћРїРёСЃР°РЅРёРµ РїР°СЂР°РјРµС‚СЂР° Р±Р°Р·РѕРІРѕРіРѕ РјРѕРґСѓР»СЏ</string>
        </property>
        <property name="scaledContents">
         <bool>true</bool>
@@ -791,7 +618,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="descParamWizardLabel">
+      <widget class="QLabel" name="descParamNormalWizardLabel">
        <property name="font">
         <font>
          <pointsize>10</pointsize>
@@ -810,7 +637,7 @@
         <number>1</number>
        </property>
        <property name="text">
-        <string>Описание выбранного данного предметной области</string>
+        <string>РћРїРёСЃР°РЅРёРµ РІС‹Р±СЂР°РЅРЅРѕРіРѕ РґР°РЅРЅРѕРіРѕ РїСЂРµРґРјРµС‚РЅРѕР№ РѕР±Р»Р°СЃС‚Рё</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -823,6 +650,295 @@
     </layout>
    </widget>
   </widget>
+  <widget class="QWidget" name="normalEditorWidget" native="true">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>531</width>
+     <height>471</height>
+    </rect>
+   </property>
+   <widget class="QFrame" name="frame">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>50</y>
+      <width>471</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::WinPanel</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Sunken</enum>
+    </property>
+    <property name="lineWidth">
+     <number>3</number>
+    </property>
+    <property name="midLineWidth">
+     <number>1</number>
+    </property>
+    <widget class="QLabel" name="moduleNameNormalEditorLabel">
+     <property name="geometry">
+      <rect>
+       <x>110</x>
+       <y>5</y>
+       <width>371</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>TextLabel</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::PlainText</enum>
+     </property>
+     <property name="scaledContents">
+      <bool>true</bool>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+     <property name="textInteractionFlags">
+      <set>Qt::LinksAccessibleByMouse|Qt::TextEditable|Qt::TextEditorInteraction|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>5</y>
+       <width>79</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="text">
+      <string>РРјСЏ РѕР±СЉРµРєС‚Р°:</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::AutoText</enum>
+     </property>
+     <property name="scaledContents">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QFrame" name="frame_2">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>110</y>
+      <width>511</width>
+      <height>241</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
+    </property>
+    <widget class="QTableWidget" name="tableWidget">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>1</y>
+       <width>511</width>
+       <height>241</height>
+      </rect>
+     </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::SingleSelection</enum>
+     </property>
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
+     <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+      <bool>true</bool>
+     </attribute>
+     <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+      <bool>true</bool>
+     </attribute>
+     <column>
+      <property name="text">
+       <string>РџР°СЂР°РјРµС‚СЂ</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>РџР°СЂР°РјРµС‚СЂ</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Р”Р°РЅРЅРѕРµ РџРћ</string>
+      </property>
+     </column>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>9</x>
+      <y>360</y>
+      <width>511</width>
+      <height>101</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QLabel" name="moduleDescNormalEditorLabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::WinPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Sunken</enum>
+       </property>
+       <property name="lineWidth">
+        <number>3</number>
+       </property>
+       <property name="midLineWidth">
+        <number>1</number>
+       </property>
+       <property name="text">
+        <string>РћРїРёСЃР°РЅРёРµ РјРѕРґСѓР»СЏ</string>
+       </property>
+       <property name="scaledContents">
+        <bool>true</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+       <property name="textInteractionFlags">
+        <set>Qt::TextSelectableByMouse</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="descParamsNormalEditorLabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::WinPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Sunken</enum>
+       </property>
+       <property name="lineWidth">
+        <number>3</number>
+       </property>
+       <property name="midLineWidth">
+        <number>1</number>
+       </property>
+       <property name="text">
+        <string>РћРїРёСЃР°РЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ РјРѕРґСѓР»СЏ</string>
+       </property>
+       <property name="scaledContents">
+        <bool>true</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+       <property name="textInteractionFlags">
+        <set>Qt::TextSelectableByMouse</set>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QLabel" name="label_3">
+    <property name="geometry">
+     <rect>
+      <x>217</x>
+      <y>10</y>
+      <width>81</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::WinPanel</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Sunken</enum>
+    </property>
+    <property name="lineWidth">
+     <number>3</number>
+    </property>
+    <property name="midLineWidth">
+     <number>1</number>
+    </property>
+    <property name="text">
+     <string>РџР°СЃРїРѕСЂС‚</string>
+    </property>
+    <property name="textFormat">
+     <enum>Qt::AutoText</enum>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+  </widget>
+  <zorder>buttonBox</zorder>
+  <zorder>prevButton</zorder>
+  <zorder>nextButton</zorder>
+  <zorder>normalWizardStep3Widget</zorder>
+  <zorder>inlineWizardStep1Widget</zorder>
+  <zorder>inlineWizardStep2Widget</zorder>
+  <zorder>normalWizardStep1Widget</zorder>
+  <zorder>normalEditorWidget</zorder>
+  <zorder>normalWizardStep2Widget</zorder>
  </widget>
  <resources/>
  <connections>

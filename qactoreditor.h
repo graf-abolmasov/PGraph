@@ -2,6 +2,7 @@
 #define QACTOREDITOR_H
 
 #include <QDialog>
+#include "actor.h"
 
 namespace Ui {
     class QActorEditor;
@@ -16,6 +17,8 @@ public:
     explicit QActorEditor(QWidget *parent = 0);
     QActorEditor(Mode mode, QWidget *parent = 0);
     ~QActorEditor();
+
+    bool prepareForm(Actor *actor);
 
 protected:
     void changeEvent(QEvent *e);
