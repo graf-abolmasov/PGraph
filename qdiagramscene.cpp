@@ -40,7 +40,7 @@ void QDiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
     case InsertItem:
         item = new TTop(myItemMenu);
         item->setBrush(QBrush(Qt::gray,Qt::SolidPattern));
-        //item->setBrush(myItemColor); //прозрачный цвет
+        //item->setBrush(myItemColor); //РїСЂРѕР·СЂР°С‡РЅС‹Р№ С†РІРµС‚
         item->setZValue(1);
         addItem(item);
         item->setPos(mouseEvent->scenePos());
@@ -78,7 +78,7 @@ void QDiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
 void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
-    //режим рисования дуги
+    //СЂРµР¶РёРј СЂРёСЃРѕРІР°РЅРёСЏ РґСѓРіРё
     if (myMode == InsertLine && line != NULL && mouseEvent->buttons() == Qt::LeftButton) {
         QLineF vector(line->line().p1(), mouseEvent->scenePos());
         float dx = vector.dx();
@@ -105,7 +105,7 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
         }
         line->setLine(newLine);
     }
-    //режим перетаскивания дуги
+    //СЂРµР¶РёРј РїРµСЂРµС‚Р°СЃРєРёРІР°РЅРёСЏ РґСѓРіРё
     else if ((myMode == MoveItem) && (mouseEvent->buttons() == Qt::LeftButton) &&
              (selectedItems().count() == 1) && (selectedItems().first()->type() == QArcLine::Type)) {
         QArcLine *selectedLine = qgraphicsitem_cast<QArcLine *>(selectedItems().first());
@@ -115,7 +115,7 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
         float dx = vector.dx();
         float dy = vector.dy();
 
-        /*//не разрешать двигать начальную и конечный кусочек дуги (пока)
+        /*//РЅРµ СЂР°Р·СЂРµС€Р°С‚СЊ РґРІРёРіР°С‚СЊ РЅР°С‡Р°Р»СЊРЅСѓСЋ Рё РєРѕРЅРµС‡РЅС‹Р№ РєСѓСЃРѕС‡РµРє РґСѓРіРё (РїРѕРєР°)
         if (!((arc->lines.first() == selectedLine) || (arc->lines.last() == selectedLine))){*/
         QArcLine *prevLine;
         QArcLine *nextLine;
@@ -134,12 +134,12 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
                 nextLine = arc->lines.at(arc->lines.indexOf(selectedLine) + 1);
             }
         }
-        //проверим чтобы начальная точка не вылезла из вершины!
+        //РїСЂРѕРІРµСЂРёРј С‡С‚РѕР±С‹ РЅР°С‡Р°Р»СЊРЅР°СЏ С‚РѕС‡РєР° РЅРµ РІС‹Р»РµР·Р»Р° РёР· РІРµСЂС€РёРЅС‹!
         if ((arc->endItem()->sceneBoundingRect().adjusted(8, 8, -8, -8).contains(arc->lines.last()->line().p2() + QPointF(dx, dy)) &&
               arc->startItem()->sceneBoundingRect().adjusted(8, 8, -8, -8).contains(arc->lines.first()->line().p1() + QPointF(dx, dy))) &&
              (arc->contains(arc->mapFromScene(mouseEvent->lastScenePos())))){
 
-            //вправо-влево можно двигать только вертикальные линии (пока)
+            //РІРїСЂР°РІРѕ-РІР»РµРІРѕ РјРѕР¶РЅРѕ РґРІРёРіР°С‚СЊ С‚РѕР»СЊРєРѕ РІРµСЂС‚РёРєР°Р»СЊРЅС‹Рµ Р»РёРЅРёРё (РїРѕРєР°)
             if (selectedLine->line().p1().x() == selectedLine->line().p2().x()){
                 if (prevLine != NULL)
                     prevLine->setLine(QLineF(prevLine->line().p1(),
@@ -161,7 +161,7 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
                                       );
             }
 
-            //вверх-вниз можно двигать только горизонтальные линии (пока)
+            //РІРІРµСЂС…-РІРЅРёР· РјРѕР¶РЅРѕ РґРІРёРіР°С‚СЊ С‚РѕР»СЊРєРѕ РіРѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅС‹Рµ Р»РёРЅРёРё (РїРѕРєР°)
             if (selectedLine->line().p1().y() == selectedLine->line().p2().y()){
                 if (prevLine != NULL)
                     prevLine->setLine(QLineF(prevLine->line().p1(),
@@ -186,7 +186,7 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
         arc->updateBounds();
     }
-    //режим перетаскивания вершины
+    //СЂРµР¶РёРј РїРµСЂРµС‚Р°СЃРєРёРІР°РЅРёСЏ РІРµСЂС€РёРЅС‹
     else if ((myMode == MoveItem) && (mouseEvent->buttons() == Qt::LeftButton) &&
              (selectedItems().count() == 1) && (selectedItems().first()->type() == TTop::Type) &&
              (selectedItems().first()->contains(selectedItems().first()->mapFromScene(mouseEvent->lastScenePos())))) {
@@ -211,9 +211,9 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
             }
         }
 
-        bool isOK = false; //false - если дугу надо полностью переделать
+        bool isOK = false; //false - РµСЃР»Рё РґСѓРіСѓ РЅР°РґРѕ РїРѕР»РЅРѕСЃС‚СЊСЋ РїРµСЂРµРґРµР»Р°С‚СЊ
 
-        QList<TArc *> brokenLines; //список содержит дуги, нуждающиеся в полной переделке
+        QList<TArc *> brokenLines; //СЃРїРёСЃРѕРє СЃРѕРґРµСЂР¶РёС‚ РґСѓРіРё, РЅСѓР¶РґР°СЋС‰РёРµСЃСЏ РІ РїРѕР»РЅРѕР№ РїРµСЂРµРґРµР»РєРµ
         foreach (TArc *arc, top->allArcs()){
            isOK = arc->remake(top, dx, dy);
            if (!isOK)
@@ -223,7 +223,7 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
         foreach (TArc *arc, brokenLines)
             arc->autoBuild(top, dx, dy);
 
-        //необходимо для правильной перерисовки.
+        //РЅРµРѕР±С…РѕРґРёРјРѕ РґР»СЏ РїСЂР°РІРёР»СЊРЅРѕР№ РїРµСЂРµСЂРёСЃРѕРІРєРё.
         foreach (TArc *arc, top->allArcs())
             arc->updateBounds();
 
@@ -237,7 +237,7 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
     if (line != NULL && newArc != NULL && myMode == InsertLine) {
-        //дуга должна начинаться с вершины!
+        //РґСѓРіР° РґРѕР»Р¶РЅР° РЅР°С‡РёРЅР°С‚СЊСЃСЏ СЃ РІРµСЂС€РёРЅС‹!
         if (newArc->startItem() == NULL){
             QList<QGraphicsItem *> startItems = items(line->line().p1());
             while (startItems.count() > 0 && startItems.first()->type() != TTop::Type)
@@ -254,7 +254,7 @@ void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
             }
         }
 
-        //дуга должна заканчиваться вершиной
+        //РґСѓРіР° РґРѕР»Р¶РЅР° Р·Р°РєР°РЅС‡РёРІР°С‚СЊСЃСЏ РІРµСЂС€РёРЅРѕР№
         if ((newArc != NULL) && (newArc->endItem() == NULL) && (newArc->prevLine() != NULL)){
             QList<QGraphicsItem *> endItems = items(line->line().p2());
             while (endItems.count() > 0 && endItems.first()->type() != TTop::Type)
@@ -265,7 +265,7 @@ void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
                 newArc->addLine(line);
             }
         }
-        //плохая ситуация, когда начало и конец совпадают, но дуга имеет явно неправилную форму
+        //РїР»РѕС…Р°СЏ СЃРёС‚СѓР°С†РёСЏ, РєРѕРіРґР° РЅР°С‡Р°Р»Рѕ Рё РєРѕРЅРµС† СЃРѕРІРїР°РґР°СЋС‚, РЅРѕ РґСѓРіР° РёРјРµРµС‚ СЏРІРЅРѕ РЅРµРїСЂР°РІРёР»РЅСѓСЋ С„РѕСЂРјСѓ
         if ((newArc != NULL) && (newArc->endItem() != NULL) && (newArc->startItem() != NULL) &&
             newArc->startItem()->collidesWithItem(newArc->endItem()) && (newArc->lines.count() == 1)){
             delete newArc;
@@ -273,7 +273,7 @@ void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
             line = NULL;
         }
 
-        //условие выполнится когда у дуги будет начало и конец!
+        //СѓСЃР»РѕРІРёРµ РІС‹РїРѕР»РЅРёС‚СЃСЏ РєРѕРіРґР° Сѓ РґСѓРіРё Р±СѓРґРµС‚ РЅР°С‡Р°Р»Рѕ Рё РєРѕРЅРµС†!
         if ((newArc != NULL) && (newArc->endItem() != NULL) && (newArc->startItem() != NULL)){
             foreach(TArc *arc, newArc->startItem()->outArcs()){
                 arc->setPriority(arc->priority() + 1);

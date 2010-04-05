@@ -3,6 +3,8 @@
 
 #include <QDialog>
 #include <QToolButton>
+#include <actor.h>
+#include <predicate.h>
 
 namespace Ui {
     class QObjectEditor;
@@ -18,12 +20,22 @@ public:
 protected:
     void changeEvent(QEvent *e);
 
+private slots:
+    void newButtonClicked();
+    void editButtonClicked();
+    void deleteButtonClicked();
+
 private:
     Ui::QObjectEditor *ui;
     QPushButton *newButton;
     QPushButton *editButton;
     QPushButton *deleteButton;
-    QButtonGroup *EditButtonGroup;
+    QButtonGroup *editButtonGroup;
+
+    QList<Actor *> actorsList;
+    QList<Predicate *> predicatesList;
+    QList<Actor *> iActorsLisr;
+    QList<Predicate *> iPredicateList;
 };
 
 #endif // QOBJECTEDITOR_H

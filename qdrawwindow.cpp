@@ -50,32 +50,32 @@ void TDrawWindow::createMenus()
 
 void TDrawWindow::createActions()
 {
-    Action1 = new QAction(tr("Загрузить иконку"), this);
-    Action1->setStatusTip(tr("Устанавливает иконку"));
+    Action1 = new QAction(tr("Р—Р°РіСЂСѓР·РёС‚СЊ РёРєРѕРЅРєСѓ"), this);
+    Action1->setStatusTip(tr("РЈСЃС‚Р°РЅР°РІР»РёРІР°РµС‚ РёРєРѕРЅРєСѓ"));
     connect(Action1, SIGNAL(triggered()), this, SLOT(setItemIcon()));
 
-    Action2 = new QAction(tr("Свойства"), this);
-    Action2->setStatusTip(tr("Свойства веришны"));
+    Action2 = new QAction(tr("РЎРІРѕР№СЃС‚РІР°"), this);
+    Action2->setStatusTip(tr("РЎРІРѕР№СЃС‚РІР° РІРµСЂРёС€РЅС‹"));
     connect(Action2, SIGNAL(triggered()), this, SLOT(showTopPropDialog()));
 
-    makeAsRootAction = new QAction(tr("Сделать корневой"), this);
-    makeAsRootAction->setStatusTip(tr("Свойства веришны"));
+    makeAsRootAction = new QAction(tr("РЎРґРµР»Р°С‚СЊ РєРѕСЂРЅРµРІРѕР№"), this);
+    makeAsRootAction->setStatusTip(tr("РЎРІРѕР№СЃС‚РІР° РІРµСЂРёС€РЅС‹"));
     connect(makeAsRootAction, SIGNAL(triggered()), this, SLOT(makeAsRoot()));
 
-    deleteAction = new QAction(QIcon(";/images/delete.png"), tr("Удалить"), this);
-    deleteAction->setStatusTip(tr("Удаляет объект"));
+    deleteAction = new QAction(QIcon(";/images/delete.png"), tr("РЈРґР°Р»РёС‚СЊ"), this);
+    deleteAction->setStatusTip(tr("РЈРґР°Р»СЏРµС‚ РѕР±СЉРµРєС‚"));
     connect(deleteAction, SIGNAL(triggered()), this, SLOT(deleteItem()));
 
-    deleteArcAction = new QAction(QIcon(";/images/delete.png"), tr("Удалить"), this);
-    deleteArcAction->setStatusTip(tr("Удаляет объект"));
+    deleteArcAction = new QAction(QIcon(";/images/delete.png"), tr("РЈРґР°Р»РёС‚СЊ"), this);
+    deleteArcAction->setStatusTip(tr("РЈРґР°Р»СЏРµС‚ РѕР±СЉРµРєС‚"));
     connect(deleteArcAction, SIGNAL(triggered()), this, SLOT(deleteArc()));
 
-    deleteSyncAction = new QAction(QIcon(";/images/delete.png"), tr("Удалить"), this);
-    deleteSyncAction->setStatusTip(tr("Удаляет объект"));
+    deleteSyncAction = new QAction(QIcon(";/images/delete.png"), tr("РЈРґР°Р»РёС‚СЊ"), this);
+    deleteSyncAction->setStatusTip(tr("РЈРґР°Р»СЏРµС‚ РѕР±СЉРµРєС‚"));
     connect(deleteSyncAction, SIGNAL(triggered()), this, SLOT(deleteSync()));
 
-    deleteCommentAction = new QAction(QIcon(";/images/delete.png"), tr("Удалить"), this);
-    deleteCommentAction->setStatusTip(tr("Удаляет объект"));
+    deleteCommentAction = new QAction(QIcon(";/images/delete.png"), tr("РЈРґР°Р»РёС‚СЊ"), this);
+    deleteCommentAction->setStatusTip(tr("РЈРґР°Р»СЏРµС‚ РѕР±СЉРµРєС‚"));
     connect(deleteCommentAction, SIGNAL(triggered()), this, SLOT(deleteComment()));
 }
 
@@ -153,7 +153,7 @@ void TDrawWindow::textInserted(TComment *)
 }
 
 /*!
-  ���������� ����� �����
+  Установить режим сцены
 */
 void TDrawWindow::setMode(QDiagramScene::Mode mode)
 {
@@ -162,12 +162,12 @@ void TDrawWindow::setMode(QDiagramScene::Mode mode)
 }
 
 /*!
-  ������� �� ������� ������ ����: ��������� ������
+  Реакция на нажатие пункта меню: Загрузить иконку
 */
 void TDrawWindow::setItemIcon()
 {
     QString fileName = QFileDialog::getOpenFileName(0,
-                                                    tr("Открыть файл..."),
+                                                    tr("РћС‚РєСЂС‹С‚СЊ С„Р°Р№Р»..."),
                                                     "",
                                                     tr("All Files (*)"));
     foreach (QGraphicsItem *item, scene->selectedItems()) {
@@ -186,7 +186,7 @@ void TDrawWindow::setItemIcon()
 }
 
 /*!
-  ������� �� ������� ������ ����: ��������
+  Реакция на нажатие пункта меню: Свойства
 */
 void TDrawWindow::showTopPropDialog(){
     TopPropertyDialog dlg;
@@ -204,7 +204,7 @@ void TDrawWindow::showTopPropDialog(){
 }
 
 /*!
-  ������� �� ������� ������ ����: ��������� ��� ��������
+  Реакция на нажатие пункта меню: Сохранить как картинку
 */
 void TDrawWindow::saveAsImage(QString filename)
 {
@@ -219,14 +219,14 @@ void TDrawWindow::saveAsImage(QString filename)
 }
 
 /*!
-  ������� �� ������� ������ ����: ������� ��������
+  Реакция на нажатие пункта меню: Сделать корневой
 */
 void TDrawWindow::makeAsRoot(){
     scene->setRootTop(qgraphicsitem_cast<TTop* >(scene->selectedItems().first()));
 }
 
 /*!
-  ���������� ������ ���� ������� ������� �� �����
+  Возвращает список всех вершиен лежащих на сцене
 */
 QList<TTop* > TDrawWindow::allTops(){
     QList<TTop* > topList;

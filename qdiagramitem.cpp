@@ -28,7 +28,7 @@ QRectF TTop::boundingRect() const{
 }
 
 /*!
-  Добавляет дугу синхронизации
+  Р”РѕР±Р°РІР»СЏРµС‚ РґСѓРіСѓ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё
 */
 
 void TTop::addSync(QSyncArc *arc){
@@ -36,8 +36,8 @@ void TTop::addSync(QSyncArc *arc){
 }
 
 /*!
-  Удаляет дугу cby[hjybpfwbb. Совсем.
-  @param arc - дуга
+  РЈРґР°Р»СЏРµС‚ РґСѓРіСѓ cby[hjybpfwbb. РЎРѕРІСЃРµРј.
+  @param arc - РґСѓРіР°
 */
 void TTop::removeSync(QSyncArc *arc){
     int index = sync.indexOf(arc);
@@ -46,8 +46,8 @@ void TTop::removeSync(QSyncArc *arc){
 }
 
 /*!
-  Удаляет дугу. Совсем.
-  @param arc - дуга
+  РЈРґР°Р»СЏРµС‚ РґСѓРіСѓ. РЎРѕРІСЃРµРј.
+  @param arc - РґСѓРіР°
 */
 void TTop::removeArc(TArc *arc){
     int index = arcs.indexOf(arc);
@@ -68,7 +68,7 @@ void TTop::removeArc(TArc *arc){
 }
 
 /*!
-  Удаляет все дуги, входящие и выходящие из вершины
+  РЈРґР°Р»СЏРµС‚ РІСЃРµ РґСѓРіРё, РІС…РѕРґСЏС‰РёРµ Рё РІС‹С…РѕРґСЏС‰РёРµ РёР· РІРµСЂС€РёРЅС‹
 */
 void TTop::removeArcs(){
     foreach (TArc *arc, arcs) {
@@ -80,7 +80,7 @@ void TTop::removeArcs(){
 }
 
 /*!
-  Удаляет все дуги синхронизации, входящие и выходящие из вершины
+  РЈРґР°Р»СЏРµС‚ РІСЃРµ РґСѓРіРё СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё, РІС…РѕРґСЏС‰РёРµ Рё РІС‹С…РѕРґСЏС‰РёРµ РёР· РІРµСЂС€РёРЅС‹
 */
 void TTop::removeSyncs(){
     foreach (QSyncArc *arc, sync) {
@@ -92,8 +92,8 @@ void TTop::removeSyncs(){
 }
 
 /*!
-  Добавляет дугу в список дуг текущей вершины
-  @param arc - дуга
+  Р”РѕР±Р°РІР»СЏРµС‚ РґСѓРіСѓ РІ СЃРїРёСЃРѕРє РґСѓРі С‚РµРєСѓС‰РµР№ РІРµСЂС€РёРЅС‹
+  @param arc - РґСѓРіР°
 */
 void TTop::addArc(TArc *arc){
     arcs.append(arc);
@@ -238,8 +238,8 @@ QList<TArc *> TTop::getArcsAtBound(QLineF bound){
 }
 
 /*!
-  Возвращает границу с которой пересекается линия
-  @param line - линия
+  Р’РѕР·РІСЂР°С‰Р°РµС‚ РіСЂР°РЅРёС†Сѓ СЃ РєРѕС‚РѕСЂРѕР№ РїРµСЂРµСЃРµРєР°РµС‚СЃСЏ Р»РёРЅРёСЏ
+  @param line - Р»РёРЅРёСЏ
 */
 QLineF TTop::getIntersectBound(QLineF line){
     int i;
@@ -260,8 +260,8 @@ QLineF TTop::getIntersectBound(QLineF line){
 }
 
 /*!
-  Устанавливает иконку.
-  @param icon - иконка
+  РЈСЃС‚Р°РЅР°РІР»РёРІР°РµС‚ РёРєРѕРЅРєСѓ.
+  @param icon - РёРєРѕРЅРєР°
 */
 void TTop::setIcon(QImage icon){
     myIcon = icon;
@@ -280,8 +280,8 @@ void TTop::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
 }
 
 /*!
-  Устанавливает флаг корневой вершины.
-  @param flag - true если корневая
+  РЈСЃС‚Р°РЅР°РІР»РёРІР°РµС‚ С„Р»Р°Рі РєРѕСЂРЅРµРІРѕР№ РІРµСЂС€РёРЅС‹.
+  @param flag - true РµСЃР»Рё РєРѕСЂРЅРµРІР°СЏ
 */
 void TTop::setAsRoot(bool flag){
     isRoot = flag;
@@ -297,7 +297,7 @@ void TTop::setAsRoot(bool flag){
 }
 
 /*!
-  Возвращает список исходящих дуг
+  Р’РѕР·РІСЂР°С‰Р°РµС‚ СЃРїРёСЃРѕРє РёСЃС…РѕРґСЏС‰РёС… РґСѓРі
 */
 QList<TArc *> TTop::inArcs(){
     QList<TArc *> result;
@@ -309,7 +309,7 @@ QList<TArc *> TTop::inArcs(){
 }
 
 /*!
-  Возвращяет список входящих дуг
+  Р’РѕР·РІСЂР°С‰СЏРµС‚ СЃРїРёСЃРѕРє РІС…РѕРґСЏС‰РёС… РґСѓРі
 */
 QList<TArc *> TTop::outArcs(){
     QList<TArc *> result;

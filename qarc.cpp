@@ -17,7 +17,7 @@ int dvec2log(float dx, float dy){
 }
 
 /*!
-  Упрощенный алгоритм перестройки дуги
+  РЈРїСЂРѕС‰РµРЅРЅС‹Р№ Р°Р»РіРѕСЂРёС‚Рј РїРµСЂРµСЃС‚СЂРѕР№РєРё РґСѓРіРё
 */
 bool TArc::autoBuild(TTop* top, float dx, float dy){
     QPointF startPoint;
@@ -36,7 +36,7 @@ bool TArc::autoBuild(TTop* top, float dx, float dy){
     }
     lines.clear();
 
-    /*высчитываем главный вектор дуги*/
+    /*РІС‹СЃС‡РёС‚С‹РІР°РµРј РіР»Р°РІРЅС‹Р№ РІРµРєС‚РѕСЂ РґСѓРіРё*/
     QLineF centerLine(startPoint, endPoint);
 
     QPointF startIntersectPoint;
@@ -117,17 +117,17 @@ bool TArc::autoBuild(TTop* top, float dx, float dy){
 }
 
 /*!
-  Хитрый алгоритм перерисовки дуги при перемещении вершины.
-  @param aMOvedTop - указатель на перетаскиваемую вершину
-  @param dx - перемещение по X
-  @param dy - перемещение по Y
+  РҐРёС‚СЂС‹Р№ Р°Р»РіРѕСЂРёС‚Рј РїРµСЂРµСЂРёСЃРѕРІРєРё РґСѓРіРё РїСЂРё РїРµСЂРµРјРµС‰РµРЅРёРё РІРµСЂС€РёРЅС‹.
+  @param aMOvedTop - СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РїРµСЂРµС‚Р°СЃРєРёРІР°РµРјСѓСЋ РІРµСЂС€РёРЅСѓ
+  @param dx - РїРµСЂРµРјРµС‰РµРЅРёРµ РїРѕ X
+  @param dy - РїРµСЂРµРјРµС‰РµРЅРёРµ РїРѕ Y
 */
 bool TArc::remake(TTop* aMovedTop, float dx, float dy){
     bool result = true;
 
     int mx, my, j;
     QPointF pnts[4];
-    bool flag; //false - если надо все напрочь переделать
+    bool flag; //false - РµСЃР»Рё РЅР°РґРѕ РІСЃРµ РЅР°РїСЂРѕС‡СЊ РїРµСЂРµРґРµР»Р°С‚СЊ
     int lgdir, lgolddir;
 
     if ((myStartTop == aMovedTop) && (myEndTop == aMovedTop)){
@@ -138,9 +138,9 @@ bool TArc::remake(TTop* aMovedTop, float dx, float dy){
     }
 
     if (lines.count() < 4){
-        //старый алгоритм
-        //переработано, дополнено, прокоментировано
-        //заполняем структуры, необходимые для старого алгоритма
+        //СЃС‚Р°СЂС‹Р№ Р°Р»РіРѕСЂРёС‚Рј
+        //РїРµСЂРµСЂР°Р±РѕС‚Р°РЅРѕ, РґРѕРїРѕР»РЅРµРЅРѕ, РїСЂРѕРєРѕРјРµРЅС‚РёСЂРѕРІР°РЅРѕ
+        //Р·Р°РїРѕР»РЅСЏРµРј СЃС‚СЂСѓРєС‚СѓСЂС‹, РЅРµРѕР±С…РѕРґРёРјС‹Рµ РґР»СЏ СЃС‚Р°СЂРѕРіРѕ Р°Р»РіРѕСЂРёС‚РјР°
         int otr = lines.count();
         QPointF pts[4];
         int i;
@@ -165,10 +165,10 @@ bool TArc::remake(TTop* aMovedTop, float dx, float dy){
         pts[i] = endIntersectPoint;
 
         bool fMovedTo = (aMovedTop == myEndTop);
-        if (fMovedTo) //двигали конечную вершину
+        if (fMovedTo) //РґРІРёРіР°Р»Рё РєРѕРЅРµС‡РЅСѓСЋ РІРµСЂС€РёРЅСѓ
             for (j = 0; j <= otr; j++)
                 pnts[j] = pts[j];
-        else //двигали начальную вершину
+        else //РґРІРёРіР°Р»Рё РЅР°С‡Р°Р»СЊРЅСѓСЋ РІРµСЂС€РёРЅСѓ
             for (j = 0; j <= otr; j++)
                 pnts[otr-j] = pts[j];
         flag = true;
@@ -229,12 +229,12 @@ bool TArc::remake(TTop* aMovedTop, float dx, float dy){
                     pts[j] = pnts[otr-j];
             }
         } else {
-            //нужна полная перерисвка
+            //РЅСѓР¶РЅР° РїРѕР»РЅР°СЏ РїРµСЂРµСЂРёСЃРІРєР°
             result = false;
             //otr = 0;
         }
 
-        //теперь в pts новые точки =) якобы. проверим это.
+        //С‚РµРїРµСЂСЊ РІ pts РЅРѕРІС‹Рµ С‚РѕС‡РєРё =) СЏРєРѕР±С‹. РїСЂРѕРІРµСЂРёРј СЌС‚Рѕ.
         foreach(QArcLine* line, lines){
             delete line;
             line = NULL;
@@ -253,11 +253,11 @@ bool TArc::remake(TTop* aMovedTop, float dx, float dy){
         return result;
     }
     
-    //если передвинутая вершина - начало
+    //РµСЃР»Рё РїРµСЂРµРґРІРёРЅСѓС‚Р°СЏ РІРµСЂС€РёРЅР° - РЅР°С‡Р°Р»Рѕ
     if (aMovedTop == myStartTop){
-        //вертикальную линию двигаем только вправо/влево или удлинняем/укорачиваем
+        //РІРµСЂС‚РёРєР°Р»СЊРЅСѓСЋ Р»РёРЅРёСЋ РґРІРёРіР°РµРј С‚РѕР»СЊРєРѕ РІРїСЂР°РІРѕ/РІР»РµРІРѕ РёР»Рё СѓРґР»РёРЅРЅСЏРµРј/СѓРєРѕСЂР°С‡РёРІР°РµРј
         if (lines.first()->line().p1().x() == lines.first()->line().p2().x()){
-            //можно двигать пока остается место для серого квадратика
+            //РјРѕР¶РЅРѕ РґРІРёРіР°С‚СЊ РїРѕРєР° РѕСЃС‚Р°РµС‚СЃСЏ РјРµСЃС‚Рѕ РґР»СЏ СЃРµСЂРѕРіРѕ РєРІР°РґСЂР°С‚РёРєР°
             if ((lines.first()->line().length() < MINDELTA) || (lines.last()->line().length() < MINDELTA)){
                 return false;
             }
@@ -267,14 +267,14 @@ bool TArc::remake(TTop* aMovedTop, float dx, float dy){
                                                   lines.first()->line().p2().y())
                                           )
                                    );
-            //перерисуем следующий кусочек тоже (если он есть)
+            //РїРµСЂРµСЂРёСЃСѓРµРј СЃР»РµРґСѓСЋС‰РёР№ РєСѓСЃРѕС‡РµРє С‚РѕР¶Рµ (РµСЃР»Рё РѕРЅ РµСЃС‚СЊ)
             if (lines.count() > 1){
                 lines.at(1)->setLine(QLineF(QPointF(lines.at(1)->line().p1().x() + dx,
                                                     lines.at(1)->line().p1().y()),
                                             lines.at(1)->line().p2()
                                             )
                                      );
-            //если дуга соединяет вершины напрямую, то ограничим перемещение шириной конечной вершины
+            //РµСЃР»Рё РґСѓРіР° СЃРѕРµРґРёРЅСЏРµС‚ РІРµСЂС€РёРЅС‹ РЅР°РїСЂСЏРјСѓСЋ, С‚Рѕ РѕРіСЂР°РЅРёС‡РёРј РїРµСЂРµРјРµС‰РµРЅРёРµ С€РёСЂРёРЅРѕР№ РєРѕРЅРµС‡РЅРѕР№ РІРµСЂС€РёРЅС‹
             } else {
                 if ((lines.first()->line().p2().x() < myEndTop->sceneBoundingRect().bottomLeft().x()) ||
                     (lines.first()->line().p2().x() > myEndTop->sceneBoundingRect().bottomRight().x())){
@@ -290,7 +290,7 @@ bool TArc::remake(TTop* aMovedTop, float dx, float dy){
 
             return true;
         }
-        //горизонтальную линию можем двигать только вверх/вниз или удлиннять/укорачивать
+        //РіРѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅСѓСЋ Р»РёРЅРёСЋ РјРѕР¶РµРј РґРІРёРіР°С‚СЊ С‚РѕР»СЊРєРѕ РІРІРµСЂС…/РІРЅРёР· РёР»Рё СѓРґР»РёРЅРЅСЏС‚СЊ/СѓРєРѕСЂР°С‡РёРІР°С‚СЊ
         if (lines.first()->line().p1().y() == lines.first()->line().p2().y()){
             if ((lines.first()->line().length() < MINDELTA) || (lines.last()->line().length() < MINDELTA)){
                 return false;
@@ -302,14 +302,14 @@ bool TArc::remake(TTop* aMovedTop, float dx, float dy){
                                                   lines.first()->line().p2().y() + dy)
                                           )
                                    );
-            //перерисуем следующий кусочек тоже (если он есть)
+            //РїРµСЂРµСЂРёСЃСѓРµРј СЃР»РµРґСѓСЋС‰РёР№ РєСѓСЃРѕС‡РµРє С‚РѕР¶Рµ (РµСЃР»Рё РѕРЅ РµСЃС‚СЊ)
             if (lines.count() > 1){
                 lines.at(1)->setLine(QLineF(QPointF(lines.at(1)->line().p1().x(),
                                                     lines.at(1)->line().p1().y() + dy),
                                             lines.at(1)->line().p2()
                                             )
                                      );
-            //если дуга соединяет вершины напрямую, то ограничим перемещение шириной конечной вершины
+            //РµСЃР»Рё РґСѓРіР° СЃРѕРµРґРёРЅСЏРµС‚ РІРµСЂС€РёРЅС‹ РЅР°РїСЂСЏРјСѓСЋ, С‚Рѕ РѕРіСЂР°РЅРёС‡РёРј РїРµСЂРµРјРµС‰РµРЅРёРµ С€РёСЂРёРЅРѕР№ РєРѕРЅРµС‡РЅРѕР№ РІРµСЂС€РёРЅС‹
             } else {
                 if ((lines.first()->line().p2().y() > myEndTop->sceneBoundingRect().bottomLeft().y()) ||
                     (lines.first()->line().p2().y() < myEndTop->sceneBoundingRect().topLeft().y())){
@@ -325,9 +325,9 @@ bool TArc::remake(TTop* aMovedTop, float dx, float dy){
             return true;
         }
     }
-    //для тех у кого эта вершина - конец
+    //РґР»СЏ С‚РµС… Сѓ РєРѕРіРѕ СЌС‚Р° РІРµСЂС€РёРЅР° - РєРѕРЅРµС†
     if (aMovedTop == myEndTop){
-        //вертикальную линию двигаем только вправо/влево или удлинняем/укорачиваем
+        //РІРµСЂС‚РёРєР°Р»СЊРЅСѓСЋ Р»РёРЅРёСЋ РґРІРёРіР°РµРј С‚РѕР»СЊРєРѕ РІРїСЂР°РІРѕ/РІР»РµРІРѕ РёР»Рё СѓРґР»РёРЅРЅСЏРµРј/СѓРєРѕСЂР°С‡РёРІР°РµРј
         if (lines.last()->line().p1().x() == lines.last()->line().p2().x()){
             if ((lines.first()->line().length() < MINDELTA) || (lines.last()->line().length() < MINDELTA)){
                 return false;
@@ -339,14 +339,14 @@ bool TArc::remake(TTop* aMovedTop, float dx, float dy){
                                                  lines.last()->line().p2().y() + dy)
                                          )
                                   );
-            //перерисуем следующий кусочек тоже (если он есть)
+            //РїРµСЂРµСЂРёСЃСѓРµРј СЃР»РµРґСѓСЋС‰РёР№ РєСѓСЃРѕС‡РµРє С‚РѕР¶Рµ (РµСЃР»Рё РѕРЅ РµСЃС‚СЊ)
             if (lines.count() > 1){
                 lines.at(lines.count()-2)->setLine(QLineF(lines.at(lines.count()-2)->line().p1(),
                                                           QPointF(lines.at(lines.count()-2)->line().p2().x() + dx,
                                                                   lines.at(lines.count()-2)->line().p2().y())
                                                           )
                                                    );
-            //если дуга соединяет вершины напрямую, то ограничим перемещение шириной начальной вершины
+            //РµСЃР»Рё РґСѓРіР° СЃРѕРµРґРёРЅСЏРµС‚ РІРµСЂС€РёРЅС‹ РЅР°РїСЂСЏРјСѓСЋ, С‚Рѕ РѕРіСЂР°РЅРёС‡РёРј РїРµСЂРµРјРµС‰РµРЅРёРµ С€РёСЂРёРЅРѕР№ РЅР°С‡Р°Р»СЊРЅРѕР№ РІРµСЂС€РёРЅС‹
             } else {
                 if ((lines.last()->line().p2().x() < myStartTop->sceneBoundingRect().bottomLeft().x()) ||
                     (lines.last()->line().p2().x() > myStartTop->sceneBoundingRect().bottomRight().x())){
@@ -361,7 +361,7 @@ bool TArc::remake(TTop* aMovedTop, float dx, float dy){
             }
             return true;
         }
-        //горизонтальную линию можем двигать только вверх/вниз или удлиннять/укорачивать
+        //РіРѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅСѓСЋ Р»РёРЅРёСЋ РјРѕР¶РµРј РґРІРёРіР°С‚СЊ С‚РѕР»СЊРєРѕ РІРІРµСЂС…/РІРЅРёР· РёР»Рё СѓРґР»РёРЅРЅСЏС‚СЊ/СѓРєРѕСЂР°С‡РёРІР°С‚СЊ
         if (lines.last()->line().p1().y() == lines.last()->line().p2().y()){
             if ((lines.first()->line().length() < MINDELTA) || (lines.last()->line().length() < MINDELTA)){
                 return false;
@@ -373,14 +373,14 @@ bool TArc::remake(TTop* aMovedTop, float dx, float dy){
                                                  lines.last()->line().p2().y() + dy)
                                          )
                                   );
-            //перерисуем следующий кусочек тоже (если он есть)
+            //РїРµСЂРµСЂРёСЃСѓРµРј СЃР»РµРґСѓСЋС‰РёР№ РєСѓСЃРѕС‡РµРє С‚РѕР¶Рµ (РµСЃР»Рё РѕРЅ РµСЃС‚СЊ)
             if (lines.count() > 1){
                 lines.at(lines.count()-2)->setLine(QLineF(lines.at(lines.count()-2)->line().p1(),
                                                           QPointF(lines.at(lines.count()-2)->line().p2().x(),
                                                                   lines.at(lines.count()-2)->line().p2().y() + dy)
                                                           )
                                                    );
-            //если дуга соединяет вершины напрямую, то ограничим перемещение шириной начальной вершины
+            //РµСЃР»Рё РґСѓРіР° СЃРѕРµРґРёРЅСЏРµС‚ РІРµСЂС€РёРЅС‹ РЅР°РїСЂСЏРјСѓСЋ, С‚Рѕ РѕРіСЂР°РЅРёС‡РёРј РїРµСЂРµРјРµС‰РµРЅРёРµ С€РёСЂРёРЅРѕР№ РЅР°С‡Р°Р»СЊРЅРѕР№ РІРµСЂС€РёРЅС‹
             } else {
                 if ((lines.last()->line().p2().y() > myStartTop->sceneBoundingRect().bottomLeft().y()) ||
                     (lines.last()->line().p2().y() < myStartTop->sceneBoundingRect().topLeft().y())){
@@ -396,8 +396,8 @@ bool TArc::remake(TTop* aMovedTop, float dx, float dy){
             return true;
         }
     }
-    //если мы попали сюда, то что то не так!!!!
-    //вернем-ка false на всякий случай
+    //РµСЃР»Рё РјС‹ РїРѕРїР°Р»Рё СЃСЋРґР°, С‚Рѕ С‡С‚Рѕ С‚Рѕ РЅРµ С‚Р°Рє!!!!
+    //РІРµСЂРЅРµРј-РєР° false РЅР° РІСЃСЏРєРёР№ СЃР»СѓС‡Р°Р№
     return false;
 }
 
@@ -408,11 +408,11 @@ void TArc::setPen(const QPen &pen){
 }
 
 /*!
-  Конструктор
-  @param startItem - указатель на начальную вершину. м.б. NULL
-  @param ensItem - указатель на конечную вершину. м.б. NULL
-  @param parent - родительский объект. (всегда NULL)
-  @param scene - указатель на контейнер (сцену)
+  РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
+  @param startItem - СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РЅР°С‡Р°Р»СЊРЅСѓСЋ РІРµСЂС€РёРЅСѓ. Рј.Р±. NULL
+  @param ensItem - СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РєРѕРЅРµС‡РЅСѓСЋ РІРµСЂС€РёРЅСѓ. Рј.Р±. NULL
+  @param parent - СЂРѕРґРёС‚РµР»СЊСЃРєРёР№ РѕР±СЉРµРєС‚. (РІСЃРµРіРґР° NULL)
+  @param scene - СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РєРѕРЅС‚РµР№РЅРµСЂ (СЃС†РµРЅСѓ)
 */
 TArc::TArc(TTop *startItem, TTop *endItem, QMenu *contextMenu,
          QGraphicsItem *parent, QGraphicsScene *scene)
@@ -433,7 +433,7 @@ TArc::~TArc(){
 }
 
 /*!
-  Возвращает прямоугольник включающий все отрезки дуги. необходимо для правильной отрисовки.
+  Р’РѕР·РІСЂР°С‰Р°РµС‚ РїСЂСЏРјРѕСѓРіРѕР»СЊРЅРёРє РІРєР»СЋС‡Р°СЋС‰РёР№ РІСЃРµ РѕС‚СЂРµР·РєРё РґСѓРіРё. РЅРµРѕР±С…РѕРґРёРјРѕ РґР»СЏ РїСЂР°РІРёР»СЊРЅРѕР№ РѕС‚СЂРёСЃРѕРІРєРё.
 */
 QRectF TArc::boundingRect() const{
     qreal extra = width*(pen().width() + 20) / 2.0;
@@ -445,7 +445,7 @@ QRectF TArc::boundingRect() const{
 }
 
 /*!
-  Работает не правильно.
+  Р Р°Р±РѕС‚Р°РµС‚ РЅРµ РїСЂР°РІРёР»СЊРЅРѕ.
 */
 QPainterPath TArc::shape() const{
     QPainterPath path;
@@ -462,23 +462,23 @@ void TArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
     if (lines.count() == 0) return;
 
     if ((myStartTop == NULL) || (myEndTop == NULL)) {
-        //СЂРµР¶РёРј СЃРѕР·РґР°РЅРёСЏ РґСѓРіРё!
+        //РЎР‚Р ВµР В¶Р С‘Р С РЎРѓР С•Р В·Р Т‘Р В°Р Р…Р С‘РЎРЏ Р Т‘РЎС“Р С–Р С‘!
 
     } else {
-        //СЂРµР¶РёРј РѕС‚СЂРёСЃРѕРІРєРё Р·Р°РІРµСЂС€РµРЅРЅРѕР№ РґСѓРіРё
+        //РЎР‚Р ВµР В¶Р С‘Р С Р С•РЎвЂљРЎР‚Р С‘РЎРѓР С•Р Р†Р С”Р С‘ Р В·Р В°Р Р†Р ВµРЎР‚РЎв‚¬Р ВµР Р…Р Р…Р С•Р в„– Р Т‘РЎС“Р С–Р С‘
 
-        //РѕС‚РѕР±СЂР°Р¶Р°РµРј СЃРµСЂС‹Р№ РєРІР°РґСЂР°С‚РёРє
+        //Р С•РЎвЂљР С•Р В±РЎР‚Р В°Р В¶Р В°Р ВµР С РЎРѓР ВµРЎР‚РЎвЂ№Р в„– Р С”Р Р†Р В°Р Т‘РЎР‚Р В°РЎвЂљР С‘Р С”
         QPointF intersectPoint;
         myStartTop->getIntersectBound(lines.first()->line()).intersect(lines.first()->line(), &intersectPoint);
-        float koeff = QLineF(lines.first()->line().p1(), intersectPoint).length() + 15 > lines.first()->line().length() ? lines.first()->line().length() : QLineF(lines.first()->line().p1(), intersectPoint).length() + 15; //ЫЫЫ =)
+        float koeff = QLineF(lines.first()->line().p1(), intersectPoint).length() + 15 > lines.first()->line().length() ? lines.first()->line().length() : QLineF(lines.first()->line().p1(), intersectPoint).length() + 15; //Р«Р«Р« =)
         arcTop->setPos(lines.first()->line().p1() + QPointF(cos(lines.first()->line().angle() * Pi / 180) * koeff, -sin(lines.first()->line().angle() * Pi / 180) * koeff));
         arcTop->show();
-        //СЂРёСЃСѓРµРј СЃС‚СЂРµР»РєСѓ
+        //РЎР‚Р С‘РЎРѓРЎС“Р ВµР С РЎРѓРЎвЂљРЎР‚Р ВµР В»Р С”РЎС“
         QPen myPen = pen();
         painter->setPen(myPen);
         painter->setBrush(myPen.color());
         myEndTop->getIntersectBound(lines.last()->line()).intersect(lines.last()->line(), &intersectPoint);
-        float koeff2 = QLineF(lines.last()->line().p2(), intersectPoint).length(); //ЫЫЫ =)
+        float koeff2 = QLineF(lines.last()->line().p2(), intersectPoint).length(); //Р«Р«Р« =)
         QPointF t = lines.last()->line().p2() - QPointF(cos(lines.last()->line().angle() * Pi / 180) * koeff2, -sin(lines.last()->line().angle() * Pi / 180) * koeff2);
         double angle = ((myEndTop->getIntersectBound(lines.last()->line()).normalVector().angle()) + 180) * Pi / 180;
         QPointF arcP1 = t + QPointF(sin(angle + Pi / 3) * 3*width,
@@ -495,9 +495,9 @@ void TArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 }
 
 /*!
-  Добавляет отрезок дуги в список отрезков
-  @param line - указатель на объект типа QArcLine
-  @return true если добавилось
+  Р”РѕР±Р°РІР»СЏРµС‚ РѕС‚СЂРµР·РѕРє РґСѓРіРё РІ СЃРїРёСЃРѕРє РѕС‚СЂРµР·РєРѕРІ
+  @param line - СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РѕР±СЉРµРєС‚ С‚РёРїР° QArcLine
+  @return true РµСЃР»Рё РґРѕР±Р°РІРёР»РѕСЃСЊ
 */
 bool TArc::addLine(QArcLine *line){
     if ((prevLine() != NULL) &&
@@ -515,10 +515,10 @@ bool TArc::addLine(QArcLine *line){
 }
 
 /*!
-  Создает новый отрезок дуги.
-  @param p1 - начальная точка
-  @param p2 - конечная точка
-  @return указатель на объект типа QArcLine
+  РЎРѕР·РґР°РµС‚ РЅРѕРІС‹Р№ РѕС‚СЂРµР·РѕРє РґСѓРіРё.
+  @param p1 - РЅР°С‡Р°Р»СЊРЅР°СЏ С‚РѕС‡РєР°
+  @param p2 - РєРѕРЅРµС‡РЅР°СЏ С‚РѕС‡РєР°
+  @return СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РѕР±СЉРµРєС‚ С‚РёРїР° QArcLine
 */
 QArcLine* TArc::newLine(QPointF p1, QPointF p2){
     if (currentLine == NULL)
@@ -535,7 +535,7 @@ QArcLine* TArc::newLine(QPointF p1, QPointF p2){
 }
 
 /*!
-  Обновляет границы. Необходимо вызываеть после изменения размеров, перемещения и т.д.
+  РћР±РЅРѕРІР»СЏРµС‚ РіСЂР°РЅРёС†С‹. РќРµРѕР±С…РѕРґРёРјРѕ РІС‹Р·С‹РІР°РµС‚СЊ РїРѕСЃР»Рµ РёР·РјРµРЅРµРЅРёСЏ СЂР°Р·РјРµСЂРѕРІ, РїРµСЂРµРјРµС‰РµРЅРёСЏ Рё С‚.Рґ.
 */
 void TArc::updateBounds(){
     if (lines.count() > 0)
@@ -543,8 +543,8 @@ void TArc::updateBounds(){
 }
 
 /*!
-  Установка приоритета
-  @param w - приоритет
+  РЈСЃС‚Р°РЅРѕРІРєР° РїСЂРёРѕСЂРёС‚РµС‚Р°
+  @param w - РїСЂРёРѕСЂРёС‚РµС‚
 */
 void TArc::setPriority(int w){
     width = w;
