@@ -47,7 +47,7 @@ void QDataTypeEditor::updateInterface()
     }
 }
 
-bool prepareForm(DataType type)
+bool QDataTypeEditor::prepareForm(DataType *type)
 {
     bool result = true;
     return result;
