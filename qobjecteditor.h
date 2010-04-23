@@ -34,7 +34,7 @@ private:
 
     QList<Actor *> actorsList;
     QList<Predicate *> predicatesList;
-    QList<Actor *> iActorsLisr;
+    QList<Actor *> iActorsList;
     QList<Predicate *> iPredicateList;
 };
 

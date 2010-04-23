@@ -24,7 +24,8 @@ SOURCES += main.cpp \
     datatype.cpp \
     qvariableeditor.cpp \
     qvariabledialog.cpp \
-    variable.cpp
+    variable.cpp \
+    qpredicateeditor.cpp
 HEADERS += qmywindow.h \
     qdrawwindow.h \
     qdiagramitem.h \
@@ -44,7 +45,8 @@ HEADERS += qmywindow.h \
     datatype.h \
     qvariableeditor.h \
     qvariabledialog.h \
-    variable.h
+    variable.h \
+    qpredicateeditor.h
 RESOURCES += resources.qrc
 FORMS += toppropertydialog.ui \
     qobjecteditor.ui \
@@ -52,4 +54,5 @@ FORMS += toppropertydialog.ui \
     qdatatypeeditor.ui \
     qdatatypedialog.ui \
     qvariableeditor.ui \
-    qvariabledialog.ui
+    qvariabledialog.ui \
+    qpredicateeditor.ui

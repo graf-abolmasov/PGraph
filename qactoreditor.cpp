@@ -1,5 +1,6 @@
 #include "qactoreditor.h"
 #include "ui_qactoreditor.h"
+#include <QComboBox>
 
 QActorEditor::QActorEditor(QWidget *parent) :
         QDialog(parent),
@@ -66,6 +67,8 @@ void QActorEditor::updateInterface()
             ui->normalWizardStep3Widget->setVisible(false);
             ui->prevButton->setEnabled(true);
             ui->nextButton->setEnabled(true);
+            ui->actorNameNormalWizardStep3Label->setText(ui->actorNameNormalEdit->text());
+            ui->actorNameNormalWizardStep2Label->setText(ui->actorNameNormalEdit->text());
             break;
         case 3:
             ui->normalWizardStep1Widget->setVisible(false);
@@ -111,5 +114,50 @@ void QActorEditor::on_prevButton_clicked()
 bool QActorEditor::prepareForm(Actor *actor)
 {
     bool result = true;
+
+    QComboBox *templateBox = new QComboBox(0);
+    templateBox->addItem("Модифицируемый");
+    templateBox->addItem("Исходный");
+    templateBox->addItem("Еще какой-то");
+
+    ui->parametersTableNormalWizard->insertRow(0);
+    ui->parametersTableNormalWizard->insertRow(0);
+    ui->parametersTableNormalWizard->setCellWidget(0,2,templateBox);
+    ui->parametersTableNormalWizard->setCellWidget(1,2,templateBox);
+    ui->parametersTableNormalWizard->setItem(0,0, new QTableWidgetItem("sad1"));
+    ui->parametersTableNormalWizard->setItem(1,0, new QTableWidgetItem("sad2"));
+
+    switch (myMode){
+    case inlineEditor:
+    case inlineWizard:
+        break;
+    case normalWizard:
+        break;
+    case normalEditor:
+        ui->actorNameNormalEditorLabel->setText(actor->name);
+        break;
+
+    }
+    return result;
+}
+
+Actor* QActorEditor::actor()
+{
+    Actor *result = new Actor();
+    switch (myMode){
+    case inlineEditor:
+    case inlineWizard:
+        result->extName = ui->textInline->document()->toPlainText();
+        result->name    = ui->textInline->document()->toPlainText();
+        result->type    = Actor::inlineType;
+        break;
+    case normalWizard:
+        result->name = ui->actorNameNormalEdit->text().toUtf8();
+        result->type = Actor::normalType;
+        break;
+    case normalEditor:
+
+        break;
+    }
     return result;
 }

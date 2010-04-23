@@ -5,19 +5,12 @@
 
 class Actor
 {
-    enum Type {normalType, inlineType};
 public:
+    enum Type {normalType, inlineType};
     Actor();
-    Type type() const
-        { return myType; }
-    QString name()
-        { return myName;}
-    QString extName()
-        {return myExtName;}
-private:
-    QString myExtName;
-    QString myName;
-    Type myType;
+    QString extName;
+    QString name;
+    Type type;
 
 };
 
