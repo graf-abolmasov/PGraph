@@ -5,7 +5,10 @@
 #include <QList>
 #include "actor.h"
 #include "qactoreditor.h"
-#include "QtCore"
+#include "qpredicateeditor.h"
+#include "predicate.h"
+#include <QtCore>
+#include <QLayout>
 
 QObjectEditor::QObjectEditor(QWidget *parent) :
     QDialog(parent),
@@ -14,8 +17,8 @@ QObjectEditor::QObjectEditor(QWidget *parent) :
     ui->setupUi(this);
     ui->tab->setTabText(0, tr("РђРєС‚РѕСЂС‹"));
     ui->tab->setTabText(1, tr("РџСЂРµРґРёРєР°С‚С‹"));
-    ui->tab->setTabText(2, tr("I-Р°РєС‚РѕСЂС‹"));
-    ui->tab->setTabText(3, tr("I-РїСЂРµРґРёРєР°С‚С‹"));
+    ui->tab->setTabText(2, tr("I-РђРєС‚РѕСЂС‹"));
+    ui->tab->setTabText(3, tr("I-РџСЂРµРґРёРєР°С‚С‹"));
 
     editButtonGroup = new QButtonGroup(ui->buttonBox);
 
@@ -60,8 +63,8 @@ void QObjectEditor::changeEvent(QEvent *e)
 }
 
 /*!
-  Получение необходимых данных из БД.
-  Заполнение всех справочников.
+  РџРѕР»СѓС‡РµРЅРёРµ РЅРµРѕР±С…РѕРґРёРјС‹С… РґР°РЅРЅС‹С… РёР· Р‘Р”.
+  Р—Р°РїРѕР»РЅРµРЅРёРµ РІСЃРµС… СЃРїСЂР°РІРѕС‡РЅРёРєРѕРІ.
 */
 bool QObjectEditor::prepareForm()
 {
@@ -70,29 +73,50 @@ bool QObjectEditor::prepareForm()
 }
 
 /*!
-  Обработка нажатия на кнопки Создать,
-  в зависимости от текущей вкладки
+  РћР±СЂР°Р±РѕС‚РєР° РЅР°Р¶Р°С‚РёСЏ РЅР° РєРЅРѕРїРєРё РЎРѕР·РґР°С‚СЊ,
+  РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ С‚РµРєСѓС‰РµР№ РІРєР»Р°РґРєРё
 */
 void QObjectEditor::newButtonClicked()
 {
     QActorEditor *actorEditor;
-    switch (ui->tab->currentIndex()){
-    case 0: //Акторы
-        actorEditor = new QActorEditor(QActorEditor::normalWizard);
-        if (actorEditor->exec()){
+    QPredicateEditor * predEditor;
 
+    switch (ui->tab->currentIndex()){
+    case 0: //РђРєС‚РѕСЂС‹
+        actorEditor = new QActorEditor(QActorEditor::normalWizard);
+        actorEditor->prepareForm(NULL);
+        if (actorEditor->exec()){
+            Actor *actor = actorEditor->actor();
+            actorsList.append(actor);
+            ui->actorList->addItem(actor->name);
         }
         break;
-    case 1: //Предикаты
+    case 1: //РџСЂРµРґРёРєР°С‚С‹
+        predEditor = new QPredicateEditor(QPredicateEditor::normalWizard);
+        predEditor->prepareForm(NULL);
+        if (predEditor->exec()){
+            Predicate *pred = predEditor->predicate();
+            predicatesList.append(pred);
+            ui->predicateList->addItem(pred->name);
+        }
         break;
-    case 2: //I-акторы
+    case 2: //I-Р°РєС‚РѕСЂС‹
         actorEditor = new QActorEditor(QActorEditor::inlineWizard);
         actorEditor->prepareForm(NULL);
         if (actorEditor->exec()){
-
+            Actor *actor = actorEditor->actor();
+            iActorsList.append(actor);
+            ui->inlineActorList->addItem(actor->name);
         }
         break;
-    case 3: //I-предикаты
+    case 3: //I-РїСЂРµРґРёРєР°С‚С‹
+        predEditor = new QPredicateEditor(QPredicateEditor::inlineWizard);
+        predEditor->prepareForm(NULL);
+        if (predEditor->exec()){
+            Predicate *pred = predEditor->predicate();
+            iPredicateList.append(pred);
+            ui->inlinePredicateList->addItem(pred->name);
+        }
         break;
     }
 }
@@ -100,38 +124,93 @@ void QObjectEditor::newButtonClicked()
 void QObjectEditor::editButtonClicked()
 {
     QActorEditor *actorEditor;
+    QPredicateEditor * predEditor;
+
+    int idx = 0;
+    Actor* actor;
+    Predicate* pred;
     switch (ui->tab->currentIndex()){
-    case 0: //Акторы
+    case 0: //РђРєС‚РѕСЂС‹
         actorEditor = new QActorEditor(QActorEditor::normalEditor);
-        actorEditor->prepareForm(NULL);
+        for (idx = 0; idx < actorsList.count(); idx++)
+            if (actorsList.at(idx)->name == ui->actorList->selectedItems().first()->text())
+                break;
+        actor = actorsList.at(idx);
+        actorEditor->prepareForm(actor);
         if (actorEditor->exec()){
 
         }
         break;
-    case 1: //Предикаты
+    case 1: //РџСЂРµРґРёРєР°С‚С‹
+        predEditor = new QPredicateEditor(QPredicateEditor::normalEditor);
+        for (idx = 0; idx < predicatesList.count(); idx++)
+            if (predicatesList.at(idx)->name == ui->predicateList->selectedItems().first()->text())
+                break;
+        pred = predicatesList.at(idx);
+        predEditor->prepareForm(pred);
+        if (predEditor->exec()){
+
+        }
         break;
-    case 2: //I-акторы
+    case 2: //I-Р°РєС‚РѕСЂС‹
         actorEditor = new QActorEditor(QActorEditor::inlineEditor);
-        actorEditor->prepareForm(NULL);
+        for (idx = 0; idx < iActorsList.count(); idx++)
+            if (iActorsList.at(idx)->name == ui->inlineActorList->selectedItems().first()->text())
+                break;
+        actorEditor->prepareForm(actor);
         if (actorEditor->exec()){
 
         }
         break;
-    case 3: //I-предикаты
+    case 3: //I-РїСЂРµРґРёРєР°С‚С‹
+        predEditor = new QPredicateEditor(QPredicateEditor::inlineEditor);
+        for (idx = 0; idx < iPredicateList.count(); idx++)
+            if (iPredicateList.at(idx)->name == ui->inlinePredicateList->selectedItems().first()->text())
+                break;
+        pred = iPredicateList.at(idx);
+        predEditor->prepareForm(pred);
+        if (predEditor->exec()){
+
+        }
         break;
     }
 }
 
 void QObjectEditor::deleteButtonClicked()
 {
+    int idx = 0;
     switch (ui->tab->currentIndex()){
-    case 0: //Акторы
+    case 0: //РђРєС‚РѕСЂС‹
+        for (idx = 0; idx < actorsList.count(); idx++)
+            if (actorsList.at(idx)->name == ui->actorList->selectedItems().first()->text())
+                break;
+        delete ui->actorList->item(idx);
+        delete actorsList.at(idx);
+        actorsList.removeAt(idx);
         break;
-    case 1: //Предикаты
+    case 1: //РџСЂРµРґРёРєР°С‚С‹
+        for (idx = 0; idx < predicatesList.count(); idx++)
+            if (predicatesList.at(idx)->name == ui->predicateList->selectedItems().first()->text())
+                break;
+        delete ui->predicateList->item(idx);
+        delete predicatesList.at(idx);
+        predicatesList.removeAt(idx);
         break;
-    case 2: //I-акторы
+    case 2: //I-Р°РєС‚РѕСЂС‹
+        for (idx = 0; idx < iActorsList.count(); idx++)
+            if (iActorsList.at(idx)->name == ui->inlineActorList->selectedItems().first()->text())
+                break;
+        delete ui->inlineActorList->item(idx);
+        delete iActorsList.at(idx);
+        iActorsList.removeAt(idx);
         break;
-    case 3: //I-предикаты
+    case 3: //I-РїСЂРµРґРёРєР°С‚С‹
+        for (idx = 0; idx < iPredicateList.count(); idx++)
+            if (iPredicateList.at(idx)->name == ui->inlinePredicateList->selectedItems().first()->text())
+                break;
+        delete ui->inlinePredicateList->item(idx);
+        delete iPredicateList.at(idx);
+        iPredicateList.removeAt(idx);
         break;
     }
 }

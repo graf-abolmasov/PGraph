@@ -19,6 +19,7 @@ public:
     ~QActorEditor();
 
     bool prepareForm(Actor *actor);
+    Actor* actor();
 
 protected:
     void changeEvent(QEvent *e);
