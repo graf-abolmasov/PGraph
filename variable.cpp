@@ -3,3 +3,11 @@
 Variable::Variable()
 {
 }
+
+Variable::Variable(QString name, DataType *type, QVariant initValue, QString description)
+{
+    this->name = name;
+    this->type = type;
+    this->initValue = initValue;
+    this->description = description;
+}

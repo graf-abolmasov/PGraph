@@ -10,11 +10,14 @@ TTop::TTop(QMenu *contextMenu,
 {
     myContextMenu = contextMenu;
 
+    setBrush(QBrush(Qt::white,Qt::SolidPattern));
+    setZValue(1);
+
     QPainterPath path;
     QPolygonF myPolygon;
-    myPolygon << QPointF(-40, 30) << QPointF(40, 30)
-            << QPointF(40,-30) << QPointF(-40, -30)
-            << QPointF(-40, 30);
+    myPolygon << QPointF(-35, 25) << QPointF(35, 25)
+            << QPointF(35,-25) << QPointF(-35, -25)
+            << QPointF(-35, 25);
 
     setPolygon(myPolygon);
     setFlag(QGraphicsItem::ItemIsMovable, true);

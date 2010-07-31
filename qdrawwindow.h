@@ -11,6 +11,8 @@
 #include "qcomment.h"
 #include "ui_toppropertydialog.h"
 #include "toppropertydialog.h"
+#include "qgraph.h"
+#include "databasemanager.h"
 
 class TDrawWindow : public QMainWindow
 {
@@ -29,27 +31,29 @@ private:
     QMenu *syncArcMenu;
 
     QAction *deleteAction;
-    QAction *Action1;
-    QAction *Action2;
+    QAction *setIconAction;
+    QAction *setTopPropertyAction;
     QAction *makeAsRootAction;
-
+    QAction *setArcPropertyAction;
     QAction *deleteArcAction;
-
     QAction *deleteSyncAction;
-
     QAction *deleteCommentAction;
 
     QDiagramScene::Mode myMode;
+
+    QList<TTop* > allTops();
+    QList<TArc* > allArcs();
+    QList<TComment* > allComments();
+    QList<QSyncArc* > allSyncArcs();
 
 public:
     TDrawWindow();
     void saveAsImage(QString filename);
     void setMode(QDiagramScene::Mode mode);
     QDiagramScene::Mode mode(){return myMode;}
-    QList<TTop* > allTops();
-    QDiagramScene* getScene(){
-        return this->scene;
-    }
+    QGraph* graph();
+    void loadGraph(DataBaseManager* dbManager);
+    void saveGraph(DataBaseManager* dbManager);
 signals:
     void sceneChanged();
 
@@ -58,6 +62,7 @@ private slots:
     void showTopPropDialog();
     void makeAsRoot();
     void deleteItem();
+    void showArcPropDialog();
     void deleteArc();
     void deleteSync();
     void deleteComment();

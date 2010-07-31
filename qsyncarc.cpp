@@ -9,7 +9,7 @@ QSyncArc::QSyncArc(TTop *startItem, TTop *endItem, QMenu *contextMenu, QGraphics
     myStartItem = startItem;
     myEndItem = endItem;
     setFlag(QGraphicsItem::ItemIsSelectable, true);
-    myColor = Qt::black;
+    myColor = Qt::red;
     setPen(QPen(myColor, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
     myContextMenu = contextMenu;
 };
@@ -36,7 +36,9 @@ QRectF QSyncArc::boundingRect() const {
         .adjusted(-extra, -extra, extra, extra);
 }
 
-void QSyncArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *){
+void QSyncArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *options, QWidget *widget){
+    /*QGraphicsLineItem::paint(painter, options, widget);*/
+
     if (myStartItem->collidesWithItem(myEndItem))
         return;
 
@@ -52,7 +54,8 @@ void QSyncArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidge
     painter->setPen(myPen);
     painter->setBrush(myColor);
 
-    QLineF centerLine(myStartItem->pos(), myEndItem->pos());
+    //QLineF centerLine(myStartItem->pos(), myEndItem->pos());
+    QLineF centerLine(line());
     QPolygonF endPolygon = myEndItem->polygon();
     QPointF p1 = endPolygon.first() + myEndItem->pos();
     QPointF p2;
@@ -95,6 +98,6 @@ void QSyncArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidge
 
 void QSyncArc::updatePosition()
 {
-    QLineF line(mapFromItem(myStartItem, 0, 0), mapFromItem(myEndItem, 0, 0));
-    setLine(line);
+    /*QLineF line(mapFromItem(myStartItem, 0, 0), mapFromItem(myEndItem, 0, 0));
+    setLine(line);*/
 }

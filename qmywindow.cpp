@@ -2,13 +2,20 @@
 #include "qobjecteditor.h"
 #include "qvariabledialog.h"
 #include "qdatatypedialog.h"
+#include "qmoduleregister.h"
 
 TMyWindow::TMyWindow()
 {
+    myStatusBar = new QStatusBar(this);
+    setStatusBar(myStatusBar);
+
     createDrawWindow();
     createActions();
     createMenus();
     createToolBar();
+
+    setWindowIcon(QIcon(":/images/G.png"));
+    setWindowTitle(tr("Граф-редактор"));
 }
 
 TMyWindow::~TMyWindow()
@@ -31,7 +38,7 @@ void TMyWindow::createMenus()
     objectMenu->addAction(viewContentAct);
     objectMenu->addAction(viewGarbageAct);
 
-    objectMenu = menuBar()->addMenu(tr("Данне"));
+    objectMenu = menuBar()->addMenu(tr("Данные"));
     objectMenu->addAction(variablesAct);
     objectMenu->addAction(dataTypeAct);
 
@@ -163,7 +170,6 @@ void TMyWindow::createToolBar()
 void TMyWindow::CMGNew()
 {
     TDrawWindow *newDrawWindow = createDrawWindow();
-    //newDrawWindow->newFile();
     newDrawWindow->showMaximized();
 }
 
@@ -205,7 +211,7 @@ void TMyWindow::CMGSaveAsImage()
 
 void TMyWindow::CMGSaveAs()
 {
-
+    activeDrawWindow()->saveGraph(globalDBManager);
 }
 
 void TMyWindow::CMObjList()
@@ -219,6 +225,7 @@ void TMyWindow::CMObjList()
 void TMyWindow::CMEdtVar()
 {
     QVariableDialog editor;
+    editor.prepareForm();
     if (editor.exec()){
 
     }
@@ -227,8 +234,22 @@ void TMyWindow::CMEdtVar()
 void TMyWindow::CMEdtType()
 {
     QDataTypeDialog editor;
+    editor.prepareForm();
     if (editor.exec()){
 
     }
+}
 
+void TMyWindow::CMGOpen()
+{
+    activeDrawWindow()->loadGraph(globalDBManager);
+}
+
+void TMyWindow::CMNewModule()
+{
+    QModuleRegister editor;
+    editor.prepareForm();
+    if (editor.exec()){
+
+    }
 }

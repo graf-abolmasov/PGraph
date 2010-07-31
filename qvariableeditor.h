@@ -12,23 +12,21 @@ class QVariableEditor : public QDialog {
     Q_OBJECT
 public:
 
-    enum Mode {wizard, editor};
-
     explicit QVariableEditor(QWidget *parent = 0);
-    QVariableEditor(Mode mode, QWidget *parent = 0);
     ~QVariableEditor();
 
-    bool prepareForm(Variable *var);
+    void prepareForm(Variable *var);
+    Variable* getResult();
 
 protected:
     void changeEvent(QEvent *e);
 
 private:
     Ui::QVariableEditor *ui;
-    Mode myMode;
 
+    Variable *myVariable;
+    QList<DataType*> typeList;
     void updateInterface();
-
 
 private slots:
     void on_pushButton_clicked();

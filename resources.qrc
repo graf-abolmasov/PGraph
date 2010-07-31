@@ -9,5 +9,6 @@
         <file>images/textpointer.png</file>
         <file>images/top.png</file>
         <file>images/syncarc.png</file>
+        <file>images/G.png</file>
     </qresource>
 </RCC>

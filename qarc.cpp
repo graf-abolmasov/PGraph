@@ -547,8 +547,8 @@ void TArc::updateBounds(){
   @param w - приоритет
 */
 void TArc::setPriority(int w){
-    width = w;
+    /*width = w;
     QPen old_pen = pen();
     old_pen.setWidth(w);
-    setPen(old_pen);
+    setPen(old_pen);*/
 }

@@ -1,6 +1,7 @@
 # -------------------------------------------------
 # Project created by QtCreator 2009-11-15T04:10:59
 # -------------------------------------------------
+QT += sql
 TARGET = NEW_GRAPH
 TEMPLATE = app
 CONFIG += static
@@ -18,14 +19,18 @@ SOURCES += main.cpp \
     qobjecteditor.cpp \
     actor.cpp \
     predicate.cpp \
-    qactoreditor.cpp \
     qdatatypeeditor.cpp \
     qdatatypedialog.cpp \
     datatype.cpp \
     qvariableeditor.cpp \
     qvariabledialog.cpp \
     variable.cpp \
-    qpredicateeditor.cpp
+    databasemanager.cpp \
+    qactoreditor.cpp \
+    qmoduleregister.cpp \
+    qpredicateeditor.cpp \
+    qgraph.cpp \
+    arcpropertydialog.cpp
 HEADERS += qmywindow.h \
     qdrawwindow.h \
     qdiagramitem.h \
@@ -39,20 +44,26 @@ HEADERS += qmywindow.h \
     qobjecteditor.h \
     actor.h \
     predicate.h \
-    qactoreditor.h \
     qdatatypeeditor.h \
     qdatatypedialog.h \
     datatype.h \
     qvariableeditor.h \
     qvariabledialog.h \
     variable.h \
-    qpredicateeditor.h
+    databasemanager.h \
+    qactoreditor.h \
+    qmoduleregister.h \
+    qpredicateeditor.h \
+    qgraph.h \
+    arcpropertydialog.h
 RESOURCES += resources.qrc
 FORMS += toppropertydialog.ui \
     qobjecteditor.ui \
-    qactoreditor.ui \
     qdatatypeeditor.ui \
     qdatatypedialog.ui \
     qvariableeditor.ui \
     qvariabledialog.ui \
-    qpredicateeditor.ui
+    qactoreditor.ui \
+    qmoduleregister.ui \
+    qpredicateeditor.ui \
+    arcpropertydialog.ui

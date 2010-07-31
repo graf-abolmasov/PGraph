@@ -22,6 +22,8 @@ class TArc : public QGraphicsLineItem
     friend class QDiagramScene;
 public:
     enum { Type = ARC_TYPE };
+    enum ArcType { SerialArc, ParallelArc, TerminateArc };
+
     QList<QArcLine *> lines;
     QArcLine* currentLine;
     TArc(TTop *startItem, TTop *endItem, QMenu *contextMenu,
@@ -58,6 +60,7 @@ protected:
 private:
     TTop *myStartTop;
     TTop *myEndTop;
+    ArcType myArcType;
     QArcTop *arcTop;
     QPolygonF arcHead;
     QMenu *myContextMenu;

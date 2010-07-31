@@ -25,30 +25,19 @@ void QDataTypeEditor::changeEvent(QEvent *e)
     }
 }
 
-QDataTypeEditor::QDataTypeEditor(Mode mode, QWidget *parent) :
-        QDialog(parent),
-        ui(new Ui::QDataTypeEditor)
+void QDataTypeEditor::prepareForm(DataType *type)
 {
-    myMode = mode;
-    ui->setupUi(this);
+    if (type != NULL) {
+        ui->typeNameEdt->setText(type->name);
+        ui->typedefTxtEdt->document()->setPlainText(type->typedefStr);
+        myDataType = type;
+    } else
+        myDataType = new DataType();
 }
 
-void QDataTypeEditor::updateInterface()
+DataType* QDataTypeEditor::getResult()
 {
-    ui->wizardWidget->setVisible(false);
-    ui->editorWidget->setVisible(false);
-    switch (myMode){
-    case wizard:
-        ui->wizardWidget->setVisible(true);
-        break;
-    case editor:
-        ui->editorWidget->setVisible(true);
-        break;
-    }
-}
-
-bool QDataTypeEditor::prepareForm(DataType *type)
-{
-    bool result = true;
-    return result;
+    myDataType->name = ui->typeNameEdt->text();
+    myDataType->typedefStr = ui->typedefTxtEdt->document()->toPlainText();
+    return myDataType;
 }

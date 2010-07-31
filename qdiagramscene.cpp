@@ -39,9 +39,6 @@ void QDiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
     switch (myMode) {
     case InsertItem:
         item = new TTop(myItemMenu);
-        item->setBrush(QBrush(Qt::gray,Qt::SolidPattern));
-        //item->setBrush(myItemColor); //прозрачный цвет
-        item->setZValue(1);
         addItem(item);
         item->setPos(mouseEvent->scenePos());
         emit itemInserted(item);
@@ -294,9 +291,6 @@ void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
         if (endItems.count() && endItems.first() == line)
             endItems.removeFirst();
 
-        removeItem(line);
-        delete line;
-
         if (startItems.count() > 0 && endItems.count() > 0 &&
             startItems.first()->type() == TTop::Type &&
             endItems.first()->type() == TTop::Type &&
@@ -306,12 +300,15 @@ void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
             TTop *endItem =
                 qgraphicsitem_cast<TTop *>(endItems.first());
             QSyncArc *arrow = new QSyncArc(startItem, endItem, mySyncArcMenu);
+            arrow->setLine(line->line());
             startItem->addSync(arrow);
             endItem->addSync(arrow);
             arrow->setZValue(-1000.0);
             addItem(arrow);
             arrow->updatePosition();
         }
+        removeItem(line);
+        delete line;
         line = 0;
     }
 
