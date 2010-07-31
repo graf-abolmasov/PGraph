@@ -5,7 +5,7 @@
 #include <QtCore>
 #include "qdiagramitem.h"
 #include "qarcline.h"
-#include "qarctop.h"
+#include "qserialarctop.h"
 
 #define ARC_TYPE      UserType+4
 #define UP	0x80
@@ -15,7 +15,7 @@
 
 class TTop;
 class QArcLine;
-class QArcTop;
+class QSerialArcTop;
 
 class TArc : public QGraphicsLineItem
 {
@@ -47,6 +47,9 @@ public:
         { return myStartTop; }
     TTop *endItem() const
         { return myEndTop; }
+    ArcType arcType() const
+        { return myArcType; }
+    void setArcType(ArcType type);
     QArcLine* prevLine(){
         if (lines.count() > 0)
             return lines.last();
@@ -61,10 +64,10 @@ private:
     TTop *myStartTop;
     TTop *myEndTop;
     ArcType myArcType;
-    QArcTop *arcTop;
+    QGraphicsItem *arcTop;
     QPolygonF arcHead;
     QMenu *myContextMenu;
-    int width;  //приоритет
+    int width;  //РїСЂРёРѕСЂРёС‚РµС‚
     bool autoBuild(TTop* top, float dx, float dy);
     bool remake(TTop *, float dx, float dy);
 };

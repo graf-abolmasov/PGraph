@@ -1,14 +1,14 @@
 #include <QtGui>
-#include "qarctop.h"
+#include "qserialarctop.h"
 #include "qarc.h"
 
-void QArcTop::contextMenuEvent(QGraphicsSceneContextMenuEvent *event){
+void QSerialArcTop::contextMenuEvent(QGraphicsSceneContextMenuEvent *event){
     scene()->clearSelection();
     setSelected(true);
     myContextMenu->exec(event->screenPos());
 }
 
-QArcTop::QArcTop(QMenu *contextMenu, QGraphicsItem *parent, QGraphicsScene *scene)
+QSerialArcTop::QSerialArcTop(QMenu *contextMenu, QGraphicsItem *parent, QGraphicsScene *scene)
     : QGraphicsPolygonItem(parent, scene)
 {
     myContextMenu = contextMenu;
@@ -22,11 +22,11 @@ QArcTop::QArcTop(QMenu *contextMenu, QGraphicsItem *parent, QGraphicsScene *scen
     setPolygon(myPolygon);
 }
 
-QRectF QArcTop::boundingRect() const {
+QRectF QSerialArcTop::boundingRect() const {
     return QGraphicsPolygonItem::boundingRect().adjusted(-2, -2, 2, 2);
 }
 
-QVariant QArcTop::itemChange(GraphicsItemChange change, const QVariant &value){
+QVariant QSerialArcTop::itemChange(GraphicsItemChange change, const QVariant &value){
     if (change == QGraphicsItem::ItemSelectedHasChanged) {
         TArc* arc = qgraphicsitem_cast<TArc* >(parentItem());
         QPen pen = arc->pen();

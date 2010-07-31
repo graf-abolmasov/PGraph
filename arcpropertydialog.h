@@ -14,12 +14,14 @@ public:
     ArcPropertyDialog(QWidget *parent = 0);
     ~ArcPropertyDialog();
     void prepareForm(TArc* arc);
+    TArc* getResult();
 
 protected:
     void changeEvent(QEvent *e);
 
 private:
     Ui::ArcPropertyDialog *ui;
+    TArc* myArc;
 };
 
 #endif // ARCPROPERTYDIALOG_H

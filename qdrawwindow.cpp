@@ -5,6 +5,9 @@
 #include "qdiagramitem.h"
 #include "qsyncarc.h"
 #include "arcpropertydialog.h"
+#include "qserialarctop.h"
+#include "qparallelarctop.h"
+#include "qterminatearctop.h"
 
 TDrawWindow::TDrawWindow()
 {
@@ -18,7 +21,7 @@ TDrawWindow::TDrawWindow()
     scene->setCommentMenu(commentMenu);
     scene->setSyncArcMenu(syncArcMenu);
     scene->setBackgroundBrush(QBrush(Qt::white));
-    //scene->setSceneRect(-800, -600, 800, 600);
+    scene->setSceneRect(-800, -600, 800, 600);
     connect(scene, SIGNAL(itemInserted(TTop *)),
             this, SLOT(itemInserted(TTop *)));
     connect(scene, SIGNAL(itemSelected(QGraphicsItem *)),
@@ -102,7 +105,7 @@ void TDrawWindow::deleteItem()
 void TDrawWindow::deleteArc()
 {
     foreach (QGraphicsItem *item, scene->selectedItems()) {
-        if (item->type() ==  QArcTop::Type) {
+        if (item->type() ==  QSerialArcTop::Type) {
             TArc *arc = qgraphicsitem_cast<TArc *>(item->parentItem());
             arc->startItem()->removeArc(arc);
             arc->endItem()->removeArc(arc);
@@ -234,10 +237,10 @@ void TDrawWindow::saveAsImage(QString filename)
 void TDrawWindow::showArcPropDialog()
 {
     ArcPropertyDialog dlg;
-    TArc* arc = qgraphicsitem_cast<TArc *>(scene->selectedItems().first());
+    TArc* arc = qgraphicsitem_cast<TArc *>(scene->selectedItems().first()->parentItem());
     dlg.prepareForm(arc);
     if (dlg.exec()){
-
+        dlg.getResult();
     }
 }
 
