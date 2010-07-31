@@ -7,11 +7,10 @@ class Actor
 {
 public:
     enum Type {normalType, inlineType};
-    Actor();
+    Actor(QString extName, QString name, Type type);
     QString extName;
     QString name;
     Type type;
-
 };
 
 #endif // ACTOR_H

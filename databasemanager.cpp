@@ -271,5 +271,9 @@ return 0;
 
 int DataBaseManager::getPredicateList(QList<Predicate *> &predList)
 {
+    QList<Predicate *> myPredList;
+    myPredList.append(new Predicate("1", "1", Predicate::inlineType));
+    myPredList.append(new Predicate("Pred1", "Сложный предикат 1", Predicate::normalType));
+    myPredList.append(new Predicate("Pred2", "Сложный предикат 2", Predicate::normalType));
 return 0;
 }

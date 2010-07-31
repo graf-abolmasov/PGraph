@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include "qarc.h"
+#include "predicate.h"
 
 namespace Ui {
     class ArcPropertyDialog;
@@ -22,6 +23,7 @@ protected:
 private:
     Ui::ArcPropertyDialog *ui;
     TArc* myArc;
+    QList<Predicate*> predicateList;
 };
 
 #endif // ARCPROPERTYDIALOG_H

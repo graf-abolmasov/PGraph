@@ -7,7 +7,7 @@ class Predicate
 {
 public:
     enum Type {normalType, inlineType};
-    Predicate();
+    Predicate(QString name, QString extName, Type type);
     QString extName;
     QString name;
     Type type;
