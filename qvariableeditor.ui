@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>QVariableEditor</class>
  <widget class="QDialog" name="QVariableEditor">
@@ -11,7 +11,11 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Редактор данного ПО</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="resources.qrc">
+    <normaloff>:/images/G.png</normaloff>:/images/G.png</iconset>
   </property>
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
@@ -63,7 +67,7 @@
    <property name="midLineWidth">
     <number>1</number>
    </property>
-   <widget class="QLabel" name="label">
+   <widget class="QLabel" name="nameLbl">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -81,7 +85,7 @@
      <string>Имя</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="nameEdit">
+   <widget class="QLineEdit" name="nameEdt">
     <property name="geometry">
      <rect>
       <x>50</x>
@@ -113,7 +117,7 @@
    <property name="midLineWidth">
     <number>1</number>
    </property>
-   <widget class="QLabel" name="label_2">
+   <widget class="QLabel" name="typeLbl">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -131,13 +135,13 @@
      <string>Тип</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="typeEdit">
+   <widget class="QComboBox" name="typeCmbBox">
     <property name="geometry">
      <rect>
       <x>50</x>
       <y>10</y>
       <width>171</width>
-      <height>20</height>
+      <height>22</height>
      </rect>
     </property>
    </widget>
@@ -163,7 +167,7 @@
    <property name="midLineWidth">
     <number>1</number>
    </property>
-   <widget class="QLabel" name="label_3">
+   <widget class="QLabel" name="initvalueLbl">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -181,7 +185,7 @@
      <string>Начальное значение</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="initialValueEdit">
+   <widget class="QLineEdit" name="initValueEdt">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -216,7 +220,7 @@
    <property name="midLineWidth">
     <number>1</number>
    </property>
-   <widget class="QLabel" name="label_4">
+   <widget class="QLabel" name="commentLbl">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -234,7 +238,7 @@
      <string>Комментарий</string>
     </property>
    </widget>
-   <widget class="QPlainTextEdit" name="commentTextEdit">
+   <widget class="QPlainTextEdit" name="commentTxtEdt">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -254,7 +258,9 @@
    </widget>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>buttonBox</sender>

@@ -2,6 +2,7 @@
 #define QDATATYPEDIALOG_H
 
 #include <QDialog>
+#include "datatype.h"
 
 namespace Ui {
     class QDataTypeDialog;
@@ -12,6 +13,7 @@ class QDataTypeDialog : public QDialog {
 public:
     explicit QDataTypeDialog(QWidget *parent = 0);
     ~QDataTypeDialog();
+    void prepareForm();
 
 
 protected:
@@ -19,9 +21,11 @@ protected:
 
 private:
     Ui::QDataTypeDialog *ui;
-    bool prepareForm();
+    QList<DataType*> typeList;
 
 private slots:
+    void on_buttonBox_accepted();
+    void on_pushButton_3_clicked();
     void on_pushButton_2_clicked();
     void on_pushButton_clicked();
 };

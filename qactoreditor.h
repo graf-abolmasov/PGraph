@@ -1,5 +1,5 @@
-#ifndef QACTOREDITOR_H
-#define QACTOREDITOR_H
+#ifndef QActorEditor_H
+#define QActorEditor_H
 
 #include <QDialog>
 #include "actor.h"
@@ -11,29 +11,19 @@ namespace Ui {
 class QActorEditor : public QDialog {
     Q_OBJECT
 public:
-
-    enum Mode {normalEditor, inlineEditor, normalWizard, inlineWizard};
-
-    explicit QActorEditor(QWidget *parent = 0);
+    enum Mode {Normal, Inline};
+    QActorEditor(QWidget *parent = 0);
     QActorEditor(Mode mode, QWidget *parent = 0);
     ~QActorEditor();
-
-    bool prepareForm(Actor *actor);
-    Actor* actor();
+    void prepareForm(Actor *actor);
+    Actor* getResult();
 
 protected:
     void changeEvent(QEvent *e);
 
 private:
-    void updateInterface();
-
     Ui::QActorEditor *ui;
-    Mode myMode;
-    int step;
-
-private slots:
-    void on_prevButton_clicked();
-    void on_nextButton_clicked();
+    void updateInterface();
 };
 
-#endif // QACTOREDITOR_H
+#endif // QActorEditor_H

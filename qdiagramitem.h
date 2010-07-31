@@ -50,12 +50,12 @@ public:
     QList<TArc *> inArcs();
     QList<TArc *> outArcs();
     QRectF boundingRect() const;
+    bool isRoot;
 protected:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 private:
-    bool isRoot;
     QList<TArc *> arcs;
     QList<QSyncArc *> sync;
     QMenu *myContextMenu;

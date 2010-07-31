@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>QDataTypeEditor</class>
  <widget class="QDialog" name="QDataTypeEditor">
@@ -11,7 +11,11 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Редактор типа данных</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="resources.qrc">
+    <normaloff>:/images/G.png</normaloff>:/images/G.png</iconset>
   </property>
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
@@ -29,175 +33,85 @@
     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
    </property>
   </widget>
-  <widget class="QWidget" name="wizardWidget" native="true">
+  <widget class="QFrame" name="frame_2">
    <property name="geometry">
     <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>401</width>
-     <height>261</height>
+     <x>10</x>
+     <y>10</y>
+     <width>381</width>
+     <height>241</height>
     </rect>
    </property>
-   <widget class="QFrame" name="frame">
+   <property name="frameShape">
+    <enum>QFrame::WinPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Sunken</enum>
+   </property>
+   <widget class="QLabel" name="typeNameLbl">
     <property name="geometry">
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>381</width>
-      <height>241</height>
+      <width>59</width>
+      <height>16</height>
      </rect>
     </property>
-    <property name="frameShape">
-     <enum>QFrame::WinPanel</enum>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
     </property>
-    <property name="frameShadow">
-     <enum>QFrame::Sunken</enum>
+    <property name="text">
+     <string>Имя типа:</string>
     </property>
-    <widget class="QLabel" name="label">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>10</y>
-       <width>59</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>10</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>Имя типа:</string>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="typeNameWizardEdit">
-     <property name="geometry">
-      <rect>
-       <x>80</x>
-       <y>10</y>
-       <width>291</width>
-       <height>20</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_2">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>40</y>
-       <width>167</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>10</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>Определение типа (typedef)</string>
-     </property>
-    </widget>
-    <widget class="QPlainTextEdit" name="typedefWizardTextEdit">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>60</y>
-       <width>361</width>
-       <height>171</height>
-      </rect>
-     </property>
-    </widget>
    </widget>
-  </widget>
-  <widget class="QWidget" name="editorWidget" native="true">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>401</width>
-     <height>261</height>
-    </rect>
-   </property>
-   <widget class="QFrame" name="frame_2">
+   <widget class="QLineEdit" name="typeNameEdt">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>10</y>
+      <width>291</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="typedefLbl">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>10</y>
-      <width>381</width>
-      <height>241</height>
+      <y>40</y>
+      <width>167</width>
+      <height>16</height>
      </rect>
     </property>
-    <property name="frameShape">
-     <enum>QFrame::WinPanel</enum>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
     </property>
-    <property name="frameShadow">
-     <enum>QFrame::Sunken</enum>
+    <property name="text">
+     <string>Определение типа (typedef)</string>
     </property>
-    <widget class="QLabel" name="label_3">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>10</y>
-       <width>59</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>10</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>Имя типа:</string>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="typeNameEditorEdit">
-     <property name="geometry">
-      <rect>
-       <x>80</x>
-       <y>10</y>
-       <width>291</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="readOnly">
-      <bool>false</bool>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_4">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>40</y>
-       <width>167</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>10</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>Определение типа (typedef)</string>
-     </property>
-    </widget>
-    <widget class="QPlainTextEdit" name="typedefEditorTextEdit">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>60</y>
-       <width>361</width>
-       <height>171</height>
-      </rect>
-     </property>
-    </widget>
+   </widget>
+   <widget class="QPlainTextEdit" name="typedefTxtEdt">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>60</y>
+      <width>361</width>
+      <height>171</height>
+     </rect>
+    </property>
    </widget>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>buttonBox</sender>

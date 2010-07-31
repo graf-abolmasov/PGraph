@@ -4,11 +4,11 @@
 #include <QListWidgetItem>
 #include <QList>
 #include "actor.h"
-#include "qactoreditor.h"
-#include "qpredicateeditor.h"
 #include "predicate.h"
 #include <QtCore>
 #include <QLayout>
+#include "qactoreditor.h"
+#include "qpredicateeditor.h"
 
 QObjectEditor::QObjectEditor(QWidget *parent) :
     QDialog(parent),
@@ -78,52 +78,56 @@ bool QObjectEditor::prepareForm()
 */
 void QObjectEditor::newButtonClicked()
 {
-    QActorEditor *actorEditor;
-    QPredicateEditor * predEditor;
+    QActorEditor* actorEditor;
+    QPredicateEditor* predEditor;
 
     switch (ui->tab->currentIndex()){
     case 0: //Акторы
-        actorEditor = new QActorEditor(QActorEditor::normalWizard);
+        actorEditor = new QActorEditor(QActorEditor::Normal);
         actorEditor->prepareForm(NULL);
         if (actorEditor->exec()){
-            Actor *actor = actorEditor->actor();
+            /*Actor *actor = actorEditor->getResult();
             actorsList.append(actor);
-            ui->actorList->addItem(actor->name);
+            ui->actorList->addItem(actor->name);*/
         }
+        delete actorEditor;
         break;
     case 1: //Предикаты
-        predEditor = new QPredicateEditor(QPredicateEditor::normalWizard);
+        predEditor = new QPredicateEditor(QPredicateEditor::Normal);
         predEditor->prepareForm(NULL);
         if (predEditor->exec()){
-            Predicate *pred = predEditor->predicate();
+            /*Predicate *pred = predEditor->getResult();
             predicatesList.append(pred);
-            ui->predicateList->addItem(pred->name);
+            ui->predicateList->addItem(pred->name);*/
         }
+        delete predEditor;
         break;
     case 2: //I-акторы
-        actorEditor = new QActorEditor(QActorEditor::inlineWizard);
+        actorEditor = new QActorEditor(QActorEditor::Inline);
         actorEditor->prepareForm(NULL);
         if (actorEditor->exec()){
-            Actor *actor = actorEditor->actor();
+            /*Actor *actor = actorEditor->getResult();
             iActorsList.append(actor);
-            ui->inlineActorList->addItem(actor->name);
+            ui->inlineActorList->addItem(actor->name);*/
         }
+        delete actorEditor;
         break;
     case 3: //I-предикаты
-        predEditor = new QPredicateEditor(QPredicateEditor::inlineWizard);
+        predEditor = new QPredicateEditor(QPredicateEditor::Inline);
         predEditor->prepareForm(NULL);
         if (predEditor->exec()){
-            Predicate *pred = predEditor->predicate();
+            /*Predicate *pred = predEditor->getResult();
             iPredicateList.append(pred);
-            ui->inlinePredicateList->addItem(pred->name);
+            ui->inlinePredicateList->addItem(pred->name);*/
         }
+        delete predEditor;
         break;
     }
 }
 
 void QObjectEditor::editButtonClicked()
 {
-    QActorEditor *actorEditor;
+    /*QActorEditor *actorEditor;
     QPredicateEditor * predEditor;
 
     int idx = 0;
@@ -173,12 +177,12 @@ void QObjectEditor::editButtonClicked()
 
         }
         break;
-    }
+    }*/
 }
 
 void QObjectEditor::deleteButtonClicked()
 {
-    int idx = 0;
+    /*int idx = 0;
     switch (ui->tab->currentIndex()){
     case 0: //Акторы
         for (idx = 0; idx < actorsList.count(); idx++)
@@ -212,7 +216,7 @@ void QObjectEditor::deleteButtonClicked()
         delete iPredicateList.at(idx);
         iPredicateList.removeAt(idx);
         break;
-    }
+    }*/
 }
 
 

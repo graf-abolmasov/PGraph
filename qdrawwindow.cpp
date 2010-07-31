@@ -3,6 +3,8 @@
 #include <QPointF>
 #include "qdrawwindow.h"
 #include "qdiagramitem.h"
+#include "qsyncarc.h"
+#include "arcpropertydialog.h"
 
 TDrawWindow::TDrawWindow()
 {
@@ -12,11 +14,11 @@ TDrawWindow::TDrawWindow()
     view = new QGraphicsView();
     scene = new QDiagramScene();
     scene->setItemMenu(itemMenu);
-    scene->setBackgroundBrush(QBrush(Qt::white));
     scene->setArcMenu(arcMenu);
     scene->setCommentMenu(commentMenu);
     scene->setSyncArcMenu(syncArcMenu);
-    scene->setSceneRect(-800, -600, 800, 600);
+    scene->setBackgroundBrush(QBrush(Qt::white));
+    //scene->setSceneRect(-800, -600, 800, 600);
     connect(scene, SIGNAL(itemInserted(TTop *)),
             this, SLOT(itemInserted(TTop *)));
     connect(scene, SIGNAL(itemSelected(QGraphicsItem *)),
@@ -34,12 +36,14 @@ void TDrawWindow::createMenus()
     itemMenu = new QMenu();
     itemMenu->addAction(deleteAction);
     itemMenu->addSeparator();
-    itemMenu->addAction(Action1);
-    itemMenu->addAction(Action2);
+    itemMenu->addAction(setIconAction);
+    itemMenu->addAction(setTopPropertyAction);
     itemMenu->addAction(makeAsRootAction);
 
     arcMenu = new QMenu();
+    arcMenu->addAction(setArcPropertyAction);
     arcMenu->addAction(deleteArcAction);
+
 
     syncArcMenu = new QMenu();
     syncArcMenu->addAction(deleteSyncAction);
@@ -50,32 +54,36 @@ void TDrawWindow::createMenus()
 
 void TDrawWindow::createActions()
 {
-    Action1 = new QAction(tr("Р—Р°РіСЂСѓР·РёС‚СЊ РёРєРѕРЅРєСѓ"), this);
-    Action1->setStatusTip(tr("РЈСЃС‚Р°РЅР°РІР»РёРІР°РµС‚ РёРєРѕРЅРєСѓ"));
-    connect(Action1, SIGNAL(triggered()), this, SLOT(setItemIcon()));
+    setIconAction = new QAction(tr("Загрузить иконку"), this);
+    setIconAction->setStatusTip(tr("Отображает иконку на вершине вместо текста"));
+    connect(setIconAction, SIGNAL(triggered()), this, SLOT(setItemIcon()));
 
-    Action2 = new QAction(tr("РЎРІРѕР№СЃС‚РІР°"), this);
-    Action2->setStatusTip(tr("РЎРІРѕР№СЃС‚РІР° РІРµСЂРёС€РЅС‹"));
-    connect(Action2, SIGNAL(triggered()), this, SLOT(showTopPropDialog()));
+    setTopPropertyAction = new QAction(tr("Свойства"), this);
+    setTopPropertyAction->setStatusTip(tr("Изменить свойства вершины"));
+    connect(setTopPropertyAction, SIGNAL(triggered()), this, SLOT(showTopPropDialog()));
 
-    makeAsRootAction = new QAction(tr("РЎРґРµР»Р°С‚СЊ РєРѕСЂРЅРµРІРѕР№"), this);
-    makeAsRootAction->setStatusTip(tr("РЎРІРѕР№СЃС‚РІР° РІРµСЂРёС€РЅС‹"));
+    makeAsRootAction = new QAction(tr("Сделать корневой"), this);
+    makeAsRootAction->setStatusTip(tr("Сделать корневой"));
     connect(makeAsRootAction, SIGNAL(triggered()), this, SLOT(makeAsRoot()));
 
-    deleteAction = new QAction(QIcon(";/images/delete.png"), tr("РЈРґР°Р»РёС‚СЊ"), this);
-    deleteAction->setStatusTip(tr("РЈРґР°Р»СЏРµС‚ РѕР±СЉРµРєС‚"));
+    deleteAction = new QAction(QIcon(";/images/delete.png"), tr("Удалить"), this);
+    deleteAction->setStatusTip(tr("Удаляет вершину"));
     connect(deleteAction, SIGNAL(triggered()), this, SLOT(deleteItem()));
 
-    deleteArcAction = new QAction(QIcon(";/images/delete.png"), tr("РЈРґР°Р»РёС‚СЊ"), this);
-    deleteArcAction->setStatusTip(tr("РЈРґР°Р»СЏРµС‚ РѕР±СЉРµРєС‚"));
+    setArcPropertyAction = new QAction(tr("Свойства"), this);
+    setArcPropertyAction->setStatusTip(tr("Изменить свойства дуги"));
+    connect(setArcPropertyAction, SIGNAL(triggered()), this, SLOT(showArcPropDialog()));
+
+    deleteArcAction = new QAction(QIcon(";/images/delete.png"), tr("Удалить"), this);
+    deleteArcAction->setStatusTip(tr("Удаляет дугу"));
     connect(deleteArcAction, SIGNAL(triggered()), this, SLOT(deleteArc()));
 
-    deleteSyncAction = new QAction(QIcon(";/images/delete.png"), tr("РЈРґР°Р»РёС‚СЊ"), this);
-    deleteSyncAction->setStatusTip(tr("РЈРґР°Р»СЏРµС‚ РѕР±СЉРµРєС‚"));
+    deleteSyncAction = new QAction(QIcon(";/images/delete.png"), tr("Удалить"), this);
+    deleteSyncAction->setStatusTip(tr("Удалить дугу синхронизации"));
     connect(deleteSyncAction, SIGNAL(triggered()), this, SLOT(deleteSync()));
 
-    deleteCommentAction = new QAction(QIcon(";/images/delete.png"), tr("РЈРґР°Р»РёС‚СЊ"), this);
-    deleteCommentAction->setStatusTip(tr("РЈРґР°Р»СЏРµС‚ РѕР±СЉРµРєС‚"));
+    deleteCommentAction = new QAction(QIcon(";/images/delete.png"), tr("Удалить"), this);
+    deleteCommentAction->setStatusTip(tr("Удаляет комментарий"));
     connect(deleteCommentAction, SIGNAL(triggered()), this, SLOT(deleteComment()));
 }
 
@@ -167,7 +175,7 @@ void TDrawWindow::setMode(QDiagramScene::Mode mode)
 void TDrawWindow::setItemIcon()
 {
     QString fileName = QFileDialog::getOpenFileName(0,
-                                                    tr("РћС‚РєСЂС‹С‚СЊ С„Р°Р№Р»..."),
+                                                    tr("Сохранить как..."),
                                                     "",
                                                     tr("All Files (*)"));
     foreach (QGraphicsItem *item, scene->selectedItems()) {
@@ -203,6 +211,8 @@ void TDrawWindow::showTopPropDialog(){
     }
 }
 
+
+
 /*!
   Реакция на нажатие пункта меню: Сохранить как картинку
 */
@@ -215,6 +225,19 @@ void TDrawWindow::saveAsImage(QString filename)
         QPainter painter(&Image);
         scene->render(&painter);
         Image.save(filename);
+    }
+}
+
+/*!
+  Реакция на нажатие пункта меню: Свойства
+*/
+void TDrawWindow::showArcPropDialog()
+{
+    ArcPropertyDialog dlg;
+    TArc* arc = qgraphicsitem_cast<TArc *>(scene->selectedItems().first());
+    dlg.prepareForm(arc);
+    if (dlg.exec()){
+
     }
 }
 
@@ -236,4 +259,70 @@ QList<TTop* > TDrawWindow::allTops(){
         }
     }
     return topList;
+}
+
+/*!
+  Возвращает список всех дуг лежащих на сцене
+*/
+QList<TArc* > TDrawWindow::allArcs(){
+    QList<TArc* > arcList;
+    for (int i = 0; i < scene->items().count(); i++){
+        if (scene->items().at(i)->type() == TArc::Type){
+            arcList.append(qgraphicsitem_cast<TArc* >(scene->items().at(i)));
+        }
+    }
+    return arcList;
+}
+
+/*!
+  Возвращает список всех комментариев лежащих на сцене
+*/
+QList<TComment* > TDrawWindow::allComments(){
+    QList<TComment* > commentList;
+    for (int i = 0; i < scene->items().count(); i++){
+        if (scene->items().at(i)->type() == TComment::Type){
+            commentList.append(qgraphicsitem_cast<TComment* >(scene->items().at(i)));
+        }
+    }
+    return commentList;
+}
+
+/*!
+  Возвращает список всех дуг синхронизации лежащих на сцене
+*/
+QList<QSyncArc* > TDrawWindow::allSyncArcs(){
+    QList<QSyncArc* > arcList;
+    for (int i = 0; i < scene->items().count(); i++){
+        if (scene->items().at(i)->type() == QSyncArc::Type){
+            arcList.append(qgraphicsitem_cast<QSyncArc* >(scene->items().at(i)));
+        }
+    }
+    return arcList;
+}
+
+/*!
+  Возвращает граф
+*/
+QGraph* TDrawWindow::graph()
+{
+    QGraph* result = new QGraph();
+    result->arcList     = allArcs();
+    result->commentList = allComments();
+    result->syncArcList = allSyncArcs();
+    result->topList     = allTops();
+    return result;
+}
+
+/*!
+  Загружает граф в редактор
+*/
+
+void TDrawWindow::loadGraph(DataBaseManager* dbManager)
+{
+    dbManager->getGraph("Project1", scene, arcMenu, itemMenu, syncArcMenu);
+}
+
+void TDrawWindow::saveGraph(DataBaseManager *dbManager)
+{
+    dbManager->saveGraph("Project1", "aaaaaaag", graph());
 }

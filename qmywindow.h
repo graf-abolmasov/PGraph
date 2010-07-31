@@ -5,6 +5,7 @@
 #include <QToolBar>
 #include <QtGui>
 #include "qdrawwindow.h"
+#include "databasemanager.h"
 
 class TMyWindow : public QMainWindow
 {
@@ -18,6 +19,8 @@ private:
     QMenu *fileMenu;
     QMenu *objectMenu;
     QMenu *buildMenu;
+
+    QStatusBar *myStatusBar;
 
     QAction *newGraphAct;
     QAction *openGraphAct;
@@ -63,9 +66,10 @@ private:
     void LoadSetup(){}		// Загрузка конфигурации программы
     void SaveSetup(){}		// Сохранение конфигурации программы
 
+    DataBaseManager* dbManager;
 private slots:
     void CMGNew();              //+ Граф->Создать
-    void CMGOpen(){}            //+ Граф->Открыть
+    void CMGOpen();             //+ Граф->Открыть
     void CMGSave(){}     	//+ Граф->Сохранить
     void CMGSaveAs();            //+ Граф->SaveAs
     void CMGSaveAsImage();      //+ Граф->SaveAsPNG
@@ -74,7 +78,7 @@ private slots:
     void CMIncap(){}		// Граф->Инкапсулировать
     void CMContent(){}		// +Объект->Дерево объектов
     void CMShowGarbage(){}	// +Объект->Неиспользуемые объекты
-    void CMNewModule(){}	// +Объект->Зарегистрировать модуль
+    void CMNewModule();   	// +Объект->Зарегистрировать модуль
     void CMObjList();		// +Объект->Редактор объектов
     void CMEdtVar();		// +Данные->Словарь данных
     void CMEdtType();		// +Данные->Список типов
