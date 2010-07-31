@@ -18,9 +18,10 @@ DataBaseManager::DataBaseManager()
 {
     db = QSqlDatabase::addDatabase("QMYSQL");
     db.setHostName("localhost");
+    db.setPort(3306);
     db.setDatabaseName("graph3");
     db.setUserName("root");
-    db.setPassword("gjkbuhfabrf");
+    db.setPassword("Marina");
 }
 
 int DataBaseManager::getLastInsertID()
