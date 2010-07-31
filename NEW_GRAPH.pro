@@ -15,7 +15,7 @@ SOURCES += main.cpp \
     toppropertydialog.cpp \
     qsyncarc.cpp \
     qarcline.cpp \
-    qarctop.cpp \
+    qserialarctop.cpp \
     qobjecteditor.cpp \
     actor.cpp \
     predicate.cpp \
@@ -30,7 +30,9 @@ SOURCES += main.cpp \
     qmoduleregister.cpp \
     qpredicateeditor.cpp \
     qgraph.cpp \
-    arcpropertydialog.cpp
+    arcpropertydialog.cpp \
+    qparallelarctop.cpp \
+    qterminatearctop.cpp
 HEADERS += qmywindow.h \
     qdrawwindow.h \
     qdiagramitem.h \
@@ -40,7 +42,7 @@ HEADERS += qmywindow.h \
     toppropertydialog.h \
     qsyncarc.h \
     qarcline.h \
-    qarctop.h \
+    qserialarctop.h \
     qobjecteditor.h \
     actor.h \
     predicate.h \
@@ -55,7 +57,9 @@ HEADERS += qmywindow.h \
     qmoduleregister.h \
     qpredicateeditor.h \
     qgraph.h \
-    arcpropertydialog.h
+    arcpropertydialog.h \
+    qparallelarctop.h \
+    qterminatearctop.h
 RESOURCES += resources.qrc
 FORMS += toppropertydialog.ui \
     qobjecteditor.ui \

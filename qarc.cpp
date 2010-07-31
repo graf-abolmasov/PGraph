@@ -2,6 +2,9 @@
 #include "qarc.h"
 #include <math.h>
 #include <time.h>
+#include "qparallelarctop.h"
+#include "qserialarctop.h"
+#include "qterminatearctop.h"
 
 const qreal Pi = 3.14;
 const int MINDELTA = 40;
@@ -419,8 +422,9 @@ TArc::TArc(TTop *startItem, TTop *endItem, QMenu *contextMenu,
     : QGraphicsLineItem(parent, scene){
     myStartTop = startItem;
     myEndTop = endItem;
+    myContextMenu = contextMenu;
     setPen(QPen(Qt::black, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-    arcTop = new QArcTop(contextMenu, this, scene);
+    arcTop = new QSerialArcTop(contextMenu, this, scene);
     width = 2;
     currentLine = NULL;
     arcTop->hide();
@@ -551,4 +555,22 @@ void TArc::setPriority(int w){
     QPen old_pen = pen();
     old_pen.setWidth(w);
     setPen(old_pen);*/
+}
+
+void TArc::setArcType(ArcType type)
+{
+    myArcType = type;
+    delete arcTop;
+    switch (arcType()) {
+    case TArc::SerialArc:
+        arcTop = new QSerialArcTop(myContextMenu, this, scene());
+        break;
+    case TArc::ParallelArc:
+        arcTop = new QParallelArcTop(myContextMenu, this, scene());
+        break;
+    case TArc::TerminateArc:
+        arcTop = new QTerminateArcTop(myContextMenu, this, scene());
+        break;
+    }
+    arcTop->setSelected(true);
 }

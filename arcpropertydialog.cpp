@@ -1,5 +1,6 @@
 #include "arcpropertydialog.h"
 #include "ui_arcpropertydialog.h"
+#include "qarc.h"
 
 ArcPropertyDialog::ArcPropertyDialog(QWidget *parent) :
     QDialog(parent),
@@ -27,5 +28,26 @@ void ArcPropertyDialog::changeEvent(QEvent *e)
 
 void ArcPropertyDialog::prepareForm(TArc *arc)
 {
+    if (arc == NULL) return;
+    myArc = arc;
+    switch (arc->arcType()) {
+    case TArc::SerialArc:
+        ui->serialRadioBtn->setChecked(true);
+        break;
+    case TArc::ParallelArc:
+        ui->parallelRadioBtn->setChecked(true);
+        break;
+    case TArc::TerminateArc:
+        ui->terminateRadioBtn->setChecked(true);
+        break;
+    }
+    ui->prioritySpnBox->setValue(arc->priority());
+}
 
+TArc* ArcPropertyDialog::getResult()
+{
+    if (ui->serialRadioBtn->isChecked()) myArc->setArcType(TArc::SerialArc);
+    if (ui->parallelRadioBtn->isChecked()) myArc->setArcType(TArc::ParallelArc);
+    if (ui->terminateRadioBtn->isChecked()) myArc->setArcType(TArc::TerminateArc);
+    myArc->setPriority(ui->prioritySpnBox->value());
 }
