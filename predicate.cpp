@@ -1,5 +1,8 @@
 #include "predicate.h"
 
-Predicate::Predicate()
+Predicate::Predicate(QString name, QString extName, Type type)
 {
+    this->extName = extName;
+    this->name = name;
+    this->type = type;
 }

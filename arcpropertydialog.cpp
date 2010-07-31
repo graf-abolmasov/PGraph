@@ -1,6 +1,7 @@
 #include "arcpropertydialog.h"
 #include "ui_arcpropertydialog.h"
 #include "qarc.h"
+#include "databasemanager.h"
 
 ArcPropertyDialog::ArcPropertyDialog(QWidget *parent) :
     QDialog(parent),
@@ -42,6 +43,10 @@ void ArcPropertyDialog::prepareForm(TArc *arc)
         break;
     }
     ui->prioritySpnBox->setValue(arc->priority());
+
+    //Загружаем предикаты из базы данных
+    globalDBManager->getPredicateList(predicateList);
+
 }
 
 TArc* ArcPropertyDialog::getResult()
