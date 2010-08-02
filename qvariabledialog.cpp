@@ -82,3 +82,8 @@ void QVariableDialog::on_deleteButton_clicked()
         ui->variablesTable->removeRow(idx);
     }
 }
+
+void QVariableDialog::on_variablesTable_doubleClicked(QModelIndex index)
+{
+    on_editButton_clicked();
+}

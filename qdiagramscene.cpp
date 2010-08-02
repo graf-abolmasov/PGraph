@@ -35,10 +35,10 @@ void QDiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
     if (mouseEvent->button() != Qt::LeftButton)
         return;
 
-    TTop* item;
+    QGraphicsItem* item;
     switch (myMode) {
     case InsertItem:
-        item = new TTop(myItemMenu);
+        item = new TTop(myTopMenu);
         addItem(item);
         item->setPos(mouseEvent->scenePos());
         emit itemInserted(item);
@@ -61,12 +61,19 @@ void QDiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
         addItem(textItem);
         textItem->setPos(mouseEvent->scenePos());
         emit textInserted(textItem);
+
     case InsertSync:
         line = new QArcLine(QLineF(mouseEvent->scenePos(),
                                     mouseEvent->scenePos()));
         addItem(line);
         break;
 
+    case InsertMultiProcTop:
+        item = new QMultiProcTop(myMultiProcTopMenu);
+        addItem(item);
+        item->setPos(mouseEvent->scenePos());
+        emit itemInserted(item);
+        break;
     default:
         ;
     }
@@ -229,6 +236,19 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
         QLineF newLine(line->line().p1(), mouseEvent->scenePos());
         line->setLine(newLine);
     }
+    else if ((myMode == MoveItem) && (mouseEvent->buttons() == Qt::LeftButton) &&
+             (selectedItems().count() == 1) && (selectedItems().first()->type() == QMultiProcTop::Type)) {
+        QMultiProcTop *top = qgraphicsitem_cast<QMultiProcTop *>(selectedItems().first());
+        QPointF old_pos = mouseEvent->lastScenePos();
+        QPointF new_pos = mouseEvent->scenePos();
+
+        QLineF vector(old_pos, new_pos);
+        float dx = vector.dx();
+        float dy = vector.dy();
+
+        top->setX(top->x() + dx);
+        top->setY(top->y() + dy);
+    }
 }
 
 void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
@@ -340,9 +360,9 @@ bool QDiagramScene::isItemChange(int type)
     return false;
 }
 
-void QDiagramScene::setItemMenu(QMenu *menu)
+void QDiagramScene::setTopMenu(QMenu *menu)
 {
-    myItemMenu = menu;
+    myTopMenu = menu;
 }
 
 void QDiagramScene::setArcMenu(QMenu *menu)
@@ -358,6 +378,11 @@ void QDiagramScene::setCommentMenu(QMenu *menu)
 void QDiagramScene::setSyncArcMenu(QMenu *menu)
 {
     mySyncArcMenu = menu;
+}
+
+void QDiagramScene::setMultiProcTopMenu(QMenu *menu)
+{
+    myMultiProcTopMenu = menu;
 }
 
 void QDiagramScene::setRootTop(TTop* top){

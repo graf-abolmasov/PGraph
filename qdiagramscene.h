@@ -1,4 +1,4 @@
-#ifndef QDIAGRAMSCENE_H
+п»ї#ifndef QDIAGRAMSCENE_H
 #define QDIAGRAMSCENE_H
 
 #include <QGraphicsScene>
@@ -6,6 +6,7 @@
 #include "qcomment.h"
 #include "qarc.h"
 #include "qsyncarc.h"
+#include "qmultiproctop.h"
 
 QT_BEGIN_NAMESPACE
 class QGraphicsSceneMouseEvent;
@@ -26,16 +27,17 @@ class QDiagramScene : public QGraphicsScene
     Q_OBJECT
 
 public:
-    enum Mode { InsertItem, InsertLine, InsertText, InsertSync, MoveItem};
+    enum Mode { InsertItem, InsertLine, InsertText, InsertSync, InsertMultiProcTop, MoveItem};
 
     QDiagramScene(QObject *parent = 0);
     void setArcMenu(QMenu *menu);
-    void setItemMenu(QMenu *menu);
+    void setTopMenu(QMenu *menu);
     void setCommentMenu(QMenu *menu);
     void setSyncArcMenu(QMenu *menu);
+    void setMultiProcTopMenu(QMenu *menu);
     void setRootTop(TTop* top);
 
-    //!Указатель на корневую вершину
+    //!РЈРєР°Р·Р°С‚РµР»СЊ РЅР° РєРѕСЂРЅРµРІСѓСЋ РІРµСЂС€РёРЅСѓ
     TTop* rootTop()
         { return myRootTop; }
 
@@ -44,7 +46,7 @@ public slots:
     void editorLostFocus(TComment *item);
 
 signals:
-    void itemInserted(TTop *item);
+    void itemInserted(QGraphicsItem *item);
     void textInserted(TComment *item);
     void itemSelected(QGraphicsItem *item);
 
@@ -65,10 +67,11 @@ private:
 
     bool isItemChange(int type);
 
-    QMenu *myItemMenu;
+    QMenu *myTopMenu;
     QMenu *myArcMenu;
     QMenu *myCommentMenu;
     QMenu *mySyncArcMenu;
+    QMenu *myMultiProcTopMenu;
 };
 
 #endif

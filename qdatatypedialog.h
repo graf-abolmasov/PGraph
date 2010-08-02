@@ -2,6 +2,7 @@
 #define QDATATYPEDIALOG_H
 
 #include <QDialog>
+#include <QtCore>
 #include "datatype.h"
 
 namespace Ui {
@@ -24,6 +25,7 @@ private:
     QList<DataType*> typeList;
 
 private slots:
+    void on_tableWidget_doubleClicked(QModelIndex index);
     void on_buttonBox_accepted();
     void on_pushButton_3_clicked();
     void on_pushButton_2_clicked();

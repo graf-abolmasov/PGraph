@@ -32,7 +32,8 @@ SOURCES += main.cpp \
     qgraph.cpp \
     arcpropertydialog.cpp \
     qparallelarctop.cpp \
-    qterminatearctop.cpp
+    qterminatearctop.cpp \
+    qmultiproctop.cpp
 HEADERS += qmywindow.h \
     qdrawwindow.h \
     qdiagramitem.h \
@@ -59,7 +60,8 @@ HEADERS += qmywindow.h \
     qgraph.h \
     arcpropertydialog.h \
     qparallelarctop.h \
-    qterminatearctop.h
+    qterminatearctop.h \
+    qmultiproctop.h
 RESOURCES += resources.qrc
 FORMS += toppropertydialog.ui \
     qobjecteditor.ui \

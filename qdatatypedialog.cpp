@@ -98,3 +98,8 @@ void QDataTypeDialog::on_buttonBox_accepted()
     //тут писать сохранение в базу
     globalDBManager->saveDataTypeList(typeList);
 }
+
+void QDataTypeDialog::on_tableWidget_doubleClicked(QModelIndex index)
+{
+    on_pushButton_2_clicked();
+}

@@ -25,10 +25,11 @@ private:
     QDiagramScene *scene;
     QGraphicsView *view;
 
-    QMenu *itemMenu;
+    QMenu *topMenu;
     QMenu *arcMenu;
     QMenu *commentMenu;
     QMenu *syncArcMenu;
+    QMenu *multiProcMenu;
 
     QAction *deleteAction;
     QAction *setIconAction;

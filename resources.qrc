@@ -10,5 +10,6 @@
         <file>images/top.png</file>
         <file>images/syncarc.png</file>
         <file>images/G.png</file>
+        <file>images/MultiProcTop.png</file>
     </qresource>
 </RCC>

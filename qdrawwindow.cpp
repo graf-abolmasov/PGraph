@@ -16,10 +16,11 @@ TDrawWindow::TDrawWindow()
 
     view = new QGraphicsView();
     scene = new QDiagramScene();
-    scene->setItemMenu(itemMenu);
+    scene->setTopMenu(topMenu);
     scene->setArcMenu(arcMenu);
     scene->setCommentMenu(commentMenu);
     scene->setSyncArcMenu(syncArcMenu);
+    scene->setMultiProcTopMenu(multiProcMenu);
     scene->setBackgroundBrush(QBrush(Qt::white));
     scene->setSceneRect(-800, -600, 800, 600);
     connect(scene, SIGNAL(itemInserted(TTop *)),
@@ -36,23 +37,25 @@ TDrawWindow::TDrawWindow()
 
 void TDrawWindow::createMenus()
 {
-    itemMenu = new QMenu();
-    itemMenu->addAction(deleteAction);
-    itemMenu->addSeparator();
-    itemMenu->addAction(setIconAction);
-    itemMenu->addAction(setTopPropertyAction);
-    itemMenu->addAction(makeAsRootAction);
+    topMenu = new QMenu();
+    topMenu->addAction(deleteAction);
+    topMenu->addSeparator();
+    topMenu->addAction(setIconAction);
+    topMenu->addAction(setTopPropertyAction);
+    topMenu->addAction(makeAsRootAction);
 
     arcMenu = new QMenu();
-    arcMenu->addAction(setArcPropertyAction);
     arcMenu->addAction(deleteArcAction);
-
+    arcMenu->addSeparator();
+    arcMenu->addAction(setArcPropertyAction);
 
     syncArcMenu = new QMenu();
     syncArcMenu->addAction(deleteSyncAction);
 
     commentMenu = new QMenu();
     commentMenu->addAction(deleteCommentAction);
+
+    multiProcMenu = new QMenu();
 }
 
 void TDrawWindow::createActions()
@@ -322,7 +325,7 @@ QGraph* TDrawWindow::graph()
 
 void TDrawWindow::loadGraph(DataBaseManager* dbManager)
 {
-    dbManager->getGraph("Project1", scene, arcMenu, itemMenu, syncArcMenu);
+    dbManager->getGraph("Project1", scene, arcMenu, topMenu, syncArcMenu);
 }
 
 void TDrawWindow::saveGraph(DataBaseManager *dbManager)
