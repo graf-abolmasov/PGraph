@@ -27,6 +27,7 @@ private:
     QAction *saveGraphAct;
     QAction *saveAsGraphAct;
     QAction *saveAsImageGraphAct;
+    QAction *exitAction;
 
     //Объект
     QAction *viewContentAct;
@@ -50,6 +51,7 @@ private:
     QToolButton *addCommentButton;
     QToolButton *addTopButton;
     QToolButton *addSyncArcButton;
+    QToolButton *addMultiProcTopButton;
     QButtonGroup *pointerTypeGroup;
 
     QToolBar *mainToolBar;
@@ -71,11 +73,12 @@ private slots:
     void CMGNew();              //+ Граф->Создать
     void CMGOpen();             //+ Граф->Открыть
     void CMGSave(){}     	//+ Граф->Сохранить
-    void CMGSaveAs();            //+ Граф->SaveAs
+    void CMGSaveAs();           //+ Граф->SaveAs
     void CMGSaveAsImage();      //+ Граф->SaveAsPNG
     void CMGChangeIcon(){}      // Граф->Сменить иконку
     void CMReporter(){}		// Граф->Создать отчет
     void CMIncap(){}		// Граф->Инкапсулировать
+    void CMExit();
     void CMContent(){}		// +Объект->Дерево объектов
     void CMShowGarbage(){}	// +Объект->Неиспользуемые объекты
     void CMNewModule();   	// +Объект->Зарегистрировать модуль

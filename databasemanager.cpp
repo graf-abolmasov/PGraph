@@ -228,16 +228,32 @@ void DataBaseManager::saveGraph(QString projectName, QString extName, QGraph *gr
     TODO: Заглушка! Сделать настоящую работу с базой.
 */
 int DataBaseManager::saveDataTypeList(QList<DataType*>& typeList){
-    return 0;
+    bool ok = db.open();
+    QSqlQuery query;
+    query.prepare("DELETE FROM TYPSYS;");
+    query.exec();
+    for (int i = 0; i < typeList.count(); i++){
+        query.prepare("INSERT INTO TYPSYS (PROJECT_ID, TYPE, TYPEDEF)"
+                      "VALUES (:PROJECT_ID, :TYPE, :TYPEDEF);");
+        query.bindValue(":PROJECT_ID", i+1);
+        query.bindValue(":TYPE", typeList.at(i)->name);
+        query.bindValue(":TYPEDEF", typeList.at(i)->typedefStr);
+        query.exec();
+        query.clear();
+    }
+    return db.lastError().number();
 }
 
 int DataBaseManager::getDataTypeList(QList<DataType*>& typeList){
-    QList<DataType* > myTypeList;
-    myTypeList.append(new DataType("long", "typedef long"));
-    myTypeList.append(new DataType("int", "typedef int"));
-    myTypeList.append(new DataType("string", "typedef char*"));
-    typeList = myTypeList;
-    return 0;
+    bool ok = db.open();
+    QSqlQuery query;
+    typeList.clear();
+    query.prepare("SELECT PROJECT_ID, TYPE, TYPEDEF FROM TYPSYS;");
+    query.exec();
+    while (query.next()){
+        typeList.append(new DataType(query.value(1).toString(), query.value(2).toString()));
+    }
+    return db.lastError().number();
 }
 
 int DataBaseManager::saveVariableList(QList<Variable*>& varList){

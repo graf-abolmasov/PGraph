@@ -31,6 +31,8 @@ void TMyWindow::createMenus()
     fileMenu->addAction(saveGraphAct);
     fileMenu->addAction(saveAsGraphAct);
     fileMenu->addAction(saveAsImageGraphAct);
+    fileMenu->addSeparator();
+    fileMenu->addAction(exitAction);
 
     objectMenu = menuBar()->addMenu(tr("Объект"));
     objectMenu->addAction(openObjectEditorAct);
@@ -73,9 +75,13 @@ void TMyWindow::createActions()
     connect(saveAsGraphAct, SIGNAL(triggered()), this, SLOT(CMGSaveAs()));
 
     saveAsImageGraphAct = new QAction(tr("Cохранить как картинку"), this);
-    saveAsImageGraphAct->setShortcuts(QKeySequence::SaveAs);
     saveAsImageGraphAct->setStatusTip(tr("Cхраняет как картинку"));
     connect(saveAsImageGraphAct, SIGNAL(triggered()), this, SLOT(CMGSaveAsImage()));
+
+    exitAction = new QAction(tr("Выход"), this);
+    exitAction->setShortcuts(QKeySequence::Close);
+    exitAction->setStatusTip(tr("Выйти из приложения"));
+    connect(exitAction, SIGNAL(triggered()), this, SLOT(CMExit()));
 
     viewContentAct = new QAction(tr("Дерево объектов"), this);
     viewContentAct->setStatusTip(tr("Дерево объектов"));
@@ -112,6 +118,10 @@ void TMyWindow::createActions()
     connect(manualInputAct, SIGNAL(triggered()), this, SLOT(CMDoUserDialog()));
 
     //LeftToolBar
+    pointerButton = new QToolButton;
+    pointerButton->setCheckable(true);
+    pointerButton->setChecked(true);
+    pointerButton->setIcon(QIcon(":/images/pointer.png"));
 
     addTopButton = new QToolButton;
     addTopButton->setCheckable(true);
@@ -121,11 +131,6 @@ void TMyWindow::createActions()
     addCommentButton->setCheckable(true);
     addCommentButton->setIcon(QIcon(":/images/textpointer.png"));
 
-    pointerButton = new QToolButton;
-    pointerButton->setCheckable(true);
-    pointerButton->setChecked(true);
-    pointerButton->setIcon(QIcon(":/images/pointer.png"));
-
     addArcButton = new QToolButton;
     addArcButton->setCheckable(true);
     addArcButton->setIcon(QIcon(":/images/linepointer.png"));
@@ -133,6 +138,10 @@ void TMyWindow::createActions()
     addSyncArcButton = new QToolButton;
     addSyncArcButton->setCheckable(true);
     addSyncArcButton->setIcon(QIcon(":/images/syncarc.png"));
+
+    addMultiProcTopButton = new QToolButton;
+    addMultiProcTopButton->setCheckable(true);
+    addMultiProcTopButton->setIcon(QIcon(":/images/MultiProcTop.png"));
 }
 
 TDrawWindow* TMyWindow::createDrawWindow()
@@ -156,15 +165,17 @@ void TMyWindow::createToolBar()
     pointerTypeGroup->addButton(pointerButton, int(QDiagramScene::MoveItem));
     pointerTypeGroup->addButton(addArcButton, int(QDiagramScene::InsertLine));
     pointerTypeGroup->addButton(addSyncArcButton, int(QDiagramScene::InsertSync));
+    pointerTypeGroup->addButton(addMultiProcTopButton, int(QDiagramScene::InsertMultiProcTop));
     connect(pointerTypeGroup, SIGNAL(buttonClicked(int)), this, SLOT(pointerGroupClicked(int)));
 
     leftToolBar = new QToolBar(tr("Палитра инструментов"), this);
     addToolBar(Qt::LeftToolBarArea, leftToolBar);
+    leftToolBar->addWidget(pointerButton);
     leftToolBar->addWidget(addTopButton);
     leftToolBar->addWidget(addCommentButton);
-    leftToolBar->addWidget(pointerButton);
     leftToolBar->addWidget(addArcButton);
     leftToolBar->addWidget(addSyncArcButton);
+    leftToolBar->addWidget(addMultiProcTopButton);
 }
 
 void TMyWindow::CMGNew()
@@ -252,4 +263,9 @@ void TMyWindow::CMNewModule()
     if (editor.exec()){
 
     }
+}
+
+void TMyWindow::CMExit()
+{
+    QApplication::closeAllWindows();
 }

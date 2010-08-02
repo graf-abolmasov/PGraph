@@ -55,4 +55,5 @@ TArc* ArcPropertyDialog::getResult()
     if (ui->parallelRadioBtn->isChecked()) myArc->setArcType(TArc::ParallelArc);
     if (ui->terminateRadioBtn->isChecked()) myArc->setArcType(TArc::TerminateArc);
     myArc->setPriority(ui->prioritySpnBox->value());
+    return myArc;
 }
