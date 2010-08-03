@@ -41,17 +41,38 @@ QActorEditor::QActorEditor(Mode mode, QWidget *parent) :
         ui->normalWidget->setVisible(false);
         break;
     }
+    myMode = mode;
 
 }
 
 void QActorEditor::prepareForm(Actor *actor)
 {
-
+    if (actor == NULL)
+        myActor = new Actor("", "", myMode == Normal ? Actor::normalType : Actor::inlineType);
+    else
+        myActor = actor;
+    //заполняем форму
+    switch(myMode){
+    case Normal:
+        ui->actorNameEdt->setText(myActor->extName);
+        break;
+    case Inline:
+        ui->iactorNameEdt->setText(myActor->extName);
+        break;
+    }
 }
 
 Actor* QActorEditor::getResult()
 {
-
+    switch(myMode){
+    case Normal:
+        myActor->extName = ui->actorNameEdt->text();
+        break;
+    case Inline:
+        myActor->extName = ui->iactorNameEdt->text();
+        break;
+    }
+    return myActor;
 }
 
 void QActorEditor::updateInterface()

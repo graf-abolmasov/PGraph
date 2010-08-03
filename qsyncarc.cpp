@@ -4,7 +4,7 @@
 
 const qreal Pi = 3.14;
 
-QSyncArc::QSyncArc(TTop *startItem, TTop *endItem, QMenu *contextMenu, QGraphicsItem *parent, QGraphicsScene *scene)
+QSyncArc::QSyncArc(QTop *startItem, QTop *endItem, QMenu *contextMenu, QGraphicsItem *parent, QGraphicsScene *scene)
     : QGraphicsLineItem(parent, scene){
     myStartItem = startItem;
     myEndItem = endItem;

@@ -12,10 +12,9 @@ class TopPropertyDialog : public QDialog {
     Q_OBJECT
 public:
     TopPropertyDialog(QWidget *parent = 0);
-    void prepareForm(TTop* top);
+    void prepareForm(QTop* top);
     ~TopPropertyDialog();
-    int getWidth();
-    int getHeight();
+    QTop* getResult();
 
 protected:
     void changeEvent(QEvent *e);
@@ -26,7 +25,8 @@ public slots:
 
 private:
     Ui::TopPropertyDialog *ui;
-    TTop* myTop;
+    QTop* myTop;
+    QList<Actor*> myActorList;
 };
 
 #endif // TOPPROPERTYDIALOG_H

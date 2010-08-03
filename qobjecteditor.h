@@ -21,6 +21,7 @@ protected:
     void changeEvent(QEvent *e);
 
 private slots:
+    void on_buttonBox_accepted();
     void newButtonClicked();
     void editButtonClicked();
     void deleteButtonClicked();

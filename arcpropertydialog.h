@@ -14,15 +14,15 @@ class ArcPropertyDialog : public QDialog {
 public:
     ArcPropertyDialog(QWidget *parent = 0);
     ~ArcPropertyDialog();
-    void prepareForm(TArc* arc);
-    TArc* getResult();
+    void prepareForm(QArc* arc);
+    QArc* getResult();
 
 protected:
     void changeEvent(QEvent *e);
 
 private:
     Ui::ArcPropertyDialog *ui;
-    TArc* myArc;
+    QArc* myArc;
     QList<Predicate*> predicateList;
 };
 

@@ -22,6 +22,16 @@ DataBaseManager::DataBaseManager()
     db.setDatabaseName("graph3");
     db.setUserName("root");
     db.setPassword("Marina");
+
+    //заполняем справочники
+    actorListProxy.append(new Actor("aaa", "ACTOR_1", Actor::normalType));
+    actorListProxy.append(new Actor("aab", "ACTOR_2", Actor::normalType));
+    actorListProxy.append(new Actor("aac", "inlineACTOR_1", Actor::inlineType));
+    actorListProxy.append(new Actor("aad", "inlineACTOR_2", Actor::inlineType));
+
+    predListProxy.append(new Predicate("1", "1", Predicate::inlineType));
+    predListProxy.append(new Predicate("Pred1", "Сложный предикат 1", Predicate::normalType));
+    predListProxy.append(new Predicate("Pred2", "Сложный предикат 2", Predicate::normalType));
 }
 
 int DataBaseManager::getLastInsertID()
@@ -50,29 +60,37 @@ void DataBaseManager::getGraph(QString projectName, QDiagramScene* scene, QMenu*
         QString a  = query.value(0).toString();
 
         if (query.value(0).toString() == "T"){
-            TTop *top = new TTop(topMenu, 0, scene);
+            QTop *top = new QTop(topMenu, 0, scene);
             top->setPos(QPointF(query.value(2).toFloat() + query.value(4).toFloat()/2, query.value(3).toFloat() + query.value(5).toFloat()/2));
             top->number = query.value(6).toInt();
             top->isRoot = query.value(7).toBool();
+
+            QPolygonF myPolygon;
+            double w = query.value(4).toDouble();
+            double h = query.value(5).toDouble();
+            myPolygon << QPointF(-w/2, h/2) << QPointF(w/2, h/2)
+                    << QPointF(w/2,-h/2) << QPointF(-w/2, -h/2)
+                    << QPointF(-w/2, h/2);
+            top->setPolygon(myPolygon);
         }
 
         if (query.value(0).toString() == "A"){
             QString nodes = query.value(9).toString();
             QStringList list = nodes.split(" ");
-            TTop *startTop = NULL;
-            TTop *endTop = NULL;
+            QTop *startTop = NULL;
+            QTop *endTop = NULL;
             for (int i = 0; i < scene->items().count(); i++){
-                if (scene->items().at(i)->type() == TTop::Type){
-                    int checkValue = ((TTop *)qgraphicsitem_cast<TTop* >(scene->items().at(i)))->number;
-                    if (((TTop *)qgraphicsitem_cast<TTop* >(scene->items().at(i)))->number == query.value(11).toInt()){
-                        startTop = qgraphicsitem_cast<TTop* >(scene->items().at(i));
+                if (scene->items().at(i)->type() == QTop::Type){
+                    int checkValue = ((QTop *)qgraphicsitem_cast<QTop* >(scene->items().at(i)))->number;
+                    if (((QTop *)qgraphicsitem_cast<QTop* >(scene->items().at(i)))->number == query.value(11).toInt()){
+                        startTop = qgraphicsitem_cast<QTop* >(scene->items().at(i));
                     }
-                    if (((TTop *)qgraphicsitem_cast<TTop* >(scene->items().at(i)))->number == query.value(12).toInt()){
-                        endTop = qgraphicsitem_cast<TTop* >(scene->items().at(i));
+                    if (((QTop *)qgraphicsitem_cast<QTop* >(scene->items().at(i)))->number == query.value(12).toInt()){
+                        endTop = qgraphicsitem_cast<QTop* >(scene->items().at(i));
                     }
                 }
             }
-            TArc *arc = new TArc(startTop, endTop, arcMenu, NULL, scene);
+            QArc *arc = new QArc(startTop, endTop, arcMenu, NULL, scene);
             int i = 0;
             while(i < list.count() - 3){
                 QPointF startPoint = QPointF(list.at(i).toFloat(), list.at(i+1).toFloat());
@@ -85,6 +103,7 @@ void DataBaseManager::getGraph(QString projectName, QDiagramScene* scene, QMenu*
             arc->currentLine = NULL;
             startTop->addArc(arc);
             endTop->addArc(arc);
+            arc->setPriority(query.value(10).toInt());
         }
 
         if (query.value(0).toString() == "C"){
@@ -133,8 +152,8 @@ void DataBaseManager::saveGraph(QString projectName, QString extName, QGraph *gr
 
     QString namepr = query.value(0).toString();
 
-    QList<TTop*> topList = graph->topList;
-    QList<TArc*> arcList = graph->arcList;
+    QList<QTop*> topList = graph->topList;
+    QList<QArc*> arcList = graph->arcList;
     QList<TComment*> commentList = graph->commentList;
 
     for (int i = 0; i < topList.count(); i++)
@@ -273,24 +292,25 @@ int DataBaseManager::getVariableList(QList<Variable*>& varList){
 
 int DataBaseManager::saveActorList(QList<Actor *> &actorList)
 {
-return 0;
+    actorListProxy.clear();
+    actorListProxy.append(actorList);
 }
 
 int DataBaseManager::getActorList(QList<Actor *> &actorList)
 {
-return 0;
+    actorList = actorListProxy;
+    return 0;
 }
 
 int DataBaseManager::savePredicateList(QList<Predicate *> &predList)
 {
-return 0;
+    predListProxy.clear();
+    predListProxy.append(predList);
+    return 0;
 }
 
 int DataBaseManager::getPredicateList(QList<Predicate *> &predList)
 {
-    QList<Predicate *> myPredList;
-    myPredList.append(new Predicate("1", "1", Predicate::inlineType));
-    myPredList.append(new Predicate("Pred1", "Сложный предикат 1", Predicate::normalType));
-    myPredList.append(new Predicate("Pred2", "Сложный предикат 2", Predicate::normalType));
-return 0;
+    predList = predListProxy;
+    return 0;
 }

@@ -13,8 +13,8 @@ Q_OBJECT
 public:
     explicit QGraph(QObject *parent = 0);
 
-    QList<TTop* >     topList;
-    QList<TArc* >     arcList;
+    QList<QTop* >     topList;
+    QList<QArc* >     arcList;
     QList<TComment* > commentList;
     QList<QSyncArc* > syncArcList;
 };

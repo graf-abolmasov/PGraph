@@ -6,6 +6,7 @@
 #include "qdiagramitem.h"
 #include "qarcline.h"
 #include "qserialarctop.h"
+#include "predicate.h"
 
 #define ARC_TYPE      UserType+4
 #define UP	0x80
@@ -13,11 +14,11 @@
 #define DOWN	0x08
 #define RIGHT	0x02
 
-class TTop;
+class QTop;
 class QArcLine;
 class QSerialArcTop;
 
-class TArc : public QGraphicsLineItem
+class QArc : public QGraphicsLineItem
 {
     friend class QDiagramScene;
 public:
@@ -26,9 +27,9 @@ public:
 
     QList<QArcLine *> lines;
     QArcLine* currentLine;
-    TArc(TTop *startItem, TTop *endItem, QMenu *contextMenu,
+    QArc(QTop *startItem, QTop *endItem, QMenu *contextMenu,
       QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
-    ~TArc();
+    ~QArc();
     bool addLine(QArcLine *line);
     QArcLine* newLine(QPointF p1, QPointF p2);
     QRectF boundingRect() const;
@@ -38,14 +39,14 @@ public:
     int type() const
         { return Type; }
     int priority()
-        { return width; }
-    void setStartTop(TTop* startTop)
+        { return myPriority; }
+    void setStartTop(QTop* startTop)
         { myStartTop = startTop; }
-    void setEndTop(TTop* endTop)
+    void setEndTop(QTop* endTop)
         { myEndTop = endTop; }
-    TTop *startItem() const
+    QTop *startItem() const
         { return myStartTop; }
-    TTop *endItem() const
+    QTop *endItem() const
         { return myEndTop; }
     ArcType arcType() const
         { return myArcType; }
@@ -61,15 +62,16 @@ protected:
                QWidget *widget = 0);
 
 private:
-    TTop *myStartTop;
-    TTop *myEndTop;
+    QTop *myStartTop;
+    QTop *myEndTop;
     ArcType myArcType;
     QGraphicsItem *arcTop;
     QPolygonF arcHead;
     QMenu *myContextMenu;
-    int width;  //приоритет
-    bool autoBuild(TTop* top, float dx, float dy);
-    bool remake(TTop *, float dx, float dy);
+    int myPriority;  //приоритет
+    bool autoBuild(QTop* top, float dx, float dy);
+    bool remake(QTop *, float dx, float dy);
+    Predicate* predicate;
 };
 
 #endif

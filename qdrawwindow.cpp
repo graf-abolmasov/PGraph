@@ -23,8 +23,8 @@ TDrawWindow::TDrawWindow()
     scene->setMultiProcTopMenu(multiProcMenu);
     scene->setBackgroundBrush(QBrush(Qt::white));
     scene->setSceneRect(-800, -600, 800, 600);
-    connect(scene, SIGNAL(itemInserted(TTop *)),
-            this, SLOT(itemInserted(TTop *)));
+    connect(scene, SIGNAL(itemInserted(QTop *)),
+            this, SLOT(itemInserted(QTop *)));
     connect(scene, SIGNAL(itemSelected(QGraphicsItem *)),
         this, SLOT(itemSelected(QGraphicsItem *)));  
     connect(scene, SIGNAL(textInserted(TComment *)),
@@ -96,9 +96,9 @@ void TDrawWindow::createActions()
 void TDrawWindow::deleteItem()
 {
     foreach (QGraphicsItem *item, scene->selectedItems()) {
-        if (item->type() == TTop::Type) {
-            qgraphicsitem_cast<TTop *>(item)->removeArcs();
-            qgraphicsitem_cast<TTop *>(item)->removeSyncs();
+        if (item->type() == QTop::Type) {
+            qgraphicsitem_cast<QTop *>(item)->removeArcs();
+            qgraphicsitem_cast<QTop *>(item)->removeSyncs();
         }
         scene->removeItem(item);
     }
@@ -109,7 +109,7 @@ void TDrawWindow::deleteArc()
 {
     foreach (QGraphicsItem *item, scene->selectedItems()) {
         if (item->type() ==  QSerialArcTop::Type) {
-            TArc *arc = qgraphicsitem_cast<TArc *>(item->parentItem());
+            QArc *arc = qgraphicsitem_cast<QArc *>(item->parentItem());
             arc->startItem()->removeArc(arc);
             arc->endItem()->removeArc(arc);
             scene->removeItem(item);
@@ -149,7 +149,7 @@ void TDrawWindow::deleteComment()
     emit sceneChanged();
 }
 
-void TDrawWindow::itemInserted(TTop *item)
+void TDrawWindow::itemInserted(QTop *item)
 {
     //setMode(QDiagramScene::MoveItem);
     emit sceneChanged();
@@ -181,15 +181,15 @@ void TDrawWindow::setMode(QDiagramScene::Mode mode)
 void TDrawWindow::setItemIcon()
 {
     QString fileName = QFileDialog::getOpenFileName(0,
-                                                    tr("Сохранить как..."),
+                                                    tr("Открыть картинку..."),
                                                     "",
                                                     tr("All Files (*)"));
     foreach (QGraphicsItem *item, scene->selectedItems()) {
-        if (item->type() == TTop::Type) {
+        if (item->type() == QTop::Type) {
             if (!fileName.isEmpty()){
                 QImage img(fileName);
                 if (!img.isNull()){
-                    qgraphicsitem_cast<TTop *>(item)->setIcon(img);
+                    qgraphicsitem_cast<QTop *>(item)->setIcon(img);
                     scene->invalidate(item->mapRectToScene(item->boundingRect()));
                 }
             }
@@ -204,16 +204,10 @@ void TDrawWindow::setItemIcon()
 */
 void TDrawWindow::showTopPropDialog(){
     TopPropertyDialog dlg;
-    TTop* top = qgraphicsitem_cast<TTop *>(scene->selectedItems().first());
+    QTop* top = qgraphicsitem_cast<QTop *>(scene->selectedItems().first());
     dlg.prepareForm(top);
     if (dlg.exec()){
-        QPolygonF myPolygon;
-        int w = dlg.getWidth();
-        int h = dlg.getHeight();
-        myPolygon << QPointF(-w/2, h/2) << QPointF(w/2, h/2)
-                << QPointF(w/2,-h/2) << QPointF(-w/2, -h/2)
-                << QPointF(-w/2, h/2);
-        top->setPolygon(myPolygon);
+        top = dlg.getResult();
     }
 }
 
@@ -240,7 +234,7 @@ void TDrawWindow::saveAsImage(QString filename)
 void TDrawWindow::showArcPropDialog()
 {
     ArcPropertyDialog dlg;
-    TArc* arc = qgraphicsitem_cast<TArc *>(scene->selectedItems().first()->parentItem());
+    QArc* arc = qgraphicsitem_cast<QArc *>(scene->selectedItems().first()->parentItem());
     dlg.prepareForm(arc);
     if (dlg.exec()){
         dlg.getResult();
@@ -251,17 +245,17 @@ void TDrawWindow::showArcPropDialog()
   Реакция на нажатие пункта меню: Сделать корневой
 */
 void TDrawWindow::makeAsRoot(){
-    scene->setRootTop(qgraphicsitem_cast<TTop* >(scene->selectedItems().first()));
+    scene->setRootTop(qgraphicsitem_cast<QTop* >(scene->selectedItems().first()));
 }
 
 /*!
   Возвращает список всех вершиен лежащих на сцене
 */
-QList<TTop* > TDrawWindow::allTops(){
-    QList<TTop* > topList;
+QList<QTop* > TDrawWindow::allTops(){
+    QList<QTop* > topList;
     for (int i = 0; i < scene->items().count(); i++){
-        if (scene->items().at(i)->type() == TTop::Type){
-            topList.append(qgraphicsitem_cast<TTop* >(scene->items().at(i)));
+        if (scene->items().at(i)->type() == QTop::Type){
+            topList.append(qgraphicsitem_cast<QTop* >(scene->items().at(i)));
         }
     }
     return topList;
@@ -270,11 +264,11 @@ QList<TTop* > TDrawWindow::allTops(){
 /*!
   Возвращает список всех дуг лежащих на сцене
 */
-QList<TArc* > TDrawWindow::allArcs(){
-    QList<TArc* > arcList;
+QList<QArc* > TDrawWindow::allArcs(){
+    QList<QArc* > arcList;
     for (int i = 0; i < scene->items().count(); i++){
-        if (scene->items().at(i)->type() == TArc::Type){
-            arcList.append(qgraphicsitem_cast<TArc* >(scene->items().at(i)));
+        if (scene->items().at(i)->type() == QArc::Type){
+            arcList.append(qgraphicsitem_cast<QArc* >(scene->items().at(i)));
         }
     }
     return arcList;

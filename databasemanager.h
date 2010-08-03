@@ -15,11 +15,15 @@
 #include "variable.h"
 #include "actor.h"
 #include "predicate.h"
+#include <QList>
 
 class DataBaseManager
 {
 private:
     QSqlDatabase db;
+    QList<Variable*> varListProxy;
+    QList<Actor*> actorListProxy;
+    QList<Predicate*> predListProxy;
 public:
     DataBaseManager();
     void getGraph(QString projectName, QDiagramScene* scene, QMenu* arcMenu, QMenu* topMenu, QMenu* syncArcMenu);

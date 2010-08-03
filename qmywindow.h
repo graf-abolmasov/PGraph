@@ -20,7 +20,7 @@ private:
     QMenu *objectMenu;
     QMenu *buildMenu;
 
-    QStatusBar *myStatusBar;
+
 
     QAction *newGraphAct;
     QAction *openGraphAct;
@@ -110,5 +110,7 @@ private slots:
     void addComment();
     void pointerGroupClicked(int id);  //Действие при выборе стрелки или линии
 };
+
+    extern QStatusBar *globalStatusBar;
 
 #endif // QMYWINDOW_H

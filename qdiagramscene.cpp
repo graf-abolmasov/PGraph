@@ -1,5 +1,6 @@
 #include <QtGui>
 #include "qdiagramscene.h"
+#include "qmywindow.h"
 
 QDiagramScene::QDiagramScene(QObject *parent)
     : QGraphicsScene(parent)
@@ -38,7 +39,7 @@ void QDiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
     QGraphicsItem* item;
     switch (myMode) {
     case InsertItem:
-        item = new TTop(myTopMenu);
+        item = new QTop(myTopMenu);
         addItem(item);
         item->setPos(mouseEvent->scenePos());
         emit itemInserted(item);
@@ -46,7 +47,7 @@ void QDiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
     case InsertLine:
         if (newArc == NULL)
-            newArc = new TArc(NULL, NULL, myArcMenu, 0, this);
+            newArc = new QArc(NULL, NULL, myArcMenu, 0, this);
         line = newArc->newLine(mouseEvent->scenePos(), mouseEvent->scenePos());
         break;
 
@@ -113,7 +114,7 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
     else if ((myMode == MoveItem) && (mouseEvent->buttons() == Qt::LeftButton) &&
              (selectedItems().count() == 1) && (selectedItems().first()->type() == QArcLine::Type)) {
         QArcLine *selectedLine = qgraphicsitem_cast<QArcLine *>(selectedItems().first());
-        TArc *arc = qgraphicsitem_cast<TArc *>(selectedLine->parentItem());
+        QArc *arc = qgraphicsitem_cast<QArc *>(selectedLine->parentItem());
 
         QLineF vector(mouseEvent->lastScenePos(), mouseEvent->scenePos());
         float dx = vector.dx();
@@ -192,9 +193,9 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
     }
     //режим перетаскивания вершины
     else if ((myMode == MoveItem) && (mouseEvent->buttons() == Qt::LeftButton) &&
-             (selectedItems().count() == 1) && (selectedItems().first()->type() == TTop::Type) &&
+             (selectedItems().count() == 1) && (selectedItems().first()->type() == QTop::Type) &&
              (selectedItems().first()->contains(selectedItems().first()->mapFromScene(mouseEvent->lastScenePos())))) {
-        TTop *top = qgraphicsitem_cast<TTop *>(selectedItems().first());
+        QTop *top = qgraphicsitem_cast<QTop *>(selectedItems().first());
         QPointF old_pos = mouseEvent->lastScenePos();
         QPointF new_pos = mouseEvent->scenePos();
 
@@ -207,7 +208,7 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
         QList<QGraphicsItem* > itemList = collidingItems(top, Qt::IntersectsItemBoundingRect);
         foreach(QGraphicsItem* item, itemList){
-            if (item->type() == TTop::Type){
+            if (item->type() == QTop::Type){
                 top->setX(top->x() - dx);
                 top->setY(top->y() - dy);
                 mouseEvent->ignore();
@@ -217,18 +218,18 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
         bool isOK = false; //false - если дугу надо полностью переделать
 
-        QList<TArc *> brokenLines; //список содержит дуги, нуждающиеся в полной переделке
-        foreach (TArc *arc, top->allArcs()){
+        QList<QArc *> brokenLines; //список содержит дуги, нуждающиеся в полной переделке
+        foreach (QArc *arc, top->allArcs()){
            isOK = arc->remake(top, dx, dy);
            if (!isOK)
                brokenLines.append(arc);
         }
 
-        foreach (TArc *arc, brokenLines)
+        foreach (QArc *arc, brokenLines)
             arc->autoBuild(top, dx, dy);
 
         //необходимо для правильной перерисовки.
-        foreach (TArc *arc, top->allArcs())
+        foreach (QArc *arc, top->allArcs())
             arc->updateBounds();
 
     }
@@ -257,10 +258,10 @@ void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
         //дуга должна начинаться с вершины!
         if (newArc->startItem() == NULL){
             QList<QGraphicsItem *> startItems = items(line->line().p1());
-            while (startItems.count() > 0 && startItems.first()->type() != TTop::Type)
+            while (startItems.count() > 0 && startItems.first()->type() != QTop::Type)
                 startItems.removeFirst();
-            if ((startItems.count() > 0) && (startItems.first()->type() == TTop::Type)) {
-                TTop *startItem = qgraphicsitem_cast<TTop *>(startItems.first());
+            if ((startItems.count() > 0) && (startItems.first()->type() == QTop::Type)) {
+                QTop *startItem = qgraphicsitem_cast<QTop *>(startItems.first());
                 newArc->setStartTop(startItem);
                 newArc->addLine(line);
             } else {
@@ -274,10 +275,10 @@ void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
         //дуга должна заканчиваться вершиной
         if ((newArc != NULL) && (newArc->endItem() == NULL) && (newArc->prevLine() != NULL)){
             QList<QGraphicsItem *> endItems = items(line->line().p2());
-            while (endItems.count() > 0 && endItems.first()->type() != TTop::Type)
+            while (endItems.count() > 0 && endItems.first()->type() != QTop::Type)
                 endItems.removeFirst();
-            if ((endItems.count() > 0) && (endItems.first()->type() == TTop::Type)){
-                TTop *endItem = qgraphicsitem_cast<TTop *>(endItems.first());
+            if ((endItems.count() > 0) && (endItems.first()->type() == QTop::Type)){
+                QTop *endItem = qgraphicsitem_cast<QTop *>(endItems.first());
                 newArc->setEndTop(endItem);              
                 newArc->addLine(line);
             }
@@ -292,7 +293,7 @@ void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
         //условие выполнится когда у дуги будет начало и конец!
         if ((newArc != NULL) && (newArc->endItem() != NULL) && (newArc->startItem() != NULL)){
-            foreach(TArc *arc, newArc->startItem()->outArcs()){
+            foreach(QArc *arc, newArc->startItem()->outArcs()){
                 arc->setPriority(arc->priority() + 1);
             }
             newArc->startItem()->addArc(newArc);
@@ -312,13 +313,13 @@ void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
             endItems.removeFirst();
 
         if (startItems.count() > 0 && endItems.count() > 0 &&
-            startItems.first()->type() == TTop::Type &&
-            endItems.first()->type() == TTop::Type &&
+            startItems.first()->type() == QTop::Type &&
+            endItems.first()->type() == QTop::Type &&
             startItems.first() != endItems.first()) {
-            TTop *startItem =
-                qgraphicsitem_cast<TTop *>(startItems.first());
-            TTop *endItem =
-                qgraphicsitem_cast<TTop *>(endItems.first());
+            QTop *startItem =
+                qgraphicsitem_cast<QTop *>(startItems.first());
+            QTop *endItem =
+                qgraphicsitem_cast<QTop *>(endItems.first());
             QSyncArc *arrow = new QSyncArc(startItem, endItem, mySyncArcMenu);
             arrow->setLine(line->line());
             startItem->addSync(arrow);
@@ -330,6 +331,72 @@ void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
         removeItem(line);
         delete line;
         line = 0;
+    }
+
+    //пишем информация в статус бар
+    if (selectedItems().count() == 1) {
+        QArc *arc;
+        QTop *top;
+        QMultiProcTop *multiTop;
+        QSyncArc *syncArc;
+        QString status = tr("");
+        QString arcTypeStr;
+        switch (selectedItems().first()->type()) {
+        case (QArcLine::Type):
+        case (QSerialArcTop::Type):
+            arc = qgraphicsitem_cast<QArc*>(selectedItems().first()->parentItem());
+            switch (arc->arcType()) {
+            case QArc::SerialArc:
+                arcTypeStr = tr("последовательная");
+                break;
+            case QArc::ParallelArc:
+                arcTypeStr = tr("параллельная");
+                break;
+            case QArc::TerminateArc:
+                arcTypeStr = tr("терминирующая");
+                break;
+            }
+            status.append(tr("Дуга ") + arcTypeStr);
+            if (arc->startItem() != NULL)
+                status.append(tr(" Начальная вершина ") + QString::number(arc->startItem()->number));
+            if (arc->endItem() != NULL)
+                status.append(tr(" Конечная вершина ") + QString::number(arc->endItem()->number));
+            status.append(tr(" Приоритет ") + QString::number(arc->priority()));
+            if (arc->predicate != NULL)
+                status.append(tr("Предикат ") + arc->predicate->name);
+            break;
+        case QArc::Type:
+            arc = qgraphicsitem_cast<QArc*>(selectedItems().first());
+            switch (arc->arcType()) {
+            case QArc::SerialArc:
+                arcTypeStr = tr("последовательная");
+                break;
+            case QArc::ParallelArc:
+                arcTypeStr = tr("параллельная");
+                break;
+            case QArc::TerminateArc:
+                arcTypeStr = tr("терминирующая");
+                break;
+            }
+            status.append(tr("Дуга ") + arcTypeStr +
+                          tr(" Начальная вершина ") + QString::number(arc->startItem()->number) +
+                          tr(" Конечная вершина ") + QString::number(arc->endItem()->number) +
+                          tr(" Приоритет ") + QString::number(arc->priority()));
+            if (arc->predicate != NULL)
+                status.append(tr(" Предикат ") + arc->predicate->name);
+            break;
+        case QTop::Type:
+            top = qgraphicsitem_cast<QTop*>(selectedItems().first());
+            status.append(tr("Номер вершины ") + QString::number(top->number));
+            if (top->actor != NULL)
+                status.append(tr(" Актор ") + top->actor->extName);
+            break;
+        case QMultiProcTop::Type:
+            break;
+        case QSyncArc::Type:
+            break;
+        }
+        globalStatusBar->showMessage(status);
     }
 
     QGraphicsScene::mouseReleaseEvent(mouseEvent);
@@ -385,7 +452,7 @@ void QDiagramScene::setMultiProcTopMenu(QMenu *menu)
     myMultiProcTopMenu = menu;
 }
 
-void QDiagramScene::setRootTop(TTop* top){
+void QDiagramScene::setRootTop(QTop* top){
     if (myRootTop != NULL)
         myRootTop->setAsRoot(false);
     myRootTop = top;

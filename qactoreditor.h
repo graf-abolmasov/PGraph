@@ -24,6 +24,8 @@ protected:
 private:
     Ui::QActorEditor *ui;
     void updateInterface();
+    Actor* myActor;
+    Mode myMode;
 };
 
 #endif // QActorEditor_H

@@ -18,8 +18,8 @@ class QGraphicsTextItem;
 class QColor;
 QT_END_NAMESPACE
 
-class TTop;
-class TArc;
+class QTop;
+class QArc;
 class QSyncArc;
 
 class QDiagramScene : public QGraphicsScene
@@ -35,10 +35,10 @@ public:
     void setCommentMenu(QMenu *menu);
     void setSyncArcMenu(QMenu *menu);
     void setMultiProcTopMenu(QMenu *menu);
-    void setRootTop(TTop* top);
+    void setRootTop(QTop* top);
 
     //!Указатель на корневую вершину
-    TTop* rootTop()
+    QTop* rootTop()
         { return myRootTop; }
 
 public slots:
@@ -59,10 +59,10 @@ protected:
 private:
     Mode myMode;
 
-    TTop* myRootTop;
+    QTop* myRootTop;
 
     TComment *textItem;
-    TArc *newArc;
+    QArc *newArc;
     QArcLine *line;
 
     bool isItemChange(int type);

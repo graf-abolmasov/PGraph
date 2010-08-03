@@ -15,20 +15,20 @@ QT_END_NAMESPACE
 
 #define SYNC_ARC_TYPE      UserType+7
 
-class TTop;
+class QTop;
 
 class QSyncArc : public QGraphicsLineItem
 {
 public:
     enum { Type = SYNC_ARC_TYPE };
-    QSyncArc(TTop *startItem, TTop *endItem, QMenu *contextMenu, QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
+    QSyncArc(QTop *startItem, QTop *endItem, QMenu *contextMenu, QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
     QRectF boundingRect() const;
     QPainterPath shape() const;
     int type() const
         { return Type;}
-    TTop* startItem() const
+    QTop* startItem() const
         { return myStartItem; }
-    TTop* endItem() const
+    QTop* endItem() const
         { return myEndItem; }
 
 protected:
@@ -40,8 +40,8 @@ public slots:
     void updatePosition();
 
 private:
-    TTop* myStartItem;
-    TTop* myEndItem;
+    QTop* myStartItem;
+    QTop* myEndItem;
     QPolygonF arrowHead;
     QColor myColor;
     QMenu *myContextMenu;

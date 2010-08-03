@@ -24,7 +24,7 @@ QRectF QParallelArcTop::boundingRect() const {
 
 QVariant QParallelArcTop::itemChange(GraphicsItemChange change, const QVariant &value){
     if (change == QGraphicsItem::ItemSelectedHasChanged) {
-        TArc* arc = qgraphicsitem_cast<TArc* >(parentItem());
+        QArc* arc = qgraphicsitem_cast<QArc* >(parentItem());
         QPen pen = arc->pen();
         if (isSelected())
             pen.setColor(Qt::green);
