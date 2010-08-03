@@ -14,7 +14,7 @@ class QObjectEditor : public QDialog {
     Q_OBJECT
 public:
     explicit QObjectEditor(QWidget *parent = 0);
-    bool prepareForm();
+    void prepareForm();
     ~QObjectEditor();
 
 protected:

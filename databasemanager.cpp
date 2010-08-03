@@ -243,9 +243,6 @@ void DataBaseManager::saveGraph(QString projectName, QString extName, QGraph *gr
     db.close();
 }
 
-/*!
-    TODO: Заглушка! Сделать настоящую работу с базой.
-*/
 int DataBaseManager::saveDataTypeList(QList<DataType*>& typeList){
     bool ok = db.open();
     QSqlQuery query;
@@ -260,6 +257,7 @@ int DataBaseManager::saveDataTypeList(QList<DataType*>& typeList){
         query.exec();
         query.clear();
     }
+    db.close();
     return db.lastError().number();
 }
 
@@ -272,22 +270,41 @@ int DataBaseManager::getDataTypeList(QList<DataType*>& typeList){
     while (query.next()){
         typeList.append(new DataType(query.value(1).toString(), query.value(2).toString()));
     }
+    db.close();
     return db.lastError().number();
 }
 
 int DataBaseManager::saveVariableList(QList<Variable*>& varList){
+    bool ok = db.open();
+    QSqlQuery query;
+    query.prepare("DELETE FROM DATA;");
+    query.exec();
+    for (int i = 0; i < varList.count(); i++){
+        query.prepare("INSERT INTO DATA (PROJECT_ID, DATA, TYPE, INIT, COMMENT)"
+                      "VALUES (:PROJECT_ID, :DATA, :TYPE, :INIT, :COMMENT);");
+        query.bindValue(":PROJECT_ID", 1);
+        query.bindValue(":DATA", varList.at(i)->name);
+        query.bindValue(":TYPE", varList.at(i)->type);
+        query.bindValue(":INIT", varList.at(i)->initValue.toString());
+        query.bindValue(":COMMENT", varList.at(i)->description);
+        query.exec();
+        query.clear();
+    }
+    db.close();
+    return db.lastError().number();
     return 0;
 }
 
 int DataBaseManager::getVariableList(QList<Variable*>& varList){
-    QList<Variable*> myVarList;
-    QList<DataType* > myTypeList;
-    getDataTypeList(myTypeList);
-    myVarList.append(new Variable("A", myTypeList.at(0), 10, "Переменная А"));
-    myVarList.append(new Variable("B", myTypeList.at(1), 10000, "Переменная B"));
-    myVarList.append(new Variable("C", myTypeList.at(2), "строка", "Переменная C"));
-    varList = myVarList;
-    return 0;
+    bool ok = db.open();
+    QSqlQuery query;
+    query.prepare("SELECT DATA, TYPE, INIT, COMMENT FROM DATA;");
+    query.exec();
+    while (query.next()){
+        varList.append(new Variable(query.value(0).toString(),query.value(1).toString(),query.value(2).toString(),query.value(3).toString()));
+    }
+    db.close();
+    return db.lastError().number();
 }
 
 int DataBaseManager::saveActorList(QList<Actor *> &actorList)

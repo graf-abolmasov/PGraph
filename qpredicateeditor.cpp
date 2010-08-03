@@ -29,6 +29,7 @@ QPredicateEditor::QPredicateEditor(Mode mode, QWidget *parent) :
         ui->normalWidget->setVisible(false);
         break;
     }
+    myMode = mode;
 }
 
 void QPredicateEditor::changeEvent(QEvent *e)
@@ -41,4 +42,34 @@ void QPredicateEditor::changeEvent(QEvent *e)
     default:
         break;
     }
+}
+
+void QPredicateEditor::prepareForm(Predicate *pred)
+{
+    if (pred == NULL)
+        myPredicate = new Predicate("", "", myMode == Normal ? Predicate::normalType : Predicate::inlineType);
+    else
+        myPredicate = pred;
+    //заполняем форму
+    switch(myMode){
+    case Normal:
+        ui->predicateNameEdt->setText(myPredicate->extName);
+        break;
+    case Inline:
+        ui->ipredicateNameEdt->setText(myPredicate->extName);
+        break;
+    }
+}
+
+Predicate* QPredicateEditor::getResult()
+{
+    switch(myMode){
+    case Normal:
+        myPredicate->extName = ui->predicateNameEdt->text();
+        break;
+    case Inline:
+        myPredicate->extName = ui->ipredicateNameEdt->text();
+        break;
+    }
+    return myPredicate;
 }

@@ -21,10 +21,11 @@ protected:
 
 private:
     Ui::QVariableDialog *ui;
-    QList<Variable*> varList;
+    QList<Variable*> myVariableList;
 
 
 private slots:
+    void on_buttonBox_accepted();
     void on_variablesTable_doubleClicked(QModelIndex index);
     void on_deleteButton_clicked();
     void on_editButton_clicked();
