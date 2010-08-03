@@ -22,7 +22,7 @@ int dvec2log(float dx, float dy){
 /*!
   Упрощенный алгоритм перестройки дуги
 */
-bool TArc::autoBuild(TTop* top, float dx, float dy){
+bool QArc::autoBuild(QTop* top, float dx, float dy){
     QPointF startPoint;
     QPointF endPoint;
     if (top == startItem()){
@@ -125,7 +125,7 @@ bool TArc::autoBuild(TTop* top, float dx, float dy){
   @param dx - перемещение по X
   @param dy - перемещение по Y
 */
-bool TArc::remake(TTop* aMovedTop, float dx, float dy){
+bool QArc::remake(QTop* aMovedTop, float dx, float dy){
     bool result = true;
 
     int mx, my, j;
@@ -404,12 +404,6 @@ bool TArc::remake(TTop* aMovedTop, float dx, float dy){
     return false;
 }
 
-void TArc::setPen(const QPen &pen){
-    foreach (QArcLine* arcLine, lines)
-        arcLine->setPen(pen);
-    QGraphicsLineItem::setPen(pen);
-}
-
 /*!
   Конструктор
   @param startItem - указатель на начальную вершину. м.б. NULL
@@ -417,7 +411,7 @@ void TArc::setPen(const QPen &pen){
   @param parent - родительский объект. (всегда NULL)
   @param scene - указатель на контейнер (сцену)
 */
-TArc::TArc(TTop *startItem, TTop *endItem, QMenu *contextMenu,
+QArc::QArc(QTop *startItem, QTop *endItem, QMenu *contextMenu,
          QGraphicsItem *parent, QGraphicsScene *scene)
     : QGraphicsLineItem(parent, scene){
     myStartTop = startItem;
@@ -425,12 +419,13 @@ TArc::TArc(TTop *startItem, TTop *endItem, QMenu *contextMenu,
     myContextMenu = contextMenu;
     setPen(QPen(Qt::black, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
     arcTop = new QSerialArcTop(contextMenu, this, scene);
-    width = 2;
+    myPriority = 1;
     currentLine = NULL;
     arcTop->hide();
+    predicate = NULL;
 }
 
-TArc::~TArc(){
+QArc::~QArc(){
     foreach (QGraphicsLineItem *line, lines){
        delete line;
     }
@@ -439,8 +434,8 @@ TArc::~TArc(){
 /*!
   Возвращает прямоугольник включающий все отрезки дуги. необходимо для правильной отрисовки.
 */
-QRectF TArc::boundingRect() const{
-    qreal extra = width*(pen().width() + 20) / 2.0;
+QRectF QArc::boundingRect() const{
+    qreal extra = (myPriority + 1)*(pen().width() + 20) / 2.0;
     QRectF rect;
     foreach (QArcLine* line, lines){
         rect = rect.united(line->boundingRect());
@@ -451,7 +446,7 @@ QRectF TArc::boundingRect() const{
 /*!
   Работает не правильно.
 */
-QPainterPath TArc::shape() const{
+QPainterPath QArc::shape() const{
     QPainterPath path;
     path.addPolygon(arcHead);
     foreach (QArcLine *line, lines){
@@ -462,7 +457,7 @@ QPainterPath TArc::shape() const{
     return path;
 }
 
-void TArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *){
+void QArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *){
     if (lines.count() == 0) return;
 
     if ((myStartTop == NULL) || (myEndTop == NULL)) {
@@ -485,6 +480,7 @@ void TArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
         float koeff2 = QLineF(lines.last()->line().p2(), intersectPoint).length(); //ЫЫЫ =)
         QPointF t = lines.last()->line().p2() - QPointF(cos(lines.last()->line().angle() * Pi / 180) * koeff2, -sin(lines.last()->line().angle() * Pi / 180) * koeff2);
         double angle = ((myEndTop->getIntersectBound(lines.last()->line()).normalVector().angle()) + 180) * Pi / 180;
+        int width = myPriority + 1;
         QPointF arcP1 = t + QPointF(sin(angle + Pi / 3) * 3*width,
                                               cos(angle + Pi / 3) * 3*width);
         QPointF arcP2 = t + QPointF(sin(angle + Pi - Pi / 3) * 3*width,
@@ -503,7 +499,7 @@ void TArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
   @param line - указатель на объект типа QArcLine
   @return true если добавилось
 */
-bool TArc::addLine(QArcLine *line){
+bool QArc::addLine(QArcLine *line){
     if ((prevLine() != NULL) &&
         (prevLine()->line().p2() == line->line().p1()) &&
         (prevLine() != line) &&
@@ -524,7 +520,7 @@ bool TArc::addLine(QArcLine *line){
   @param p2 - конечная точка
   @return указатель на объект типа QArcLine
 */
-QArcLine* TArc::newLine(QPointF p1, QPointF p2){
+QArcLine* QArc::newLine(QPointF p1, QPointF p2){
     if (currentLine == NULL)
         currentLine = new QArcLine(QLineF(p1, p2), this, scene());
     else {
@@ -541,7 +537,7 @@ QArcLine* TArc::newLine(QPointF p1, QPointF p2){
 /*!
   Обновляет границы. Необходимо вызываеть после изменения размеров, перемещения и т.д.
 */
-void TArc::updateBounds(){
+void QArc::updateBounds(){
     if (lines.count() > 0)
         setLine(QLineF(lines.first()->line().p1(), lines.last()->line().p2()));
 }
@@ -550,25 +546,31 @@ void TArc::updateBounds(){
   Установка приоритета
   @param w - приоритет
 */
-void TArc::setPriority(int w){
-    /*width = w;
+void QArc::setPriority(int w){
+    myPriority = w;
     QPen old_pen = pen();
-    old_pen.setWidth(w);
-    setPen(old_pen);*/
+    old_pen.setWidth(myPriority + 1);
+    setPen(old_pen);
 }
 
-void TArc::setArcType(ArcType type)
+void QArc::setPen(const QPen &pen){
+    foreach (QArcLine* arcLine, lines)
+        arcLine->setPen(pen);
+    QGraphicsLineItem::setPen(pen);
+}
+
+void QArc::setArcType(ArcType type)
 {
     myArcType = type;
     delete arcTop;
     switch (arcType()) {
-    case TArc::SerialArc:
+    case QArc::SerialArc:
         arcTop = new QSerialArcTop(myContextMenu, this, scene());
         break;
-    case TArc::ParallelArc:
+    case QArc::ParallelArc:
         arcTop = new QParallelArcTop(myContextMenu, this, scene());
         break;
-    case TArc::TerminateArc:
+    case QArc::TerminateArc:
         arcTop = new QTerminateArcTop(myContextMenu, this, scene());
         break;
     }

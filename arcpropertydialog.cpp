@@ -27,18 +27,18 @@ void ArcPropertyDialog::changeEvent(QEvent *e)
     }
 }
 
-void ArcPropertyDialog::prepareForm(TArc *arc)
+void ArcPropertyDialog::prepareForm(QArc *arc)
 {
     if (arc == NULL) return;
     myArc = arc;
     switch (arc->arcType()) {
-    case TArc::SerialArc:
+    case QArc::SerialArc:
         ui->serialRadioBtn->setChecked(true);
         break;
-    case TArc::ParallelArc:
+    case QArc::ParallelArc:
         ui->parallelRadioBtn->setChecked(true);
         break;
-    case TArc::TerminateArc:
+    case QArc::TerminateArc:
         ui->terminateRadioBtn->setChecked(true);
         break;
     }
@@ -49,11 +49,11 @@ void ArcPropertyDialog::prepareForm(TArc *arc)
 
 }
 
-TArc* ArcPropertyDialog::getResult()
+QArc* ArcPropertyDialog::getResult()
 {
-    if (ui->serialRadioBtn->isChecked()) myArc->setArcType(TArc::SerialArc);
-    if (ui->parallelRadioBtn->isChecked()) myArc->setArcType(TArc::ParallelArc);
-    if (ui->terminateRadioBtn->isChecked()) myArc->setArcType(TArc::TerminateArc);
+    if (ui->serialRadioBtn->isChecked()) myArc->setArcType(QArc::SerialArc);
+    if (ui->parallelRadioBtn->isChecked()) myArc->setArcType(QArc::ParallelArc);
+    if (ui->terminateRadioBtn->isChecked()) myArc->setArcType(QArc::TerminateArc);
     myArc->setPriority(ui->prioritySpnBox->value());
     return myArc;
 }

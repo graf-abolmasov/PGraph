@@ -1,10 +1,11 @@
+#include <QtCore>
 #include <QtGui>
 
 #include "qdiagramitem.h"
 
-int TTop::counter = 0;
+int QTop::counter = 0;
 
-TTop::TTop(QMenu *contextMenu,
+QTop::QTop(QMenu *contextMenu,
              QGraphicsItem *parent, QGraphicsScene *scene)
     : QGraphicsPolygonItem(parent, scene)
 {
@@ -24,9 +25,12 @@ TTop::TTop(QMenu *contextMenu,
     setFlag(QGraphicsItem::ItemIsSelectable, true);
     setAsRoot(false);
     number = counter++;
+
+    actor = NULL;
+
 }
 
-QRectF TTop::boundingRect() const{
+QRectF QTop::boundingRect() const{
     return QGraphicsPolygonItem::boundingRect().adjusted(-5, -5, 5, 5);
 }
 
@@ -34,7 +38,7 @@ QRectF TTop::boundingRect() const{
   Добавляет дугу синхронизации
 */
 
-void TTop::addSync(QSyncArc *arc){
+void QTop::addSync(QSyncArc *arc){
     sync.append(arc);
 }
 
@@ -42,7 +46,7 @@ void TTop::addSync(QSyncArc *arc){
   Удаляет дугу cby[hjybpfwbb. Совсем.
   @param arc - дуга
 */
-void TTop::removeSync(QSyncArc *arc){
+void QTop::removeSync(QSyncArc *arc){
     int index = sync.indexOf(arc);
     if (index != -1)
         sync.removeAt(index);
@@ -52,13 +56,13 @@ void TTop::removeSync(QSyncArc *arc){
   Удаляет дугу. Совсем.
   @param arc - дуга
 */
-void TTop::removeArc(TArc *arc){
+void QTop::removeArc(QArc *arc){
     int index = arcs.indexOf(arc);
 
     if (index != -1) {
         arcs.removeAt(index);
 
-        QList<TArc *> outArcsList = outArcs();
+        QList<QArc *> outArcsList = outArcs();
 
         if (arc->startItem() == this){
             for (int i = 0; i < outArcsList.count(); i++){
@@ -73,8 +77,8 @@ void TTop::removeArc(TArc *arc){
 /*!
   Удаляет все дуги, входящие и выходящие из вершины
 */
-void TTop::removeArcs(){
-    foreach (TArc *arc, arcs) {
+void QTop::removeArcs(){
+    foreach (QArc *arc, arcs) {
         arc->startItem()->removeArc(arc);
         arc->endItem()->removeArc(arc);
         scene()->removeItem(arc);
@@ -85,7 +89,7 @@ void TTop::removeArcs(){
 /*!
   Удаляет все дуги синхронизации, входящие и выходящие из вершины
 */
-void TTop::removeSyncs(){
+void QTop::removeSyncs(){
     foreach (QSyncArc *arc, sync) {
         arc->startItem()->removeSync(arc);
         arc->endItem()->removeSync(arc);
@@ -98,17 +102,17 @@ void TTop::removeSyncs(){
   Добавляет дугу в список дуг текущей вершины
   @param arc - дуга
 */
-void TTop::addArc(TArc *arc){
+void QTop::addArc(QArc *arc){
     arcs.append(arc);
 }
 
-void TTop::contextMenuEvent(QGraphicsSceneContextMenuEvent *event){
+void QTop::contextMenuEvent(QGraphicsSceneContextMenuEvent *event){
     scene()->clearSelection();
     setSelected(true);
     myContextMenu->exec(event->screenPos());
 }
 
-QVariant TTop::itemChange(GraphicsItemChange change, const QVariant &value){
+QVariant QTop::itemChange(GraphicsItemChange change, const QVariant &value){
     if (change == QGraphicsItem::ItemPositionChange) {
         foreach (QSyncArc *arc, sync) {
             arc->updatePosition();
@@ -118,13 +122,13 @@ QVariant TTop::itemChange(GraphicsItemChange change, const QVariant &value){
     return value;
 }
 
-float TTop::getMinWidth(){
-    QList<TArc* > arcListAtBound2 = getArcsAtBound(1);
-    QList<TArc* > arcListAtBound1 = getArcsAtBound(3);
-    QList<TArc* > arcList;
-    foreach (TArc* arc, arcListAtBound1)
+float QTop::getMinWidth(){
+    QList<QArc* > arcListAtBound2 = getArcsAtBound(1);
+    QList<QArc* > arcListAtBound1 = getArcsAtBound(3);
+    QList<QArc* > arcList;
+    foreach (QArc* arc, arcListAtBound1)
         arcList.append(arc);
-    foreach (TArc* arc, arcListAtBound2)
+    foreach (QArc* arc, arcListAtBound2)
         arcList.append(arc);
     float xMax = 0;
     float xMin = 0;
@@ -137,7 +141,7 @@ float TTop::getMinWidth(){
             xMin = arcList.first()->lines.last()->line().x1();
         }
 
-        foreach (TArc* arc, arcList){
+        foreach (QArc* arc, arcList){
             if (this == arcList.first()->startItem()){
                 if(arc->lines.first()->line().x1() > xMax)
                     xMax = arc->lines.first()->line().x1();
@@ -157,13 +161,13 @@ float TTop::getMinWidth(){
     return xMax > xMin ? xMax*2 : xMin*2;
 }
 
-float TTop::getMinHeight(){
-    QList<TArc* > arcListAtBound2 = getArcsAtBound(2);
-    QList<TArc* > arcListAtBound1 = getArcsAtBound(4);
-    QList<TArc* > arcList;
-    foreach (TArc* arc, arcListAtBound1)
+float QTop::getMinHeight(){
+    QList<QArc* > arcListAtBound2 = getArcsAtBound(2);
+    QList<QArc* > arcListAtBound1 = getArcsAtBound(4);
+    QList<QArc* > arcList;
+    foreach (QArc* arc, arcListAtBound1)
         arcList.append(arc);
-    foreach (TArc* arc, arcListAtBound2)
+    foreach (QArc* arc, arcListAtBound2)
         arcList.append(arc);
     float yMax = 0;
     float yMin = 0;
@@ -177,7 +181,7 @@ float TTop::getMinHeight(){
         }
 
 
-        foreach (TArc* arc, arcList){
+        foreach (QArc* arc, arcList){
             if (this == arcList.first()->startItem()){
                 if(arc->lines.first()->line().y1() > yMax)
                     yMax = arc->lines.first()->line().y1();
@@ -198,13 +202,13 @@ float TTop::getMinHeight(){
     return yMax > yMin ? yMax*2 : yMin*2;
 }
 
-QList<TArc *> TTop::getArcsAtBound(int i){
-    QList<TArc *> result;
+QList<QArc *> QTop::getArcsAtBound(int i){
+    QList<QArc *> result;
     QPointF p1 = polygon().at(i-1) + pos();
     QPointF p2 = polygon().at(i) + pos();
     QPointF intersectPoint;
     QLineF polyLine = QLineF(p1, p2);
-    foreach (TArc *arc, arcs) {
+    foreach (QArc *arc, arcs) {
         QLineF arcLine;
         if (arc->lines.count() == 0)
             continue;
@@ -221,10 +225,10 @@ QList<TArc *> TTop::getArcsAtBound(int i){
     return result;
 }
 
-QList<TArc *> TTop::getArcsAtBound(QLineF bound){
+QList<QArc *> QTop::getArcsAtBound(QLineF bound){
     QPointF intersectPoint;
-    QList<TArc *> result;
-    foreach (TArc *arc, arcs) {
+    QList<QArc *> result;
+    foreach (QArc *arc, arcs) {
         QLineF arcLine;
         if (arc->lines.count() == 0)
             continue;
@@ -244,7 +248,7 @@ QList<TArc *> TTop::getArcsAtBound(QLineF bound){
   Возвращает границу с которой пересекается линия
   @param line - линия
 */
-QLineF TTop::getIntersectBound(QLineF line){
+QLineF QTop::getIntersectBound(QLineF line){
     int i;
     QLineF result;
     QPointF intersectPoint;
@@ -266,27 +270,36 @@ QLineF TTop::getIntersectBound(QLineF line){
   Устанавливает иконку.
   @param icon - иконка
 */
-void TTop::setIcon(QImage icon){
+void QTop::setIcon(QImage icon){
     myIcon = icon;
 }
 
-void TTop::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget){
+void QTop::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget){
     QGraphicsPolygonItem::paint(painter, option, widget);
+    //рисуем иконку
     if (!myIcon.isNull()) {
         if ((myIcon.width() >= boundingRect().width()) ||
             (myIcon.height() >= boundingRect().height())) {
-            painter->drawImage(boundingRect(), myIcon);
+            painter->drawImage(boundingRect().adjusted(5, 5, -5, -5), myIcon);
         } else {
             painter->drawImage(-myIcon.width()/2, -myIcon.height()/2, myIcon);
         }
     }
+    //пишем текст
+    else if (actor != NULL) {
+        QTextOption opt;
+        opt.setWrapMode(QTextOption::WrapAnywhere);
+        opt.setAlignment(Qt::AlignLeft);
+        painter->drawText(boundingRect().adjusted(8, 8, -8, -8), actor->extName, opt);
+    }
+
 }
 
 /*!
   Устанавливает флаг корневой вершины.
   @param flag - true если корневая
 */
-void TTop::setAsRoot(bool flag){
+void QTop::setAsRoot(bool flag){
     isRoot = flag;
     if (isRoot){
         QPen p = pen();// painter->pen();
@@ -302,9 +315,9 @@ void TTop::setAsRoot(bool flag){
 /*!
   Возвращает список исходящих дуг
 */
-QList<TArc *> TTop::inArcs(){
-    QList<TArc *> result;
-    foreach(TArc *arc, arcs){
+QList<QArc *> QTop::inArcs(){
+    QList<QArc *> result;
+    foreach(QArc *arc, arcs){
         if (arc->endItem() == this)
             result.append(arc);
     }
@@ -314,9 +327,9 @@ QList<TArc *> TTop::inArcs(){
 /*!
   Возвращяет список входящих дуг
 */
-QList<TArc *> TTop::outArcs(){
-    QList<TArc *> result;
-    foreach(TArc *arc, arcs){
+QList<QArc *> QTop::outArcs(){
+    QList<QArc *> result;
+    foreach(QArc *arc, arcs){
         if (arc->startItem() == this)
             result.append(arc);
     }

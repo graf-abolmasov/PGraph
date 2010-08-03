@@ -42,8 +42,8 @@ private:
 
     QDiagramScene::Mode myMode;
 
-    QList<TTop* > allTops();
-    QList<TArc* > allArcs();
+    QList<QTop* > allTops();
+    QList<QArc* > allArcs();
     QList<TComment* > allComments();
     QList<QSyncArc* > allSyncArcs();
 
@@ -67,7 +67,7 @@ private slots:
     void deleteArc();
     void deleteSync();
     void deleteComment();
-    void itemInserted(TTop *item);
+    void itemInserted(QTop *item);
     void itemSelected(QGraphicsItem *item);
     void textInserted(TComment *);
 };

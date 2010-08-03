@@ -4,10 +4,12 @@
 #include "qdatatypedialog.h"
 #include "qmoduleregister.h"
 
+QStatusBar *globalStatusBar;
+
 TMyWindow::TMyWindow()
 {
-    myStatusBar = new QStatusBar(this);
-    setStatusBar(myStatusBar);
+    globalStatusBar = new QStatusBar(this);
+    setStatusBar(globalStatusBar);
 
     createDrawWindow();
     createActions();

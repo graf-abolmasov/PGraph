@@ -5,6 +5,7 @@
 #include <QList>
 #include "qsyncarc.h"
 #include "qarc.h"
+#include "actor.h"
 
 QT_BEGIN_NAMESPACE
 class QPixmap;
@@ -20,24 +21,27 @@ class QWidget;
 class QPolygonF;
 QT_END_NAMESPACE
 
-class TArc;
+class QArc;
 class QSyncArc;
 
-class TTop : public QGraphicsPolygonItem{
+#define TOP_TYPE UserType+15
+
+class QTop : public QGraphicsPolygonItem{
+
     friend class QDiagramScene;
-    friend class TArc;
+    friend class QArc;
     friend class QSyncArc;
 
 public:
-    enum { Type = UserType + 15 };
-    TTop(QMenu *contextMenu, QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
+    enum { Type = TOP_TYPE};
+    QTop(QMenu *contextMenu, QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
     int number;
-    void removeArc(TArc *arc);
+    void removeArc(QArc *arc);
     void removeArcs();
     void removeSync(QSyncArc *arc);
     void removeSyncs();
     void setIcon(QImage icon);
-    void addArc(TArc *arc);
+    void addArc(QArc *arc);
     void addSync(QSyncArc *arc);
     void setAsRoot(bool flag);
     float getMinWidth();
@@ -45,23 +49,24 @@ public:
     QLineF getIntersectBound(QLineF line);
     int type() const
         { return Type; }
-    QList<TArc *> allArcs()
+    QList<QArc *> allArcs()
         { return arcs; }
-    QList<TArc *> inArcs();
-    QList<TArc *> outArcs();
+    QList<QArc *> inArcs();
+    QList<QArc *> outArcs();
     QRectF boundingRect() const;
     bool isRoot;
+    Actor* actor;
 protected:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 private:
-    QList<TArc *> arcs;
+    QList<QArc *> arcs;
     QList<QSyncArc *> sync;
     QMenu *myContextMenu;
     QImage myIcon;
-    QList<TArc *> getArcsAtBound(int i);
-    QList<TArc *> getArcsAtBound(QLineF bound);
+    QList<QArc *> getArcsAtBound(int i);
+    QList<QArc *> getArcsAtBound(QLineF bound);
     static int counter;
 };
 
