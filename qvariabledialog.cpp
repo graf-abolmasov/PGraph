@@ -90,5 +90,5 @@ void QVariableDialog::on_variablesTable_doubleClicked(QModelIndex index)
 
 void QVariableDialog::on_buttonBox_accepted()
 {
-    globalDBManager->saveVariabl-List(myVariableList);
+    globalDBManager->saveVariableList(myVariableList);
 }
