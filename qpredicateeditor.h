@@ -16,13 +16,16 @@ public:
     QPredicateEditor(Mode mode, QWidget *parent = 0);
     ~QPredicateEditor();
 
-    void prepareForm(Predicate* pred){}
+    void prepareForm(Predicate* pred);
+    Predicate* getResult();
 
 protected:
     void changeEvent(QEvent *e);
 
 private:
     Ui::QPredicateEditor *ui;
+    Predicate* myPredicate;
+    Mode myMode;
 };
 
 #endif // QPREDICATEEDITOR_H

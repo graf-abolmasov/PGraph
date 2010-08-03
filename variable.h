@@ -8,10 +8,10 @@ class Variable
 {
 public:
     Variable();
-    Variable(QString name, DataType *type, QVariant initValue, QString description);
+    Variable(QString name, QString type, QVariant initValue, QString description);
 
     QString name;
-    DataType *type;
+    QString type;
     QVariant initValue;
     QString description;
 
