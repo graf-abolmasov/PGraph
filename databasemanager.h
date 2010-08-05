@@ -41,6 +41,9 @@ public:
     int savePredicateList(QList<Predicate*>& predList);
     int getPredicateList(QList<Predicate*>& predList);
 
+    int registerModule(QString uniqName, QString fileName, QString comment, QStringList &paramList);
+    int getRegisteredModules(QStringList &moduleList);
+
     int getLastInsertID();
 };
 
