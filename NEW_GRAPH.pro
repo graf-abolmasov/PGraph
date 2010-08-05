@@ -62,7 +62,8 @@ HEADERS += qmywindow.h \
     arcpropertydialog.h \
     qparallelarctop.h \
     qterminatearctop.h \
-    qmultiproctop.h
+    qmultiproctop.h \
+    commonutils.h
 RESOURCES += resources.qrc
 FORMS += toppropertydialog.ui \
     qobjecteditor.ui \

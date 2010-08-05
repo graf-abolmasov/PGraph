@@ -331,3 +331,49 @@ int DataBaseManager::getPredicateList(QList<Predicate *> &predList)
     predList = predListProxy;
     return 0;
 }
+
+int DataBaseManager::registerModule(QString uniqName, QString fileName, QString comment, QStringList &paramList)
+{
+    bool ok = db.open();
+    QSqlQuery query;
+    query.prepare("INSERT INTO BAZMOD (PROJECT_ID, PROTOTIP, NAMEPR, COMMENT)"
+                  "VALUES (:PROJECT_ID, :PROTOTIP, :NAMEPR, :COMMENT);");
+    query.bindValue(":PROJECT_ID", 1);
+    query.bindValue(":PROTOTIP", uniqName.mid(0,8));
+    query.bindValue(":NAMEPR", fileName);
+    query.bindValue(":COMMENT", comment);
+    query.exec();
+
+    QString error = query.lastQuery();
+    int error1 = db.lastError().number();
+    //if (db.lastError().number() != QSqlError::NoError)
+    //    return 1; //Модуль уже зарегистрирован
+
+
+    for (int i = 0; i < paramList.count(); i++){
+        query.clear();
+        query.prepare("INSERT INTO DATABAZ (PROJECT_ID, PROTOTIP, DATA, TYPE, MODE, COMMENT)"
+                      "VALUES (:PROJECT_ID, :PROTOTIP, :DATA, :TYPE, :MODE, :COMMENT);");
+        QStringList parameter = paramList.at(i).split(";;");
+        query.bindValue(":PROJECT_ID", 1);
+        query.bindValue(":PROTOTIP", uniqName.mid(0,8));
+        query.bindValue(":DATA", parameter.at(0));
+        query.bindValue(":TYPE", parameter.at(1));
+        query.bindValue(":MODE", parameter.at(2)[0]);
+        query.bindValue(":COMMENT", parameter.at(3));
+        query.exec();
+    }
+
+    db.close();
+}
+
+int DataBaseManager::getRegisteredModules(QStringList &moduleList)
+{
+    bool ok = db.open();
+    QSqlQuery query;
+    query.prepare("SELECT NAMEPR FROM BAZMOD;");
+    query.exec();
+    while (query.next())
+        moduleList.append(query.value(0).toString());
+    db.close();
+}
