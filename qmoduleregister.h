@@ -2,6 +2,8 @@
 #define QMODULEREGISTER_H
 
 #include <QDialog>
+#include <QtCore>
+#include <QtGui>
 
 namespace Ui {
     class QModuleRegister;
@@ -19,6 +21,13 @@ protected:
 
 private:
     Ui::QModuleRegister *ui;
+    QDir workingDir;
+    QFileInfoList fileList;
+    QComboBox* paramTypeCmbBox;
+
+private slots:
+    void on_parametersTable_currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn);
+    void on_fileList_currentRowChanged(int currentRow);
 };
 
 #endif // QMODULEREGISTER_H

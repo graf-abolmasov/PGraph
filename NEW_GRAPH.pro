@@ -33,7 +33,8 @@ SOURCES += main.cpp \
     arcpropertydialog.cpp \
     qparallelarctop.cpp \
     qterminatearctop.cpp \
-    qmultiproctop.cpp
+    qmultiproctop.cpp \
+    commonutils.cpp
 HEADERS += qmywindow.h \
     qdrawwindow.h \
     qdiagramitem.h \
