@@ -15,6 +15,7 @@
 #include "variable.h"
 #include "actor.h"
 #include "predicate.h"
+#include "basemodule.h"
 #include <QList>
 
 class DataBaseManager
@@ -42,7 +43,7 @@ public:
     int getPredicateList(QList<Predicate*>& predList);
 
     int registerModule(QString uniqName, QString fileName, QString comment, QStringList &paramList);
-    int getRegisteredModules(QStringList &moduleList);
+    int getRegisteredModules(QList<BaseModule*> &moduleList);
 
     int getLastInsertID();
 };

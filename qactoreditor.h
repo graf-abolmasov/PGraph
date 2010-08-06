@@ -3,6 +3,8 @@
 
 #include <QDialog>
 #include "actor.h"
+#include "basemodule.h"
+#include <QtGui>
 
 namespace Ui {
     class QActorEditor;
@@ -26,6 +28,17 @@ private:
     void updateInterface();
     Actor* myActor;
     Mode myMode;
+    QList<BaseModule*> myModuleList;
+    QToolButton* varEditBtn;
+    QWidget* varWidget;
+    QHBoxLayout* varLayout;
+
+
+private slots:
+    void on_buttonBox_accepted();
+    void on_paramsNormalTable_currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn);
+    void on_baseModuleList_currentRowChanged(int currentRow);
+    void on_varEditBtn_clicked();
 };
 
 #endif // QActorEditor_H

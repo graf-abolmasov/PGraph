@@ -34,7 +34,8 @@ SOURCES += main.cpp \
     qparallelarctop.cpp \
     qterminatearctop.cpp \
     qmultiproctop.cpp \
-    commonutils.cpp
+    commonutils.cpp \
+    basemodule.cpp
 HEADERS += qmywindow.h \
     qdrawwindow.h \
     qdiagramitem.h \
@@ -63,7 +64,8 @@ HEADERS += qmywindow.h \
     qparallelarctop.h \
     qterminatearctop.h \
     qmultiproctop.h \
-    commonutils.h
+    commonutils.h \
+    basemodule.h
 RESOURCES += resources.qrc
 FORMS += toppropertydialog.ui \
     qobjecteditor.ui \

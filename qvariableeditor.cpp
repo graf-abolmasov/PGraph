@@ -53,7 +53,7 @@ void QVariableEditor::prepareForm(Variable *var)
 
     if (var != NULL) {
         ui->nameEdt->setText(var->name);
-        ui->commentTxtEdt->setPlainText(var->description);
+        ui->commentTxtEdt->setPlainText(var->comment);
         ui->initValueEdt->setText(var->initValue.toString());
         int idx = -1;
         for (int i = 0; i < typeList.count(); i++){
@@ -66,14 +66,14 @@ void QVariableEditor::prepareForm(Variable *var)
         myVariable = var;
     }
     else
-        myVariable = new Variable();
+        myVariable = new Variable("", "", "", "");
 }
 
 Variable* QVariableEditor::getResult()
 {
     myVariable->name = ui->nameEdt->text();
     myVariable->initValue = ui->initValueEdt->text();
-    myVariable->description = ui->commentTxtEdt->document()->toPlainText();
+    myVariable->comment = ui->commentTxtEdt->document()->toPlainText();
     myVariable->type = typeList.at(ui->typeCmbBox->currentIndex())->name;
     return myVariable;
 }

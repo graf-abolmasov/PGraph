@@ -24,10 +24,10 @@ DataBaseManager::DataBaseManager()
     db.setPassword("Marina");
 
     //заполняем справочники
-    actorListProxy.append(new Actor("aaa", "ACTOR_1", Actor::normalType));
+    /*actorListProxy.append(new Actor("aaa", "ACTOR_1", Actor::normalType));
     actorListProxy.append(new Actor("aab", "ACTOR_2", Actor::normalType));
     actorListProxy.append(new Actor("aac", "inlineACTOR_1", Actor::inlineType));
-    actorListProxy.append(new Actor("aad", "inlineACTOR_2", Actor::inlineType));
+    actorListProxy.append(new Actor("aad", "inlineACTOR_2", Actor::inlineType));*/
 
     predListProxy.append(new Predicate("1", "1", Predicate::inlineType));
     predListProxy.append(new Predicate("Pred1", "Сложный предикат 1", Predicate::normalType));
@@ -286,7 +286,7 @@ int DataBaseManager::saveVariableList(QList<Variable*>& varList){
         query.bindValue(":DATA", varList.at(i)->name);
         query.bindValue(":TYPE", varList.at(i)->type);
         query.bindValue(":INIT", varList.at(i)->initValue.toString());
-        query.bindValue(":COMMENT", varList.at(i)->description);
+        query.bindValue(":COMMENT", varList.at(i)->comment);
         query.exec();
         query.clear();
     }
@@ -295,7 +295,7 @@ int DataBaseManager::saveVariableList(QList<Variable*>& varList){
     return 0;
 }
 
-int DataBaseManager::getVariableList(QList<Variable*>& varList){
+int DataBaseManager::getVariableList(QList<Variable* >& varList){
     bool ok = db.open();
     QSqlQuery query;
     query.prepare("SELECT DATA, TYPE, INIT, COMMENT FROM DATA;");
@@ -344,8 +344,6 @@ int DataBaseManager::registerModule(QString uniqName, QString fileName, QString 
     query.bindValue(":COMMENT", comment);
     query.exec();
 
-    QString error = query.lastQuery();
-    int error1 = db.lastError().number();
     //if (db.lastError().number() != QSqlError::NoError)
     //    return 1; //Модуль уже зарегистрирован
 
@@ -367,13 +365,26 @@ int DataBaseManager::registerModule(QString uniqName, QString fileName, QString 
     db.close();
 }
 
-int DataBaseManager::getRegisteredModules(QStringList &moduleList)
+int DataBaseManager::getRegisteredModules(QList<BaseModule*> &moduleList)
 {
     bool ok = db.open();
-    QSqlQuery query;
-    query.prepare("SELECT NAMEPR FROM BAZMOD;");
-    query.exec();
-    while (query.next())
-        moduleList.append(query.value(0).toString());
+    QSqlQuery query1;
+    QSqlQuery query2;
+    query1.prepare("SELECT PROTOTIP, NAMEPR, COMMENT FROM BAZMOD;");
+    query1.exec();
+    while (query1.next()){
+        query2.prepare("SELECT TYPE, DATA, MODE, COMMENT FROM DATABAZ WHERE PROTOTIP = :PROTOTIP;");
+        query2.bindValue(":PROTOTIP", query1.value(0).toString());
+        query2.exec();
+        QStringList parameterList;
+        while (query2.next()){
+            parameterList.append(query2.value(0).toString() + ";;" +
+                                 query2.value(1).toString() + ";;" +
+                                 query2.value(2).toString() + ";;" +
+                                 query2.value(3).toString());
+        }
+        query2.clear();
+        moduleList.append(new BaseModule(query1.value(1).toString(), query1.value(0).toString(), query1.value(2).toString(), parameterList));
+    }
     db.close();
 }
