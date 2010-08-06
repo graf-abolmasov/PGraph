@@ -24,7 +24,7 @@ protected:
 private:
     Ui::QVariableEditor *ui;
 
-    Variable *myVariable;
+    Variable* myVariable;
     QList<DataType*> typeList;
     void updateInterface();
 

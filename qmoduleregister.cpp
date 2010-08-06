@@ -2,6 +2,7 @@
 #include "ui_qmoduleregister.h"
 #include "databasemanager.h"
 #include "commonutils.h"
+#include "basemodule.h"
 
 
 QModuleRegister::QModuleRegister(QWidget *parent) :
@@ -41,7 +42,10 @@ void QModuleRegister::changeEvent(QEvent *e)
 void QModuleRegister::prepareForm()
 {
     QStringList moduleList;
-    globalDBManager->getRegisteredModules(moduleList);
+    QList<BaseModule*> tempList;
+    globalDBManager->getRegisteredModules(tempList);
+    for (int i = 0; i < tempList.count(); i++)
+        moduleList.append(tempList.at(i)->name);
     int i = 0;
     while (i < fileList.count()){
         //если уже зарегистрирован, то удаляем его из списка файлов
@@ -71,10 +75,14 @@ void QModuleRegister::on_fileList_currentRowChanged(int currentRow)
     int end   = buff.indexOf(")", start, Qt::CaseSensitive);
     QString signature(buff.mid(start, end-start));
     QStringList paramsList = signature.split(QRegExp(",{1,}\\s*"));
+    //QStringList paramsList = signature.split(QRegExp(","));
     for (int i = 0; i < paramsList.count(); i++){
         ui->parametersTable->insertRow(i);
-        QString paramName = paramsList.at(i).split(QRegExp("\\s{1,}")).at(1);
-        QString paramType = paramsList.at(i).split(QRegExp("\\s{1,}")).at(0);
+        //paramsList.replace(i,paramsList.at(i).simplify());
+        //QString paramName = paramsList.at(i).split(QRegExp(" ")).at(1);
+        //QString paramType = paramsList.at(i).split(QRegExp(" ")).at(0);
+        QString paramName = paramsList.at(i).split(QRegExp("\\*\\s{1,}")).at(1);
+        QString paramType = paramsList.at(i).split(QRegExp("\\*\\s{1,}")).at(0);
         ui->parametersTable->setItem(i, 0, new QTableWidgetItem(paramName));
         ui->parametersTable->setItem(i, 1, new QTableWidgetItem(paramType));
         ui->parametersTable->setItem(i, 2, new QTableWidgetItem(" "));
@@ -86,24 +94,34 @@ void QModuleRegister::on_fileList_currentRowChanged(int currentRow)
 void QModuleRegister::on_parametersTable_currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn)
 {
     if (previousRow != -1){
-        ui->parametersTable->setCellWidget(previousRow, 2, NULL);
-        //ui->parametersTable->setCellWidget(previousRow, 3, NULL);
-        ui->parametersTable->setItem(previousRow, 2, new QTableWidgetItem(paramTypeCmbBox->currentText()));
-        //ui->parametersTable->setItem(previousRow, 3, new QTableWidgetItem(paramCommentEdt->document()->toPlainText()));
-        //delete paramCommentEdt;
-        delete paramTypeCmbBox;
+        if (previousColumn == 2){
+            ui->parametersTable->setCellWidget(previousRow, 2, NULL);
+            ui->parametersTable->item(previousRow, 2)->setText(paramTypeCmbBox->currentText());
+            delete paramTypeCmbBox;
+        }
+        if (previousColumn == 3){
+            ui->parametersTable->setCellWidget(previousRow, 3, NULL);
+            ui->parametersTable->item(previousRow, 3)->setText(paramCommentEdt->document()->toPlainText());
+            delete paramCommentEdt;
+        }
     }
-    /*paramCommentEdt = new QTextEdit(ui->parametersTable);
-    if (ui->parametersTable->item(currentRow, 3) != NULL)
-        paramCommentEdt->setPlainText(ui->parametersTable->item(currentRow, 3)->text());
-    ui->parametersTable->setCellWidget(currentRow, 3, paramCommentEdt);*/
-    paramTypeCmbBox = new QComboBox(ui->parametersTable);
-    paramTypeCmbBox->addItem(tr("Исходный"));
-    paramTypeCmbBox->addItem(tr("Модифицируемый"));
-    paramTypeCmbBox->addItem(tr("Вычисляемый"));
-    if (ui->parametersTable->item(currentRow, 2) != NULL)
-        paramTypeCmbBox->setCurrentIndex(paramTypeCmbBox->findText(ui->parametersTable->item(currentRow, 2)->text()));
-    ui->parametersTable->setCellWidget(currentRow, 2, paramTypeCmbBox);
+
+    if (currentColumn == 2){
+        paramTypeCmbBox = new QComboBox(ui->parametersTable);
+        paramTypeCmbBox->addItem(tr("Исходный"));
+        paramTypeCmbBox->addItem(tr("Модифицируемый"));
+        paramTypeCmbBox->addItem(tr("Вычисляемый"));
+        if (ui->parametersTable->item(currentRow, 2) != NULL)
+            paramTypeCmbBox->setCurrentIndex(paramTypeCmbBox->findText(ui->parametersTable->item(currentRow, 2)->text()));
+        ui->parametersTable->setCellWidget(currentRow, 2, paramTypeCmbBox);
+    }
+
+    if (currentColumn == 3){
+        paramCommentEdt = new QTextEdit(ui->parametersTable);
+        if (ui->parametersTable->item(currentRow, 3) != NULL)
+            paramCommentEdt->setPlainText(ui->parametersTable->item(currentRow, 3)->text());
+        ui->parametersTable->setCellWidget(currentRow, 3, paramCommentEdt);
+    }
 }
 
 void QModuleRegister::on_buttonBox_accepted()

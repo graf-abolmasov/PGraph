@@ -92,3 +92,9 @@ void QVariableDialog::on_buttonBox_accepted()
 {
     globalDBManager->saveVariableList(myVariableList);
 }
+
+Variable* QVariableDialog::getVariable()
+{
+    Variable* var = myVariableList.at(ui->variablesTable->currentRow());
+    return var;
+}

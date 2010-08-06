@@ -7,13 +7,12 @@
 class Variable
 {
 public:
-    Variable();
-    Variable(QString name, QString type, QVariant initValue, QString description);
+    Variable(QString name, QString type, QVariant initValue, QString comment);
 
     QString name;
     QString type;
     QVariant initValue;
-    QString description;
+    QString comment;
 
 };
 

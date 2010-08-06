@@ -15,13 +15,14 @@ public:
     explicit QVariableDialog(QWidget *parent = 0);
     ~QVariableDialog();
     void prepareForm();
+    Variable* getVariable();
 
 protected:
     void changeEvent(QEvent *e);
 
 private:
     Ui::QVariableDialog *ui;
-    QList<Variable*> myVariableList;
+    QList<Variable* > myVariableList;
 
 
 private slots:
