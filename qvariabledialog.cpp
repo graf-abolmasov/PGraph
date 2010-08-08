@@ -27,11 +27,16 @@ void QVariableDialog::changeEvent(QEvent *e)
     }
 }
 
-void QVariableDialog::prepareForm()
+void QVariableDialog::prepareForm(QString filter)
 {
     /*тут мы получаем данные из базы*/
     globalDBManager->getVariableList(myVariableList);
     /*заполняем форму*/
+    if (filter != "")
+        foreach (Variable* var, myVariableList)
+            if (var->name != filter)
+                myVariableList.removeAt(myVariableList.indexOf(var));
+        
     foreach (Variable* var, myVariableList){
         ui->variablesTable->insertRow(ui->variablesTable->rowCount());
         ui->variablesTable->setItem(ui->variablesTable->rowCount()-1,0,new QTableWidgetItem(var->name,QTableWidgetItem::Type));

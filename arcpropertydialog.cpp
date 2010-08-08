@@ -51,9 +51,14 @@ void ArcPropertyDialog::prepareForm(QArc *arc)
 
 QArc* ArcPropertyDialog::getResult()
 {
+    return myArc;
+}
+
+void ArcPropertyDialog::on_buttonBox_accepted()
+{
     if (ui->serialRadioBtn->isChecked()) myArc->setArcType(QArc::SerialArc);
     if (ui->parallelRadioBtn->isChecked()) myArc->setArcType(QArc::ParallelArc);
     if (ui->terminateRadioBtn->isChecked()) myArc->setArcType(QArc::TerminateArc);
     myArc->setPriority(ui->prioritySpnBox->value());
-    return myArc;
+
 }

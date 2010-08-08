@@ -134,10 +134,43 @@ void QModuleRegister::on_buttonBox_accepted()
                          ui->parametersTable->item(i, 3)->text());
     }
 
-    globalDBManager->registerModule("S" + QString::number(getCRC(ui->fileList->currentItem()->text().toAscii().data(), sizeof(ui->fileList->currentItem()->text().toAscii().data())), 16).toUpper(),
+    QString uniqName = "S" + QString::number(getCRC(ui->fileList->currentItem()->text().toUtf8().data(), sizeof(ui->fileList->currentItem()->text().toUtf8().data())), 16).toUpper();
+    globalDBManager->registerModule(uniqName,
                                     fileList.at(ui->fileList->currentRow()).baseName(),
                                     ui->commentTxtEdt->document()->toPlainText(), paramList);
 
+    QFile output(uniqName + ".CPP");
+    output.open(QFile::WriteOnly);
+    QFile input(fileList.at(ui->fileList->currentRow()).absoluteFilePath());
+    input.open(QFile::ReadOnly);
+    QString buff(input.readAll());
+    int start = buff.indexOf(fileList.at(ui->fileList->currentRow()).baseName() + "(", 0, Qt::CaseSensitive) + fileList.at(ui->fileList->currentRow()).baseName().length() + 1;
+    int end   = buff.indexOf(")", start, Qt::CaseSensitive);
+    QString signature(buff.mid(start, end-start));
+    QByteArray outputData;
+    outputData.append("#include \"graph.h\"\r\nextern int ");
+    outputData.append(fileList.at(ui->fileList->currentRow()).baseName() + "(" + signature + ");\r\n");
+    outputData.append("int " + uniqName + "(TPOData *D)\r\n{\r\n");
+    QStringList paramsList = signature.split(QRegExp(",{1,}\\s*"));
+    for (int i = 0; i < paramsList.count(); i++){
+        QString paramName = paramsList.at(i).split(QRegExp("\\*\\s{1,}")).at(1);
+        QString paramType = paramsList.at(i).split(QRegExp("\\*\\s{1,}")).at(0);
+        outputData.append("  " + paramType + " " + paramName + " = (D->" + paramName + ");\r\n");
+    }
+    outputData.append("\r\n  " + fileList.at(ui->fileList->currentRow()).baseName() + "(&" + paramsList.first().split(QRegExp("\\*\\s{1,}")).at(1));
+    for (int i = 1; i < paramsList.count(); i++){
+        QString paramName = paramsList.at(i).split(QRegExp("\\*\\s{1,}")).at(1);
+        outputData.append(",&" + paramName);
+    }
+    outputData.append(");\r\n\r\n");
+    for (int i = 0; i < paramsList.count(); i++){
+        QString paramName = paramsList.at(i).split(QRegExp("\\*\\s{1,}")).at(1);
+        outputData.append("  D->" + paramName + " = " + paramName + ";\r\n");
+    }
+    outputData.append("  return 1;\r\n}\r\n");
+    output.write(outputData);
+    output.close();
+    input.close();
 }
 
 
@@ -146,8 +179,8 @@ void QModuleRegister::on_buttonBox_clicked(QAbstractButton* button)
     ui->parametersTable->setCurrentCell(-1, -1);
     bool readyToSave = (ui->parametersTable->rowCount() > 0);
     for (int i = 0; i < ui->parametersTable->rowCount(); i++){
-        if ((ui->parametersTable->item(i, 0)->text() == "") &&
-            (ui->parametersTable->item(i, 1)->text() == "") &&
+        if ((ui->parametersTable->item(i, 0)->text() == "") ||
+            (ui->parametersTable->item(i, 1)->text() == "") ||
             (ui->parametersTable->item(i, 2)->text() == "")){
             readyToSave = false;
             break;
