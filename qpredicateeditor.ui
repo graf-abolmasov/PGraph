@@ -65,61 +65,13 @@
      <height>510</height>
     </rect>
    </property>
-   <widget class="QFrame" name="frame_3">
+   <widget class="QFrame" name="frame_4">
     <property name="geometry">
      <rect>
       <x>10</x>
       <y>10</y>
       <width>531</width>
-      <height>44</height>
-     </rect>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::WinPanel</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Sunken</enum>
-    </property>
-    <property name="lineWidth">
-     <number>3</number>
-    </property>
-    <property name="midLineWidth">
-     <number>1</number>
-    </property>
-    <layout class="QHBoxLayout" name="horizontalLayout_6">
-     <item>
-      <widget class="QLabel" name="ipredicateNameLbl">
-       <property name="font">
-        <font>
-         <pointsize>10</pointsize>
-        </font>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
-       </property>
-       <property name="text">
-        <string>Название объекта</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLineEdit" name="ipredicateNameEdt">
-       <property name="font">
-        <font>
-         <pointsize>10</pointsize>
-        </font>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-   <widget class="QFrame" name="frame_4">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>60</y>
-      <width>531</width>
-      <height>441</height>
+      <height>491</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -153,7 +105,7 @@
        <x>10</x>
        <y>30</y>
        <width>511</width>
-       <height>401</height>
+       <height>451</height>
       </rect>
      </property>
     </widget>
@@ -162,7 +114,7 @@
   <widget class="QWidget" name="normalWidget" native="true">
    <property name="geometry">
     <rect>
-     <x>554</x>
+     <x>0</x>
      <y>0</y>
      <width>554</width>
      <height>510</height>
@@ -239,6 +191,9 @@
           <property name="textFormat">
            <enum>Qt::PlainText</enum>
           </property>
+          <property name="alignment">
+           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+          </property>
           <property name="wordWrap">
            <bool>true</bool>
           </property>
@@ -260,6 +215,9 @@
           </property>
           <property name="textFormat">
            <enum>Qt::PlainText</enum>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
           </property>
          </widget>
         </item>
@@ -285,7 +243,53 @@
        </widget>
       </item>
       <item>
-       <widget class="QTableWidget" name="paramsNormalTable"/>
+       <widget class="QTableWidget" name="paramsNormalTable">
+        <attribute name="horizontalHeaderCascadingSectionResizes">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="horizontalHeaderDefaultSectionSize">
+         <number>165</number>
+        </attribute>
+        <attribute name="horizontalHeaderMinimumSectionSize">
+         <number>165</number>
+        </attribute>
+        <attribute name="horizontalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="verticalHeaderDefaultSectionSize">
+         <number>22</number>
+        </attribute>
+        <attribute name="verticalHeaderDefaultSectionSize">
+         <number>22</number>
+        </attribute>
+        <attribute name="horizontalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="horizontalHeaderCascadingSectionResizes">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="horizontalHeaderMinimumSectionSize">
+         <number>165</number>
+        </attribute>
+        <attribute name="horizontalHeaderDefaultSectionSize">
+         <number>165</number>
+        </attribute>
+        <column>
+         <property name="text">
+          <string>Параметр</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Тип</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Данное ПО</string>
+         </property>
+        </column>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -367,8 +371,14 @@
           <property name="textFormat">
            <enum>Qt::PlainText</enum>
           </property>
+          <property name="alignment">
+           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+          </property>
           <property name="wordWrap">
            <bool>true</bool>
+          </property>
+          <property name="textInteractionFlags">
+           <set>Qt::NoTextInteraction</set>
           </property>
          </widget>
         </item>
@@ -420,6 +430,9 @@
         <font>
          <pointsize>10</pointsize>
         </font>
+       </property>
+       <property name="maxLength">
+        <number>255</number>
        </property>
       </widget>
      </item>

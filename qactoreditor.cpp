@@ -2,6 +2,7 @@
 #include "ui_qactoreditor.h"
 #include "databasemanager.h"
 #include "qvariabledialog.h"
+#include "commonutils.h"
 
 QActorEditor::QActorEditor(QWidget *parent) :
     QDialog(parent),
@@ -50,8 +51,9 @@ QActorEditor::QActorEditor(Mode mode, QWidget *parent) :
 void QActorEditor::prepareForm(Actor *actor)
 {
     QList<Variable*> newVariableList;
+    QStringList newAMList;
     if (actor == NULL){
-        myActor = new Actor("", "", myMode == Normal ? Actor::normalType : Actor::inlineType, "", newVariableList);
+        myActor = new Actor("", "", myMode == Normal ? Actor::normalType : Actor::inlineType, "", newVariableList, newAMList);
     } else {
         myActor = actor;
         ui->baseModuleList->setEnabled(false);
@@ -60,41 +62,41 @@ void QActorEditor::prepareForm(Actor *actor)
     switch(myMode){
     case Normal:
         ui->actorNameEdt->setText(myActor->extName);
+        globalDBManager->getRegisteredModules(myModuleList);
+        foreach(BaseModule* baseModule, myModuleList){
+            ui->baseModuleList->insertItem(ui->baseModuleList->count(), baseModule->name);
+            if (myActor->baseModule == baseModule->unicName){
+                ui->baseModuleList->blockSignals(true);
+                ui->baseModuleList->setCurrentRow(ui->baseModuleList->count()-1);
+                for (int i = 0; i < myModuleList.at(ui->baseModuleList->currentRow())->parameterList.count(); i++){
+                    QStringList parameter = myModuleList.at(ui->baseModuleList->currentRow())->parameterList.at(i).split(";;");
+                    ui->paramsNormalTable->insertRow(i);
+                    ui->paramsNormalTable->setItem(i, 0, new QTableWidgetItem(parameter.at(1)));
+                    ui->paramsNormalTable->setItem(i, 1, new QTableWidgetItem(parameter.at(0)));
+                    ui->paramsNormalTable->setItem(i, 2, new QTableWidgetItem(myActor->variableList.at(i) == NULL ? "N/A" : myActor->variableList.at(i)->name));
+                }
+                ui->baseModuleList->blockSignals(false);
+             }
+        }
         break;
     case Inline:
-        ui->iactorNameEdt->setText(myActor->extName);
+        globalDBManager->getVariableList(myVariableList);
+        ui->inlineModuleTxtEdt->blockSignals(true);
+        ui->inlineModuleTxtEdt->setPlainText(myActor->extName);
+        for (int i = 0; i < myActor->variableList.count(); i++){
+            ui->paramsInlineTable->insertRow(i);
+            ui->paramsInlineTable->setItem(i, 0, new QTableWidgetItem(myActor->variableList.at(i)->name));
+            ui->paramsInlineTable->setItem(i, 1, new QTableWidgetItem(myActor->variableList.at(i)->type));
+            ui->paramsInlineTable->setItem(i, 2, new QTableWidgetItem(myActor->varAMList.at(i)));
+        }
+        ui->inlineModuleTxtEdt->blockSignals(false);
         break;
     }
 
-    globalDBManager->getRegisteredModules(myModuleList);
-    foreach(BaseModule* baseModule, myModuleList){
-        ui->baseModuleList->insertItem(ui->baseModuleList->count(), baseModule->name);
-        if (myActor->baseModule == baseModule->name){
-            ui->baseModuleList->blockSignals(true);
-            ui->baseModuleList->setCurrentRow(ui->baseModuleList->count()-1);
-            for (int i = 0; i < myModuleList.at(ui->baseModuleList->currentRow())->parameterList.count(); i++){
-                QStringList parameter = myModuleList.at(ui->baseModuleList->currentRow())->parameterList.at(i).split(";;");
-                ui->paramsNormalTable->insertRow(i);
-                ui->paramsNormalTable->setItem(i, 0, new QTableWidgetItem(parameter.at(1)));
-                ui->paramsNormalTable->setItem(i, 1, new QTableWidgetItem(parameter.at(0)));
-                ui->paramsNormalTable->setItem(i, 2, new QTableWidgetItem(myActor->variableList.at(i) == NULL ? "N/A" : myActor->variableList.at(i)->name));
-            }
-            ui->baseModuleList->blockSignals(false);
-         }
-    }
 }
 
 Actor* QActorEditor::getResult()
 {
-    switch(myMode){
-    case Normal:
-        myActor->extName = ui->actorNameEdt->text();
-        myActor->baseModule = ui->baseModuleList->currentItem()->text();
-        break;
-    case Inline:
-        myActor->extName = ui->iactorNameEdt->text();
-        break;
-    }
     return myActor;
 }
 
@@ -109,9 +111,11 @@ void QActorEditor::on_baseModuleList_currentRowChanged(int currentRow)
     ui->paramsNormalTable->clearContents();
     ui->paramsNormalTable->setRowCount(0);
     myActor->variableList.clear();
+    myActor->varAMList.clear();
     for (int i = 0; i < myModuleList.at(currentRow)->parameterList.count(); i++){
         myActor->variableList.append(NULL);
         QStringList parameter = myModuleList.at(currentRow)->parameterList.at(i).split(";;");
+        myActor->varAMList.append(parameter.at(2));
         ui->paramsNormalTable->insertRow(i);
         ui->paramsNormalTable->setItem(i, 0, new QTableWidgetItem(parameter.at(1)));
         ui->paramsNormalTable->setItem(i, 1, new QTableWidgetItem(parameter.at(0)));
@@ -157,5 +161,72 @@ void QActorEditor::on_varEditBtn_clicked()
 
 void QActorEditor::on_buttonBox_accepted()
 {
+    switch(myMode){
+    case Normal:
+        myActor->extName = ui->actorNameEdt->text();
+        myActor->baseModule = myModuleList.at(ui->baseModuleList->currentRow())->unicName;
+        myActor->name = "A" + QString::number(getCRC(myActor->extName.toUtf8().data(), sizeof(myActor->extName.toUtf8().data())), 16).toUpper();
+        break;
+    case Inline:
+        myActor->extName = ui->inlineModuleTxtEdt->document()->toPlainText();
+        ui->paramsInlineTable->setCurrentCell(-1, -1);
+        myActor->name = "A" + QString::number(getCRC(myActor->extName.toUtf8().data(), sizeof(myActor->extName.toUtf8().data())), 16).toUpper();
+        //генерируем с++ файл
+        QFile output(QApplication::applicationDirPath() + "\\C\\" + myActor->name + ".cpp");
+        output.open(QFile::WriteOnly);
+        QByteArray outputData;
+        outputData.append("#include \"stype.h\"\r\n");
+        outputData.append("int " + myActor->name + "(TPOData *D)\r\n");
+        outputData.append("{\r\n");
+        QString code(myActor->extName);
+        for (int i = 0; i < myActor->variableList.count(); i++){
+            code.replace(QRegExp("(\\b)" + myActor->variableList.at(i)->name + "(\\b)", Qt::CaseSensitive), "D->" + myActor->variableList.at(i)->name);
+        }
+        //code.replace(QRegExp("\\n"), "\n  ");
+        outputData.append("  " + code + "\r\n");
+        outputData.append("  return 1;\r\n");
+        outputData.append("}\r\n");
+        output.write(outputData);
+        output.close();
+        break;
+    }
+}
 
+void QActorEditor::on_inlineModuleTxtEdt_textChanged()
+{
+    ui->paramsInlineTable->clearContents();
+    ui->paramsInlineTable->setRowCount(0);
+    int p = 0;
+    myActor->variableList.clear();
+    myActor->varAMList.clear();
+    for (int i = 0; i < myVariableList.count(); i++){
+        if (ui->inlineModuleTxtEdt->document()->toPlainText().contains(QRegExp("(\\s|\\b|\\W)" + myVariableList.at(i)->name + "(\\s|\\b|\\W)", Qt::CaseSensitive))){
+            ui->paramsInlineTable->insertRow(p);
+            myActor->variableList.append(myVariableList.at(i));
+            myActor->varAMList.append("");
+            ui->paramsInlineTable->setItem(p, 0, new QTableWidgetItem(myVariableList.at(i)->name));
+            ui->paramsInlineTable->setItem(p, 1, new QTableWidgetItem(myVariableList.at(i)->type));
+            ui->paramsInlineTable->setItem(p, 2, new QTableWidgetItem("N/A"));
+            p++;
+        }
+    }
+}
+
+void QActorEditor::on_paramsInlineTable_currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn)
+{
+    if (previousRow != -1){
+        ui->paramsInlineTable->setCellWidget(previousRow, 2, NULL);
+        ui->paramsInlineTable->item(previousRow, 2)->setText(paramTypeCmbBox->currentText());
+        myActor->varAMList.replace(previousRow, paramTypeCmbBox->currentText());
+        delete paramTypeCmbBox;
+    }
+
+    paramTypeCmbBox = new QComboBox(ui->paramsInlineTable);
+    paramTypeCmbBox->addItem(tr("Исходный"));
+    paramTypeCmbBox->addItem(tr("Модифицируемый"));
+    paramTypeCmbBox->addItem(tr("Вычисляемый"));
+
+    if (ui->paramsInlineTable->item(currentRow, 2) != NULL)
+        paramTypeCmbBox->setCurrentIndex(paramTypeCmbBox->findText(ui->paramsInlineTable->item(currentRow, 2)->text()));
+    ui->paramsInlineTable->setCellWidget(currentRow, 2, paramTypeCmbBox);
 }

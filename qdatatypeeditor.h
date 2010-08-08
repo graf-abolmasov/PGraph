@@ -23,6 +23,9 @@ protected:
 private:
     Ui::QDataTypeEditor *ui;
     DataType* myDataType;
+
+private slots:
+    void on_buttonBox_accepted();
 };
 
 #endif // QDATATYPEEDITOR_H

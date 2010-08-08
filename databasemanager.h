@@ -25,8 +25,15 @@ private:
     QList<Variable*> varListProxy;
     QList<Actor*> actorListProxy;
     QList<Predicate*> predListProxy;
+    int myProgectId;
 public:
     DataBaseManager();
+
+    void setProjectId(int pid)
+        { myProgectId = pid; }
+    int projectId()
+        { return myProgectId; }
+
     void getGraph(QString projectName, QDiagramScene* scene, QMenu* arcMenu, QMenu* topMenu, QMenu* syncArcMenu);
     void saveGraph(QString projectName, QString extName, QGraph* graph);
 

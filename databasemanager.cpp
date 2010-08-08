@@ -11,6 +11,7 @@
 #include <QStringList>
 #include <QString>
 #include <QList>
+#include "commonutils.h"
 
 DataBaseManager* globalDBManager;
 
@@ -23,15 +24,8 @@ DataBaseManager::DataBaseManager()
     db.setUserName("root");
     db.setPassword("Marina");
 
-    //заполняем справочники
-    /*actorListProxy.append(new Actor("aaa", "ACTOR_1", Actor::normalType));
-    actorListProxy.append(new Actor("aab", "ACTOR_2", Actor::normalType));
-    actorListProxy.append(new Actor("aac", "inlineACTOR_1", Actor::inlineType));
-    actorListProxy.append(new Actor("aad", "inlineACTOR_2", Actor::inlineType));*/
+    myProgectId = 1;
 
-    predListProxy.append(new Predicate("1", "1", Predicate::inlineType));
-    predListProxy.append(new Predicate("Pred1", "Сложный предикат 1", Predicate::normalType));
-    predListProxy.append(new Predicate("Pred2", "Сложный предикат 2", Predicate::normalType));
 }
 
 int DataBaseManager::getLastInsertID()
@@ -125,12 +119,11 @@ void DataBaseManager::saveGraph(QString projectName, QString extName, QGraph *gr
     query.bindValue(":project_name", projectName);
     query.exec();
 
-    int projectID = -1;
-    projectID =  getLastInsertID();
+    myProgectId =  getLastInsertID();
     query.prepare("INSERT INTO actor (PROJECT_ID, NAMEPR, CLASPR, EXTNAME, DATE, TIME, ICON, PROTOTIP, BAZIS)"
                   "VALUES (:PROJECT_ID, :NAMEPR, :CLASPR, :EXTNAME, CURDATE(), CURTIME(), NULL, :PROTOTIP, :BAZIS)");
 
-    query.bindValue(":PROJECT_ID", projectID);
+    query.bindValue(":PROJECT_ID", myProgectId);
     query.bindValue(":NAMEPR", "temp");
     query.bindValue(":CLASPR",  "g");
     query.bindValue(":EXTNAME",  extName);
@@ -140,11 +133,11 @@ void DataBaseManager::saveGraph(QString projectName, QString extName, QGraph *gr
 
     query.prepare("UPDATE ACTOR SET NAMEPR = CONCAT(CLASPR,AUTOINCREMENT_NAMEPR)"
            "WHERE PROJECT_ID = :PROJECT_ID");
-    query.bindValue(":PROJECT_ID", projectID);
+    query.bindValue(":PROJECT_ID", myProgectId);
     query.exec();
 
     query.prepare("SELECT NAMEPR FROM ACTOR WHERE PROJECT_ID = :PROJECT_ID AND CLASPR = :CLASPR");
-    query.bindValue(":PROJECT_ID", projectID);
+    query.bindValue(":PROJECT_ID", myProgectId);
     query.bindValue(":CLASPR", "g");
     query.exec();
 
@@ -162,7 +155,7 @@ void DataBaseManager::saveGraph(QString projectName, QString extName, QGraph *gr
         query.prepare("INSERT INTO GRAPHPIC (PROJECT_ID, NAMEPR, ELTYP, ISTR, X, Y, SizeX, SizeY, ntop, isRoot, Actor, Nodes, ArcPrior, ArcFromTop, ArcToTop, ArcPred) "
                       "VALUES (:PROJECT_ID, :NAMEPR, :ELTYP, :ISTR, :X, :Y, :SizeX, :SizeY, :ntop, :isRoot, NULL, NULL, NULL, NULL, NULL, NULL)");
 
-        query.bindValue(":PROJECT_ID", projectID);
+        query.bindValue(":PROJECT_ID", myProgectId);
         query.bindValue(":NAMEPR", namepr);
         query.bindValue(":ELTYP",  "T");
         QPointF p = topList.at(i)->polygon().at(0) + topList.at(i)->scenePos();
@@ -186,7 +179,7 @@ void DataBaseManager::saveGraph(QString projectName, QString extName, QGraph *gr
         query.prepare("INSERT INTO GRAPHPIC (PROJECT_ID, NAMEPR, ELTYP, ISTR, X, Y, SizeX, SizeY, ntop, isRoot, Actor, Nodes, ArcPrior, ArcFromTop, ArcToTop, ArcPred) "
                       "VALUES (:PROJECT_ID, :NAMEPR, :ELTYP, :ISTR, :X, :Y, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)");
 
-        query.bindValue(":PROJECT_ID", projectID);
+        query.bindValue(":PROJECT_ID", myProgectId);
         query.bindValue(":NAMEPR", namepr);
         query.bindValue(":ELTYP",  "C");
 
@@ -207,7 +200,7 @@ void DataBaseManager::saveGraph(QString projectName, QString extName, QGraph *gr
         query.prepare("INSERT INTO GRAPHPIC (PROJECT_ID, NAMEPR, ELTYP, ISTR, X, Y, SizeX, SizeY, ntop, isRoot, Actor, Nodes, ArcPrior, ArcFromTop, ArcToTop, ArcPred) "
                       "VALUES (:PROJECT_ID, :NAMEPR, :ELTYP, :ISTR, NULL, NULL, NULL, NULL, NULL, NULL, NULL, :Nodes, :ArcPrior, :ArcFromTop, :ArcToTop, NULL)");
 
-        query.bindValue(":PROJECT_ID", projectID);
+        query.bindValue(":PROJECT_ID", myProgectId);
         query.bindValue(":NAMEPR", namepr);
         query.bindValue(":ELTYP",  "A");
 
@@ -251,7 +244,7 @@ int DataBaseManager::saveDataTypeList(QList<DataType*>& typeList){
     for (int i = 0; i < typeList.count(); i++){
         query.prepare("INSERT INTO TYPSYS (PROJECT_ID, TYPE, TYPEDEF)"
                       "VALUES (:PROJECT_ID, :TYPE, :TYPEDEF);");
-        query.bindValue(":PROJECT_ID", i+1);
+        query.bindValue(":PROJECT_ID", myProgectId);
         query.bindValue(":TYPE", typeList.at(i)->name);
         query.bindValue(":TYPEDEF", typeList.at(i)->typedefStr);
         query.exec();
@@ -282,7 +275,7 @@ int DataBaseManager::saveVariableList(QList<Variable*>& varList){
     for (int i = 0; i < varList.count(); i++){
         query.prepare("INSERT INTO DATA (PROJECT_ID, DATA, TYPE, INIT, COMMENT)"
                       "VALUES (:PROJECT_ID, :DATA, :TYPE, :INIT, :COMMENT);");
-        query.bindValue(":PROJECT_ID", 1);
+        query.bindValue(":PROJECT_ID", myProgectId);
         query.bindValue(":DATA", varList.at(i)->name);
         query.bindValue(":TYPE", varList.at(i)->type);
         query.bindValue(":INIT", varList.at(i)->initValue.toString());
@@ -292,7 +285,6 @@ int DataBaseManager::saveVariableList(QList<Variable*>& varList){
     }
     db.close();
     return db.lastError().number();
-    return 0;
 }
 
 int DataBaseManager::getVariableList(QList<Variable* >& varList){
@@ -309,14 +301,81 @@ int DataBaseManager::getVariableList(QList<Variable* >& varList){
 
 int DataBaseManager::saveActorList(QList<Actor *> &actorList)
 {
-    actorListProxy.clear();
-    actorListProxy.append(actorList);
+    bool ok = db.open();
+    QSqlQuery query1;
+    for (int i = 0; i < actorList.count(); i++){
+        query1.clear();
+        query1.prepare("INSERT INTO ACTOR (PROJECT_ID, NAMEPR, CLASPR, EXTNAME, DATE, TIME, ICON, PROTOTIP)"
+                      "VALUES (:PROJECT_ID, :NAMEPR, :CLASPR, :EXTNAME, CURDATE(), CURTIME(), :ICON, :PROTOTIP);");
+        query1.bindValue(":PROJECT_ID", myProgectId);
+        query1.bindValue(":NAMEPR", actorList.at(i)->name);
+        query1.bindValue(":CLASPR", "a");
+        query1.bindValue(":EXTNAME", actorList.at(i)->extName);
+        query1.bindValue(":ICON", NULL);
+        query1.bindValue(":PROTOTIP", actorList.at(i)->baseModule);
+        query1.exec();
+
+        QSqlQuery query2;
+        for (int j = 0; j < actorList.at(i)->variableList.count(); j++){
+            query2.clear();
+            query2.prepare("INSERT INTO PASPORT (PROJECT_ID, NAMEPR, NEV, DATA, MODE)"
+                           "VALUES (:PROJECT_ID, :NAMEPR, :NEV, :DATA, :MODE);");
+            query2.bindValue(":PROJECT_ID", myProgectId);
+            query2.bindValue(":NAMEPR", actorList.at(i)->name);
+            query2.bindValue(":NEV", j);
+            query2.bindValue(":DATA", actorList.at(i)->variableList.at(j)->name);
+            QString vaMode;
+            if (actorList.at(i)->varAMList.at(j) == "Исходный")
+                vaMode = "I";
+            else if (actorList.at(i)->varAMList.at(j) == "Модифицируемый")
+                vaMode = "M";
+            else if (actorList.at(i)->varAMList.at(j) == "Вычисляемый")
+                vaMode = "R";
+            query2.bindValue(":MODE", vaMode);
+            query2.exec();
+        }
+    }
 }
 
 int DataBaseManager::getActorList(QList<Actor *> &actorList)
 {
-    actorList = actorListProxy;
-    return 0;
+    QList<Variable* > varList;
+    getVariableList(varList);
+    bool ok = db.open();
+    QSqlQuery query1;
+    QSqlQuery query2;
+    query1.prepare("SELECT NAMEPR, CLASPR, EXTNAME, DATE, TIME, ICON, PROTOTIP FROM ACTOR WHERE CLASPR = 'a';");
+    query1.exec();
+    while (query1.next()){
+        query2.prepare("SELECT NEV, DATA, MODE FROM PASPORT WHERE NAMEPR = :NAMEPR ORDER BY NEV");
+        query2.bindValue(":NAMEPR", query1.value(0).toString());
+        query2.exec();
+        QList<Variable* > myVariableList;
+        QStringList myVAList;
+        while (query2.next()){
+            for (int i = 0; i < varList.count(); i++)
+                if (query2.value(1).toString() == varList.at(i)->name){
+                    myVariableList.append(varList.at(i));
+                    break;
+                }
+            QString vaMode;
+            if (query2.value(2).toString() == "I")
+                vaMode = QObject::tr("Исходный");
+            else if (query2.value(2).toString() == "M")
+                vaMode = QObject::tr("Модифицируемый");
+            else if (query2.value(2).toString() == "R")
+                vaMode = QObject::tr("Вычисляемый");
+            myVAList.append(vaMode);
+        }
+        actorList.append(new Actor(query1.value(0).toString(),
+                                   query1.value(2).toString(),
+                                   query1.value(6).toString() == "" ? Actor::inlineType : Actor::normalType,
+                                   query1.value(6).toString(),
+                                   myVariableList,
+                                   myVAList));
+        query2.clear();
+    }
+    return db.lastError().number();
 }
 
 int DataBaseManager::savePredicateList(QList<Predicate *> &predList)
@@ -339,22 +398,18 @@ int DataBaseManager::registerModule(QString uniqName, QString fileName, QString 
     query.prepare("INSERT INTO BAZMOD (PROJECT_ID, PROTOTIP, NAMEPR, COMMENT)"
                   "VALUES (:PROJECT_ID, :PROTOTIP, :NAMEPR, :COMMENT);");
     query.bindValue(":PROJECT_ID", 1);
-    query.bindValue(":PROTOTIP", uniqName.mid(0,8));
+    query.bindValue(":PROTOTIP", uniqName);
     query.bindValue(":NAMEPR", fileName);
     query.bindValue(":COMMENT", comment);
     query.exec();
-
-    //if (db.lastError().number() != QSqlError::NoError)
-    //    return 1; //Модуль уже зарегистрирован
-
 
     for (int i = 0; i < paramList.count(); i++){
         query.clear();
         query.prepare("INSERT INTO DATABAZ (PROJECT_ID, PROTOTIP, DATA, TYPE, MODE, COMMENT)"
                       "VALUES (:PROJECT_ID, :PROTOTIP, :DATA, :TYPE, :MODE, :COMMENT);");
         QStringList parameter = paramList.at(i).split(";;");
-        query.bindValue(":PROJECT_ID", 1);
-        query.bindValue(":PROTOTIP", uniqName.mid(0,8));
+        query.bindValue(":PROJECT_ID", myProgectId);
+        query.bindValue(":PROTOTIP", uniqName);
         query.bindValue(":DATA", parameter.at(0));
         query.bindValue(":TYPE", parameter.at(1));
         query.bindValue(":MODE", parameter.at(2)[0]);

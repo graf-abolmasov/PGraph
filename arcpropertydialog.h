@@ -24,6 +24,9 @@ private:
     Ui::ArcPropertyDialog *ui;
     QArc* myArc;
     QList<Predicate*> predicateList;
+
+private slots:
+    void on_buttonBox_accepted();
 };
 
 #endif // ARCPROPERTYDIALOG_H

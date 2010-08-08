@@ -37,7 +37,11 @@ void QDataTypeEditor::prepareForm(DataType *type)
 
 DataType* QDataTypeEditor::getResult()
 {
+    return myDataType;
+}
+
+void QDataTypeEditor::on_buttonBox_accepted()
+{
     myDataType->name = ui->typeNameEdt->text();
     myDataType->typedefStr = ui->typedefTxtEdt->document()->toPlainText();
-    return myDataType;
 }

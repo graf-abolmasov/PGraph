@@ -14,7 +14,7 @@ class QVariableDialog : public QDialog {
 public:
     explicit QVariableDialog(QWidget *parent = 0);
     ~QVariableDialog();
-    void prepareForm();
+    void prepareForm(QString filter = "");
     Variable* getVariable();
 
 protected:
@@ -23,7 +23,6 @@ protected:
 private:
     Ui::QVariableDialog *ui;
     QList<Variable* > myVariableList;
-
 
 private slots:
     void on_buttonBox_accepted();

@@ -207,6 +207,9 @@
       </item>
       <item>
        <widget class="QTableWidget" name="paramsNormalTable">
+        <property name="focusPolicy">
+         <enum>Qt::WheelFocus</enum>
+        </property>
         <property name="editTriggers">
          <set>QAbstractItemView::NoEditTriggers</set>
         </property>
@@ -412,6 +415,9 @@
          <pointsize>10</pointsize>
         </font>
        </property>
+       <property name="maxLength">
+        <number>254</number>
+       </property>
       </widget>
      </item>
     </layout>
@@ -420,67 +426,19 @@
   <widget class="QWidget" name="inlineWidget" native="true">
    <property name="geometry">
     <rect>
-     <x>554</x>
+     <x>0</x>
      <y>0</y>
      <width>554</width>
      <height>510</height>
     </rect>
    </property>
-   <widget class="QFrame" name="frame_3">
+   <widget class="QFrame" name="frame_4">
     <property name="geometry">
      <rect>
       <x>10</x>
       <y>10</y>
       <width>531</width>
-      <height>44</height>
-     </rect>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::WinPanel</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Sunken</enum>
-    </property>
-    <property name="lineWidth">
-     <number>3</number>
-    </property>
-    <property name="midLineWidth">
-     <number>1</number>
-    </property>
-    <layout class="QHBoxLayout" name="horizontalLayout_6">
-     <item>
-      <widget class="QLabel" name="iactorNameLbl">
-       <property name="font">
-        <font>
-         <pointsize>10</pointsize>
-        </font>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
-       </property>
-       <property name="text">
-        <string>Название объекта</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLineEdit" name="iactorNameEdt">
-       <property name="font">
-        <font>
-         <pointsize>10</pointsize>
-        </font>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-   <widget class="QFrame" name="frame_4">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>60</y>
-      <width>531</width>
-      <height>271</height>
+      <height>291</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -514,8 +472,11 @@
        <x>10</x>
        <y>30</y>
        <width>511</width>
-       <height>231</height>
+       <height>251</height>
       </rect>
+     </property>
+     <property name="maximumBlockCount">
+      <number>0</number>
      </property>
     </widget>
    </widget>
@@ -523,9 +484,9 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>340</y>
+      <y>310</y>
       <width>531</width>
-      <height>161</height>
+      <height>191</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -546,7 +507,7 @@
        <x>10</x>
        <y>10</y>
        <width>511</width>
-       <height>141</height>
+       <height>171</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -558,7 +519,71 @@
        </widget>
       </item>
       <item>
-       <widget class="QTableWidget" name="paramsInlineTable"/>
+       <widget class="QTableWidget" name="paramsInlineTable">
+        <property name="editTriggers">
+         <set>QAbstractItemView::NoEditTriggers</set>
+        </property>
+        <property name="showDropIndicator" stdset="0">
+         <bool>false</bool>
+        </property>
+        <property name="dragDropOverwriteMode">
+         <bool>false</bool>
+        </property>
+        <property name="selectionMode">
+         <enum>QAbstractItemView::SingleSelection</enum>
+        </property>
+        <property name="selectionBehavior">
+         <enum>QAbstractItemView::SelectRows</enum>
+        </property>
+        <property name="cornerButtonEnabled">
+         <bool>false</bool>
+        </property>
+        <attribute name="horizontalHeaderCascadingSectionResizes">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="horizontalHeaderDefaultSectionSize">
+         <number>165</number>
+        </attribute>
+        <attribute name="horizontalHeaderMinimumSectionSize">
+         <number>165</number>
+        </attribute>
+        <attribute name="horizontalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="verticalHeaderDefaultSectionSize">
+         <number>22</number>
+        </attribute>
+        <attribute name="verticalHeaderDefaultSectionSize">
+         <number>22</number>
+        </attribute>
+        <attribute name="horizontalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="horizontalHeaderCascadingSectionResizes">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="horizontalHeaderMinimumSectionSize">
+         <number>165</number>
+        </attribute>
+        <attribute name="horizontalHeaderDefaultSectionSize">
+         <number>165</number>
+        </attribute>
+        <column>
+         <property name="text">
+          <string>Параметр</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Тип</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Класс</string>
+         </property>
+        </column>
+       </widget>
       </item>
      </layout>
     </widget>

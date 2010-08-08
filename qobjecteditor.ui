@@ -14,7 +14,7 @@
    <string>Справочник объектов</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="resources.qrc">
+   <iconset>
     <normaloff>:/images/G.png</normaloff>:/images/G.png</iconset>
   </property>
   <widget class="QTabWidget" name="tab">
@@ -63,6 +63,18 @@
        <height>411</height>
       </rect>
      </property>
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <property name="tabKeyNavigation">
+      <bool>true</bool>
+     </property>
+     <property name="showDropIndicator" stdset="0">
+      <bool>false</bool>
+     </property>
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectItems</enum>
+     </property>
     </widget>
    </widget>
    <widget class="QWidget" name="predicatesTab">
@@ -92,6 +104,15 @@
        <width>501</width>
        <height>411</height>
       </rect>
+     </property>
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <property name="tabKeyNavigation">
+      <bool>true</bool>
+     </property>
+     <property name="showDropIndicator" stdset="0">
+      <bool>false</bool>
      </property>
     </widget>
    </widget>
@@ -131,9 +152,7 @@
    </property>
   </widget>
  </widget>
- <resources>
-  <include location="resources.qrc"/>
- </resources>
+ <resources/>
  <connections>
   <connection>
    <sender>buttonBox</sender>
