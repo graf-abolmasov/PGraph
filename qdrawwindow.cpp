@@ -322,7 +322,7 @@ void TDrawWindow::loadGraph(DataBaseManager* dbManager)
     dbManager->getGraph("Project1", scene, arcMenu, topMenu, syncArcMenu);
 }
 
-void TDrawWindow::saveGraph(DataBaseManager *dbManager)
+void TDrawWindow::saveGraph(QString extName, DataBaseManager *dbManager)
 {
-    dbManager->saveGraph("Project1", "aaaaaaag", graph());
+    dbManager->saveGraph(extName, graph());
 }

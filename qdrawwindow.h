@@ -54,7 +54,7 @@ public:
     QDiagramScene::Mode mode(){return myMode;}
     QGraph* graph();
     void loadGraph(DataBaseManager* dbManager);
-    void saveGraph(DataBaseManager* dbManager);
+    void saveGraph(QString extName, DataBaseManager* dbManager);
 signals:
     void sceneChanged();
 

@@ -3,6 +3,7 @@
 #include "qvariabledialog.h"
 #include "qdatatypedialog.h"
 #include "qmoduleregister.h"
+#include "qsavegraphdialog.h"
 
 QStatusBar *globalStatusBar;
 
@@ -224,7 +225,10 @@ void TMyWindow::CMGSaveAsImage()
 
 void TMyWindow::CMGSaveAs()
 {
-    activeDrawWindow()->saveGraph(globalDBManager);
+    QSaveGraphDialog dialog;
+    if (dialog.exec()){
+        activeDrawWindow()->saveGraph(dialog.getResult(), globalDBManager);
+    }
 }
 
 void TMyWindow::CMObjList()

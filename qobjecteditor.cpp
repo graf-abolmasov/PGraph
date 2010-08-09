@@ -122,7 +122,7 @@ void QObjectEditor::newButtonClicked()
         if (predEditor->exec()){
             Predicate *pred = predEditor->getResult();
             predicatesList.append(pred);
-            ui->predicateList->addItem(pred->name);
+            ui->predicateList->addItem(pred->extName);
         }
         delete predEditor;
         break;
@@ -142,7 +142,7 @@ void QObjectEditor::newButtonClicked()
         if (predEditor->exec()){
             Predicate *pred = predEditor->getResult();
             iPredicateList.append(pred);
-            ui->inlinePredicateList->addItem(pred->name);
+            ui->inlinePredicateList->addItem(pred->extName);
         }
         delete predEditor;
         break;

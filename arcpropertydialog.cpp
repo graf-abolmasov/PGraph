@@ -47,6 +47,9 @@ void ArcPropertyDialog::prepareForm(QArc *arc)
     //Загружаем предикаты из базы данных
     globalDBManager->getPredicateList(predicateList);
 
+    for (int i = 0; i < predicateList.count(); i++){
+        ui->predicateList->addItem(new QListWidgetItem(predicateList.at(i)->extName));
+    }
 }
 
 QArc* ArcPropertyDialog::getResult()
@@ -60,5 +63,9 @@ void ArcPropertyDialog::on_buttonBox_accepted()
     if (ui->parallelRadioBtn->isChecked()) myArc->setArcType(QArc::ParallelArc);
     if (ui->terminateRadioBtn->isChecked()) myArc->setArcType(QArc::TerminateArc);
     myArc->setPriority(ui->prioritySpnBox->value());
+    if (ui->predicateList->currentRow() > -1)
+        myArc->predicate = predicateList.at(ui->predicateList->currentRow());
+    else
+        myArc->predicate = NULL;
 
 }

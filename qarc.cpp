@@ -180,8 +180,8 @@ bool QArc::remake(QTop* aMovedTop, float dx, float dy){
             lgolddir = dvec2log(pnts[1].x() - pnts[0].x(), pnts[1].y() - pnts[0].y());
             lgdir    = dvec2log(pnts[1].x() + dx - pnts[0].x(), pnts[1].y() + dy - pnts[0].y());
             if (lgolddir & lgdir){
-                if (!(pnts[1].x() - pnts[0].x()) && !dx ||
-                    !(pnts[1].y() - pnts[0].y()) && !dy){
+                if ((!(pnts[1].x() - pnts[0].x()) && !dx) ||
+                    (!(pnts[1].y() - pnts[0].y()) && !dy)){
                     pnts[1] += QPointF(dx, dy);
                 } else {
                     pnts[3] = pnts[1] + QPointF(dx, dy);

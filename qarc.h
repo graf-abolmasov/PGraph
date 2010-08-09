@@ -57,6 +57,7 @@ public:
          else return NULL;
     }
     void setPen(const QPen &pen);
+    Predicate* predicate;
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                QWidget *widget = 0);
@@ -71,7 +72,6 @@ private:
     int myPriority;  //приоритет
     bool autoBuild(QTop* top, float dx, float dy);
     bool remake(QTop *, float dx, float dy);
-    Predicate* predicate;
 };
 
 #endif

@@ -383,7 +383,7 @@ void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
                           tr(" Конечная вершина ") + QString::number(arc->endItem()->number) +
                           tr(" Приоритет ") + QString::number(arc->priority()));
             if (arc->predicate != NULL)
-                status.append(tr(" Предикат ") + arc->predicate->name);
+                status.append(tr(" Предикат ") + arc->predicate->extName);
             break;
         case QTop::Type:
             top = qgraphicsitem_cast<QTop*>(selectedItems().first());
