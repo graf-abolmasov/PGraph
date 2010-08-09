@@ -175,7 +175,6 @@ void QPredicateEditor::on_buttonBox_accepted()
 
 void QPredicateEditor::on_inlineModuleTxtEdt_textChanged()
 {
-    int p = 0;
     myPredicate->variableList.clear();
     for (int i = 0; i < myVariableList.count(); i++){
         if (ui->inlineModuleTxtEdt->document()->toPlainText().contains(QRegExp("(\\s|\\b|\\W)" + myVariableList.at(i)->name + "(\\s|\\b|\\W)", Qt::CaseSensitive))){

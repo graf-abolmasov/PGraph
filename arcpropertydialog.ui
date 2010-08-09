@@ -44,7 +44,7 @@
     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
    </property>
   </widget>
-  <widget class="QListWidget" name="actorsListWidget">
+  <widget class="QListWidget" name="predicateList">
    <property name="geometry">
     <rect>
      <x>9</x>

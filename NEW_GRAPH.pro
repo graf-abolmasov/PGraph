@@ -35,7 +35,8 @@ SOURCES += main.cpp \
     qterminatearctop.cpp \
     qmultiproctop.cpp \
     commonutils.cpp \
-    basemodule.cpp
+    basemodule.cpp \
+    qsavegraphdialog.cpp
 HEADERS += qmywindow.h \
     qdrawwindow.h \
     qdiagramitem.h \
@@ -65,7 +66,8 @@ HEADERS += qmywindow.h \
     qterminatearctop.h \
     qmultiproctop.h \
     commonutils.h \
-    basemodule.h
+    basemodule.h \
+    qsavegraphdialog.h
 RESOURCES += resources.qrc
 FORMS += toppropertydialog.ui \
     qobjecteditor.ui \
@@ -76,4 +78,5 @@ FORMS += toppropertydialog.ui \
     qactoreditor.ui \
     qmoduleregister.ui \
     qpredicateeditor.ui \
-    arcpropertydialog.ui
+    arcpropertydialog.ui \
+    qsavegraphdialog.ui

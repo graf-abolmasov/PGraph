@@ -34,8 +34,8 @@ public:
     int projectId()
         { return myProgectId; }
 
-    void getGraph(QString projectName, QDiagramScene* scene, QMenu* arcMenu, QMenu* topMenu, QMenu* syncArcMenu);
-    void saveGraph(QString projectName, QString extName, QGraph* graph);
+    int getGraph(QString projectName, QDiagramScene* scene, QMenu* arcMenu, QMenu* topMenu, QMenu* syncArcMenu);
+    int saveGraph(QString extName, QGraph* graph);
 
     int saveVariableList(QList<Variable*>& varList);
     int getVariableList(QList<Variable*>& varList);
@@ -45,9 +45,11 @@ public:
 
     int saveActorList(QList<Actor*>& actorList);
     int getActorList(QList<Actor*>& actorList);
+    Actor* getActor(QString namepr);
 
     int savePredicateList(QList<Predicate*>& predList);
     int getPredicateList(QList<Predicate*>& predList);
+    Predicate* getPredicate(QString namepr);
 
     int registerModule(QString uniqName, QString fileName, QString comment, QStringList &paramList);
     int getRegisteredModules(QList<BaseModule*> &moduleList);
