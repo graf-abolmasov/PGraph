@@ -4,6 +4,7 @@
 #include "qdatatypedialog.h"
 #include "qmoduleregister.h"
 #include "qsavegraphdialog.h"
+#include "qopengraphdialog.h"
 
 QStatusBar *globalStatusBar;
 
@@ -259,7 +260,11 @@ void TMyWindow::CMEdtType()
 
 void TMyWindow::CMGOpen()
 {
-    activeDrawWindow()->loadGraph(globalDBManager);
+    QOpenGraphDialog dialog;
+    dialog.prepareForm();
+    if (dialog.exec()){
+        activeDrawWindow()->loadGraph(dialog.getResult(), globalDBManager);
+    }
 }
 
 void TMyWindow::CMNewModule()

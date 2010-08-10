@@ -11,20 +11,28 @@ class QGraphicsScene;
 class QGraphicsSceneMouseEvent;
 QT_END_NAMESPACE
 
-class TComment : public QGraphicsTextItem
+class Comment
+{
+public:
+    Comment(float x, float y, QString text);
+    float x;
+    float y;
+    QString text;
+};
+
+class QComment : public QGraphicsTextItem
 {
     Q_OBJECT
 
 public:
     enum { Type = UserType + 3 };
-
-    TComment(QMenu *menu, QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
-
+    QComment(QMenu *menu, QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
     int type() const
         { return Type; }
+    Comment* toComment();
 
 signals:
-    void lostFocus(TComment *item);
+    void lostFocus(QComment *item);
     void selectedChange(QGraphicsItem *item);
 
 protected:

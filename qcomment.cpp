@@ -2,7 +2,7 @@
 
 #include "qcomment.h"
 
-TComment::TComment(QMenu *menu, QGraphicsItem *parent, QGraphicsScene *scene)
+QComment::QComment(QMenu *menu, QGraphicsItem *parent, QGraphicsScene *scene)
     : QGraphicsTextItem(parent, scene)
 {
     myContextMenu = menu;
@@ -10,7 +10,7 @@ TComment::TComment(QMenu *menu, QGraphicsItem *parent, QGraphicsScene *scene)
     setFlag(QGraphicsItem::ItemIsSelectable);
 }
 
-QVariant TComment::itemChange(GraphicsItemChange change,
+QVariant QComment::itemChange(GraphicsItemChange change,
                      const QVariant &value)
 {
     if (change == QGraphicsItem::ItemSelectedHasChanged)
@@ -18,21 +18,21 @@ QVariant TComment::itemChange(GraphicsItemChange change,
     return value;
 }
 
-void TComment::focusOutEvent(QFocusEvent *event)
+void QComment::focusOutEvent(QFocusEvent *event)
 {
     setTextInteractionFlags(Qt::NoTextInteraction);
     emit lostFocus(this);
     QGraphicsTextItem::focusOutEvent(event);
 }
 
-void TComment::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+void QComment::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
     if (textInteractionFlags() == Qt::NoTextInteraction)
         setTextInteractionFlags(Qt::TextEditorInteraction);
     QGraphicsTextItem::mouseDoubleClickEvent(event);
 }
 
-void TComment::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
+void QComment::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
     scene()->clearSelection();
     setSelected(true);
@@ -40,4 +40,16 @@ void TComment::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
         myContextMenu->exec(event->screenPos());
     else
         QGraphicsTextItem::contextMenuEvent(event);
+}
+
+Comment* QComment::toComment()
+{
+    return new Comment(scenePos().x(), scenePos().y(), document()->toPlainText());
+}
+
+Comment::Comment(float x, float y, QString text)
+{
+    this->x = x;
+    this->y = y;
+    this->text = text;
 }

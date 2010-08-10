@@ -4,6 +4,8 @@
 #include "qmywindow.h"
 #include "qdrawwindow.h"
 #include "databasemanager.h"
+#include "commonutils.h"
+#include "md5.h"
 
 int main(int argc, char *argv[])
 {  	

@@ -134,7 +134,7 @@ void QModuleRegister::on_buttonBox_accepted()
                          ui->parametersTable->item(i, 3)->text());
     }
 
-    QString uniqName = "S" + QString::number(getCRC(ui->fileList->currentItem()->text().toUtf8().data(), sizeof(ui->fileList->currentItem()->text().toUtf8().data())), 16).toUpper();
+    QString uniqName = "S" + getCRC(ui->fileList->currentItem()->text().toUtf8());
     globalDBManager->registerModule(uniqName,
                                     fileList.at(ui->fileList->currentRow()).baseName(),
                                     ui->commentTxtEdt->document()->toPlainText(), paramList);
@@ -157,7 +157,7 @@ void QModuleRegister::on_buttonBox_accepted()
         QString paramType = paramsList.at(i).split(QRegExp("\\*\\s{1,}")).at(0);
         outputData.append("  " + paramType + " " + paramName + " = (D->" + paramName + ");\r\n");
     }
-    outputData.append("\r\n  " + fileList.at(ui->fileList->currentRow()).baseName() + "(&" + paramsList.first().split(QRegExp("\\*\\s{1,}")).at(1));
+    outputData.append("\r\n  int result = " + fileList.at(ui->fileList->currentRow()).baseName() + "(&" + paramsList.first().split(QRegExp("\\*\\s{1,}")).at(1));
     for (int i = 1; i < paramsList.count(); i++){
         QString paramName = paramsList.at(i).split(QRegExp("\\*\\s{1,}")).at(1);
         outputData.append(",&" + paramName);
@@ -167,7 +167,7 @@ void QModuleRegister::on_buttonBox_accepted()
         QString paramName = paramsList.at(i).split(QRegExp("\\*\\s{1,}")).at(1);
         outputData.append("  D->" + paramName + " = " + paramName + ";\r\n");
     }
-    outputData.append("  return 1;\r\n}\r\n");
+    outputData.append("  return result;\r\n}\r\n");
     output.write(outputData);
     output.close();
     input.close();

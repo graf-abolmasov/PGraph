@@ -34,8 +34,9 @@ public:
     int projectId()
         { return myProgectId; }
 
-    int getGraph(QString projectName, QDiagramScene* scene, QMenu* arcMenu, QMenu* topMenu, QMenu* syncArcMenu);
-    int saveGraph(QString extName, QGraph* graph);
+    int getGraphList(QList<Graph* > &graphList);
+    int getGraph(QString extName, Graph &graph);
+    int saveGraph(Graph* graph);
 
     int saveVariableList(QList<Variable*>& varList);
     int getVariableList(QList<Variable*>& varList);

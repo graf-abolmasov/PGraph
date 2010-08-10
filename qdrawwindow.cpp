@@ -27,8 +27,8 @@ TDrawWindow::TDrawWindow()
             this, SLOT(itemInserted(QTop *)));
     connect(scene, SIGNAL(itemSelected(QGraphicsItem *)),
         this, SLOT(itemSelected(QGraphicsItem *)));  
-    connect(scene, SIGNAL(textInserted(TComment *)),
-        this, SLOT(textInserted(TComment *)));
+    connect(scene, SIGNAL(textInserted(QComment *)),
+        this, SLOT(textInserted(QComment *)));
 
     view->setScene(scene);
     this->setCentralWidget(view);
@@ -142,7 +142,7 @@ void TDrawWindow::deleteSync()
 void TDrawWindow::deleteComment()
 {
     foreach (QGraphicsItem *item, scene->selectedItems()) {
-        if (item->type() ==  TComment::Type) {
+        if (item->type() ==  QComment::Type) {
             scene->removeItem(item);
         }
     }
@@ -160,7 +160,7 @@ void TDrawWindow::itemSelected(QGraphicsItem *item)
     //setWindowTitle("sdfdasf");
 }
 
-void TDrawWindow::textInserted(TComment *)
+void TDrawWindow::textInserted(QComment *)
 {
     //setMode(QDiagramScene::MoveItem);
     emit sceneChanged();
@@ -275,13 +275,26 @@ QList<QArc* > TDrawWindow::allArcs(){
 }
 
 /*!
+  Возвращает список всех многопоточных вершин лежащих на сцене
+*/
+QList<QMultiProcTop* > TDrawWindow::allMultiProcTop(){
+    QList<QMultiProcTop* > topList;
+    for (int i = 0; i < scene->items().count(); i++){
+        if (scene->items().at(i)->type() == QMultiProcTop::Type){
+            topList.append(qgraphicsitem_cast<QMultiProcTop* >(scene->items().at(i)));
+        }
+    }
+    return topList;
+}
+
+/*!
   Возвращает список всех комментариев лежащих на сцене
 */
-QList<TComment* > TDrawWindow::allComments(){
-    QList<TComment* > commentList;
+QList<QComment* > TDrawWindow::allComments(){
+    QList<QComment* > commentList;
     for (int i = 0; i < scene->items().count(); i++){
-        if (scene->items().at(i)->type() == TComment::Type){
-            commentList.append(qgraphicsitem_cast<TComment* >(scene->items().at(i)));
+        if (scene->items().at(i)->type() == QComment::Type){
+            commentList.append(qgraphicsitem_cast<QComment* >(scene->items().at(i)));
         }
     }
     return commentList;
@@ -303,13 +316,21 @@ QList<QSyncArc* > TDrawWindow::allSyncArcs(){
 /*!
   Возвращает граф
 */
-QGraph* TDrawWindow::graph()
+Graph* TDrawWindow::getGraph()
 {
-    QGraph* result = new QGraph();
-    result->arcList     = allArcs();
-    result->commentList = allComments();
-    result->syncArcList = allSyncArcs();
-    result->topList     = allTops();
+    QList<Top* > topList;
+    foreach (QTop* top, allTops())
+        topList.append(top->toTop());
+    QList<Arc* > arcList;
+    foreach (QArc* arc, allArcs())
+        arcList.append(arc->toArc());
+     QList<Comment* > commentList;
+    foreach (QComment* comment, allComments())
+        commentList.append(comment->toComment());
+
+    QList<QSyncArc* > syncArcList = allSyncArcs();
+    QList<QMultiProcTop* > multiProcTopList = allMultiProcTop();
+    Graph* result = new Graph("", "", topList, arcList, commentList, syncArcList, multiProcTopList);
     return result;
 }
 
@@ -317,12 +338,67 @@ QGraph* TDrawWindow::graph()
   Загружает граф в редактор
 */
 
-void TDrawWindow::loadGraph(DataBaseManager* dbManager)
+void TDrawWindow::loadGraph(QString extName, DataBaseManager* dbManager)
 {
-    dbManager->getGraph("Project1", scene, arcMenu, topMenu, syncArcMenu);
+    QList<Top* > topList;
+    QList<Arc* > arcList;
+    QList<Comment* > commentList;
+    QList<QSyncArc* > syncArcList;
+    QList<QMultiProcTop* > multiProcTopList;
+    Graph graph("", "", topList, arcList, commentList, syncArcList, multiProcTopList);
+    dbManager->getGraph(extName, graph);
+    foreach (Top* top, graph.topList){
+        QTop *qtop = new QTop(topMenu, NULL, scene);
+        qtop->setPos(top->x, top->y);
+        qtop->number = top->number;
+        if (top->isRoot) scene->setRootTop(qtop);
+
+        QPolygonF myPolygon;
+        double w = top->sizeX;
+        double h = top->sizeY;
+        myPolygon << QPointF(-w/2, h/2) << QPointF(w/2, h/2)
+                << QPointF(w/2,-h/2) << QPointF(-w/2, -h/2)
+                << QPointF(-w/2, h/2);
+        qtop->setPolygon(myPolygon);
+        qtop->actor = dbManager->getActor(top->actor);
+    }
+
+    foreach (Arc* arc, graph.arcList){
+        QTop *startTop = NULL;
+        QTop *endTop = NULL;
+        QList<QTop* > topList = allTops();
+        for (int i = 0; i < topList.count(); i++){
+            if (topList.at(i)->number == arc->startTop)
+                startTop = topList.at(i);
+            if (topList.at(i)->number == arc->endTop)
+                endTop = topList.at(i);
+        }
+
+        QArc *qarc = new QArc(startTop, endTop, arcMenu, NULL, scene);
+        for (int i = 0; i < arc->lines.count(); i++){
+            QStringList nodes = arc->lines.at(i).split(" ");
+            QPointF startPoint = QPointF(nodes.at(0).toFloat(), nodes.at(1).toFloat());
+            QPointF endPoint = QPointF(nodes.at(2).toFloat(), nodes.at(3).toFloat());
+            qarc->newLine(startPoint, endPoint);
+        }
+        qarc->addLine(qarc->currentLine);
+        qarc->currentLine = NULL;
+        startTop->addArc(qarc);
+        endTop->addArc(qarc);
+        qarc->setPriority(arc->priority);
+        qarc->predicate = dbManager->getPredicate(arc->predicate);
+    }
+
+    foreach (Comment* comment, graph.commentList){
+        QComment *qcomment = new QComment(NULL, NULL, scene);
+        qcomment->setPos(comment->x, comment->y);
+        qcomment->setPlainText(comment->text);
+    }
 }
 
 void TDrawWindow::saveGraph(QString extName, DataBaseManager *dbManager)
 {
-    dbManager->saveGraph(extName, graph());
+    Graph* graph = getGraph();
+    graph->extName = extName;
+    dbManager->saveGraph(graph);
 }

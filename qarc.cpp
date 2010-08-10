@@ -576,3 +576,23 @@ void QArc::setArcType(ArcType type)
     }
     arcTop->setSelected(true);
 }
+
+Arc* QArc::toArc()
+{
+    QStringList nodes;
+    foreach(QArcLine* line, lines){
+         nodes.append(QString::number(line->line().x1()) + " " + QString::number(line->line().y1()) + " " +
+                      QString::number(line->line().x2()) + " " + QString::number(line->line().y2()));
+    }
+    return new Arc((Arc::ArcType)arcType(), priority(), myStartTop->number, myEndTop->number, predicate->name, nodes);
+}
+
+Arc::Arc(ArcType type, int priority, int startTop, int endTop, QString predicate, QStringList &lines)
+{
+    this->type = type;
+    this->priority = priority;
+    this->startTop = startTop;
+    this->endTop = endTop;
+    this->predicate = predicate;
+    this->lines = lines;
+}

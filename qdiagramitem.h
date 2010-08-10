@@ -26,11 +26,25 @@ class QSyncArc;
 
 #define TOP_TYPE UserType+15
 
+class Top
+{
+public:
+    Top(float x, float y, float sizeX, float sizeY, int number, bool isRoot, QString actor);
+    float x;
+    float y;
+    float sizeX;
+    float sizeY;
+    int number;
+    bool isRoot;
+    QString actor;
+};
+
 class QTop : public QGraphicsPolygonItem{
 
     friend class QDiagramScene;
     friend class QArc;
     friend class QSyncArc;
+    friend class Top;
 
 public:
     enum { Type = TOP_TYPE};
@@ -56,6 +70,7 @@ public:
     QRectF boundingRect() const;
     bool isRoot;
     Actor* actor;
+    Top* toTop();
 protected:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);

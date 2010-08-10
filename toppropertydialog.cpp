@@ -31,9 +31,11 @@ void TopPropertyDialog::prepareForm(QTop* top){
     myTop = top;
 
     globalDBManager->getActorList(myActorList);
+    //globalDBManager->getGraphList(myGraphList);
     foreach (Actor* actor, myActorList){
         ui->actorsListWidget->addItem(actor->extName);
     }
+
 
     if (top->actor != NULL){
         int idx = -1;

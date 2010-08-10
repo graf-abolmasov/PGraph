@@ -1,5 +1,7 @@
 #ifndef COMMONUTILS_H
 #define COMMONUTILS_H
 #include <QtCore>
-unsigned long getCRC (char *pchBuf, int nBufLen);
+#include <stddef.h>
+#include <stdint.h>
+QString getCRC(QByteArray in);
 #endif // COMMONUTILS_H
