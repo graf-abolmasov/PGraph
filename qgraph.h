@@ -1,22 +1,25 @@
-#ifndef QGRAPH_H
-#define QGRAPH_H
+#ifndef GRAPH_H
+#define GRAPH_H
 
-#include <QObject>
 #include <QList>
 #include "qdiagramitem.h"
 #include "qarc.h"
 #include "qcomment.h"
+#include "qmultiproctop.h"
 
-class QGraph : public QObject
+class Graph
 {
-Q_OBJECT
 public:
-    explicit QGraph(QObject *parent = 0);
+    Graph(QString name, QString extName, QList<Top* > &topList, QList<Arc* > &arcList, QList<Comment* > &commentList, QList<QSyncArc* > &syncArcList, QList<QMultiProcTop* > &multiProcTopList);
 
-    QList<QTop* >     topList;
-    QList<QArc* >     arcList;
-    QList<TComment* > commentList;
-    QList<QSyncArc* > syncArcList;
+    QString name;
+    QString extName;
+
+    QList<Top* >           topList;
+    QList<Arc* >           arcList;
+    QList<Comment* >      commentList;
+    QList<QSyncArc* >      syncArcList;
+    QList<QMultiProcTop* > multiProcTopList;
 };
 
-#endif // QGRAPH_H
+#endif // GRAPH_H

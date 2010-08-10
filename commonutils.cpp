@@ -1,6 +1,7 @@
 #include "commonutils.h"
+#include "md5.h"
 
-unsigned long getCRC (char *pchBuf, int nBufLen)
+QString getCRC(QByteArray in)
 {
     int i;
     int nIndex;
@@ -88,11 +89,14 @@ unsigned long getCRC (char *pchBuf, int nBufLen)
         0xB40BBE37, 0xC30C8EA1, 0x5A05DF1B, 0x2D02EF8D
     };
 
+    QByteArray pchBuf = MD5(in);
+    int nBufLen = pchBuf.length();
+
     res = 0xFFFFFFFF;
-    for (i=0;i<nBufLen+4;i++)
+    for (i=0; i < nBufLen + 4; i++)
     {
         nIndex = (res >> 24) & 0xFF;
-        if (i<nBufLen)
+        if (i < nBufLen)
             ch = pchBuf[i];
         else
             ch = 0x0;
@@ -100,5 +104,5 @@ unsigned long getCRC (char *pchBuf, int nBufLen)
         res ^= table[nIndex];
     }
 
-    return res;
+    return QString::number(res, 16).toUpper();
 }

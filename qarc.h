@@ -18,6 +18,19 @@ class QTop;
 class QArcLine;
 class QSerialArcTop;
 
+class Arc
+{
+public:
+    enum ArcType { SerialArc, ParallelArc, TerminateArc };
+    Arc(ArcType type, int priority, int startTop, int endTop, QString predicate, QStringList &lines);
+    ArcType type;
+    int priority;
+    int startTop;
+    int endTop;
+    QStringList lines;
+    QString predicate;
+};
+
 class QArc : public QGraphicsLineItem
 {
     friend class QDiagramScene;
@@ -58,6 +71,7 @@ public:
     }
     void setPen(const QPen &pen);
     Predicate* predicate;
+    Arc* toArc();
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                QWidget *widget = 0);

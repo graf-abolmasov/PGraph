@@ -1,4 +1,4 @@
-п»ї#ifndef QDIAGRAMSCENE_H
+#ifndef QDIAGRAMSCENE_H
 #define QDIAGRAMSCENE_H
 
 #include <QGraphicsScene>
@@ -37,17 +37,17 @@ public:
     void setMultiProcTopMenu(QMenu *menu);
     void setRootTop(QTop* top);
 
-    //!РЈРєР°Р·Р°С‚РµР»СЊ РЅР° РєРѕСЂРЅРµРІСѓСЋ РІРµСЂС€РёРЅСѓ
+    //!Указатель на корневую вершину
     QTop* rootTop()
         { return myRootTop; }
 
 public slots:
     void setMode(Mode mode);
-    void editorLostFocus(TComment *item);
+    void editorLostFocus(QComment *item);
 
 signals:
     void itemInserted(QGraphicsItem *item);
-    void textInserted(TComment *item);
+    void textInserted(QComment *item);
     void itemSelected(QGraphicsItem *item);
 
 protected:
@@ -61,7 +61,7 @@ private:
 
     QTop* myRootTop;
 
-    TComment *textItem;
+    QComment *textItem;
     QArc *newArc;
     QArcLine *line;
 

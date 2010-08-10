@@ -335,3 +335,22 @@ QList<QArc *> QTop::outArcs(){
     }
     return result;
 }
+
+Top* QTop::toTop()
+{
+    QPointF pos = polygon().at(0) + scenePos();
+    QPointF sizeX = polygon().at(1) - polygon().at(0);
+    QPointF sizeY = polygon().at(2) - polygon().at(1);
+    return new Top(pos.x(), pos.y(), sizeX.x(), sizeY.y(), number, isRoot, actor->name);
+}
+
+Top::Top(float x, float y, float sizeX, float sizeY, int number, bool isRoot, QString actor)
+{
+    this->x = x;
+    this->y = y;
+    this->actor = actor;
+    this->isRoot = isRoot;
+    this->number = number;
+    this->sizeX = sizeX;
+    this->sizeY = sizeY;
+}

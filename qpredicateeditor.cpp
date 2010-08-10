@@ -147,11 +147,11 @@ void QPredicateEditor::on_buttonBox_accepted()
     case Normal:
         myPredicate->extName = ui->predicateNameEdt->text();
         myPredicate->baseModule = myModuleList.at(ui->baseModuleList->currentRow())->unicName;
-        myPredicate->name = "P" + QString::number(getCRC(myPredicate->extName.toUtf8().data(), sizeof(myPredicate->extName.toUtf8().data())), 16).toUpper();
+        myPredicate->name = "P" + getCRC(myPredicate->extName.toUtf8());
         break;
     case Inline:
         myPredicate->extName = ui->inlineModuleTxtEdt->document()->toPlainText();
-        myPredicate->name = "P" + QString::number(getCRC(myPredicate->extName.toUtf8().data(), sizeof(myPredicate->extName.toUtf8().data())), 16).toUpper();
+        myPredicate->name = "P" + getCRC(myPredicate->extName.toUtf8());
         //генерируем с++ файл
         QFile output(QApplication::applicationDirPath() + "\\C\\" + myPredicate->name + ".cpp");
         output.open(QFile::WriteOnly);

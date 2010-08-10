@@ -165,12 +165,12 @@ void QActorEditor::on_buttonBox_accepted()
     case Normal:
         myActor->extName = ui->actorNameEdt->text();
         myActor->baseModule = myModuleList.at(ui->baseModuleList->currentRow())->unicName;
-        myActor->name = "A" + QString::number(getCRC(myActor->extName.toUtf8().data(), sizeof(myActor->extName.toUtf8().data())), 16).toUpper();
+        myActor->name = "A" + getCRC(myActor->extName.toUtf8());
         break;
     case Inline:
         myActor->extName = ui->inlineModuleTxtEdt->document()->toPlainText();
         ui->paramsInlineTable->setCurrentCell(-1, -1);
-        myActor->name = "A" + QString::number(getCRC(myActor->extName.toUtf8().data(), sizeof(myActor->extName.toUtf8().data())), 16).toUpper();
+        myActor->name = "A" + getCRC(myActor->extName.toUtf8());
         //генерируем с++ файл
         QFile output(QApplication::applicationDirPath() + "\\C\\" + myActor->name + ".cpp");
         output.open(QFile::WriteOnly);

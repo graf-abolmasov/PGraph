@@ -19,7 +19,7 @@ void QDiagramScene::setMode(Mode mode)
     myMode = mode;
 }
 
-void QDiagramScene::editorLostFocus(TComment *item)
+void QDiagramScene::editorLostFocus(QComment *item)
 {
     QTextCursor cursor = item->textCursor();
     cursor.clearSelection();
@@ -52,11 +52,11 @@ void QDiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
         break;
 
     case InsertText:
-        textItem = new TComment(myCommentMenu);
+        textItem = new QComment(myCommentMenu);
         textItem->setTextInteractionFlags(Qt::TextEditorInteraction);
         textItem->setZValue(1000.0);
-        connect(textItem, SIGNAL(lostFocus(TComment *)),
-                this, SLOT(editorLostFocus(TComment *)));
+        connect(textItem, SIGNAL(lostFocus(QComment *)),
+                this, SLOT(editorLostFocus(QComment *)));
         connect(textItem, SIGNAL(selectedChange(QGraphicsItem *)),
                 this, SIGNAL(itemSelected(QGraphicsItem *)));
         addItem(textItem);

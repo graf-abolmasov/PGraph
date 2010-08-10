@@ -44,16 +44,17 @@ private:
 
     QList<QTop* > allTops();
     QList<QArc* > allArcs();
-    QList<TComment* > allComments();
+    QList<QComment* > allComments();
     QList<QSyncArc* > allSyncArcs();
+    QList<QMultiProcTop* > allMultiProcTop();
 
 public:
     TDrawWindow();
     void saveAsImage(QString filename);
     void setMode(QDiagramScene::Mode mode);
     QDiagramScene::Mode mode(){return myMode;}
-    QGraph* graph();
-    void loadGraph(DataBaseManager* dbManager);
+    Graph* getGraph();
+    void loadGraph(QString extName, DataBaseManager* dbManager);
     void saveGraph(QString extName, DataBaseManager* dbManager);
 signals:
     void sceneChanged();
@@ -69,7 +70,7 @@ private slots:
     void deleteComment();
     void itemInserted(QTop *item);
     void itemSelected(QGraphicsItem *item);
-    void textInserted(TComment *);
+    void textInserted(QComment *);
 };
 
 #endif // QDRAWWINDOW_H
