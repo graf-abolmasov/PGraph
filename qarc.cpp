@@ -418,7 +418,8 @@ QArc::QArc(QTop *startItem, QTop *endItem, QMenu *contextMenu,
     myEndTop = endItem;
     myContextMenu = contextMenu;
     setPen(QPen(Qt::black, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-    arcTop = new QSerialArcTop(contextMenu, this, scene);
+    arcTop = NULL;
+    setArcType(QArc::SerialArc);
     myPriority = 1;
     currentLine = NULL;
     arcTop->hide();
@@ -470,8 +471,10 @@ void QArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
         QPointF intersectPoint;
         myStartTop->getIntersectBound(lines.first()->line()).intersect(lines.first()->line(), &intersectPoint);
         float koeff = QLineF(lines.first()->line().p1(), intersectPoint).length() + 15 > lines.first()->line().length() ? lines.first()->line().length() : QLineF(lines.first()->line().p1(), intersectPoint).length() + 15; //ЫЫЫ =)
-        arcTop->setPos(lines.first()->line().p1() + QPointF(cos(lines.first()->line().angle() * Pi / 180) * koeff, -sin(lines.first()->line().angle() * Pi / 180) * koeff));
-        arcTop->show();
+        if (arcTop != NULL){
+            arcTop->setPos(lines.first()->line().p1() + QPointF(cos(lines.first()->line().angle() * Pi / 180) * koeff, -sin(lines.first()->line().angle() * Pi / 180) * koeff));
+            arcTop->show();
+        }
         //СЂРёСЃСѓРµРј СЃС‚СЂРµР»РєСѓ
         QPen myPen = pen();
         painter->setPen(myPen);
@@ -561,8 +564,14 @@ void QArc::setPen(const QPen &pen){
 
 void QArc::setArcType(ArcType type)
 {
+    if (myArcType == type) return;
     myArcType = type;
-    delete arcTop;
+    bool wasSelected = false;
+    if (arcTop != NULL){
+        wasSelected = arcTop->isSelected();
+        delete arcTop;
+        arcTop = NULL;
+    }
     switch (arcType()) {
     case QArc::SerialArc:
         arcTop = new QSerialArcTop(myContextMenu, this, scene());
@@ -574,7 +583,7 @@ void QArc::setArcType(ArcType type)
         arcTop = new QTerminateArcTop(myContextMenu, this, scene());
         break;
     }
-    arcTop->setSelected(true);
+    arcTop->setSelected(wasSelected);
 }
 
 Arc* QArc::toArc()
@@ -584,7 +593,12 @@ Arc* QArc::toArc()
          nodes.append(QString::number(line->line().x1()) + " " + QString::number(line->line().y1()) + " " +
                       QString::number(line->line().x2()) + " " + QString::number(line->line().y2()));
     }
-    return new Arc((Arc::ArcType)arcType(), priority(), myStartTop->number, myEndTop->number, predicate->name, nodes);
+    return new Arc(Arc::ArcType(arcType()),
+                   priority(),
+                   myStartTop->number,
+                   myEndTop->number,
+                   predicate == NULL ? "" : predicate->name,
+                   nodes);
 }
 
 Arc::Arc(ArcType type, int priority, int startTop, int endTop, QString predicate, QStringList &lines)

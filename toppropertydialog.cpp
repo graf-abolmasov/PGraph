@@ -31,15 +31,22 @@ void TopPropertyDialog::prepareForm(QTop* top){
     myTop = top;
 
     globalDBManager->getActorList(myActorList);
-    //globalDBManager->getGraphList(myGraphList);
-    foreach (Actor* actor, myActorList){
-        ui->actorsListWidget->addItem(actor->extName);
+    myActorList.insert(0, NULL);
+    QList<Graph* > myGraphList;
+    globalDBManager->getGraphList(myGraphList);
+    foreach(Graph* graph, myGraphList){
+        QList<Variable* > varList;
+        QStringList varAMList;
+        myActorList.append(new Actor(graph->name, graph->extName, Actor::normalType, "", varList, varAMList));
     }
-
+    ui->actorsListWidget->addItem(tr("Нет"));
+    for (int i = 1 ; i < myActorList.count(); i++){
+        ui->actorsListWidget->addItem(myActorList.at(i)->extName);
+    }
 
     if (top->actor != NULL){
         int idx = -1;
-        for (int i = 0; i < myActorList.count(); i++)
+        for (int i = 1; i < myActorList.count(); i++)
             if (top->actor->name == myActorList.at(i)->name &&
                 top->actor->extName == myActorList.at(i)->extName) {
                 idx = i;
@@ -50,7 +57,7 @@ void TopPropertyDialog::prepareForm(QTop* top){
             QMessageBox(QMessageBox::Critical, tr("Ошибка"), tr("Вершина использует несуществующий объект"), QMessageBox::Ok).exec();
             top->actor = NULL;
         }
-    }
+    } else ui->actorsListWidget->setCurrentRow(0);
 
     ui->spnBoxHeight->setProperty("value", top->polygon().boundingRect().height());
     ui->spnBoxWidth->setProperty("value", top->polygon().boundingRect().width());
@@ -90,4 +97,30 @@ QTop* TopPropertyDialog::getResult(){
     myTop->setPolygon(myPolygon);
     myTop->actor = myActorList.at(ui->actorsListWidget->currentRow());
     return myTop;
+}
+
+void TopPropertyDialog::on_actorsListWidget_currentRowChanged(int currentRow)
+{
+    QString info("");
+    if (currentRow > 0){
+        Actor* actor = myActorList.at(currentRow);
+        info.append(tr("Name: ") + actor->name + "\r\n");
+        QString type;
+        switch (actor->type){
+        case Actor::inlineType:
+            type = tr("inline");
+            break;
+        case Actor::normalType:
+            type = tr("normal");
+            break;
+        }
+        info.append(tr("Type: ") + type + "\r\n");
+        info.append(tr("Base module: ") + actor->baseModule + "\r\n");
+    }
+    ui->descriptionLbl->setText(info);
+}
+
+void TopPropertyDialog::on_actorsListWidget_itemDoubleClicked(QListWidgetItem* item)
+{
+    accept();
 }

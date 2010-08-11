@@ -23,7 +23,7 @@ protected:
 private:
     Ui::ArcPropertyDialog *ui;
     QArc* myArc;
-    QList<Predicate*> predicateList;
+    QList<Predicate*> myPredicateList;
 
 private slots:
     void on_buttonBox_accepted();

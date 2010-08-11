@@ -2,6 +2,7 @@
 #define QOPENGRAPHDIALOG_H
 
 #include <QDialog>
+#include "qgraph.h"
 
 namespace Ui {
     class QOpenGraphDialog;
@@ -12,7 +13,7 @@ class QOpenGraphDialog : public QDialog {
 public:
     QOpenGraphDialog(QWidget *parent = 0);
     ~QOpenGraphDialog();
-    QString getResult();
+    Graph* getResult();
     void prepareForm();
 
 protected:
@@ -20,6 +21,10 @@ protected:
 
 private:
     Ui::QOpenGraphDialog *ui;
+    QList<Graph* > myGraphList;
+
+private slots:
+    void on_listWidget_itemDoubleClicked(QListWidgetItem* item);
 };
 
 #endif // QOPENGRAPHDIALOG_H

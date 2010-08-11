@@ -26,15 +26,19 @@ void QOpenGraphDialog::changeEvent(QEvent *e)
     }
 }
 
-QString QOpenGraphDialog::getResult()
+Graph* QOpenGraphDialog::getResult()
 {
-    return ui->listWidget->currentItem()->text();
+    return myGraphList.at(ui->listWidget->currentRow());
 }
 
 void QOpenGraphDialog::prepareForm()
 {
-    QList<Graph* > graphList;
-    globalDBManager->getGraphList(graphList);
-    for (int i = 0; i < graphList.count(); i++)
-        ui->listWidget->addItem(new QListWidgetItem(graphList.at(i)->extName));
+    globalDBManager->getGraphList(myGraphList);
+    for (int i = 0; i < myGraphList.count(); i++)
+        ui->listWidget->addItem(new QListWidgetItem(myGraphList.at(i)->extName));
+}
+
+void QOpenGraphDialog::on_listWidget_itemDoubleClicked(QListWidgetItem* item)
+{
+    accept();
 }

@@ -37,6 +37,7 @@ public:
     int getGraphList(QList<Graph* > &graphList);
     int getGraph(QString extName, Graph &graph);
     int saveGraph(Graph* graph);
+    int updateGraph(Graph* graph);
 
     int saveVariableList(QList<Variable*>& varList);
     int getVariableList(QList<Variable*>& varList);
@@ -54,6 +55,8 @@ public:
 
     int registerModule(QString uniqName, QString fileName, QString comment, QStringList &paramList);
     int getRegisteredModules(QList<BaseModule*> &moduleList);
+
+    int saveStruct(Graph *graph);
 
     int getLastInsertID();
 };
