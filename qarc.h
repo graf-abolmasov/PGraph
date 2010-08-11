@@ -77,12 +77,12 @@ protected:
                QWidget *widget = 0);
 
 private:
+    ArcType myArcType;
     QTop *myStartTop;
     QTop *myEndTop;
-    ArcType myArcType;
-    QGraphicsItem *arcTop;
-    QPolygonF arcHead;
     QMenu *myContextMenu;
+    QPolygonF arcHead;
+    QGraphicsItem *arcTop;
     int myPriority;  //приоритет
     bool autoBuild(QTop* top, float dx, float dy);
     bool remake(QTop *, float dx, float dy);

@@ -28,13 +28,13 @@ QRectF QSerialArcTop::boundingRect() const {
 
 QVariant QSerialArcTop::itemChange(GraphicsItemChange change, const QVariant &value){
     if (change == QGraphicsItem::ItemSelectedHasChanged) {
-        QArc* arc = qgraphicsitem_cast<QArc* >(parentItem());
+        /*QArc* arc = qgraphicsitem_cast<QArc* >(parentItem());
         QPen pen = arc->pen();
         if (isSelected())
             pen.setColor(Qt::green);
         else
             pen.setColor(Qt::black);
-        arc->setPen(pen);
+        arc->setPen(pen);*/
     }
 
     return value;

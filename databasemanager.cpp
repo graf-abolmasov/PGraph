@@ -262,7 +262,7 @@ int DataBaseManager::getDataTypeList(QList<DataType*>& typeList){
     return db.lastError().number();
 }
 
-int DataBaseManager::saveVariableList(QList<Variable*>& varList){
+bool DataBaseManager::saveVariableList(QList<Variable*>& varList){
     bool ok = db.open();
     if (!ok) return db.lastError().number();
     QSqlQuery query;
@@ -280,7 +280,7 @@ int DataBaseManager::saveVariableList(QList<Variable*>& varList){
         query.clear();
     }
     db.close();
-    return db.lastError().number();
+    return (db.lastError().number() == QSqlError::NoError);
 }
 
 int DataBaseManager::getVariableList(QList<Variable* >& varList){

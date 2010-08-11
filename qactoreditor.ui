@@ -542,10 +542,10 @@
          <bool>true</bool>
         </attribute>
         <attribute name="horizontalHeaderDefaultSectionSize">
-         <number>165</number>
+         <number>160</number>
         </attribute>
         <attribute name="horizontalHeaderMinimumSectionSize">
-         <number>165</number>
+         <number>160</number>
         </attribute>
         <attribute name="horizontalHeaderStretchLastSection">
          <bool>true</bool>
@@ -563,10 +563,10 @@
          <bool>true</bool>
         </attribute>
         <attribute name="horizontalHeaderMinimumSectionSize">
-         <number>165</number>
+         <number>160</number>
         </attribute>
         <attribute name="horizontalHeaderDefaultSectionSize">
-         <number>165</number>
+         <number>160</number>
         </attribute>
         <column>
          <property name="text">

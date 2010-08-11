@@ -8,6 +8,10 @@ QVariableDialog::QVariableDialog(QWidget *parent) :
     ui(new Ui::QVariableDialog)
 {
     ui->setupUi(this);
+    ui->variablesTable->setColumnWidth(0, 80);
+    ui->variablesTable->setColumnWidth(1, 70);
+    ui->variablesTable->setColumnWidth(2, 145);
+    ui->variablesTable->setColumnWidth(3, 145);
 }
 
 QVariableDialog::~QVariableDialog()
@@ -31,50 +35,60 @@ void QVariableDialog::prepareForm(QString filter)
 {
     /*тут мы получаем данные из базы*/
     globalDBManager->getVariableList(myVariableList);
+    globalDBManager->getDataTypeList(myTypeList);
     /*заполняем форму*/
     if (filter != "")
         foreach (Variable* var, myVariableList)
             if (var->name != filter)
                 myVariableList.removeAt(myVariableList.indexOf(var));
-        
+    ui->variablesTable->blockSignals(true);
     foreach (Variable* var, myVariableList){
         ui->variablesTable->insertRow(ui->variablesTable->rowCount());
-        ui->variablesTable->setItem(ui->variablesTable->rowCount()-1,0,new QTableWidgetItem(var->name,QTableWidgetItem::Type));
-        ui->variablesTable->setItem(ui->variablesTable->rowCount()-1,1,new QTableWidgetItem(var->type,0));
+        ui->variablesTable->setItem(ui->variablesTable->rowCount()-1,0,new QTableWidgetItem(var->name));
+        ui->variablesTable->setItem(ui->variablesTable->rowCount()-1,1,new QTableWidgetItem(var->type));
+        ui->variablesTable->setItem(ui->variablesTable->rowCount()-1,2,new QTableWidgetItem(var->initValue.toString()));
+        ui->variablesTable->setItem(ui->variablesTable->rowCount()-1,3,new QTableWidgetItem(var->comment));
     }
+    ui->variablesTable->blockSignals(false);
 }
 
 void QVariableDialog::on_newButton_clicked()
 {
-    QVariableEditor *editor = new QVariableEditor();
-    editor->prepareForm(NULL);
-    if (editor->exec()){
-        Variable* newVar = editor->getResult();
+    QVariableEditor editor;
+    editor.prepareForm(NULL);
+    if (editor.exec()){
+        Variable* newVar = editor.getResult();
         myVariableList.append(newVar);
+        ui->variablesTable->blockSignals(true);
         ui->variablesTable->insertRow(ui->variablesTable->rowCount());
-        ui->variablesTable->setItem(ui->variablesTable->rowCount()-1,0,new QTableWidgetItem(newVar->name, QTableWidgetItem::Type));
-        ui->variablesTable->setItem(ui->variablesTable->rowCount()-1,1,new QTableWidgetItem(newVar->type,0));
+        ui->variablesTable->setItem(ui->variablesTable->rowCount()-1,0,new QTableWidgetItem(newVar->name));
+        ui->variablesTable->setItem(ui->variablesTable->rowCount()-1,1,new QTableWidgetItem(newVar->type));
+        ui->variablesTable->setItem(ui->variablesTable->rowCount()-1,2,new QTableWidgetItem(newVar->initValue.toString()));
+        ui->variablesTable->setItem(ui->variablesTable->rowCount()-1,3,new QTableWidgetItem(newVar->comment));
+        ui->variablesTable->blockSignals(false);
     }
-    delete editor;
 }
 
 void QVariableDialog::on_editButton_clicked()
 {
-    QVariableEditor *editor = new QVariableEditor();
+    QVariableEditor editor;
     Variable* var;
     if (ui->variablesTable->selectedRanges().count() > 0) {
         int idx = ui->variablesTable->selectedRanges().first().topRow();
         if (idx == -1) return;
         var = myVariableList.at(idx);
-        editor->prepareForm(var);
-        if (editor->exec()){
-            Variable* newVar = editor->getResult();
+        editor.prepareForm(var);
+        if (editor.exec()){
+            Variable* newVar = editor.getResult();
             myVariableList.replace(idx, newVar);
-            ui->variablesTable->setItem(idx,0,new QTableWidgetItem(newVar->name, QTableWidgetItem::Type));
-            ui->variablesTable->setItem(idx,1,new QTableWidgetItem(newVar->type,0));
+            ui->variablesTable->blockSignals(true);
+            ui->variablesTable->setItem(idx,0,new QTableWidgetItem(newVar->name));
+            ui->variablesTable->setItem(idx,1,new QTableWidgetItem(newVar->type));
+            ui->variablesTable->setItem(idx,2,new QTableWidgetItem(newVar->initValue.toString()));
+            ui->variablesTable->setItem(idx,3,new QTableWidgetItem(newVar->comment));
+            ui->variablesTable->blockSignals(false);
         }
     }
-    delete editor;
 }
 
 void QVariableDialog::on_deleteButton_clicked()
@@ -84,22 +98,62 @@ void QVariableDialog::on_deleteButton_clicked()
         if (idx == -1) return;
         delete myVariableList.at(idx);
         myVariableList.removeAt(idx);
+        ui->variablesTable->blockSignals(true);
         ui->variablesTable->removeRow(idx);
+        ui->variablesTable->blockSignals(false);
     }
-}
-
-void QVariableDialog::on_variablesTable_doubleClicked(QModelIndex index)
-{
-    on_editButton_clicked();
 }
 
 void QVariableDialog::on_buttonBox_accepted()
 {
-    globalDBManager->saveVariableList(myVariableList);
+    ui->variablesTable->setCurrentCell(-1, -1);
+    if (!globalDBManager->saveVariableList(myVariableList))
+        QMessageBox::warning(this, "Ошибка", "Произошла ошибка при сохранении в информационный фонд", QMessageBox::Ok);
 }
 
 Variable* QVariableDialog::getVariable()
 {
     Variable* var = myVariableList.at(ui->variablesTable->currentRow());
     return var;
+}
+
+void QVariableDialog::on_variablesTable_cellChanged(int row, int column)
+{
+    if (row == -1) return;
+    switch (column) {
+    case 0:
+        myVariableList.at(row)->name = ui->variablesTable->item(row, column)->text();
+        break;
+    case 1:
+        myVariableList.at(row)->type = ui->variablesTable->item(row, column)->text();
+        break;
+    case 2:
+        myVariableList.at(row)->initValue = ui->variablesTable->item(row, column)->text();
+        break;
+    case 3:
+        myVariableList.at(row)->comment = ui->variablesTable->item(row, column)->text();
+        break;
+    }
+}
+
+void QVariableDialog::on_variablesTable_currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn)
+{
+    if (previousRow != -1){
+        if (previousColumn == 1){
+            ui->variablesTable->setCellWidget(previousRow, 1, NULL);
+            ui->variablesTable->item(previousRow, 1)->setText(varTypeCmbBox->currentText());
+            delete varTypeCmbBox;
+        }
+    }
+
+    if (currentColumn == 1){
+        varTypeCmbBox = new QComboBox(ui->variablesTable);
+        foreach (DataType* type, myTypeList)
+            varTypeCmbBox->addItem(type->name);
+
+        int idx = varTypeCmbBox->findText(ui->variablesTable->item(currentRow, 1)->text());
+        varTypeCmbBox->setCurrentIndex(idx);
+
+        ui->variablesTable->setCellWidget(currentRow, 1, varTypeCmbBox);
+    }
 }
