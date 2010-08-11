@@ -69,7 +69,6 @@ private slots:
     void deleteArc();
     void deleteSync();
     void deleteComment();
-    void itemInserted(QTop *item);
     void itemSelected(QGraphicsItem *item);
     void textInserted(QComment *);
 };

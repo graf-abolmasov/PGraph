@@ -180,7 +180,7 @@ void QActorEditor::on_buttonBox_accepted()
         outputData.append("{\r\n");
         QString code(myActor->extName);
         for (int i = 0; i < myActor->variableList.count(); i++){
-            code.replace(QRegExp("(\\b)" + myActor->variableList.at(i)->name + "(\\b)", Qt::CaseSensitive), "D->" + myActor->variableList.at(i)->name);
+            code.replace(QRegExp("(\\b)" + myActor->variableList.at(i)->name + "(\\b)", Qt::CaseSensitive), "(D->" + myActor->variableList.at(i)->name + ")");
         }
         //code.replace(QRegExp("\\n"), "\n  ");
         outputData.append("  " + code + "\r\n");

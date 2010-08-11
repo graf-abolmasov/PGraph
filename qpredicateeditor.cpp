@@ -164,8 +164,7 @@ void QPredicateEditor::on_buttonBox_accepted()
             code.replace(QRegExp("(\\b)" + myPredicate->variableList.at(i)->name + "(\\b)", Qt::CaseSensitive), "D->" + myPredicate->variableList.at(i)->name);
         }
         //code.replace(QRegExp("\\n"), "\n  ");
-        outputData.append("  " + code + "\r\n");
-        outputData.append("  return 1;\r\n");
+        outputData.append("  return (" + code + ")\r\n");
         outputData.append("}\r\n");
         output.write(outputData);
         output.close();

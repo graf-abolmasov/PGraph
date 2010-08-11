@@ -39,7 +39,7 @@ public:
     int saveGraph(Graph* graph);
     int updateGraph(Graph* graph);
 
-    int saveVariableList(QList<Variable*>& varList);
+    bool saveVariableList(QList<Variable*>& varList);
     int getVariableList(QList<Variable*>& varList);
 
     int saveDataTypeList(QList<DataType*>& typeList);

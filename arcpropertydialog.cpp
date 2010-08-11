@@ -46,14 +46,16 @@ void ArcPropertyDialog::prepareForm(QArc *arc)
 
     //Загружаем предикаты из базы данных
     globalDBManager->getPredicateList(myPredicateList);
+    myPredicateList.insert(0, NULL);;
 
-    for (int i = 0; i < myPredicateList.count(); i++){
+    ui->predicateList->addItem(tr("Нет"));
+    for (int i = 1; i < myPredicateList.count(); i++){
         ui->predicateList->addItem(myPredicateList.at(i)->extName);
     }
 
-    if (arc->predicate != NULL){
+    if (arc->predicate != NULL) {
         int idx = -1;
-        for (int i = 0; i < myPredicateList.count(); i++)
+        for (int i = 1; i < myPredicateList.count(); i++)
             if (arc->predicate->name == myPredicateList.at(i)->name &&
                 arc->predicate->extName == myPredicateList.at(i)->extName) {
                 idx = i;
@@ -64,7 +66,7 @@ void ArcPropertyDialog::prepareForm(QArc *arc)
             QMessageBox(QMessageBox::Critical, tr("Ошибка"), tr("Вершина использует несуществующий объект"), QMessageBox::Ok).exec();
             arc->predicate = NULL;
         }
-    }
+    } else ui->predicateList->setCurrentRow(0);
 }
 
 QArc* ArcPropertyDialog::getResult()

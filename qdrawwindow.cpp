@@ -23,8 +23,8 @@ TDrawWindow::TDrawWindow()
     scene->setMultiProcTopMenu(multiProcMenu);
     scene->setBackgroundBrush(QBrush(Qt::white));
     scene->setSceneRect(-800, -600, 800, 600);
-    connect(scene, SIGNAL(itemInserted(QTop *)),
-            this, SLOT(itemInserted(QTop *)));
+    /*connect(scene, SIGNAL(itemInserted(QGraphicsItem*)),
+            this, SLOT(itemInserted(QTop *)));*/
     connect(scene, SIGNAL(itemSelected(QGraphicsItem *)),
         this, SLOT(itemSelected(QGraphicsItem *)));  
     connect(scene, SIGNAL(textInserted(QComment *)),
@@ -149,20 +149,13 @@ void TDrawWindow::deleteComment()
     emit sceneChanged();
 }
 
-void TDrawWindow::itemInserted(QTop *item)
-{
-    //setMode(QDiagramScene::MoveItem);
-    emit sceneChanged();
-}
-
 void TDrawWindow::itemSelected(QGraphicsItem *item)
 {
-    //setWindowTitle("sdfdasf");
+
 }
 
 void TDrawWindow::textInserted(QComment *)
 {
-    //setMode(QDiagramScene::MoveItem);
     emit sceneChanged();
 }
 
@@ -183,34 +176,30 @@ void TDrawWindow::setItemIcon()
     QString fileName = QFileDialog::getOpenFileName(0,
                                                     tr("Открыть картинку..."),
                                                     "",
-                                                    tr("All Files (*)"));
-    foreach (QGraphicsItem *item, scene->selectedItems()) {
-        if (item->type() == QTop::Type) {
-            if (!fileName.isEmpty()){
+                                                    tr("Images (*.png *.xpm *.jpg *.jpeg)"));
+    foreach (QGraphicsItem *item, scene->selectedItems())
+        if (item->type() == QTop::Type)
+            if (!fileName.isEmpty()) {
                 QImage img(fileName);
-                if (!img.isNull()){
+                if (!img.isNull()) {
                     qgraphicsitem_cast<QTop *>(item)->setIcon(img);
                     scene->invalidate(item->mapRectToScene(item->boundingRect()));
                 }
             }
-        }
-    }
 
     emit sceneChanged();
 }
 
 /*!
-  Реакция на нажатие пункта меню: Свойства
+  Реакция на нажатие пункта меню: Свойства вершины
 */
 void TDrawWindow::showTopPropDialog(){
     TopPropertyDialog dlg;
     QTop* top = qgraphicsitem_cast<QTop *>(scene->selectedItems().first());
     dlg.prepareForm(top);
-    if (dlg.exec()){
+    if (dlg.exec())
         top = dlg.getResult();
-    }
 }
-
 
 
 /*!
@@ -218,18 +207,18 @@ void TDrawWindow::showTopPropDialog(){
 */
 void TDrawWindow::saveAsImage(QString filename)
 {
-    if (scene != NULL){
+    if (scene != NULL) {
         QSizeF size = scene->sceneRect().size();
         QImage Image(size.toSize(), QImage::Format_ARGB32_Premultiplied);
         Image.fill(0);
         QPainter painter(&Image);
-        scene->render(&painter);
+        scene->render(&painter, scene->sceneRect(), scene->sceneRect(), Qt::KeepAspectRatio);
         Image.save(filename);
     }
 }
 
 /*!
-  Реакция на нажатие пункта меню: Свойства
+  Реакция на нажатие пункта меню: Свойства дуги
 */
 void TDrawWindow::showArcPropDialog()
 {
@@ -253,11 +242,9 @@ void TDrawWindow::makeAsRoot(){
 */
 QList<QTop* > TDrawWindow::allTops(){
     QList<QTop* > topList;
-    for (int i = 0; i < scene->items().count(); i++){
-        if (scene->items().at(i)->type() == QTop::Type){
+    for (int i = 0; i < scene->items().count(); i++)
+        if (scene->items().at(i)->type() == QTop::Type)
             topList.append(qgraphicsitem_cast<QTop* >(scene->items().at(i)));
-        }
-    }
     return topList;
 }
 
@@ -266,11 +253,9 @@ QList<QTop* > TDrawWindow::allTops(){
 */
 QList<QArc* > TDrawWindow::allArcs(){
     QList<QArc* > arcList;
-    for (int i = 0; i < scene->items().count(); i++){
-        if (scene->items().at(i)->type() == QArc::Type){
+    for (int i = 0; i < scene->items().count(); i++)
+        if (scene->items().at(i)->type() == QArc::Type)
             arcList.append(qgraphicsitem_cast<QArc* >(scene->items().at(i)));
-        }
-    }
     return arcList;
 }
 
@@ -279,11 +264,9 @@ QList<QArc* > TDrawWindow::allArcs(){
 */
 QList<QMultiProcTop* > TDrawWindow::allMultiProcTop(){
     QList<QMultiProcTop* > topList;
-    for (int i = 0; i < scene->items().count(); i++){
-        if (scene->items().at(i)->type() == QMultiProcTop::Type){
+    for (int i = 0; i < scene->items().count(); i++)
+        if (scene->items().at(i)->type() == QMultiProcTop::Type)
             topList.append(qgraphicsitem_cast<QMultiProcTop* >(scene->items().at(i)));
-        }
-    }
     return topList;
 }
 
@@ -292,11 +275,9 @@ QList<QMultiProcTop* > TDrawWindow::allMultiProcTop(){
 */
 QList<QComment* > TDrawWindow::allComments(){
     QList<QComment* > commentList;
-    for (int i = 0; i < scene->items().count(); i++){
-        if (scene->items().at(i)->type() == QComment::Type){
+    for (int i = 0; i < scene->items().count(); i++)
+        if (scene->items().at(i)->type() == QComment::Type)
             commentList.append(qgraphicsitem_cast<QComment* >(scene->items().at(i)));
-        }
-    }
     return commentList;
 }
 
@@ -305,11 +286,9 @@ QList<QComment* > TDrawWindow::allComments(){
 */
 QList<QSyncArc* > TDrawWindow::allSyncArcs(){
     QList<QSyncArc* > arcList;
-    for (int i = 0; i < scene->items().count(); i++){
-        if (scene->items().at(i)->type() == QSyncArc::Type){
+    for (int i = 0; i < scene->items().count(); i++)
+        if (scene->items().at(i)->type() == QSyncArc::Type)
             arcList.append(qgraphicsitem_cast<QSyncArc* >(scene->items().at(i)));
-        }
-    }
     return arcList;
 }
 
@@ -347,7 +326,7 @@ void TDrawWindow::loadGraph(QString extName, DataBaseManager* dbManager)
     QList<QMultiProcTop* > multiProcTopList;
     Graph graph("", "", topList, arcList, commentList, syncArcList, multiProcTopList);
     dbManager->getGraph(extName, graph);
-    foreach (Top* top, graph.topList){
+    foreach (Top* top, graph.topList) {
         QTop *qtop = new QTop(topMenu, NULL, scene);
         qtop->setPos(top->x, top->y);
         qtop->number = top->number;
@@ -363,7 +342,7 @@ void TDrawWindow::loadGraph(QString extName, DataBaseManager* dbManager)
         qtop->actor = dbManager->getActor(top->actor);
     }
 
-    foreach (Arc* arc, graph.arcList){
+    foreach (Arc* arc, graph.arcList) {
         QTop *startTop = NULL;
         QTop *endTop = NULL;
         QList<QTop* > topList = allTops();
@@ -383,14 +362,14 @@ void TDrawWindow::loadGraph(QString extName, DataBaseManager* dbManager)
         }
         qarc->addLine(qarc->currentLine);
         qarc->currentLine = NULL;
-        startTop->addArc(qarc);
-        endTop->addArc(qarc);
         qarc->setPriority(arc->priority);
         qarc->setArcType(QArc::ArcType(arc->type));
         qarc->predicate = dbManager->getPredicate(arc->predicate);
+        startTop->addArc(qarc);
+        endTop->addArc(qarc);
     }
 
-    foreach (Comment* comment, graph.commentList){
+    foreach (Comment* comment, graph.commentList) {
         QComment *qcomment = new QComment(NULL, NULL, scene);
         qcomment->setPos(comment->x, comment->y);
         qcomment->setPlainText(comment->text);

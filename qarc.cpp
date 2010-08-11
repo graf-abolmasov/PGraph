@@ -414,22 +414,24 @@ bool QArc::remake(QTop* aMovedTop, float dx, float dy){
 QArc::QArc(QTop *startItem, QTop *endItem, QMenu *contextMenu,
          QGraphicsItem *parent, QGraphicsScene *scene)
     : QGraphicsLineItem(parent, scene){
-    myStartTop = startItem;
-    myEndTop = endItem;
-    myContextMenu = contextMenu;
+    //инициализация указателей
+    arcTop          = NULL;
+    currentLine     = NULL;
+    predicate       = NULL;
+    myStartTop      = startItem;
+    myEndTop        = endItem;
+    myContextMenu   = contextMenu;
+
     setPen(QPen(Qt::black, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-    arcTop = NULL;
+
     setArcType(QArc::SerialArc);
     myPriority = 1;
-    currentLine = NULL;
     arcTop->hide();
-    predicate = NULL;
 }
 
 QArc::~QArc(){
-    foreach (QGraphicsLineItem *line, lines){
+    foreach (QGraphicsLineItem *line, lines)
        delete line;
-    }
 }
 
 /*!
@@ -445,14 +447,13 @@ QRectF QArc::boundingRect() const{
 }
 
 /*!
-  Работает не правильно.
+  Форма дуги
 */
 QPainterPath QArc::shape() const{
     QPainterPath path;
     path.addPolygon(arcHead);
-    foreach (QArcLine *line, lines){
+    foreach (QArcLine *line, lines)
        path.addPath(line->shape());
-    }
     path.addPath(arcTop->shape());
 
     return path;
@@ -462,12 +463,7 @@ void QArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
     if (lines.count() == 0) return;
 
     if ((myStartTop == NULL) || (myEndTop == NULL)) {
-        //СЂРµР¶РёРј СЃРѕР·РґР°РЅРёСЏ РґСѓРіРё!
-
     } else {
-        //СЂРµР¶РёРј РѕС‚СЂРёСЃРѕРІРєРё Р·Р°РІРµСЂС€РµРЅРЅРѕР№ РґСѓРіРё
-
-        //РѕС‚РѕР±СЂР°Р¶Р°РµРј СЃРµСЂС‹Р№ РєРІР°РґСЂР°С‚РёРє
         QPointF intersectPoint;
         myStartTop->getIntersectBound(lines.first()->line()).intersect(lines.first()->line(), &intersectPoint);
         float koeff = QLineF(lines.first()->line().p1(), intersectPoint).length() + 15 > lines.first()->line().length() ? lines.first()->line().length() : QLineF(lines.first()->line().p1(), intersectPoint).length() + 15; //ЫЫЫ =)
@@ -475,7 +471,6 @@ void QArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
             arcTop->setPos(lines.first()->line().p1() + QPointF(cos(lines.first()->line().angle() * Pi / 180) * koeff, -sin(lines.first()->line().angle() * Pi / 180) * koeff));
             arcTop->show();
         }
-        //СЂРёСЃСѓРµРј СЃС‚СЂРµР»РєСѓ
         QPen myPen = pen();
         painter->setPen(myPen);
         painter->setBrush(myPen.color());
@@ -484,17 +479,14 @@ void QArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
         QPointF t = lines.last()->line().p2() - QPointF(cos(lines.last()->line().angle() * Pi / 180) * koeff2, -sin(lines.last()->line().angle() * Pi / 180) * koeff2);
         double angle = ((myEndTop->getIntersectBound(lines.last()->line()).normalVector().angle()) + 180) * Pi / 180;
         int width = myPriority + 1;
-        QPointF arcP1 = t + QPointF(sin(angle + Pi / 3) * 3*width,
-                                              cos(angle + Pi / 3) * 3*width);
-        QPointF arcP2 = t + QPointF(sin(angle + Pi - Pi / 3) * 3*width,
-                                              cos(angle + Pi - Pi / 3) * 3*width);
-
+        QPointF arcP1 = t + QPointF(sin(angle + Pi / 3) * 1.8*width,
+                                              cos(angle + Pi / 3) * 1.8*width);
+        QPointF arcP2 = t + QPointF(sin(angle + Pi - Pi / 3) * 1.8*width,
+                                              cos(angle + Pi - Pi / 3) * 1.8*width);
         arcHead.clear();
         arcHead << t << arcP1 << arcP2;
         painter->drawPolygon(arcHead);
    }
-
-   return;
 }
 
 /*!
@@ -564,15 +556,12 @@ void QArc::setPen(const QPen &pen){
 
 void QArc::setArcType(ArcType type)
 {
-    if (myArcType == type) return;
     myArcType = type;
-    bool wasSelected = false;
     if (arcTop != NULL){
-        wasSelected = arcTop->isSelected();
         delete arcTop;
         arcTop = NULL;
     }
-    switch (arcType()) {
+    switch (myArcType) {
     case QArc::SerialArc:
         arcTop = new QSerialArcTop(myContextMenu, this, scene());
         break;
@@ -583,7 +572,6 @@ void QArc::setArcType(ArcType type)
         arcTop = new QTerminateArcTop(myContextMenu, this, scene());
         break;
     }
-    arcTop->setSelected(wasSelected);
 }
 
 Arc* QArc::toArc()
