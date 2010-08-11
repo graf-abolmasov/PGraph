@@ -303,7 +303,7 @@ void QTop::setAsRoot(bool flag){
     isRoot = flag;
     if (isRoot){
         QPen p = pen();// painter->pen();
-        p.setWidth(5);
+        p.setWidth(4);
         setPen(p);
     } else {
         QPen p = pen();// painter->pen();
@@ -341,7 +341,7 @@ Top* QTop::toTop()
     QPointF pos = polygon().at(0) + scenePos();
     QPointF sizeX = polygon().at(1) - polygon().at(0);
     QPointF sizeY = polygon().at(2) - polygon().at(1);
-    return new Top(pos.x(), pos.y(), sizeX.x(), sizeY.y(), number, isRoot, actor->name);
+    return new Top(pos.x(), pos.y(), sizeX.x(), sizeY.y(), number, isRoot, actor == NULL ? "" : actor->name);
 }
 
 Top::Top(float x, float y, float sizeX, float sizeY, int number, bool isRoot, QString actor)

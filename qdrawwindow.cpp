@@ -324,7 +324,7 @@ Graph* TDrawWindow::getGraph()
     QList<Arc* > arcList;
     foreach (QArc* arc, allArcs())
         arcList.append(arc->toArc());
-     QList<Comment* > commentList;
+    QList<Comment* > commentList;
     foreach (QComment* comment, allComments())
         commentList.append(comment->toComment());
 
@@ -386,6 +386,7 @@ void TDrawWindow::loadGraph(QString extName, DataBaseManager* dbManager)
         startTop->addArc(qarc);
         endTop->addArc(qarc);
         qarc->setPriority(arc->priority);
+        qarc->setArcType(QArc::ArcType(arc->type));
         qarc->predicate = dbManager->getPredicate(arc->predicate);
     }
 
@@ -396,9 +397,20 @@ void TDrawWindow::loadGraph(QString extName, DataBaseManager* dbManager)
     }
 }
 
-void TDrawWindow::saveGraph(QString extName, DataBaseManager *dbManager)
+void TDrawWindow::saveGraph(QString name, QString extName, DataBaseManager *dbManager, bool update)
 {
     Graph* graph = getGraph();
     graph->extName = extName;
-    dbManager->saveGraph(graph);
+    graph->name = name;
+    if (update)
+        dbManager->updateGraph(graph);
+    else
+        dbManager->saveGraph(graph);
+}
+
+void TDrawWindow::saveStruct(QString name, DataBaseManager *dbManager)
+{
+    Graph* graph = getGraph();
+    graph->name = name;
+    dbManager->saveStruct(graph);
 }

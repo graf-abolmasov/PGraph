@@ -27,6 +27,10 @@ private:
     Ui::TopPropertyDialog *ui;
     QTop* myTop;
     QList<Actor*> myActorList;
+
+private slots:
+    void on_actorsListWidget_itemDoubleClicked(QListWidgetItem* item);
+    void on_actorsListWidget_currentRowChanged(int currentRow);
 };
 
 #endif // TOPPROPERTYDIALOG_H

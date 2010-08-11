@@ -45,10 +45,25 @@ void ArcPropertyDialog::prepareForm(QArc *arc)
     ui->prioritySpnBox->setValue(arc->priority());
 
     //Загружаем предикаты из базы данных
-    globalDBManager->getPredicateList(predicateList);
+    globalDBManager->getPredicateList(myPredicateList);
 
-    for (int i = 0; i < predicateList.count(); i++){
-        ui->predicateList->addItem(new QListWidgetItem(predicateList.at(i)->extName));
+    for (int i = 0; i < myPredicateList.count(); i++){
+        ui->predicateList->addItem(myPredicateList.at(i)->extName);
+    }
+
+    if (arc->predicate != NULL){
+        int idx = -1;
+        for (int i = 0; i < myPredicateList.count(); i++)
+            if (arc->predicate->name == myPredicateList.at(i)->name &&
+                arc->predicate->extName == myPredicateList.at(i)->extName) {
+                idx = i;
+                break;
+        }
+        if (idx != -1) ui->predicateList->setCurrentRow(idx);
+        else {
+            QMessageBox(QMessageBox::Critical, tr("Ошибка"), tr("Вершина использует несуществующий объект"), QMessageBox::Ok).exec();
+            arc->predicate = NULL;
+        }
     }
 }
 
@@ -64,7 +79,7 @@ void ArcPropertyDialog::on_buttonBox_accepted()
     if (ui->terminateRadioBtn->isChecked()) myArc->setArcType(QArc::TerminateArc);
     myArc->setPriority(ui->prioritySpnBox->value());
     if (ui->predicateList->currentRow() > -1)
-        myArc->predicate = predicateList.at(ui->predicateList->currentRow());
+        myArc->predicate = myPredicateList.at(ui->predicateList->currentRow());
     else
         myArc->predicate = NULL;
 

@@ -5,6 +5,7 @@
 #include "qmoduleregister.h"
 #include "qsavegraphdialog.h"
 #include "qopengraphdialog.h"
+#include "commonutils.h"
 
 QStatusBar *globalStatusBar;
 
@@ -19,7 +20,8 @@ TMyWindow::TMyWindow()
     createToolBar();
 
     setWindowIcon(QIcon(":/images/G.png"));
-    setWindowTitle(tr("Граф-редактор"));
+    setMyGraphName("");
+    setMyGraphExtName("");
 }
 
 TMyWindow::~TMyWindow()
@@ -29,14 +31,14 @@ TMyWindow::~TMyWindow()
 
 void TMyWindow::createMenus()
 {
-    fileMenu = menuBar()->addMenu(tr("Файл"));
-    fileMenu->addAction(newGraphAct);
-    fileMenu->addAction(openGraphAct);
-    fileMenu->addAction(saveGraphAct);
-    fileMenu->addAction(saveAsGraphAct);
-    fileMenu->addAction(saveAsImageGraphAct);
-    fileMenu->addSeparator();
-    fileMenu->addAction(exitAction);
+    grafMenu = menuBar()->addMenu(tr("Граф"));
+    grafMenu->addAction(newGraphAct);
+    grafMenu->addAction(openGraphAct);
+    grafMenu->addAction(saveGraphAct);
+    grafMenu->addAction(saveAsGraphAct);
+    grafMenu->addAction(saveAsImageGraphAct);
+    grafMenu->addSeparator();
+    grafMenu->addAction(exitAction);
 
     objectMenu = menuBar()->addMenu(tr("Объект"));
     objectMenu->addAction(openObjectEditorAct);
@@ -58,17 +60,17 @@ void TMyWindow::createMenus()
 void TMyWindow::createActions()
 {
 
-    newGraphAct = new QAction(tr("Создать"), this);
+    newGraphAct = new QAction(QIcon(":images/new.png"), tr("Создать"), this);
     newGraphAct->setShortcuts(QKeySequence::New);
     newGraphAct->setStatusTip(tr("Создать пустой граф"));
     connect(newGraphAct, SIGNAL(triggered()), this, SLOT(CMGNew()));
 
-    openGraphAct = new QAction(tr("Открыть"), this);
+    openGraphAct = new QAction(QIcon(":/images/open.png"), tr("Открыть"), this);
     openGraphAct->setShortcuts(QKeySequence::Open);
     openGraphAct->setStatusTip(tr("Открыть из базы"));
     connect(openGraphAct, SIGNAL(triggered()), this, SLOT(CMGOpen()));
 
-    saveGraphAct = new QAction(tr("Сохранить"), this);
+    saveGraphAct = new QAction(QIcon(":/images/save.png"), tr("Сохранить"), this);
     saveGraphAct->setShortcuts(QKeySequence::Save);
     saveGraphAct->setStatusTip(tr("Сохранить в базу"));
     connect(saveGraphAct, SIGNAL(triggered()), this, SLOT(CMGSave()));
@@ -99,7 +101,7 @@ void TMyWindow::createActions()
     registerUnitAct->setStatusTip(tr("Зарегистрировать модуль"));
     connect(registerUnitAct, SIGNAL(triggered()), this, SLOT(CMNewModule()));
 
-    openObjectEditorAct = new QAction(tr("Редактор объектов"), this);
+    openObjectEditorAct = new QAction(QIcon(":/images/objectEditor.png"), tr("Редактор объектов"), this);
     openObjectEditorAct->setStatusTip(tr("Редактор объектов"));
     connect(openObjectEditorAct, SIGNAL(triggered()), this, SLOT(CMObjList()));
 
@@ -110,12 +112,15 @@ void TMyWindow::createActions()
     connect(dataTypeAct, SIGNAL(triggered()), this, SLOT(CMEdtType()));
 
     runAct = new QAction(QIcon(":/images/build.png"), tr("Запуск"), this);
+    runAct->setStatusTip(tr("Компиляция и запуск"));
     connect(runAct, SIGNAL(triggered()), this, SLOT(CMRun()));
 
     compileAct = new QAction(QIcon(":/images/compile.png"), tr("Компилировать"), this);
+    compileAct->setStatusTip(tr("Компилировать в exe"));
     connect(compileAct, SIGNAL(triggered()), this, SLOT(CMCompile()));
 
     saveStructAct = new QAction(tr("Записать структуру"), this);
+    saveStructAct->setStatusTip(tr("Записать структуру графа в базу"));
     connect(saveStructAct, SIGNAL(triggered()), this, SLOT(CMSaveStruct()));
 
     manualInputAct = new QAction(tr("Ручной ввод данных"), this);
@@ -160,6 +165,12 @@ TDrawWindow* TMyWindow::createDrawWindow()
 void TMyWindow::createToolBar()
 {
     mainToolBar = addToolBar(tr("Инструменты"));
+    mainToolBar->addAction(newGraphAct);
+    mainToolBar->addAction(openGraphAct);
+    mainToolBar->addAction(saveGraphAct);
+    mainToolBar->addSeparator();
+    mainToolBar->addAction(openObjectEditorAct);
+    mainToolBar->addSeparator();
     mainToolBar->addAction(runAct);
     mainToolBar->addAction(compileAct);
 
@@ -186,6 +197,8 @@ void TMyWindow::CMGNew()
 {
     TDrawWindow *newDrawWindow = createDrawWindow();
     newDrawWindow->showMaximized();
+    setMyGraphExtName("");
+    setMyGraphName("");
 }
 
 TDrawWindow *TMyWindow::activeDrawWindow()
@@ -228,7 +241,9 @@ void TMyWindow::CMGSaveAs()
 {
     QSaveGraphDialog dialog;
     if (dialog.exec()){
-        activeDrawWindow()->saveGraph(dialog.getResult(), globalDBManager);
+        setMyGraphExtName(dialog.getResult());
+        setMyGraphName("G" + getCRC(myGraphExtName.toUtf8()));
+        activeDrawWindow()->saveGraph(myGraphName, myGraphExtName, globalDBManager);
     }
 }
 
@@ -263,7 +278,10 @@ void TMyWindow::CMGOpen()
     QOpenGraphDialog dialog;
     dialog.prepareForm();
     if (dialog.exec()){
-        activeDrawWindow()->loadGraph(dialog.getResult(), globalDBManager);
+        CMGNew();
+        setMyGraphExtName(dialog.getResult()->extName);
+        setMyGraphName(dialog.getResult()->name);
+        activeDrawWindow()->loadGraph(dialog.getResult()->extName, globalDBManager);
     }
 }
 
@@ -279,4 +297,40 @@ void TMyWindow::CMNewModule()
 void TMyWindow::CMExit()
 {
     QApplication::closeAllWindows();
+}
+
+void TMyWindow::CMSaveStruct()
+{
+    if (myGraphName == "") {
+        QMessageBox::warning(this, "Ошибка", "Сохраните граф", QMessageBox::Ok);
+        return;
+    }
+    activeDrawWindow()->saveStruct(myGraphName, globalDBManager);
+}
+
+void TMyWindow::CMGSave()
+{
+    if (myGraphName != "")
+        activeDrawWindow()->saveGraph(myGraphName, myGraphExtName, globalDBManager, true);
+}
+
+void TMyWindow::setMyGraphName(QString name)
+{
+    myGraphName = name;
+    if (myGraphName == ""){
+        buildMenu->setEnabled(false);
+        saveGraphAct->setEnabled(false);
+    } else {
+        buildMenu->setEnabled(true);
+        saveGraphAct->setEnabled(true);
+    }
+}
+
+void TMyWindow::setMyGraphExtName(QString extName)
+{
+    myGraphExtName = extName;
+    if (myGraphExtName == "")
+        setWindowTitle(tr("Граф-редактор"));
+    else
+        setWindowTitle(myGraphExtName + tr(" - Граф-редактор"));
 }

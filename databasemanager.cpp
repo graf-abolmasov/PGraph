@@ -44,7 +44,7 @@ int DataBaseManager::getGraph(QString extName, Graph &graph)
     if (!ok) return db.lastError().number();
     QSqlQuery query;
     query.prepare("SELECT ELTYP, ISTR, X, Y, SizeX, SizeY, ntop, isRoot, Actor, "
-                  " Nodes, ArcPrior, ArcFromTop, ArcToTop, ArcPred "
+                  " Nodes, ArcPrior, ArcFromTop, ArcToTop, ArcPred, ArcType "
                   " FROM PROJECT pr JOIN ACTOR ac ON pr.PROJECT_ID = ac.PROJECT_ID "
                   " JOIN GRAPHPIC grp ON ac.NAMEPR = grp.NAMEPR "
                   " WHERE ac.EXTNAME = :EXTNAME AND ac.CLASPR = 'g' AND pr.PROJECT_ID = :PROJECT_ID"
@@ -67,18 +67,18 @@ int DataBaseManager::getGraph(QString extName, Graph &graph)
 
         if (query.value(0).toString() == "A"){
             Arc::ArcType arcType;
-            if (query.value(1).toString() == "S")
+            if (query.value(14).toString() == QObject::tr("S"))
                 arcType = Arc::SerialArc;
-            if (query.value(1).toString() == "P")
+            if (query.value(14).toString() == QObject::tr("P"))
                 arcType = Arc::ParallelArc;
-            if (query.value(1).toString() == "T")
+            if (query.value(14).toString() == QObject::tr("T"))
                 arcType = Arc::TerminateArc;
             QStringList lines = query.value(9).toString().split(";;");
             Arc* arc = new Arc(arcType,
                                query.value(10).toInt(),
                                query.value(11).toInt(),
                                query.value(12).toInt(),
-                               query.value(14).toString(),
+                               query.value(13).toString(),
                                lines);
             graph.arcList.append(arc);
         }
@@ -104,7 +104,7 @@ int DataBaseManager::saveGraph(Graph *graph)
     query.exec();
 
     myProgectId =  getLastInsertID();*/
-    graph->name = "G" + getCRC(graph->extName.toUtf8());
+
     query.prepare("INSERT INTO actor (PROJECT_ID, NAMEPR, CLASPR, EXTNAME, DATE, TIME, ICON, PROTOTIP, BAZIS)"
                   "VALUES (:PROJECT_ID, :NAMEPR, :CLASPR, :EXTNAME, CURDATE(), CURTIME(), NULL, :PROTOTIP, :BAZIS)");
 
@@ -134,8 +134,8 @@ int DataBaseManager::saveGraph(Graph *graph)
     //QList<QComment*> commentList = graph->commentList;
 
     foreach (Top* top, graph->topList){
-        query.prepare("INSERT INTO GRAPHPIC (PROJECT_ID, NAMEPR, ELTYP, ISTR, X, Y, SizeX, SizeY, ntop, isRoot, Actor, Nodes, ArcPrior, ArcFromTop, ArcToTop, ArcPred) "
-                      "VALUES (:PROJECT_ID, :NAMEPR, :ELTYP, :ISTR, :X, :Y, :SizeX, :SizeY, :ntop, :isRoot, :Actor, NULL, NULL, NULL, NULL, NULL)");
+        query.prepare("INSERT INTO GRAPHPIC (PROJECT_ID, NAMEPR, ELTYP, ISTR, X, Y, SizeX, SizeY, ntop, isRoot, Actor, Nodes, ArcPrior, ArcFromTop, ArcToTop, ArcPred, ArcType) "
+                      "VALUES (:PROJECT_ID, :NAMEPR, :ELTYP, :ISTR, :X, :Y, :SizeX, :SizeY, :ntop, :isRoot, :Actor, NULL, NULL, NULL, NULL, NULL, NULL)");
 
         query.bindValue(":PROJECT_ID",  myProgectId);
         query.bindValue(":NAMEPR",      graph->name);
@@ -154,8 +154,8 @@ int DataBaseManager::saveGraph(Graph *graph)
     }
 
     foreach(Comment* comment, graph->commentList){
-        query.prepare("INSERT INTO GRAPHPIC (PROJECT_ID, NAMEPR, ELTYP, ISTR, X, Y, SizeX, SizeY, ntop, isRoot, Actor, Nodes, ArcPrior, ArcFromTop, ArcToTop, ArcPred) "
-                      "VALUES (:PROJECT_ID, :NAMEPR, :ELTYP, :ISTR, :X, :Y, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)");
+        query.prepare("INSERT INTO GRAPHPIC (PROJECT_ID, NAMEPR, ELTYP, ISTR, X, Y, SizeX, SizeY, ntop, isRoot, Actor, Nodes, ArcPrior, ArcFromTop, ArcToTop, ArcPred, ArcType) "
+                      "VALUES (:PROJECT_ID, :NAMEPR, :ELTYP, :ISTR, :X, :Y, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)");
         query.bindValue(":PROJECT_ID", myProgectId);
         query.bindValue(":NAMEPR",     graph->name);
         query.bindValue(":ELTYP",      "C");
@@ -166,11 +166,12 @@ int DataBaseManager::saveGraph(Graph *graph)
     }
 
     foreach (Arc* arc, graph->arcList){
-        query.prepare("INSERT INTO GRAPHPIC (PROJECT_ID, NAMEPR, ELTYP, ISTR, X, Y, SizeX, SizeY, ntop, isRoot, Actor, Nodes, ArcPrior, ArcFromTop, ArcToTop, ArcPred) "
-                      "VALUES (:PROJECT_ID, :NAMEPR, :ELTYP, :ISTR, NULL, NULL, NULL, NULL, NULL, NULL, NULL, :Nodes, :ArcPrior, :ArcFromTop, :ArcToTop, :ArcPred)");
+        query.prepare("INSERT INTO GRAPHPIC (PROJECT_ID, NAMEPR, ELTYP, ISTR, X, Y, SizeX, SizeY, ntop, isRoot, Actor, Nodes, ArcPrior, ArcFromTop, ArcToTop, ArcPred, ArcType) "
+                      "VALUES (:PROJECT_ID, :NAMEPR, :ELTYP, :ISTR, NULL, NULL, NULL, NULL, NULL, NULL, NULL, :Nodes, :ArcPrior, :ArcFromTop, :ArcToTop, :ArcPred, :ArcType)");
         query.bindValue(":PROJECT_ID", myProgectId);
         query.bindValue(":NAMEPR",     graph->name);
         query.bindValue(":ELTYP",      "A");
+        query.bindValue(":ISTR",       arc->lines.join(" "));
         QString arcType;
         switch (arc->type){
         case Arc::SerialArc:
@@ -183,7 +184,7 @@ int DataBaseManager::saveGraph(Graph *graph)
             arcType = "T";
             break;
         }
-        query.bindValue(":ISTR",        arcType);
+        query.bindValue(":ArcType",     arcType);
         query.bindValue(":Nodes",       arc->lines.join(";;"));
         query.bindValue(":ArcPrior",    arc->priority);
         query.bindValue(":ArcFromTop",  arc->startTop);
@@ -193,6 +194,19 @@ int DataBaseManager::saveGraph(Graph *graph)
     }
     db.close();
     return db.lastError().number();
+}
+
+int DataBaseManager::updateGraph(Graph *graph)
+{
+    bool ok = db.open();
+    if (!ok) return db.lastError().number();
+    QSqlQuery query;
+    query.prepare("DELETE FROM GRAPHPIC WHERE PROJECT_ID = :PROJECT_ID AND NAMEPR = :NAMEPR;");
+    query.bindValue(":PROJECT_ID", myProgectId);
+    query.bindValue(":NAMEPR", graph->name);
+    query.exec();
+    db.close();
+    return saveGraph(graph);
 }
 
 int DataBaseManager::getGraphList(QList<Graph* > &graphList)
@@ -211,6 +225,7 @@ int DataBaseManager::getGraphList(QList<Graph* > &graphList)
         QList<QMultiProcTop* > multiProcTopList;
         graphList.append(new Graph(query.value(0).toString(), query.value(1).toString(), topList, arcList, commentList, syncArcList, multiProcTopList));
     }
+    db.close();
     return db.lastError().number();
 }
 
@@ -308,16 +323,17 @@ int DataBaseManager::saveActorList(QList<Actor *> &actorList)
             query2.bindValue(":NEV", j);
             query2.bindValue(":DATA", actorList.at(i)->variableList.at(j)->name);
             QString vaMode;
-            if (actorList.at(i)->varAMList.at(j) == "Исходный")
+            if (actorList.at(i)->varAMList.at(j) == QObject::tr("Исходный"))
                 vaMode = "I";
-            else if (actorList.at(i)->varAMList.at(j) == "Модифицируемый")
+            else if (actorList.at(i)->varAMList.at(j) ==  QObject::tr("Модифицируемый"))
                 vaMode = "M";
-            else if (actorList.at(i)->varAMList.at(j) == "Вычисляемый")
+            else if (actorList.at(i)->varAMList.at(j) ==  QObject::tr("Вычисляемый"))
                 vaMode = "R";
             query2.bindValue(":MODE", vaMode);
             query2.exec();
         }
     }
+    db.close();
     return db.lastError().number();
 }
 
@@ -360,11 +376,13 @@ int DataBaseManager::getActorList(QList<Actor *> &actorList)
                                    myVAList));
         query2.clear();
     }
+    db.close();
     return db.lastError().number();
 }
 
 Actor* DataBaseManager::getActor(QString namepr)
 {
+    if (namepr == "") return NULL;
     QList<Variable* > varList;
     getVariableList(varList);
     bool ok = db.open();
@@ -373,7 +391,10 @@ Actor* DataBaseManager::getActor(QString namepr)
     query1.prepare("SELECT CLASPR, EXTNAME, DATE, TIME, ICON, PROTOTIP FROM ACTOR WHERE NAMEPR = :NAMEPR;");
     query1.bindValue(":NAMEPR", namepr);
     query1.exec();
-    query1.first();
+    if(!query1.first()){
+        db.close();
+        return NULL;
+    }
 
     QSqlQuery query2;
     query2.prepare("SELECT NEV, DATA, MODE FROM PASPORT WHERE NAMEPR = :NAMEPR ORDER BY NEV");
@@ -402,6 +423,7 @@ Actor* DataBaseManager::getActor(QString namepr)
                                query1.value(5).toString(),
                                myVariableList,
                                myVAList);
+    db.close();
     return newActor;
 }
 
@@ -435,6 +457,7 @@ int DataBaseManager::savePredicateList(QList<Predicate *> &predList)
             query2.exec();
         }
     }
+    db.close();
     return 0;
 }
 
@@ -467,20 +490,27 @@ int DataBaseManager::getPredicateList(QList<Predicate *> &predList)
                                       myVariableList));
         query2.clear();
     }
+    db.close();
     return db.lastError().number();
 }
 
 Predicate* DataBaseManager::getPredicate(QString namepr)
 {
+    if (namepr == "") return NULL;
     QList<Variable* > varList;
     getVariableList(varList);
     bool ok = db.open();
     if (!ok) return NULL;
     QSqlQuery query1;
-    query1.prepare("SELECT CLASPR, EXTNAME, DATE, TIME, ICON, PROTOTIP FROM ACTOR WHERE NAMEPR = :NAMEPR;");
+    query1.prepare("SELECT CLASPR, EXTNAME, DATE, TIME, ICON, PROTOTIP FROM ACTOR WHERE NAMEPR = :NAMEPR AND PROJECT_ID = :PROJECT_ID;");
     query1.bindValue(":NAMEPR", namepr);
+    query1.bindValue(":PROJECT_ID", myProgectId);
     query1.exec();
-    query1.first();
+
+    if (!query1.first()) {
+        db.close();
+        return NULL;
+    }
 
     QSqlQuery query2;
     query2.prepare("SELECT NEV, DATA, MODE FROM PASPORT WHERE NAMEPR = :NAMEPR ORDER BY NEV");
@@ -494,6 +524,7 @@ Predicate* DataBaseManager::getPredicate(QString namepr)
             break;
         }
     }
+    db.close();
     return new Predicate(namepr,
                          query1.value(1).toString(),
                          query1.value(5).toString() == "" ? Predicate::inlineType : Predicate::normalType,
@@ -524,11 +555,11 @@ int DataBaseManager::registerModule(QString uniqName, QString fileName, QString 
         query.bindValue(":DATA",        parameter.at(0));
         query.bindValue(":TYPE",        parameter.at(1));
         QString vaMode;
-        if (parameter.at(2) == "Исходный")
+        if (parameter.at(2) == QObject::tr("Исходный"))
             vaMode = "I";
-        else if (parameter.at(2) == "Модифицируемый")
+        else if (parameter.at(2) == QObject::tr("Модифицируемый"))
             vaMode = "M";
-        else if (parameter.at(2) == "Вычисляемый")
+        else if (parameter.at(2) == QObject::tr("Вычисляемый"))
             vaMode = "R";
         query.bindValue(":MODE",        vaMode);
         query.bindValue(":COMMENT",     parameter.at(3));
@@ -554,20 +585,102 @@ int DataBaseManager::getRegisteredModules(QList<BaseModule*> &moduleList)
         QStringList parameterList;
         while (query2.next()){
             QString vaMode;
-            if (query2.value(3).toString() == "I")
+            if (query2.value(2).toString() == "I")
                 vaMode = QObject::tr("Исходный");
-            else if (query2.value(3).toString() == "M")
+            else if (query2.value(2).toString() == "M")
                 vaMode = QObject::tr("Модифицируемый");
-            else if (query2.value(3).toString() == "R")
+            else if (query2.value(2).toString() == "R")
                 vaMode = QObject::tr("Вычисляемый");
             parameterList.append(query2.value(0).toString() + ";;" +
                                  query2.value(1).toString() + ";;" +
-                                 query2.value(2).toString() + ";;" +
-                                 vaMode);
+                                 vaMode + ";;" +
+                                 query2.value(3).toString());
         }
         query2.clear();
         moduleList.append(new BaseModule(query1.value(1).toString(), query1.value(0).toString(), query1.value(2).toString(), parameterList));
     }
     db.close();
+    return db.lastError().number();
+}
+
+int DataBaseManager::saveStruct(Graph *graph)
+{
+    bool ok = db.open();
+    if (!ok) return db.lastError().number();
+    QSqlQuery query;
+    QStringList predicateList;
+    int i = 0;
+
+    query.prepare("DELETE FROM GRAPH WHERE NAMEPR = :NAMEPR AND PROJECT_ID = :PROJECT_ID;");
+    query.bindValue(":NAMEPR", graph->name);
+    query.bindValue(":PROJECT_ID", myProgectId);
+    query.exec();
+    query.prepare("DELETE FROM GRAPHTOP WHERE NAMEPR = :NAMEPR AND PROJECT_ID = :PROJECT_ID;");
+    query.bindValue(":NAMEPR", graph->name);
+    query.bindValue(":PROJECT_ID", myProgectId);
+    query.exec();
+    query.prepare("DELETE FROM GRAPHPRE WHERE NAMEPR = :NAMEPR AND PROJECT_ID = :PROJECT_ID;");
+    query.bindValue(":NAMEPR", graph->name);
+    query.bindValue(":PROJECT_ID", myProgectId);
+    query.exec();
+
+    foreach (Arc* arc, graph->arcList){
+        if (!predicateList.contains(arc->predicate)){
+            predicateList.append(arc->predicate);
+            query.prepare("INSERT INTO GRAPHPRE (PROJECT_ID, NAMEPR, NPRED, NAME)"
+                          "VALUES (:PROJECT_ID, :NAMEPR, :NPRED, :NAME)");
+            query.bindValue(":PROJECT_ID", myProgectId);
+            query.bindValue(":NAMEPR", graph->name);
+            query.bindValue(":NPRED", i);
+            query.bindValue(":NAME", arc->predicate);
+            query.exec();
+        }
+        query.prepare("INSERT INTO GRAPH (PROJECT_ID, NAMEPR, NFROM, NTO, NPRED, PRIOR, ARCTYPE)"
+                      "VALUES (:PROJECT_ID, :NAMEPR, :NFROM, :NTO, :NPRED, :PRIOR, :ARCTYPE);");
+        query.bindValue(":PROJECT_ID", myProgectId);
+        query.bindValue(":NAMEPR", graph->name);
+        query.bindValue(":NFROM", arc->startTop);
+        query.bindValue(":NTO", arc->endTop);
+        query.bindValue(":NPRED", predicateList.indexOf(arc->predicate));
+        query.bindValue(":PRIOR", arc->priority);
+        int arcType;
+        switch (arc->type){
+        case Arc::SerialArc:
+            arcType = 1;
+            break;
+        case Arc::ParallelArc:
+            arcType = 2;
+            break;
+        case Arc::TerminateArc:
+            arcType = 3;
+        }
+        query.bindValue(":ARCTYPE", arcType);
+        query.exec();
+    }
+
+    int rootTop = -1;
+    foreach (Top* top, graph->topList){
+        query.prepare("INSERT INTO GRAPHTOP (PROJECT_ID, NAMEPR, NTOP, NAME)"
+                      "VALUES (:PROJECT_ID, :NAMEPR, :NTOP, :NAME);");
+        query.bindValue(":PROJECT_ID", myProgectId);
+        query.bindValue(":NAMEPR", graph->name);
+        query.bindValue(":NTOP", top->number);
+        query.bindValue(":NAME", top->actor);
+        if (top->isRoot)
+            rootTop = top->number;
+        query.exec();
+    }
+    query.prepare("INSERT INTO GRAPH (PROJECT_ID, NAMEPR, NFROM, NTO, NPRED, PRIOR, ARCTYPE)"
+                  "VALUES (:PROJECT_ID, :NAMEPR, :NFROM, :NTO, :NPRED, :PRIOR, :ARCTYPE);");
+    query.bindValue(":PROJECT_ID", myProgectId);
+    query.bindValue(":NAMEPR", graph->name);
+    query.bindValue(":NFROM",rootTop);
+    query.bindValue(":NTO", 0);
+    query.bindValue(":NPRED", 0);
+    query.bindValue(":PRIOR", 0);
+    query.bindValue(":ARCTYPE", 0);
+    query.exec();
+    db.close();
+
     return db.lastError().number();
 }

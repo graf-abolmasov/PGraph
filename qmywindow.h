@@ -16,12 +16,11 @@ public:
     ~TMyWindow();
 
 private:
-    QMenu *fileMenu;
+    QMenu *grafMenu;
     QMenu *objectMenu;
     QMenu *buildMenu;
 
-
-
+    //Файл
     QAction *newGraphAct;
     QAction *openGraphAct;
     QAction *saveGraphAct;
@@ -68,11 +67,15 @@ private:
     void LoadSetup(){}		// Загрузка конфигурации программы
     void SaveSetup(){}		// Сохранение конфигурации программы
 
-    DataBaseManager* dbManager;
+    //DataBaseManager* dbManager;
+    QString myGraphName;
+    void setMyGraphName(QString name);
+    QString myGraphExtName;
+    void setMyGraphExtName(QString extName);
 private slots:
     void CMGNew();              //+ Граф->Создать
     void CMGOpen();             //+ Граф->Открыть
-    void CMGSave(){}     	//+ Граф->Сохранить
+    void CMGSave();     	//+ Граф->Сохранить
     void CMGSaveAs();           //+ Граф->SaveAs
     void CMGSaveAsImage();      //+ Граф->SaveAsPNG
     void CMGChangeIcon(){}      // Граф->Сменить иконку
@@ -82,7 +85,7 @@ private slots:
     void CMContent(){}		// +Объект->Дерево объектов
     void CMShowGarbage(){}	// +Объект->Неиспользуемые объекты
     void CMNewModule();   	// +Объект->Зарегистрировать модуль
-    void CMObjList();		// +Объект->Редактор объектов
+    void CMObjList();		// +Объект->� едактор объектов
     void CMEdtVar();		// +Данные->Словарь данных
     void CMEdtType();		// +Данные->Список типов
     void CMGspUser(){}		// Данные->Gspuser.h
@@ -94,12 +97,12 @@ private slots:
     void CMPredTabl(){}		// Настройки->Таблица предикатов
     void CMFSaveBMP(){}		// Настройки->Сохранять BMP
     void CMDoCountMar(){}	// Настройки->Подсчет числа маршрутов
-    void CMDirectories(){}	// Настройки->Πазмещение...
+    void CMDirectories(){}	// Настройки->� азмещение...
     void CMBuildOpt(){}		// Настройки->Построение...
     void CMFont(){}		// Настройки->Шрифт
     void CMSaveSetup(){}  	// Настройки->Сохранить
-    void CMDoUserDialog(){}	// +Запуск->Πежим ручного ввода данных
-    void CMSaveStruct(){}       // +Запуск->Запись структуры
+    void CMDoUserDialog(){}	// +Запуск->� ежим ручного ввода данных
+    void CMSaveStruct();        // +Запуск->Запись структуры
     void CMCompile(){}          // +Запуск->Компиляция
     void CMRun(){}              // +Запуск->Построение и запуск
     void CMHelpContents(){}	// Помощь->Содержание
