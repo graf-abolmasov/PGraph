@@ -7,11 +7,10 @@
 #include <QGraphicsScene>
 #include <QWheelEvent>
 #include "qdiagramscene.h"
-#include "qdiagramitem.h"
+#include "qtop.h"
 #include "qcomment.h"
-#include "ui_toppropertydialog.h"
 #include "toppropertydialog.h"
-#include "qgraph.h"
+#include "graph.h"
 #include "databasemanager.h"
 
 class TDrawWindow : public QMainWindow
@@ -39,6 +38,8 @@ private:
     QAction *deleteArcAction;
     QAction *deleteSyncAction;
     QAction *deleteCommentAction;
+    QAction *deleteMultiProcTopAction;
+    QAction *setMultiProcTopAction;
 
     QDiagramScene::Mode myMode;
 
@@ -69,6 +70,8 @@ private slots:
     void deleteArc();
     void deleteSync();
     void deleteComment();
+    void deleteMultiProcTop();
+    void showMultiProcTopDialog();
     void itemSelected(QGraphicsItem *item);
     void textInserted(QComment *);
 };

@@ -2,12 +2,14 @@
 #include <QCoreApplication>
 #include <QPointF>
 #include "qdrawwindow.h"
-#include "qdiagramitem.h"
+#include "qtop.h"
 #include "qsyncarc.h"
 #include "arcpropertydialog.h"
 #include "qserialarctop.h"
 #include "qparallelarctop.h"
 #include "qterminatearctop.h"
+#include "qnormaltop.h"
+#include "multiproctoppropertydialog.h"
 
 TDrawWindow::TDrawWindow()
 {
@@ -22,7 +24,7 @@ TDrawWindow::TDrawWindow()
     scene->setSyncArcMenu(syncArcMenu);
     scene->setMultiProcTopMenu(multiProcMenu);
     scene->setBackgroundBrush(QBrush(Qt::white));
-    scene->setSceneRect(-800, -600, 800, 600);
+    scene->setSceneRect(-800, -600, 1600, 1200);
     /*connect(scene, SIGNAL(itemInserted(QGraphicsItem*)),
             this, SLOT(itemInserted(QTop *)));*/
     connect(scene, SIGNAL(itemSelected(QGraphicsItem *)),
@@ -56,6 +58,9 @@ void TDrawWindow::createMenus()
     commentMenu->addAction(deleteCommentAction);
 
     multiProcMenu = new QMenu();
+    multiProcMenu->addAction(deleteMultiProcTopAction);
+    multiProcMenu->addSeparator();
+    multiProcMenu->addAction(setMultiProcTopAction);
 }
 
 void TDrawWindow::createActions()
@@ -91,6 +96,14 @@ void TDrawWindow::createActions()
     deleteCommentAction = new QAction(QIcon(";/images/delete.png"), tr("Удалить"), this);
     deleteCommentAction->setStatusTip(tr("Удаляет комментарий"));
     connect(deleteCommentAction, SIGNAL(triggered()), this, SLOT(deleteComment()));
+
+    deleteMultiProcTopAction = new QAction(QIcon(";/images/delete.png"), tr("Удалить"), this);
+    deleteMultiProcTopAction->setStatusTip(tr("Удалить многопоточную вершину"));
+    connect(deleteMultiProcTopAction, SIGNAL(triggered()), this, SLOT(deleteMultiProcTop()));
+
+    setMultiProcTopAction = new QAction(tr("Свойства"), this);
+    setMultiProcTopAction->setStatusTip(tr("Изменить совйства многопоточной вершины"));
+    connect(setMultiProcTopAction, SIGNAL(triggered()), this, SLOT(showMultiProcTopDialog()));
 }
 
 void TDrawWindow::deleteItem()
@@ -182,7 +195,7 @@ void TDrawWindow::setItemIcon()
             if (!fileName.isEmpty()) {
                 QImage img(fileName);
                 if (!img.isNull()) {
-                    qgraphicsitem_cast<QTop *>(item)->setIcon(img);
+                    qgraphicsitem_cast<QNormalTop *>(item)->setIcon(img);
                     scene->invalidate(item->mapRectToScene(item->boundingRect()));
                 }
             }
@@ -195,7 +208,7 @@ void TDrawWindow::setItemIcon()
 */
 void TDrawWindow::showTopPropDialog(){
     TopPropertyDialog dlg;
-    QTop* top = qgraphicsitem_cast<QTop *>(scene->selectedItems().first());
+    QNormalTop* top = qgraphicsitem_cast<QNormalTop *>(scene->selectedItems().first());
     dlg.prepareForm(top);
     if (dlg.exec())
         top = dlg.getResult();
@@ -234,7 +247,7 @@ void TDrawWindow::showArcPropDialog()
   Реакция на нажатие пункта меню: Сделать корневой
 */
 void TDrawWindow::makeAsRoot(){
-    scene->setRootTop(qgraphicsitem_cast<QTop* >(scene->selectedItems().first()));
+    scene->setRootTop(qgraphicsitem_cast<QNormalTop* >(scene->selectedItems().first()));
 }
 
 /*!
@@ -327,19 +340,23 @@ void TDrawWindow::loadGraph(QString extName, DataBaseManager* dbManager)
     Graph graph("", "", topList, arcList, commentList, syncArcList, multiProcTopList);
     dbManager->getGraph(extName, graph);
     foreach (Top* top, graph.topList) {
-        QTop *qtop = new QTop(topMenu, NULL, scene);
-        qtop->setPos(top->x, top->y);
-        qtop->number = top->number;
-        if (top->isRoot) scene->setRootTop(qtop);
-
-        QPolygonF myPolygon;
-        double w = top->sizeX;
-        double h = top->sizeY;
-        myPolygon << QPointF(-w/2, h/2) << QPointF(w/2, h/2)
-                << QPointF(w/2,-h/2) << QPointF(-w/2, -h/2)
-                << QPointF(-w/2, h/2);
-        qtop->setPolygon(myPolygon);
-        qtop->actor = dbManager->getActor(top->actor);
+        if (top->type == "T") {
+            QNormalTop *qtop = new QNormalTop(topMenu, NULL, scene);
+            qtop->number = top->number;
+            if (top->isRoot)
+                scene->setRootTop(qtop);
+            double w = top->sizeX;
+            double h = top->sizeY;
+            qtop->setRect(-w/2, -h/2, w, h);
+            qtop->setPos(top->x, top->y);
+            qtop->actor = dbManager->getActor(top->actor);
+        } else if (top->type == "M") {
+            QMultiProcTop *qtop = new QMultiProcTop(multiProcMenu, NULL, scene);
+            qtop->number = top->number;
+            qtop->setPos(top->x, top->y);
+            qtop->procCount = top->procCount;
+            qtop->actor = dbManager->getActor(top->actor);
+        }
     }
 
     foreach (Arc* arc, graph.arcList) {
@@ -392,4 +409,18 @@ void TDrawWindow::saveStruct(QString name, DataBaseManager *dbManager)
     Graph* graph = getGraph();
     graph->name = name;
     dbManager->saveStruct(graph);
+}
+
+void TDrawWindow::showMultiProcTopDialog()
+{
+    MultiProcTopPropertyDialog dlg;
+    QMultiProcTop* top = qgraphicsitem_cast<QMultiProcTop *>(scene->selectedItems().first());
+    dlg.prepareForm(top);
+    if (dlg.exec())
+        top = dlg.getResult();
+}
+
+void TDrawWindow::deleteMultiProcTop()
+{
+
 }

@@ -9,7 +9,7 @@
 #include <QSqlError>
 #include <QSqlTableModel>
 #include <QString>
-#include "qgraph.h"
+#include "graph.h"
 #include "qdiagramscene.h"
 #include "datatype.h"
 #include "variable.h"
@@ -36,8 +36,8 @@ public:
 
     int getGraphList(QList<Graph* > &graphList);
     int getGraph(QString extName, Graph &graph);
-    int saveGraph(Graph* graph);
-    int updateGraph(Graph* graph);
+    bool saveGraph(Graph* graph);
+    bool updateGraph(Graph* graph);
 
     bool saveVariableList(QList<Variable*>& varList);
     int getVariableList(QList<Variable*>& varList);
@@ -57,8 +57,6 @@ public:
     int getRegisteredModules(QList<BaseModule*> &moduleList);
 
     int saveStruct(Graph *graph);
-
-    int getLastInsertID();
 };
 
 extern DataBaseManager* globalDBManager;

@@ -13,6 +13,7 @@
 #include <QList>
 #include <QtGui>
 #include "commonutils.h"
+#include <typeinfo>
 
 DataBaseManager* globalDBManager;
 
@@ -27,15 +28,6 @@ DataBaseManager::DataBaseManager()
 
     myProgectId = 1;
 
-}
-
-int DataBaseManager::getLastInsertID()
-{
-    QSqlQuery query;
-    query.exec("SELECT LAST_INSERT_ID()");
-    QString text = query.lastError().text();
-    query.next();
-    return query.value(0).toInt();;
 }
 
 int DataBaseManager::getGraph(QString extName, Graph &graph)
@@ -55,13 +47,28 @@ int DataBaseManager::getGraph(QString extName, Graph &graph)
 
     while (query.next()){
         if (query.value(0).toString() == "T"){
-            Top* top = new Top(query.value(2).toFloat() + query.value(4).toFloat()/2,
-                               query.value(3).toFloat() + query.value(5).toFloat()/2,
+            Top* top = new Top(query.value(2).toFloat(),
+                               query.value(3).toFloat(),
                                query.value(4).toDouble(),
                                query.value(5).toDouble(),
                                query.value(6).toInt(),
+                               -1,
                                query.value(7).toBool(),
-                               query.value(8).toString());
+                               query.value(8).toString(),
+                               "T");
+            graph.topList.append(top);
+        }
+
+        if (query.value(0).toString() == "M"){
+            Top* top = new Top(query.value(2).toFloat(),
+                               query.value(3).toFloat(),
+                               -1,
+                               -1,
+                               query.value(6).toInt(),
+                               10,
+                               query.value(7).toBool(),
+                               query.value(8).toString(),
+                               "M");
             graph.topList.append(top);
         }
 
@@ -92,18 +99,10 @@ int DataBaseManager::getGraph(QString extName, Graph &graph)
     return db.lastError().number();
 }
 
-
-int DataBaseManager::saveGraph(Graph *graph)
+bool DataBaseManager::saveGraph(Graph *graph)
 {
-    bool ok = db.open();
-    if (!ok) return db.lastError().number();
+    if (!db.open()) return false;
     QSqlQuery query;
-    /*query.prepare("INSERT INTO project (project_name) "
-           "VALUES (:project_name)");
-    query.bindValue(":project_name", projectName);
-    query.exec();
-
-    myProgectId =  getLastInsertID();*/
 
     query.prepare("INSERT INTO actor (PROJECT_ID, NAMEPR, CLASPR, EXTNAME, DATE, TIME, ICON, PROTOTIP, BAZIS)"
                   "VALUES (:PROJECT_ID, :NAMEPR, :CLASPR, :EXTNAME, CURDATE(), CURTIME(), NULL, :PROTOTIP, :BAZIS)");
@@ -116,30 +115,13 @@ int DataBaseManager::saveGraph(Graph *graph)
     query.bindValue(":BAZIS",  NULL);
     query.exec();
 
-    /*query.prepare("UPDATE ACTOR SET NAMEPR = CONCAT(CLASPR,AUTOINCREMENT_NAMEPR)"
-           "WHERE PROJECT_ID = :PROJECT_ID");
-    query.bindValue(":PROJECT_ID", myProgectId);
-    query.exec();*/
-
-    /*query.prepare("SELECT NAMEPR FROM ACTOR WHERE PROJECT_ID = :PROJECT_ID AND CLASPR = :CLASPR");
-    query.bindValue(":PROJECT_ID", myProgectId);
-    query.bindValue(":CLASPR", "g");
-    query.exec();
-
-    query.next();
-
-    QString namepr = query.value(0).toString();*/
-
-    //QList<QArc*> arcList = graph->arcList;
-    //QList<QComment*> commentList = graph->commentList;
-
     foreach (Top* top, graph->topList){
         query.prepare("INSERT INTO GRAPHPIC (PROJECT_ID, NAMEPR, ELTYP, ISTR, X, Y, SizeX, SizeY, ntop, isRoot, Actor, Nodes, ArcPrior, ArcFromTop, ArcToTop, ArcPred, ArcType) "
                       "VALUES (:PROJECT_ID, :NAMEPR, :ELTYP, :ISTR, :X, :Y, :SizeX, :SizeY, :ntop, :isRoot, :Actor, NULL, NULL, NULL, NULL, NULL, NULL)");
 
         query.bindValue(":PROJECT_ID",  myProgectId);
         query.bindValue(":NAMEPR",      graph->name);
-        query.bindValue(":ELTYP",       "T");
+        query.bindValue(":ELTYP",       top->type);
         query.bindValue(":X",           top->x);
         query.bindValue(":Y",           top->y);
         query.bindValue(":ISTR",        QString::number(top->x) + " " +
@@ -196,12 +178,11 @@ int DataBaseManager::saveGraph(Graph *graph)
     return db.lastError().number();
 }
 
-int DataBaseManager::updateGraph(Graph *graph)
+bool DataBaseManager::updateGraph(Graph *graph)
 {
-    bool ok = db.open();
-    if (!ok) return db.lastError().number();
+    if (!db.open()) return false;
     QSqlQuery query;
-    query.prepare("DELETE FROM GRAPHPIC WHERE PROJECT_ID = :PROJECT_ID AND NAMEPR = :NAMEPR;");
+    query.prepare("DELETE FROM ACTOR WHERE PROJECT_ID = :PROJECT_ID AND NAMEPR = :NAMEPR;");
     query.bindValue(":PROJECT_ID", myProgectId);
     query.bindValue(":NAMEPR", graph->name);
     query.exec();

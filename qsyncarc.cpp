@@ -37,9 +37,8 @@ QRectF QSyncArc::boundingRect() const {
 }
 
 void QSyncArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *options, QWidget *widget){
-    /*QGraphicsLineItem::paint(painter, options, widget);*/
 
-    if (myStartItem->collidesWithItem(myEndItem))
+    /*if (myStartItem->collidesWithItem(myEndItem))
         return;
 
     QPen myPen = pen();
@@ -54,7 +53,6 @@ void QSyncArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *options,
     painter->setPen(myPen);
     painter->setBrush(myColor);
 
-    //QLineF centerLine(myStartItem->pos(), myEndItem->pos());
     QLineF centerLine(line());
     QPolygonF endPolygon = myEndItem->polygon();
     QPointF p1 = endPolygon.first() + myEndItem->pos();
@@ -62,12 +60,12 @@ void QSyncArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *options,
     QPointF intersectPoint;
     QLineF polyLine;
     for (int i = 1; i < endPolygon.count(); ++i) {
-    p2 = endPolygon.at(i) + myEndItem->pos();
-    polyLine = QLineF(p1, p2);
-    QLineF::IntersectType intersectType =
-        polyLine.intersect(centerLine, &intersectPoint);
-    if (intersectType == QLineF::BoundedIntersection)
-        break;
+        p2 = endPolygon.at(i) + myEndItem->pos();
+        polyLine = QLineF(p1, p2);
+        QLineF::IntersectType intersectType =
+                polyLine.intersect(centerLine, &intersectPoint);
+        if (intersectType == QLineF::BoundedIntersection)
+            break;
         p1 = p2;
     }
 
@@ -93,7 +91,7 @@ void QSyncArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *options,
         painter->drawLine(myLine);
         myLine.translate(0,-8.0);
         painter->drawLine(myLine);
-    }
+    }*/
 }
 
 void QSyncArc::updatePosition()

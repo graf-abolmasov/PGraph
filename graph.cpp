@@ -1,4 +1,4 @@
-#include "qgraph.h"
+#include "graph.h"
 
 Graph::Graph(QString name, QString extName, QList<Top *> &topList, QList<Arc *> &arcList, QList<Comment *> &commentList, QList<QSyncArc *> &syncArcList, QList<QMultiProcTop *> &multiProcTopList)
 {

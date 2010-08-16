@@ -2,8 +2,7 @@
 #define QSYNCARC_H
 
 #include <QGraphicsLineItem>
-#include "qdiagramitem.h"
-
+#include "qtop.h"
 QT_BEGIN_NAMESPACE
 class QGraphicsPolygonItem;
 class QGraphicsLineItem;
@@ -30,14 +29,12 @@ public:
         { return myStartItem; }
     QTop* endItem() const
         { return myEndItem; }
+    void updatePosition();
 
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                QWidget *widget = 0);
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
-
-public slots:
-    void updatePosition();
 
 private:
     QTop* myStartItem;

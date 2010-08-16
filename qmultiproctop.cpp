@@ -2,28 +2,22 @@
 
 QMultiProcTop::QMultiProcTop(QMenu *contextMenu,
                              QGraphicsItem *parent, QGraphicsScene *scene)
-                                 : QGraphicsRectItem(parent, scene)
+                                 : QTop(contextMenu, parent, scene)
 {
-    myContextMenu = contextMenu;
     setRect(-70, -50, 140, 100);
-
-    setBrush(QBrush(Qt::white,Qt::SolidPattern));
-    setZValue(1);
-
-    setFlag(QGraphicsItem::ItemIsMovable, true);
-    setFlag(QGraphicsItem::ItemIsSelectable, true);
-
-    procCount = 100;
-
+    procCount = 2;
 }
 
 void QMultiProcTop::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     QPen pen = painter->pen();
     pen.setWidth(2);
-    painter->setPen(pen);
+    painter->setPen(Qt::NoPen);
     painter->setBrush(QBrush(Qt::white,Qt::SolidPattern));
-    //верзний прямоугольник
+    //зальем весь прямоугольник, чтобы он был непрозрачный
+    painter->drawRect(rect());
+    //верхний прямоугольник
+    painter->setPen(pen);
     painter->drawRoundedRect(QRect(-25, -50, 50, 30), 10, 10);
     painter->drawLine(-25, -35, -50, -35);
     painter->drawLine(25, -35, 50, -35);
@@ -79,11 +73,9 @@ void QMultiProcTop::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
         painter->setPen(Qt::DashLine);
         painter->drawRect(boundingRect());
     }
-
-    //QGraphicsRectItem::paint(painter, option, widget);
 }
 
-QRectF QMultiProcTop::boundingRect() const
+Top* QMultiProcTop::toTop()
 {
-    return QGraphicsRectItem::boundingRect().adjusted(-5, -5, 5, 5);
+    return new Top(scenePos().x(), scenePos().y(), rect().width(), rect().height(), number, procCount, false, actor == NULL ? "" : actor->name, "M");
 }
