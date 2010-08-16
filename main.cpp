@@ -6,17 +6,22 @@
 #include "databasemanager.h"
 #include "commonutils.h"
 #include "md5.h"
+#include "logger.h"
+
+#define QT_DEBUG_COMPONENT
 
 int main(int argc, char *argv[])
 {  	
+    QApplication::addLibraryPath("./");
     QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
     QApplication a(argc, argv);
     TMyWindow w;
-    //w.setWindowTitle(tr("Редактирование сообщения"));
-    srand(time(NULL));
-    rand();
+    globalLogger = new Logger("log.txt");
     globalDBManager = new DataBaseManager();
     w.show();
 
-    return a.exec();
+    int result = a.exec();
+    delete globalDBManager;
+    delete globalLogger;
+    return result;
 }
