@@ -4,7 +4,6 @@
 QT += sql
 TARGET = NEW_GRAPH
 TEMPLATE = app
-CONFIG += static
 SOURCES += main.cpp \
     qmywindow.cpp \
     qdrawwindow.cpp \
@@ -29,7 +28,6 @@ SOURCES += main.cpp \
     qactoreditor.cpp \
     qmoduleregister.cpp \
     qpredicateeditor.cpp \
-    qgraph.cpp \
     arcpropertydialog.cpp \
     qparallelarctop.cpp \
     qterminatearctop.cpp \
@@ -41,7 +39,8 @@ SOURCES += main.cpp \
     md5.cpp \
     qnormaltop.cpp \
     multiproctoppropertydialog.cpp \
-    graph.cpp
+    graph.cpp \
+    logger.cpp
 HEADERS += qmywindow.h \
     qdrawwindow.h \
     qtop.h \
@@ -76,7 +75,8 @@ HEADERS += qmywindow.h \
     md5.h \
     qnormaltop.h \
     multiproctoppropertydialog.h \
-    graph.h
+    graph.h \
+    logger.h
 RESOURCES += resources.qrc
 FORMS += toppropertydialog.ui \
     qobjecteditor.ui \
@@ -91,3 +91,4 @@ FORMS += toppropertydialog.ui \
     qsavegraphdialog.ui \
     qopengraphdialog.ui \
     multiproctoppropertydialog.ui
+RC_FILE = images/resources.rc
