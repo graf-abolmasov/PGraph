@@ -13,13 +13,14 @@
 #include <QList>
 #include <QtGui>
 #include "commonutils.h"
-#include <typeinfo>
+#include "logger.h"
 
 DataBaseManager* globalDBManager;
 
 DataBaseManager::DataBaseManager()
 {
     db = QSqlDatabase::addDatabase("QMYSQL");
+    globalLogger->writeLog(db.lastError().text());
     db.setHostName("localhost");
     db.setPort(3306);
     db.setDatabaseName("graph3");
