@@ -2,7 +2,7 @@
 #define GRAPH_H
 
 #include <QList>
-#include "qdiagramitem.h"
+#include "qtop.h"
 #include "qarc.h"
 #include "qcomment.h"
 #include "qmultiproctop.h"
@@ -17,7 +17,7 @@ public:
 
     QList<Top* >           topList;
     QList<Arc* >           arcList;
-    QList<Comment* >      commentList;
+    QList<Comment* >       commentList;
     QList<QSyncArc* >      syncArcList;
     QList<QMultiProcTop* > multiProcTopList;
 };

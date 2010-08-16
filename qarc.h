@@ -3,7 +3,7 @@
 
 #include <QtGui>
 #include <QtCore>
-#include "qdiagramitem.h"
+#include "qtop.h"
 #include "qarcline.h"
 #include "qserialarctop.h"
 #include "predicate.h"

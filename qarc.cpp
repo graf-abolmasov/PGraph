@@ -6,7 +6,7 @@
 #include "qserialarctop.h"
 #include "qterminatearctop.h"
 
-const qreal Pi = 3.14;
+const qreal Pi = M_PI;
 const int MINDELTA = 40;
 
 int dvec2log(float dx, float dy){
@@ -21,6 +21,9 @@ int dvec2log(float dx, float dy){
 
 /*!
   Упрощенный алгоритм перестройки дуги
+  @param top - указатель на перетаскиваемую вершину
+  @param dx - перемещение по X
+  @param dy - перемещение по Y
 */
 bool QArc::autoBuild(QTop* top, float dx, float dy){
     QPointF startPoint;
@@ -44,24 +47,10 @@ bool QArc::autoBuild(QTop* top, float dx, float dy){
 
     QPointF startIntersectPoint;
     QLineF polyLineStart;
-    for (int i = 1; i < 5; i++){
-        QPointF p1 = startItem()->polygon().at(i-1) + startItem()->scenePos();
-        QPointF p2 = startItem()->polygon().at(i) + startItem()->scenePos();
-        polyLineStart = QLineF(p1, p2);
-        QLineF::IntersectType intersectType = polyLineStart.intersect(centerLine, &startIntersectPoint);
-        if (intersectType == QLineF::BoundedIntersection)
-            break;
-    }
+    polyLineStart = startItem()->getIntersectBound(centerLine);
     QPointF endIntersectPoint;
     QLineF polyLineEnd;
-    for (int i = 1; i < 5; i++){
-        QPointF p1 = endItem()->polygon().at(i-1) + endItem()->scenePos();
-        QPointF p2 = endItem()->polygon().at(i) + endItem()->scenePos();
-        polyLineEnd = QLineF(p1, p2);
-        QLineF::IntersectType intersectType = polyLineEnd.intersect(centerLine, &endIntersectPoint);
-        if (intersectType == QLineF::BoundedIntersection)
-            break;
-    }
+    polyLineEnd = endItem()->getIntersectBound(centerLine);
 
     double deltaY = endPoint.y() - startPoint.y();
     double deltaX = endPoint.x() - startPoint.x();
@@ -121,7 +110,7 @@ bool QArc::autoBuild(QTop* top, float dx, float dy){
 
 /*!
   Хитрый алгоритм перерисовки дуги при перемещении вершины.
-  @param aMOvedTop - указатель на перетаскиваемую вершину
+  @param aMovedTop - указатель на перетаскиваемую вершину
   @param dx - перемещение по X
   @param dy - перемещение по Y
 */
@@ -463,8 +452,9 @@ void QArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
     if (lines.count() == 0) return;
 
     if ((myStartTop == NULL) || (myEndTop == NULL)) {
+        //пока рисуем дугу
     } else {
-        QPointF intersectPoint;
+        QPointF intersectPoint(-1, -1);
         myStartTop->getIntersectBound(lines.first()->line()).intersect(lines.first()->line(), &intersectPoint);
         float koeff = QLineF(lines.first()->line().p1(), intersectPoint).length() + 15 > lines.first()->line().length() ? lines.first()->line().length() : QLineF(lines.first()->line().p1(), intersectPoint).length() + 15; //ЫЫЫ =)
         if (arcTop != NULL){
@@ -475,18 +465,18 @@ void QArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
         painter->setPen(myPen);
         painter->setBrush(myPen.color());
         myEndTop->getIntersectBound(lines.last()->line()).intersect(lines.last()->line(), &intersectPoint);
-        float koeff2 = QLineF(lines.last()->line().p2(), intersectPoint).length(); //ЫЫЫ =)
+        float koeff2 = QLineF(lines.last()->line().p2(), intersectPoint).length() + 2; //ЫЫЫ =)
         QPointF t = lines.last()->line().p2() - QPointF(cos(lines.last()->line().angle() * Pi / 180) * koeff2, -sin(lines.last()->line().angle() * Pi / 180) * koeff2);
         double angle = ((myEndTop->getIntersectBound(lines.last()->line()).normalVector().angle()) + 180) * Pi / 180;
         int width = myPriority + 1;
-        QPointF arcP1 = t + QPointF(sin(angle + Pi / 3) * 1.8*width,
-                                              cos(angle + Pi / 3) * 1.8*width);
-        QPointF arcP2 = t + QPointF(sin(angle + Pi - Pi / 3) * 1.8*width,
-                                              cos(angle + Pi - Pi / 3) * 1.8*width);
+        QPointF arcP1 = t - QPointF(sin(angle + Pi / 3) * 1.8*width,
+                                    cos(angle + Pi / 3) * 1.8*width);
+        QPointF arcP2 = t - QPointF(sin(angle + Pi - Pi / 3) * 1.8*width,
+                                    cos(angle + Pi - Pi / 3) * 1.8*width);
         arcHead.clear();
         arcHead << t << arcP1 << arcP2;
         painter->drawPolygon(arcHead);
-   }
+    }
 }
 
 /*!

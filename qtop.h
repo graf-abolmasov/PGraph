@@ -1,25 +1,11 @@
-#ifndef QDIAGRAMITEM_H
-#define QDIAGRAMITEM_H
+#ifndef QTOP_H
+#define QTOP_H
 
-#include <QGraphicsItem>
+#include <QtGui>
 #include <QList>
 #include "qsyncarc.h"
 #include "qarc.h"
 #include "actor.h"
-
-QT_BEGIN_NAMESPACE
-class QPixmap;
-class QGraphicsItem;
-class QGraphicsScene;
-class QTextEdit;
-class QGraphicsSceneMouseEvent;
-class QMenu;
-class QGraphicsSceneContextMenuEvent;
-class QPainter;
-class QStyleOptionGraphicsItem;
-class QWidget;
-class QPolygonF;
-QT_END_NAMESPACE
 
 class QArc;
 class QSyncArc;
@@ -29,37 +15,32 @@ class QSyncArc;
 class Top
 {
 public:
-    Top(float x, float y, float sizeX, float sizeY, int number, bool isRoot, QString actor);
+    Top(float x, float y, float sizeX, float sizeY, int number, int procCount, bool isRoot, QString actor, QString type);
     float x;
     float y;
     float sizeX;
     float sizeY;
     int number;
+    int procCount;
     bool isRoot;
     QString actor;
+    QString type;
 };
 
-class QTop : public QGraphicsPolygonItem{
-
-    friend class QDiagramScene;
-    friend class QArc;
-    friend class QSyncArc;
-    friend class Top;
-
+class QTop : public QGraphicsRectItem
+{
 public:
     enum { Type = TOP_TYPE};
     QTop(QMenu *contextMenu, QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
     int number;
+    bool isRoot;
+    Actor* actor;
     void removeArc(QArc *arc);
     void removeArcs();
     void removeSync(QSyncArc *arc);
     void removeSyncs();
-    void setIcon(QImage icon);
     void addArc(QArc *arc);
     void addSync(QSyncArc *arc);
-    void setAsRoot(bool flag);
-    float getMinWidth();
-    float getMinHeight();
     QLineF getIntersectBound(QLineF line);
     int type() const
         { return Type; }
@@ -68,20 +49,18 @@ public:
     QList<QArc *> inArcs();
     QList<QArc *> outArcs();
     QRectF boundingRect() const;
-    bool isRoot;
-    Actor* actor;
-    Top* toTop();
+    QPainterPath shape() const;
+    QPainterPath opaqueArea() const;
+    virtual Top* toTop() = 0;
+    QList<QArc *> getArcsAtBound(int i);
 protected:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 private:
     QList<QArc *> arcs;
     QList<QSyncArc *> sync;
     QMenu *myContextMenu;
-    QImage myIcon;
-    QList<QArc *> getArcsAtBound(int i);
-    QList<QArc *> getArcsAtBound(QLineF bound);
+    //QList<QArc *> getArcsAtBound(QLineF bound);
     static int counter;
 };
 

@@ -2,11 +2,12 @@
 #define QDIAGRAMSCENE_H
 
 #include <QGraphicsScene>
-#include "qdiagramitem.h"
+#include "qtop.h"
 #include "qcomment.h"
 #include "qarc.h"
 #include "qsyncarc.h"
 #include "qmultiproctop.h"
+#include "qnormaltop.h"
 
 QT_BEGIN_NAMESPACE
 class QGraphicsSceneMouseEvent;
@@ -35,10 +36,10 @@ public:
     void setCommentMenu(QMenu *menu);
     void setSyncArcMenu(QMenu *menu);
     void setMultiProcTopMenu(QMenu *menu);
-    void setRootTop(QTop* top);
+    void setRootTop(QNormalTop* top);
 
-    //!Указатель на корневую вершину
-    QTop* rootTop()
+    //!РЈРєР°Р·Р°С‚РµР»СЊ РЅР° РєРѕСЂРЅРµРІСѓСЋ РІРµСЂС€РёРЅСѓ
+    QNormalTop* rootTop()
         { return myRootTop; }
 
 public slots:
@@ -59,7 +60,7 @@ protected:
 private:
     Mode myMode;
 
-    QTop* myRootTop;
+    QNormalTop* myRootTop;
 
     QComment *textItem;
     QArc *newArc;

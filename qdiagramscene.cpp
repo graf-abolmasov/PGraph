@@ -39,7 +39,7 @@ void QDiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
     QGraphicsItem* item;
     switch (myMode) {
     case InsertItem:
-        item = new QTop(myTopMenu);
+        item = new QNormalTop(myTopMenu);
         addItem(item);
         item->setPos(mouseEvent->scenePos());
         emit itemInserted(item);
@@ -192,8 +192,10 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
         arc->updateBounds();
     }
     //режим перетаскивания вершины
-    else if ((myMode == MoveItem) && (mouseEvent->buttons() == Qt::LeftButton) &&
-             (selectedItems().count() == 1) && (selectedItems().first()->type() == QTop::Type) &&
+    else if ((myMode == MoveItem) &&
+             (mouseEvent->buttons() == Qt::LeftButton) &&
+             (selectedItems().count() == 1) &&
+             (selectedItems().first()->type() == QTop::Type) &&
              (selectedItems().first()->contains(selectedItems().first()->mapFromScene(mouseEvent->lastScenePos())))) {
         QTop *top = qgraphicsitem_cast<QTop *>(selectedItems().first());
         QPointF old_pos = mouseEvent->lastScenePos();
@@ -203,14 +205,12 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
         float dx = vector.dx();
         float dy = vector.dy();
 
-        top->setX(top->x() + dx);
-        top->setY(top->y() + dy);
+        top->moveBy(dx, dy);
 
         QList<QGraphicsItem* > itemList = collidingItems(top, Qt::IntersectsItemBoundingRect);
         foreach(QGraphicsItem* item, itemList){
             if (item->type() == QTop::Type){
-                top->setX(top->x() - dx);
-                top->setY(top->y() - dy);
+                top->moveBy(-dx, -dy);
                 mouseEvent->ignore();
                 return;
             }
@@ -236,7 +236,7 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
     else if (myMode == InsertSync && line != NULL) {
         QLineF newLine(line->line().p1(), mouseEvent->scenePos());
         line->setLine(newLine);
-    }
+    }/*
     else if ((myMode == MoveItem) && (mouseEvent->buttons() == Qt::LeftButton) &&
              (selectedItems().count() == 1) && (selectedItems().first()->type() == QMultiProcTop::Type)) {
         QMultiProcTop *top = qgraphicsitem_cast<QMultiProcTop *>(selectedItems().first());
@@ -249,7 +249,7 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
         top->setX(top->x() + dx);
         top->setY(top->y() + dy);
-    }
+    }*/
 }
 
 void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
@@ -386,13 +386,13 @@ void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
                 status.append(tr(" Предикат ") + arc->predicate->extName);
             break;
         case QTop::Type:
-            top = qgraphicsitem_cast<QTop*>(selectedItems().first());
+            top = qgraphicsitem_cast<QTop* >(selectedItems().first());
             status.append(tr("Номер вершины ") + QString::number(top->number));
             if (top->actor != NULL)
                 status.append(tr(" Актор ") + top->actor->extName);
             break;
-        case QMultiProcTop::Type:
-            break;
+        /*case QMultiProcTop::Type:
+            break;*/
         case QSyncArc::Type:
             break;
         }
@@ -452,7 +452,7 @@ void QDiagramScene::setMultiProcTopMenu(QMenu *menu)
     myMultiProcTopMenu = menu;
 }
 
-void QDiagramScene::setRootTop(QTop* top){
+void QDiagramScene::setRootTop(QNormalTop* top){
     if (myRootTop != NULL)
         myRootTop->setAsRoot(false);
     myRootTop = top;

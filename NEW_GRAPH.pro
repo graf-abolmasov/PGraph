@@ -8,7 +8,7 @@ CONFIG += static
 SOURCES += main.cpp \
     qmywindow.cpp \
     qdrawwindow.cpp \
-    qdiagramitem.cpp \
+    qtop.cpp \
     qdiagramscene.cpp \
     qarc.cpp \
     qcomment.cpp \
@@ -38,10 +38,13 @@ SOURCES += main.cpp \
     basemodule.cpp \
     qsavegraphdialog.cpp \
     qopengraphdialog.cpp \
-    md5.cpp
+    md5.cpp \
+    qnormaltop.cpp \
+    multiproctoppropertydialog.cpp \
+    graph.cpp
 HEADERS += qmywindow.h \
     qdrawwindow.h \
-    qdiagramitem.h \
+    qtop.h \
     qdiagramscene.h \
     qarc.h \
     qcomment.h \
@@ -62,7 +65,6 @@ HEADERS += qmywindow.h \
     qactoreditor.h \
     qmoduleregister.h \
     qpredicateeditor.h \
-    qgraph.h \
     arcpropertydialog.h \
     qparallelarctop.h \
     qterminatearctop.h \
@@ -71,7 +73,10 @@ HEADERS += qmywindow.h \
     basemodule.h \
     qsavegraphdialog.h \
     qopengraphdialog.h \
-    md5.h
+    md5.h \
+    qnormaltop.h \
+    multiproctoppropertydialog.h \
+    graph.h
 RESOURCES += resources.qrc
 FORMS += toppropertydialog.ui \
     qobjecteditor.ui \
@@ -84,4 +89,5 @@ FORMS += toppropertydialog.ui \
     qpredicateeditor.ui \
     arcpropertydialog.ui \
     qsavegraphdialog.ui \
-    qopengraphdialog.ui
+    qopengraphdialog.ui \
+    multiproctoppropertydialog.ui

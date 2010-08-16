@@ -27,7 +27,7 @@ void TopPropertyDialog::changeEvent(QEvent *e)
 }
 
 
-void TopPropertyDialog::prepareForm(QTop* top){
+void TopPropertyDialog::prepareForm(QNormalTop* top){
     myTop = top;
 
     globalDBManager->getActorList(myActorList);
@@ -59,8 +59,8 @@ void TopPropertyDialog::prepareForm(QTop* top){
         }
     } else ui->actorsListWidget->setCurrentRow(0);
 
-    ui->spnBoxHeight->setProperty("value", top->polygon().boundingRect().height());
-    ui->spnBoxWidth->setProperty("value", top->polygon().boundingRect().width());
+    ui->spnBoxHeight->setProperty("value", top->rect().height());
+    ui->spnBoxWidth->setProperty("value", top->rect().width());
 
     float minHeight = top->getMinHeight() > 10 ? top->getMinHeight() : 10;
     float minWidth = top->getMinWidth() > 10 ? top->getMinWidth() : 10;
@@ -69,32 +69,10 @@ void TopPropertyDialog::prepareForm(QTop* top){
     ui->spnBoxWidth->setProperty("minimum", minWidth);
 }
 
-void TopPropertyDialog::widthChanged(int w){
-    int h = myTop->polygon().boundingRect().height();
-    QPolygonF myPolygon;
-    myPolygon << QPointF(-w/2, h/2) << QPointF(w/2, h/2)
-            << QPointF(w/2,-h/2) << QPointF(-w/2, -h/2)
-            << QPointF(-w/2, h/2);
-    myTop->setPolygon(myPolygon);
-}
-
-void TopPropertyDialog::heightChanged(int h){
-    int w = myTop->polygon().boundingRect().width();
-    QPolygonF myPolygon;
-    myPolygon << QPointF(-w/2, h/2) << QPointF(w/2, h/2)
-            << QPointF(w/2,-h/2) << QPointF(-w/2, -h/2)
-            << QPointF(-w/2, h/2);
-    myTop->setPolygon(myPolygon);
-}
-
-QTop* TopPropertyDialog::getResult(){
-    QPolygonF myPolygon;
+QNormalTop* TopPropertyDialog::getResult(){
     int w = ui->spnBoxWidth->value();
     int h = ui->spnBoxHeight->value();
-    myPolygon << QPointF(-w/2, h/2) << QPointF(w/2, h/2)
-            << QPointF(w/2,-h/2) << QPointF(-w/2, -h/2)
-            << QPointF(-w/2, h/2);
-    myTop->setPolygon(myPolygon);
+    myTop->setRect(-w/2, -h/2, w, h);
     myTop->actor = myActorList.at(ui->actorsListWidget->currentRow());
     return myTop;
 }

@@ -2,7 +2,7 @@
 #define TOPPROPERTYDIALOG_H
 
 #include <QDialog>
-#include "qdiagramitem.h"
+#include "qnormaltop.h"
 
 namespace Ui {
     class TopPropertyDialog;
@@ -12,20 +12,16 @@ class TopPropertyDialog : public QDialog {
     Q_OBJECT
 public:
     TopPropertyDialog(QWidget *parent = 0);
-    void prepareForm(QTop* top);
+    void prepareForm(QNormalTop* top);
     ~TopPropertyDialog();
-    QTop* getResult();
+    QNormalTop* getResult();
 
 protected:
     void changeEvent(QEvent *e);
 
-public slots:
-    void widthChanged(int w);
-    void heightChanged(int h);
-
 private:
     Ui::TopPropertyDialog *ui;
-    QTop* myTop;
+    QNormalTop* myTop;
     QList<Actor*> myActorList;
 
 private slots:

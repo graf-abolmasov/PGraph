@@ -2,7 +2,7 @@
 #define QOPENGRAPHDIALOG_H
 
 #include <QDialog>
-#include "qgraph.h"
+#include "graph.h"
 
 namespace Ui {
     class QOpenGraphDialog;
