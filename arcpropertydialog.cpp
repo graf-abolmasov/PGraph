@@ -84,5 +84,9 @@ void ArcPropertyDialog::on_buttonBox_accepted()
         myArc->predicate = myPredicateList.at(ui->predicateList->currentRow());
     else
         myArc->predicate = NULL;
+}
 
+void ArcPropertyDialog::on_predicateList_itemDoubleClicked(QListWidgetItem* item)
+{
+    accept();
 }

@@ -19,6 +19,7 @@ protected:
 
 private:
     Ui::QSaveGraphDialog *ui;
+
 };
 
 #endif // QSAVEGRAPHDIALOG_H

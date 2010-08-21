@@ -8,20 +8,27 @@
 #include "md5.h"
 #include "logger.h"
 
-#define QT_DEBUG_COMPONENT
-
 int main(int argc, char *argv[])
 {  	
     QApplication::addLibraryPath("./");
-    QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
     QApplication a(argc, argv);
-    TMyWindow w;
-    globalLogger = new Logger("log.txt");
+    a.setApplicationVersion("21.08.2010 18.27");
+
+    QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
+    QTranslator qtTranslator;
+    qtTranslator.load("qt_" + QLocale::system().name(),
+                      QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+
+    a.installTranslator(&qtTranslator);
+
+    //globalLogger = new Logger("log.txt");
     globalDBManager = new DataBaseManager();
+
+    TMyWindow w;
     w.show();
 
     int result = a.exec();
     delete globalDBManager;
-    delete globalLogger;
+    //delete globalLogger;
     return result;
 }

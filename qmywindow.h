@@ -19,6 +19,7 @@ private:
     QMenu *grafMenu;
     QMenu *objectMenu;
     QMenu *buildMenu;
+    QMenu *helpMenu;
 
     //Файл
     QAction *newGraphAct;
@@ -43,6 +44,9 @@ private:
     //Данные
     QAction *variablesAct;
     QAction *dataTypeAct;
+
+    //Опрограмме
+    QAction *aboutEditorAct;
 
     //LeftToolBar
     QToolButton *pointerButton;
@@ -106,11 +110,10 @@ private slots:
     void CMCompile(){}          // +Запуск->Компиляция
     void CMRun(){}              // +Запуск->Построение и запуск
     void CMHelpContents(){}	// Помощь->Содержание
-    void CMHelpAbout(){}	// Помощь->О программе
+    void CMHelpAbout(); 	// +Помощь->О программе
     void updateMenus();         // Действие при активации дочернего окна
     void switchLayoutDirection();
 
-    void addComment();
     void pointerGroupClicked(int id);  //Действие при выборе стрелки или линии
 };
 

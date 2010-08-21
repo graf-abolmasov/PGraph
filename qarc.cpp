@@ -414,7 +414,7 @@ QArc::QArc(QTop *startItem, QTop *endItem, QMenu *contextMenu,
     setPen(QPen(Qt::black, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 
     setArcType(QArc::SerialArc);
-    myPriority = 1;
+    myPriority = 0;
     arcTop->hide();
 }
 
@@ -452,7 +452,7 @@ void QArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
     if (lines.count() == 0) return;
 
     if ((myStartTop == NULL) || (myEndTop == NULL)) {
-        //пока рисуем дугу
+        //пока рисуем(создаем) дугу
     } else {
         QPointF intersectPoint(-1, -1);
         myStartTop->getIntersectBound(lines.first()->line()).intersect(lines.first()->line(), &intersectPoint);
@@ -468,7 +468,7 @@ void QArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
         float koeff2 = QLineF(lines.last()->line().p2(), intersectPoint).length() + 2; //ЫЫЫ =)
         QPointF t = lines.last()->line().p2() - QPointF(cos(lines.last()->line().angle() * Pi / 180) * koeff2, -sin(lines.last()->line().angle() * Pi / 180) * koeff2);
         double angle = ((myEndTop->getIntersectBound(lines.last()->line()).normalVector().angle()) + 180) * Pi / 180;
-        int width = myPriority + 1;
+        int width = myPen.width();
         QPointF arcP1 = t - QPointF(sin(angle + Pi / 3) * 1.8*width,
                                     cos(angle + Pi / 3) * 1.8*width);
         QPointF arcP2 = t - QPointF(sin(angle + Pi - Pi / 3) * 1.8*width,
@@ -533,8 +533,9 @@ void QArc::updateBounds(){
 */
 void QArc::setPriority(int w){
     myPriority = w;
+    QList<QArc* > arcList = myStartTop->outArcs();
     QPen old_pen = pen();
-    old_pen.setWidth(myPriority + 1);
+    old_pen.setWidth(arcList.count() - myPriority + 2);
     setPen(old_pen);
 }
 

@@ -75,14 +75,10 @@ void QModuleRegister::on_fileList_currentRowChanged(int currentRow)
     int end   = buff.indexOf(")", start, Qt::CaseSensitive);
     QString signature(buff.mid(start, end-start));
     QStringList paramsList = signature.split(QRegExp(",{1,}\\s*"));
-    //QStringList paramsList = signature.split(QRegExp(","));
     for (int i = 0; i < paramsList.count(); i++){
         ui->parametersTable->insertRow(i);
-        //paramsList.replace(i,paramsList.at(i).simplify());
-        //QString paramName = paramsList.at(i).split(QRegExp(" ")).at(1);
-        //QString paramType = paramsList.at(i).split(QRegExp(" ")).at(0);
-        QString paramName = paramsList.at(i).split(QRegExp("\\*\\s{1,}")).at(1);
-        QString paramType = paramsList.at(i).split(QRegExp("\\*\\s{1,}")).at(0);
+        QString paramName = paramsList.at(i).split(QRegExp("\\*?\\s{1,}\\*?")).at(1);
+        QString paramType = paramsList.at(i).split(QRegExp("\\*?\\s{1,}\\*?")).at(0);
         ui->parametersTable->setItem(i, 0, new QTableWidgetItem(paramName));
         ui->parametersTable->setItem(i, 1, new QTableWidgetItem(paramType));
         ui->parametersTable->setItem(i, 2, new QTableWidgetItem(" "));
