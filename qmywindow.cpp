@@ -162,7 +162,7 @@ void TMyWindow::createActions()
 
     addMultiProcTopButton = new QToolButton;
     addMultiProcTopButton->setCheckable(true);
-    addMultiProcTopButton->setIcon(QIcon(":/images/MultiProcTop.png"));
+    addMultiProcTopButton->setIcon(QIcon(":/images/multiproctop.png"));
 }
 
 TDrawWindow* TMyWindow::createDrawWindow()
@@ -198,11 +198,14 @@ void TMyWindow::createToolBar()
     leftToolBar = new QToolBar(tr("Палитра инструментов"), this);
     addToolBar(Qt::LeftToolBarArea, leftToolBar);
     leftToolBar->addWidget(pointerButton);
+    leftToolBar->addSeparator();
     leftToolBar->addWidget(addTopButton);
-    leftToolBar->addWidget(addCommentButton);
+    leftToolBar->addWidget(addMultiProcTopButton);
+    leftToolBar->addSeparator();
     leftToolBar->addWidget(addArcButton);
     leftToolBar->addWidget(addSyncArcButton);
-    leftToolBar->addWidget(addMultiProcTopButton);
+    leftToolBar->addSeparator();
+    leftToolBar->addWidget(addCommentButton);
 }
 
 void TMyWindow::CMGNew()

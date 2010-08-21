@@ -1,6 +1,7 @@
 #include <QtGui>
 #include "qserialarctop.h"
 #include "qarc.h"
+#include "arcpropertydialog.h"
 
 void QSerialArcTop::contextMenuEvent(QGraphicsSceneContextMenuEvent *event){
     scene()->clearSelection();
@@ -38,4 +39,13 @@ QVariant QSerialArcTop::itemChange(GraphicsItemChange change, const QVariant &va
     }
 
     return value;
+}
+
+void QSerialArcTop::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+{
+    ArcPropertyDialog dlg;
+    QArc* arc = qgraphicsitem_cast<QArc *>(parentItem());
+    dlg.prepareForm(arc);
+    if (dlg.exec())
+        dlg.getResult();
 }

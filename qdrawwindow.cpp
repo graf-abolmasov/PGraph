@@ -33,6 +33,10 @@ TDrawWindow::TDrawWindow()
         this, SLOT(textInserted(QComment *)));
 
     view->setScene(scene);
+    /*QBrush myBackgroundBrush = view->backgroundBrush();
+    myBackgroundBrush.setColor(Qt::lightGray);
+    myBackgroundBrush.setStyle(Qt::CrossPattern);
+    view->setBackgroundBrush(myBackgroundBrush);*/
     this->setCentralWidget(view);
     setMode(QDiagramScene::MoveItem);
 }
