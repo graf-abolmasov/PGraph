@@ -43,6 +43,7 @@ void ArcPropertyDialog::prepareForm(QArc *arc)
         break;
     }
     ui->prioritySpnBox->setValue(arc->priority());
+    ui->prioritySpnBox->setMaximum(myArc->startItem()->outArcs().count());
 
     //Загружаем предикаты из базы данных
     globalDBManager->getPredicateList(myPredicateList);
@@ -63,7 +64,7 @@ void ArcPropertyDialog::prepareForm(QArc *arc)
         }
         if (idx != -1) ui->predicateList->setCurrentRow(idx);
         else {
-            QMessageBox(QMessageBox::Critical, tr("Ошибка"), tr("Вершина использует несуществующий объект"), QMessageBox::Ok).exec();
+            QMessageBox(QMessageBox::Critical, tr("Ошибка"), tr("Дуга использует несуществующий предикат"), QMessageBox::Ok).exec();
             arc->predicate = NULL;
         }
     } else ui->predicateList->setCurrentRow(0);
@@ -80,6 +81,10 @@ void ArcPropertyDialog::on_buttonBox_accepted()
     if (ui->parallelRadioBtn->isChecked()) myArc->setArcType(QArc::ParallelArc);
     if (ui->terminateRadioBtn->isChecked()) myArc->setArcType(QArc::TerminateArc);
     myArc->setPriority(ui->prioritySpnBox->value());
+    QList<QArc* > arcList = myArc->startItem()->outArcs();
+    for (int i = 0; i < arcList.count(); i++)
+        if (ui->prioritySpnBox->value() <= arcList.at(i)->priority() && arcList.at(i)!=myArc)
+            arcList.at(i)->setPriority(arcList.at(i)->priority() + 1);
     if (ui->predicateList->currentRow() > -1)
         myArc->predicate = myPredicateList.at(ui->predicateList->currentRow());
     else
