@@ -25,14 +25,14 @@ private:
     QList<Variable*> varListProxy;
     QList<Actor*> actorListProxy;
     QList<Predicate*> predListProxy;
-    int myProgectId;
+    int myProjectId;
 public:
     DataBaseManager();
 
     void setProjectId(int pid)
-        { myProgectId = pid; }
+        { myProjectId = pid; }
     int projectId()
-        { return myProgectId; }
+        { return myProjectId; }
 
     int getGraphList(QList<Graph* > &graphList);
     int getGraph(QString extName, Graph &graph);

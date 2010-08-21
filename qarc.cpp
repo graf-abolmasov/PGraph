@@ -461,14 +461,17 @@ void QArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
             arcTop->setPos(lines.first()->line().p1() + QPointF(cos(lines.first()->line().angle() * Pi / 180) * koeff, -sin(lines.first()->line().angle() * Pi / 180) * koeff));
             arcTop->show();
         }
-        QPen myPen = pen();
-        painter->setPen(myPen);
-        painter->setBrush(myPen.color());
+        QList<QArc* > arcList = myStartTop->outArcs();
+        QPen old_pen = pen();
+        old_pen.setWidth(arcList.count() - myPriority + 2);
+        setPen(old_pen);
+        painter->setPen(old_pen);
+        painter->setBrush(old_pen.color());
         myEndTop->getIntersectBound(lines.last()->line()).intersect(lines.last()->line(), &intersectPoint);
         float koeff2 = QLineF(lines.last()->line().p2(), intersectPoint).length() + 2; //ЫЫЫ =)
         QPointF t = lines.last()->line().p2() - QPointF(cos(lines.last()->line().angle() * Pi / 180) * koeff2, -sin(lines.last()->line().angle() * Pi / 180) * koeff2);
         double angle = ((myEndTop->getIntersectBound(lines.last()->line()).normalVector().angle()) + 180) * Pi / 180;
-        int width = myPen.width();
+        int width = old_pen.width();
         QPointF arcP1 = t - QPointF(sin(angle + Pi / 3) * 1.8*width,
                                     cos(angle + Pi / 3) * 1.8*width);
         QPointF arcP2 = t - QPointF(sin(angle + Pi - Pi / 3) * 1.8*width,
@@ -533,10 +536,7 @@ void QArc::updateBounds(){
 */
 void QArc::setPriority(int w){
     myPriority = w;
-    QList<QArc* > arcList = myStartTop->outArcs();
-    QPen old_pen = pen();
-    old_pen.setWidth(arcList.count() - myPriority + 2);
-    setPen(old_pen);
+
 }
 
 void QArc::setPen(const QPen &pen){

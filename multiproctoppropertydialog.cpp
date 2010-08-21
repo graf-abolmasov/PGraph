@@ -123,7 +123,7 @@ void MultiProcTopPropertyDialog::on_buttonBox_accepted()
                      QString::number(-85) + " " +
                      QString::number(-(myTop->procCount-1)*25+i*50) + " " +
                      QString::number(-1));
-        Arc* newArc = new Arc(Arc::ParallelArc, 1, 0, i+1, "", nodes);
+        Arc* newArc = new Arc(Arc::ParallelArc, i+1, 0, i+1, "", nodes);
         newGraph->arcList.append(newArc);
         nodes.clear();
         nodes.append(QString::number(-(myTop->procCount-1)*25+i*50) + " " +
