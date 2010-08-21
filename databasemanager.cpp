@@ -20,12 +20,12 @@ DataBaseManager* globalDBManager;
 DataBaseManager::DataBaseManager()
 {
     db = QSqlDatabase::addDatabase("QMYSQL");
-    globalLogger->writeLog(db.lastError().text());
-    db.setHostName("localhost");
-    db.setPort(3306);
-    db.setDatabaseName("graph3");
-    db.setUserName("root");
-    db.setPassword("Marina");
+    QSettings myDBSettings("graph.ini", QSettings::IniFormat);
+    db.setHostName(myDBSettings.value("DB/hostname", "localhost").toString());
+    db.setPort(myDBSettings.value("DB/port", 3306).toInt());
+    db.setDatabaseName(myDBSettings.value("DB/dbname", "graph3").toString());
+    db.setUserName(myDBSettings.value("DB/login", "root").toString());
+    db.setPassword(myDBSettings.value("DB/password", "Marina").toString());
 
     myProgectId = 1;
 

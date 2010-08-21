@@ -55,6 +55,9 @@ void TMyWindow::createMenus()
     buildMenu->addAction(compileAct);
     buildMenu->addAction(saveStructAct);
     buildMenu->addAction(manualInputAct);
+
+    helpMenu = menuBar()->addMenu(tr("Помощь"));
+    helpMenu->addAction(aboutEditorAct);
 }
 
 void TMyWindow::createActions()
@@ -81,7 +84,7 @@ void TMyWindow::createActions()
     connect(saveAsGraphAct, SIGNAL(triggered()), this, SLOT(CMGSaveAs()));
 
     saveAsImageGraphAct = new QAction(tr("Cохранить как картинку"), this);
-    saveAsImageGraphAct->setStatusTip(tr("Cхраняет как картинку"));
+    saveAsImageGraphAct->setStatusTip(tr("Cохраняет как картинку"));
     connect(saveAsImageGraphAct, SIGNAL(triggered()), this, SLOT(CMGSaveAsImage()));
 
     exitAction = new QAction(tr("Выход"), this);
@@ -92,10 +95,12 @@ void TMyWindow::createActions()
     viewContentAct = new QAction(tr("Дерево объектов"), this);
     viewContentAct->setStatusTip(tr("Дерево объектов"));
     connect(viewContentAct, SIGNAL(triggered()), this, SLOT(CMContent()));
+    viewContentAct->setEnabled(false);
 
     viewGarbageAct = new QAction(tr("Неиспользуемые объекты"), this);
     viewGarbageAct->setStatusTip(tr("Неиспользуемые объекты"));
     connect(viewGarbageAct, SIGNAL(triggered()), this, SLOT(CMShowGarbage()));
+    viewGarbageAct->setEnabled(false);
 
     registerUnitAct = new QAction(tr("Зарегистрировать модуль"), this);
     registerUnitAct->setStatusTip(tr("Зарегистрировать модуль"));
@@ -114,10 +119,12 @@ void TMyWindow::createActions()
     runAct = new QAction(QIcon(":/images/build.png"), tr("Запуск"), this);
     runAct->setStatusTip(tr("Компиляция и запуск"));
     connect(runAct, SIGNAL(triggered()), this, SLOT(CMRun()));
+    runAct->setEnabled(false);
 
     compileAct = new QAction(QIcon(":/images/compile.png"), tr("Компилировать"), this);
     compileAct->setStatusTip(tr("Компилировать в exe"));
     connect(compileAct, SIGNAL(triggered()), this, SLOT(CMCompile()));
+    compileAct->setEnabled(false);
 
     saveStructAct = new QAction(tr("Записать структуру"), this);
     saveStructAct->setStatusTip(tr("Записать структуру графа в базу"));
@@ -125,6 +132,10 @@ void TMyWindow::createActions()
 
     manualInputAct = new QAction(tr("Ручной ввод данных"), this);
     connect(manualInputAct, SIGNAL(triggered()), this, SLOT(CMDoUserDialog()));
+    manualInputAct->setEnabled(false);
+
+    aboutEditorAct = new QAction(tr("О редакторе"), this);
+    connect(aboutEditorAct, SIGNAL(triggered()), this, SLOT(CMHelpAbout()));
 
     //LeftToolBar
     pointerButton = new QToolButton;
@@ -147,6 +158,7 @@ void TMyWindow::createActions()
     addSyncArcButton = new QToolButton;
     addSyncArcButton->setCheckable(true);
     addSyncArcButton->setIcon(QIcon(":/images/syncarc.png"));
+    addSyncArcButton->setEnabled(false);
 
     addMultiProcTopButton = new QToolButton;
     addMultiProcTopButton->setCheckable(true);
@@ -212,11 +224,6 @@ void TMyWindow::switchLayoutDirection()
         qApp->setLayoutDirection(Qt::RightToLeft);
     else
         qApp->setLayoutDirection(Qt::LeftToRight);
-}
-
-void TMyWindow::addComment()
-{
-    activeDrawWindow()->setMode(QDiagramScene::InsertText);
 }
 
 void TMyWindow::pointerGroupClicked(int)
@@ -333,4 +340,14 @@ void TMyWindow::setMyGraphExtName(QString extName)
         setWindowTitle(tr("Граф-редактор"));
     else
         setWindowTitle(myGraphExtName + tr(" - Граф-редактор"));
+}
+
+void TMyWindow::CMHelpAbout()
+{
+    QMessageBox::about(this, tr("O Граф-редакторе"),
+                       tr("<h2>Граф-редатор 2.0</h2>"
+                          "<p>Внутренняя версия ") + QApplication::applicationVersion() +
+                          tr("<p>Copyright &copy; 2010 FuzzyLogic Team. All rights reserved.</p>"
+                          "<p>The program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.</p>"));
+
 }

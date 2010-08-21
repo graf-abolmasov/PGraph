@@ -26,6 +26,7 @@ private:
     QList<Predicate*> myPredicateList;
 
 private slots:
+    void on_predicateList_itemDoubleClicked(QListWidgetItem* item);
     void on_buttonBox_accepted();
 };
 

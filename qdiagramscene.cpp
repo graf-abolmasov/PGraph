@@ -7,6 +7,8 @@ QDiagramScene::QDiagramScene(QObject *parent)
 {
     myMode = MoveItem;
 
+    setItemIndexMethod(NoIndex);
+
     line = 0;
     textItem = 0;
     newArc = 0;
@@ -120,8 +122,6 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
         float dx = vector.dx();
         float dy = vector.dy();
 
-        /*//не разрешать двигать начальную и конечный кусочек дуги (пока)
-        if (!((arc->lines.first() == selectedLine) || (arc->lines.last() == selectedLine))){*/
         QArcLine *prevLine;
         QArcLine *nextLine;
         if (arc->lines.count() == 1){
@@ -220,7 +220,7 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
         QList<QArc *> brokenLines; //список содержит дуги, нуждающиеся в полной переделке
         foreach (QArc *arc, top->allArcs()){
-           isOK = arc->remake(top, dx, dy);
+           //isOK = arc->remake(top, dx, dy);
            if (!isOK)
                brokenLines.append(arc);
         }
@@ -236,20 +236,7 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
     else if (myMode == InsertSync && line != NULL) {
         QLineF newLine(line->line().p1(), mouseEvent->scenePos());
         line->setLine(newLine);
-    }/*
-    else if ((myMode == MoveItem) && (mouseEvent->buttons() == Qt::LeftButton) &&
-             (selectedItems().count() == 1) && (selectedItems().first()->type() == QMultiProcTop::Type)) {
-        QMultiProcTop *top = qgraphicsitem_cast<QMultiProcTop *>(selectedItems().first());
-        QPointF old_pos = mouseEvent->lastScenePos();
-        QPointF new_pos = mouseEvent->scenePos();
-
-        QLineF vector(old_pos, new_pos);
-        float dx = vector.dx();
-        float dy = vector.dy();
-
-        top->setX(top->x() + dx);
-        top->setY(top->y() + dy);
-    }*/
+    }
 }
 
 void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
@@ -293,11 +280,11 @@ void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
         //условие выполнится когда у дуги будет начало и конец!
         if ((newArc != NULL) && (newArc->endItem() != NULL) && (newArc->startItem() != NULL)){
-            foreach(QArc *arc, newArc->startItem()->outArcs()){
-                arc->setPriority(arc->priority() + 1);
-            }
             newArc->startItem()->addArc(newArc);
             newArc->endItem()->addArc(newArc);
+            foreach(QArc *arc, newArc->startItem()->outArcs())
+                arc->setPriority(arc->priority() + 1);
+            newArc->setPriority(1);
             newArc->updateBounds();
             update();
             newArc->currentLine = NULL;
@@ -337,7 +324,6 @@ void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
     if (selectedItems().count() == 1) {
         QArc *arc;
         QTop *top;
-        QMultiProcTop *multiTop;
         QSyncArc *syncArc;
         QString status = tr("");
         QString arcTypeStr;
@@ -361,7 +347,8 @@ void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
                 status.append(tr(" Начальная вершина ") + QString::number(arc->startItem()->number));
             if (arc->endItem() != NULL)
                 status.append(tr(" Конечная вершина ") + QString::number(arc->endItem()->number));
-            status.append(tr(" Приоритет ") + QString::number(arc->priority()));
+            status.append(tr(" Приоритет ") + QString::number(arc->priority()) +
+                          tr(" Ширина пера ") + QString::number(arc->pen().width()));
             if (arc->predicate != NULL)
                 status.append(tr("Предикат ") + arc->predicate->extName);
             break;
@@ -381,7 +368,8 @@ void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
             status.append(tr("Дуга ") + arcTypeStr +
                           tr(" Начальная вершина ") + QString::number(arc->startItem()->number) +
                           tr(" Конечная вершина ") + QString::number(arc->endItem()->number) +
-                          tr(" Приоритет ") + QString::number(arc->priority()));
+                          tr(" Приоритет ") + QString::number(arc->priority()) +
+                          tr(" Ширина пера ") + QString::number(arc->pen().width()));
             if (arc->predicate != NULL)
                 status.append(tr(" Предикат ") + arc->predicate->extName);
             break;
@@ -391,14 +379,12 @@ void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
             if (top->actor != NULL)
                 status.append(tr(" Актор ") + top->actor->extName);
             break;
-        /*case QMultiProcTop::Type:
-            break;*/
         case QSyncArc::Type:
+            syncArc = qgraphicsitem_cast<QSyncArc* >(selectedItems().first());
             break;
         }
         globalStatusBar->showMessage(status);
     }
-
     QGraphicsScene::mouseReleaseEvent(mouseEvent);
 }
 

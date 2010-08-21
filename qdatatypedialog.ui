@@ -14,7 +14,7 @@
    <string>Справочник типов данных</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="resources.qrc">
+   <iconset>
     <normaloff>:/images/G.png</normaloff>:/images/G.png</iconset>
   </property>
   <widget class="QDialogButtonBox" name="buttonBox">
@@ -90,6 +90,12 @@
    <attribute name="horizontalHeaderHighlightSections">
     <bool>false</bool>
    </attribute>
+   <attribute name="verticalHeaderDefaultSectionSize">
+    <number>22</number>
+   </attribute>
+   <attribute name="verticalHeaderDefaultSectionSize">
+    <number>22</number>
+   </attribute>
    <attribute name="horizontalHeaderVisible">
     <bool>false</bool>
    </attribute>
@@ -150,9 +156,7 @@
    </property>
   </widget>
  </widget>
- <resources>
-  <include location="resources.qrc"/>
- </resources>
+ <resources/>
  <connections>
   <connection>
    <sender>buttonBox</sender>
