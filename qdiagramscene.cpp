@@ -220,7 +220,7 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
         QList<QArc *> brokenLines; //список содержит дуги, нуждающиеся в полной переделке
         foreach (QArc *arc, top->allArcs()){
-           //isOK = arc->remake(top, dx, dy);
+           isOK = arc->remake(top, dx, dy);
            if (!isOK)
                brokenLines.append(arc);
         }

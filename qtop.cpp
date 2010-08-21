@@ -14,7 +14,7 @@ QTop::QTop(QMenu *contextMenu,
     QPen p = pen();
     p.setWidth(2);
     setPen(p);
-    setBrush(QBrush(Qt::white,Qt::SolidPattern));
+    setBrush(QBrush(QColor::fromRgb(220, 220, 220), Qt::SolidPattern));
     setZValue(1);
 
     setFlag(QGraphicsItem::ItemIsMovable, true);
@@ -113,7 +113,8 @@ void QTop::removeSyncs(){
   @param arc - дуга
 */
 void QTop::addArc(QArc *arc){
-    arcs.append(arc);
+    if (!arcs.contains(arc))
+        arcs.append(arc);
 }
 
 void QTop::contextMenuEvent(QGraphicsSceneContextMenuEvent *event){

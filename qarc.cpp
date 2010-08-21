@@ -523,7 +523,7 @@ QArcLine* QArc::newLine(QPointF p1, QPointF p2){
 }
 
 /*!
-  Обновляет границы. Необходимо вызываеть после изменения размеров, перемещения и т.д.
+  Обновляет границы. Необходимо вызывать после изменения размеров, перемещения и т.д.
 */
 void QArc::updateBounds(){
     if (lines.count() > 0)
@@ -536,7 +536,6 @@ void QArc::updateBounds(){
 */
 void QArc::setPriority(int w){
     myPriority = w;
-
 }
 
 void QArc::setPen(const QPen &pen){

@@ -17,6 +17,7 @@ void QMultiProcTop::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
     //зальем весь прямоугольник, чтобы он был непрозрачный
     painter->drawRect(rect());
     //верхний прямоугольник
+    painter->setBrush(QBrush(QColor::fromRgb(220, 220, 220),Qt::SolidPattern));
     painter->setPen(pen);
     painter->drawRoundedRect(QRect(-25, -50, 50, 30), 10, 10);
     painter->drawLine(-25, -35, -50, -35);

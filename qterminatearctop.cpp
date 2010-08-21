@@ -1,6 +1,7 @@
 #include "qterminatearctop.h"
 #include <QtGui>
 #include "qarc.h"
+#include "arcpropertydialog.h"
 
 void QTerminateArcTop::contextMenuEvent(QGraphicsSceneContextMenuEvent *event){
     scene()->clearSelection();
@@ -32,7 +33,7 @@ QPainterPath QTerminateArcTop::shape() const{
 
 QVariant QTerminateArcTop::itemChange(GraphicsItemChange change, const QVariant &value){
     if (change == QGraphicsItem::ItemSelectedHasChanged) {
-        QArc* arc = qgraphicsitem_cast<QArc* >(parentItem());
+        //QArc* arc = qgraphicsitem_cast<QArc* >(parentItem());
         /*QPen pen = arc->pen();
         if (isSelected())
             pen.setColor(Qt::green);
@@ -42,4 +43,13 @@ QVariant QTerminateArcTop::itemChange(GraphicsItemChange change, const QVariant 
     }
 
     return value;
+}
+
+void QTerminateArcTop::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+{
+    ArcPropertyDialog dlg;
+    QArc* arc = qgraphicsitem_cast<QArc *>(parentItem());
+    dlg.prepareForm(arc);
+    if (dlg.exec())
+        dlg.getResult();
 }

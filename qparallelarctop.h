@@ -15,6 +15,7 @@ public:
     QRectF boundingRect() const;
 protected:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 private:
     QMenu *myContextMenu;

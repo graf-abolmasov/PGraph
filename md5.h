@@ -1,6 +1,4 @@
-//#include <system.hpp>
 #include <QtCore>
-//#include <windef.h>
 #include <stdio.h>
 
 #ifdef __alpha  

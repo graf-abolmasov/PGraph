@@ -1,6 +1,7 @@
 #include "qparallelarctop.h"
 #include <QtGui>
 #include "qarc.h"
+#include "arcpropertydialog.h"
 
 void QParallelArcTop::contextMenuEvent(QGraphicsSceneContextMenuEvent *event){
     scene()->clearSelection();
@@ -34,4 +35,13 @@ QVariant QParallelArcTop::itemChange(GraphicsItemChange change, const QVariant &
     }
 
     return value;
+}
+
+void QParallelArcTop::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+{
+    ArcPropertyDialog dlg;
+    QArc* arc = qgraphicsitem_cast<QArc *>(parentItem());
+    dlg.prepareForm(arc);
+    if (dlg.exec())
+        dlg.getResult();
 }
