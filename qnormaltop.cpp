@@ -8,7 +8,18 @@ QNormalTop::QNormalTop(QMenu *contextMenu, QGraphicsItem *parent, QGraphicsScene
 
 void QNormalTop::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    QGraphicsRectItem::paint(painter, option, widget);
+    if (option->state & QStyle::State_Selected) {
+        painter->setPen(Qt::DashLine);
+        painter->drawRect(boundingRect());
+    }
+
+    painter->setRenderHints(QPainter::TextAntialiasing |
+                            QPainter::Antialiasing |
+                            QPainter::HighQualityAntialiasing);
+    painter->setPen(pen());
+    painter->setBrush(brush());
+    painter->drawRect(rect());
+
     //рисуем иконку
     if (!myIcon.isNull()) {
         if ((myIcon.width() >= boundingRect().width()) ||
@@ -21,9 +32,9 @@ void QNormalTop::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
     //пишем текст
     else if (actor != NULL) {
         QTextOption opt;
-        opt.setWrapMode(QTextOption::WrapAnywhere);
+        opt.setWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
         opt.setAlignment(Qt::AlignLeft);
-        painter->drawText(boundingRect().adjusted(8, 8, -8, -8), actor->extName, opt);
+        painter->drawText(boundingRect().adjusted(7, 6, -6, -6), actor->extName, opt);
     }
 }
 

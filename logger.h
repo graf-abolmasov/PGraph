@@ -6,11 +6,14 @@
 class Logger
 {
 public:
-    Logger(QString fileName);
+    enum DebugLevel {Critical, All};
+
+    Logger();
     ~Logger();
-    void writeLog(QString message);
+    void writeLog(QString message, DebugLevel level = All);
 private:
     QFile *logFile;
+    DebugLevel myDebugLevel;
 };
 
 extern Logger *globalLogger;

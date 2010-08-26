@@ -32,6 +32,7 @@ class QTop : public QGraphicsRectItem
 public:
     enum { Type = TOP_TYPE};
     QTop(QMenu *contextMenu, QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
+    ~QTop();
     int number;
     bool isRoot;
     Actor* actor;

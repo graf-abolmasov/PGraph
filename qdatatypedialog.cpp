@@ -29,7 +29,7 @@ void QDataTypeDialog::changeEvent(QEvent *e)
 }
 
 /*!
-        Обработка нажатия на кнопку Создать
+  Обработка нажатия на кнопку Создать
 */
 void QDataTypeDialog::on_pushButton_clicked()
 {

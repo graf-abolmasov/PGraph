@@ -199,38 +199,6 @@
     </hint>
    </hints>
   </connection>
-  <connection>
-   <sender>spnBoxWidth</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>TopPropertyDialog</receiver>
-   <slot>widthChanged(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>134</x>
-     <y>177</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>190</x>
-     <y>203</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>spnBoxHeight</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>TopPropertyDialog</receiver>
-   <slot>heightChanged(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>327</x>
-     <y>170</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>199</x>
-     <y>149</y>
-    </hint>
-   </hints>
-  </connection>
  </connections>
  <slots>
   <slot>widthChanged(int)</slot>

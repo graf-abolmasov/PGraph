@@ -234,3 +234,9 @@ Top::Top(float x, float y, float sizeX, float sizeY, int number, int procCount, 
     this->type = type;
     this->procCount = procCount;
 }
+
+QTop::~QTop()
+{
+    removeArcs();
+    removeSyncs();
+}

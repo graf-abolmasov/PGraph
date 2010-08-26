@@ -33,6 +33,7 @@ TDrawWindow::TDrawWindow()
         this, SLOT(textInserted(QComment *)));
 
     view->setScene(scene);
+    view->setAlignment(Qt::AlignCenter);
     /*QBrush myBackgroundBrush = view->backgroundBrush();
     myBackgroundBrush.setColor(Qt::lightGray);
     myBackgroundBrush.setStyle(Qt::CrossPattern);
@@ -112,13 +113,9 @@ void TDrawWindow::createActions()
 
 void TDrawWindow::deleteTop()
 {
-    foreach (QGraphicsItem *item, scene->selectedItems()) {
-        if (item->type() == QTop::Type) {
-            qgraphicsitem_cast<QTop *>(item)->removeArcs();
-            qgraphicsitem_cast<QTop *>(item)->removeSyncs();
-        }
-        scene->removeItem(item);
-    }
+    foreach (QGraphicsItem *item, scene->selectedItems())
+        if (item->type() == QTop::Type)
+            delete item;
     emit sceneChanged();
 }
 
@@ -127,15 +124,7 @@ void TDrawWindow::deleteArc()
     foreach (QGraphicsItem *item, scene->selectedItems()) {
         if (item->type() ==  QSerialArcTop::Type) {
             QArc *arc = qgraphicsitem_cast<QArc *>(item->parentItem());
-            arc->startItem()->removeArc(arc);
-            arc->endItem()->removeArc(arc);
-            scene->removeItem(item);
-            foreach (QGraphicsLineItem *line, arc->lines){
-                scene->removeItem(line);
-            }
-            scene->removeItem(arc);
             delete arc;
-            arc = NULL;
         }        
     }
     emit sceneChanged();
@@ -145,12 +134,7 @@ void TDrawWindow::deleteSync()
 {
     foreach (QGraphicsItem *item, scene->selectedItems()) {
         if (item->type() ==  QSyncArc::Type) {
-            QSyncArc *arc = qgraphicsitem_cast<QSyncArc *>(item);
-            arc->startItem()->removeSync(arc);
-            arc->endItem()->removeSync(arc);
-            scene->removeItem(item);
-            delete arc;
-            arc = NULL;
+            delete item;
         }
     }
     emit sceneChanged();
@@ -229,7 +213,7 @@ void TDrawWindow::saveAsImage(QString filename)
         QImage Image(size.toSize(), QImage::Format_ARGB32_Premultiplied);
         Image.fill(0);
         QPainter painter(&Image);
-        scene->render(&painter, scene->sceneRect(), scene->sceneRect(), Qt::KeepAspectRatio);
+        view->render(&painter, scene->sceneRect(), scene->sceneRect().toRect(), Qt::KeepAspectRatio);
         Image.save(filename);
     }
 }

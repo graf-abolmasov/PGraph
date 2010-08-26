@@ -6,8 +6,8 @@ const qreal Pi = 3.14;
 
 QSyncArc::QSyncArc(QTop *startItem, QTop *endItem, QMenu *contextMenu, QGraphicsItem *parent, QGraphicsScene *scene)
     : QGraphicsLineItem(parent, scene){
-    myStartItem = startItem;
-    myEndItem = endItem;
+    myStartTop = startItem;
+    myEndTop = endItem;
     setFlag(QGraphicsItem::ItemIsSelectable, true);
     myColor = Qt::red;
     setPen(QPen(myColor, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
@@ -98,4 +98,12 @@ void QSyncArc::updatePosition()
 {
     /*QLineF line(mapFromItem(myStartItem, 0, 0), mapFromItem(myEndItem, 0, 0));
     setLine(line);*/
+}
+
+QSyncArc::~QSyncArc()
+{
+    if (myStartTop != NULL)
+        myStartTop->removeSync(this);
+    if (myEndTop != NULL)
+        myEndTop->removeSync(this);
 }

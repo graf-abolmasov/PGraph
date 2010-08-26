@@ -80,11 +80,17 @@ void ArcPropertyDialog::on_buttonBox_accepted()
     if (ui->serialRadioBtn->isChecked()) myArc->setArcType(QArc::SerialArc);
     if (ui->parallelRadioBtn->isChecked()) myArc->setArcType(QArc::ParallelArc);
     if (ui->terminateRadioBtn->isChecked()) myArc->setArcType(QArc::TerminateArc);
-    myArc->setPriority(ui->prioritySpnBox->value());
     QList<QArc* > arcList = myArc->startItem()->outArcs();
-    for (int i = 0; i < arcList.count(); i++)
-        if (ui->prioritySpnBox->value() <= arcList.at(i)->priority() && arcList.at(i)!=myArc)
-            arcList.at(i)->setPriority(arcList.at(i)->priority() + 1);
+    if (myArc->priority() < ui->prioritySpnBox->value()) {
+        for (int i = 0; i < arcList.count(); i++)
+            if (arcList.at(i)->priority()>myArc->priority() && arcList.at(i)->priority() <= ui->prioritySpnBox->value())
+                arcList.at(i)->setPriority(arcList.at(i)->priority() - 1);
+    } else {
+        for (int i = 0; i < arcList.count(); i++)
+            if (arcList.at(i)->priority() < myArc->priority() && arcList.at(i)->priority() >= ui->prioritySpnBox->value())
+                arcList.at(i)->setPriority(arcList.at(i)->priority() + 1);
+    }
+    myArc->setPriority(ui->prioritySpnBox->value());
     if (ui->predicateList->currentRow() > -1)
         myArc->predicate = myPredicateList.at(ui->predicateList->currentRow());
     else

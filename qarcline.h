@@ -13,6 +13,7 @@ public:
     QPainterPath shape() const;
     int type() const
         { return Type;}
+    void setSelected(bool selected);
 };
 
 #endif // QARCLINE_H
