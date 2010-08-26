@@ -10,7 +10,18 @@ QMultiProcTop::QMultiProcTop(QMenu *contextMenu,
 
 void QMultiProcTop::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    QPen pen = painter->pen();
+    //Рисуем вокруг пунктир
+    if (option->state & QStyle::State_Selected) {
+        painter->setBrush(QBrush(Qt::white,Qt::NoBrush));
+        painter->setPen(Qt::DashLine);
+        painter->drawRect(boundingRect());
+    }
+
+    painter->setRenderHints(QPainter::TextAntialiasing |
+                            QPainter::Antialiasing |
+                            QPainter::HighQualityAntialiasing);
+    QPen pen = this->pen();
+    //pen.setStyle(Qt::SolidLine);
     pen.setWidth(2);
     painter->setPen(Qt::NoPen);
     painter->setBrush(QBrush(Qt::white,Qt::SolidPattern));
@@ -69,11 +80,7 @@ void QMultiProcTop::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
     painter->setFont(old_font);
     painter->drawText(QRect(-25, -15, 50, 30), Qt::AlignCenter, QString::number(procCount));
 
-    if (isSelected()) {
-        painter->setBrush(QBrush(Qt::white,Qt::NoBrush));
-        painter->setPen(Qt::DashLine);
-        painter->drawRect(boundingRect());
-    }
+
 }
 
 Top* QMultiProcTop::toTop()

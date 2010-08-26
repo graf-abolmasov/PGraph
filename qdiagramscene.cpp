@@ -1,6 +1,8 @@
 #include <QtGui>
 #include "qdiagramscene.h"
 #include "qmywindow.h"
+#include "qparallelarctop.h"
+#include "qterminatearctop.h"
 
 QDiagramScene::QDiagramScene(QObject *parent)
     : QGraphicsScene(parent)
@@ -286,6 +288,7 @@ void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
                 arc->setPriority(arc->priority() + 1);
             newArc->setPriority(1);
             newArc->updateBounds();
+            line->setSelected(false);
             update();
             newArc->currentLine = NULL;
             newArc = NULL;
@@ -401,6 +404,41 @@ void QDiagramScene::keyReleaseEvent (QKeyEvent *keyEvent){
         newArc = NULL;
         line = NULL;
     }
+
+    if (selectedItems().count() > 0 && (keyEvent->key() == Qt::Key_Delete)) {
+        /*QList<QGraphicsItem* > deleteList;
+        foreach (QGraphicsItem *item, selectedItems()){
+            switch (item->type()){
+            case QTop::Type:
+            case QArc::Type:
+            case QSyncArc::Type:
+                if (!deleteList.contains(item))
+                    deleteList.append(item);
+                break;
+            case QTerminateArcTop::Type:
+            case QArcLine::Type:
+                if (!deleteList.contains(item->parentItem()))
+                    deleteList.append(item->parentItem());
+                break;
+            }
+        }
+        foreach (QGraphicsItem *item, deleteList)
+            delete item;*/
+        QGraphicsItem *item = selectedItems().first();
+        clearSelection();
+        switch (item->type()){
+        case QTop::Type:
+        case QArc::Type:
+        case QSyncArc::Type:
+            delete item;
+            break;
+        case QTerminateArcTop::Type:
+        case QArcLine::Type:
+            delete item->parentItem();
+            break;
+        }
+    }
+
     QGraphicsScene::keyReleaseEvent(keyEvent);
 }
 

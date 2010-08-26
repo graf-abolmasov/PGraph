@@ -129,9 +129,10 @@ bool QArc::remake(QTop* aMovedTop, float dx, float dy){
         return true;
     }
 
-    if (lines.count() < 4){
+    if (lines.count() == 1){
         //старый алгоритм
         //переработано, дополнено, прокоментировано
+        //и как ни странно - не работает
         //заполняем структуры, необходимые для старого алгоритма
         int otr = lines.count();
         QPointF pts[4];
@@ -189,7 +190,7 @@ bool QArc::remake(QTop* aMovedTop, float dx, float dy){
             }
             else flag = false;
             break;
-            case 2:
+            /*case 2:
             lgolddir = dvec2log(pnts[2].x() - pnts[0].x(), pnts[2].y() - pnts[0].y());
             lgdir    = dvec2log(pnts[2].x() + dx - pnts[0].x(), pnts[2].y() + dy - pnts[0].y());
             if (lgolddir == lgdir){
@@ -210,7 +211,7 @@ bool QArc::remake(QTop* aMovedTop, float dx, float dy){
                 }
             }
             else flag = false;
-            break;
+            break;*/
         }
         if (flag) {
             if (fMovedTo){
@@ -411,7 +412,7 @@ QArc::QArc(QTop *startItem, QTop *endItem, QMenu *contextMenu,
     myEndTop        = endItem;
     myContextMenu   = contextMenu;
 
-    setPen(QPen(Qt::black, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+    setPen(QPen(Qt::black, 2, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
 
     setArcType(QArc::SerialArc);
     myPriority = 0;
@@ -419,6 +420,11 @@ QArc::QArc(QTop *startItem, QTop *endItem, QMenu *contextMenu,
 }
 
 QArc::~QArc(){
+    if (myStartTop != NULL)
+        myStartTop->removeArc(this);
+    if (myEndTop != NULL)
+        myEndTop->removeArc(this);
+
     foreach (QGraphicsLineItem *line, lines)
        delete line;
 }
@@ -478,6 +484,9 @@ void QArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
                                     cos(angle + Pi - Pi / 3) * 1.8*width);
         arcHead.clear();
         arcHead << t << arcP1 << arcP2;
+        painter->setRenderHints(QPainter::TextAntialiasing |
+                                QPainter::Antialiasing |
+                                QPainter::HighQualityAntialiasing);
         painter->drawPolygon(arcHead);
     }
 }

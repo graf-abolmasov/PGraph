@@ -21,14 +21,15 @@ class QSyncArc : public QGraphicsLineItem
 public:
     enum { Type = SYNC_ARC_TYPE };
     QSyncArc(QTop *startItem, QTop *endItem, QMenu *contextMenu, QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
+    ~QSyncArc();
     QRectF boundingRect() const;
     QPainterPath shape() const;
     int type() const
         { return Type;}
     QTop* startItem() const
-        { return myStartItem; }
+        { return myStartTop; }
     QTop* endItem() const
-        { return myEndItem; }
+        { return myEndTop; }
     void updatePosition();
 
 protected:
@@ -37,8 +38,8 @@ protected:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 
 private:
-    QTop* myStartItem;
-    QTop* myEndItem;
+    QTop* myStartTop;
+    QTop* myEndTop;
     QPolygonF arrowHead;
     QColor myColor;
     QMenu *myContextMenu;

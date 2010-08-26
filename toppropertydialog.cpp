@@ -91,8 +91,7 @@ void TopPropertyDialog::on_actorsListWidget_currentRowChanged(int currentRow)
         case Actor::normalType:
             type = tr("normal");
             break;
-        }
-        info.append(tr("Type: ") + type + "\r\n");
+        }        info.append(tr("Type: ") + type + "\r\n");
         info.append(tr("Base module: ") + actor->baseModule + "\r\n");
     }
     ui->descriptionLbl->setText(info);

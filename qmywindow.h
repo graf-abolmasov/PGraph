@@ -45,7 +45,7 @@ private:
     QAction *variablesAct;
     QAction *dataTypeAct;
 
-    //Опрограмме
+    //О программе
     QAction *aboutEditorAct;
 
     //LeftToolBar

@@ -2,22 +2,31 @@
 
 Logger *globalLogger;
 
-Logger::Logger(QString fileName)
+Logger::Logger()
 {
-    logFile = new QFile(fileName);
-    logFile->reset();
-    logFile->open(QFile::WriteOnly);
+    QSettings myLoggerSettings("graph.ini", QSettings::IniFormat);
+    logFile = NULL;
+    if (myLoggerSettings.value("Logger/WriteLog", false).toBool()) {
+        myDebugLevel = DebugLevel(myLoggerSettings.value("Logger/DebugLevel", int(Critical)).toInt());
+        logFile = new QFile(myLoggerSettings.value("Logger/FileName", "log.txt").toString());
+        logFile->reset();
+        logFile->open(QFile::WriteOnly);
+    }
 }
 
-void Logger::writeLog(QString message)
+void Logger::writeLog(QString message, DebugLevel level)
 {
-    QString text;
-    text.append(QDateTime::currentDateTime().toUTC().toString() + ": " + message + "\r\n");
-    logFile->write(text.toUtf8());
+    if (logFile != NULL && level <= myDebugLevel) {
+        QString text;
+        text.append(QDateTime::currentDateTime().toUTC().toString() + ": " + message + "\r\n");
+        logFile->write(text.toUtf8());
+    }
 }
 
 Logger::~Logger()
 {
-    logFile->close();
-    delete logFile;
+    if (logFile != NULL) {
+        logFile->close();
+        delete logFile;
+    }
 }

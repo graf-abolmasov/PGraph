@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
 {  	
     QApplication::addLibraryPath("./");
     QApplication a(argc, argv);
-    a.setApplicationVersion("21.08.2010 18.27");
+    a.setApplicationVersion("21.08.2010 23.51");
 
     QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
     QTranslator qtTranslator;
@@ -21,14 +21,20 @@ int main(int argc, char *argv[])
 
     a.installTranslator(&qtTranslator);
 
-    //globalLogger = new Logger("log.txt");
+    globalLogger = new Logger();
     globalDBManager = new DataBaseManager();
+
+    if (globalDBManager->lastError().type() != QSqlError::NoError) {
+        QMessageBox::critical(NULL, QObject::tr("Ошибка"), QObject::tr("Ошибка подключения к базе данных.\n") + globalDBManager->lastError().databaseText(), QMessageBox::Ok);
+        return -1;
+    }
 
     TMyWindow w;
     w.show();
 
     int result = a.exec();
+
     delete globalDBManager;
-    //delete globalLogger;
+    delete globalLogger;
     return result;
 }

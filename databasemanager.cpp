@@ -20,6 +20,8 @@ DataBaseManager* globalDBManager;
 DataBaseManager::DataBaseManager()
 {
     db = QSqlDatabase::addDatabase("QMYSQL");
+    if (db.lastError().type() != QSqlError::NoError)
+        globalLogger->writeLog(db.lastError().driverText(), Logger::Critical);
     QSettings myDBSettings("graph.ini", QSettings::IniFormat);
     db.setHostName(myDBSettings.value("DB/hostname", "localhost").toString());
     db.setPort(myDBSettings.value("DB/port", 3306).toInt());
@@ -28,13 +30,15 @@ DataBaseManager::DataBaseManager()
     db.setPassword(myDBSettings.value("DB/password", "Marina").toString());
 
     myProjectId = 1;
-
 }
 
-int DataBaseManager::getGraph(QString extName, Graph &graph)
+bool DataBaseManager::getGraph(QString extName, Graph &graph)
 {
     bool ok = db.open();
-    if (!ok) return db.lastError().number();
+    if (!ok) {
+        globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+        return false;
+    }
     QSqlQuery query;
     query.prepare("SELECT ELTYP, ISTR, X, Y, SizeX, SizeY, ntop, isRoot, Actor, "
                   " Nodes, ArcPrior, ArcFromTop, ArcToTop, ArcPred, ArcType "
@@ -45,7 +49,7 @@ int DataBaseManager::getGraph(QString extName, Graph &graph)
     query.bindValue(":PROJECT_ID", myProjectId);
     query.bindValue(":EXTNAME", extName);
     query.exec();
-
+    globalLogger->writeLog(query.executedQuery().toUtf8());
     while (query.next()){
         if (query.value(0).toString() == "T"){
             Top* top = new Top(query.value(2).toFloat(),
@@ -97,7 +101,9 @@ int DataBaseManager::getGraph(QString extName, Graph &graph)
         }
     }
     db.close();
-    return db.lastError().number();
+    ok = (db.lastError().type() == QSqlError::NoError);
+    if (!ok) globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+    return ok;
 }
 
 bool DataBaseManager::saveGraph(Graph *graph)
@@ -115,6 +121,7 @@ bool DataBaseManager::saveGraph(Graph *graph)
     query.bindValue(":PROTOTIP",  NULL);
     query.bindValue(":BAZIS",  NULL);
     query.exec();
+    globalLogger->writeLog(query.executedQuery().toUtf8());
 
     foreach (Top* top, graph->topList){
         query.prepare("INSERT INTO GRAPHPIC (PROJECT_ID, NAMEPR, ELTYP, ISTR, X, Y, SizeX, SizeY, ntop, isRoot, Actor, Nodes, ArcPrior, ArcFromTop, ArcToTop, ArcPred, ArcType) "
@@ -134,6 +141,7 @@ bool DataBaseManager::saveGraph(Graph *graph)
         query.bindValue(":isRoot",      top->isRoot ? 1 : 0 );
         query.bindValue(":Actor",       top->actor);
         query.exec();
+        globalLogger->writeLog(query.executedQuery().toUtf8());
     }
 
     foreach(Comment* comment, graph->commentList){
@@ -146,6 +154,7 @@ bool DataBaseManager::saveGraph(Graph *graph)
         query.bindValue(":Y",          comment->y);
         query.bindValue(":ISTR",       comment->text);
         query.exec();
+        globalLogger->writeLog(query.executedQuery().toUtf8());
     }
 
     foreach (Arc* arc, graph->arcList){
@@ -174,6 +183,7 @@ bool DataBaseManager::saveGraph(Graph *graph)
         query.bindValue(":ArcToTop",    arc->endTop);
         query.bindValue(":ArcPred",     arc->predicate);
         query.exec();
+        globalLogger->writeLog(query.executedQuery().toUtf8());
     }
     db.close();
     return db.lastError().number();
@@ -187,6 +197,7 @@ bool DataBaseManager::updateGraph(Graph *graph)
     query.bindValue(":PROJECT_ID", myProjectId);
     query.bindValue(":NAMEPR", graph->name);
     query.exec();
+    globalLogger->writeLog(query.executedQuery().toUtf8());
     db.close();
     return saveGraph(graph);
 }
@@ -199,6 +210,7 @@ int DataBaseManager::getGraphList(QList<Graph* > &graphList)
     query.prepare("SELECT NAMEPR, EXTNAME FROM ACTOR WHERE CLASPR = 'g' AND PROJECT_ID = :PROJECT_ID;");
     query.bindValue(":PROJECT_ID", myProjectId);
     query.exec();
+    globalLogger->writeLog(query.executedQuery().toUtf8());
     while(query.next()){
         QList<Top* > topList;
         QList<Arc* > arcList;
@@ -218,6 +230,7 @@ int DataBaseManager::saveDataTypeList(QList<DataType*>& typeList){
     query.prepare("DELETE FROM TYPSYS WHERE PROJECT_ID = :PROJECT_ID;");
     query.bindValue(":PROJECT_ID", myProjectId);
     query.exec();
+    globalLogger->writeLog(query.executedQuery().toUtf8());
     for (int i = 0; i < typeList.count(); i++){
         query.prepare("INSERT INTO TYPSYS (PROJECT_ID, TYPE, TYPEDEF)"
                       "VALUES (:PROJECT_ID, :TYPE, :TYPEDEF);");
@@ -225,6 +238,7 @@ int DataBaseManager::saveDataTypeList(QList<DataType*>& typeList){
         query.bindValue(":TYPE", typeList.at(i)->name);
         query.bindValue(":TYPEDEF", typeList.at(i)->typedefStr);
         query.exec();
+        globalLogger->writeLog(query.executedQuery().toUtf8());
         query.clear();
     }
     db.close();
@@ -239,6 +253,7 @@ int DataBaseManager::getDataTypeList(QList<DataType*>& typeList){
     query.prepare("SELECT PROJECT_ID, TYPE, TYPEDEF FROM TYPSYS WHERE PROJECT_ID = :PROJECT_ID;");
     query.bindValue(":PROJECT_ID", myProjectId);
     query.exec();
+    globalLogger->writeLog(query.executedQuery().toUtf8());
     while (query.next()){
         typeList.append(new DataType(query.value(1).toString(), query.value(2).toString()));
     }
@@ -253,6 +268,7 @@ bool DataBaseManager::saveVariableList(QList<Variable*>& varList){
     query.prepare("DELETE FROM DATA WHERE PROJECT_ID = :PROJECT_ID;");
     query.bindValue(":PROJECT_ID", myProjectId);
     query.exec();
+    globalLogger->writeLog(query.executedQuery().toUtf8());
     for (int i = 0; i < varList.count(); i++){
         query.prepare("INSERT INTO DATA (PROJECT_ID, DATA, TYPE, INIT, COMMENT)"
                       "VALUES (:PROJECT_ID, :DATA, :TYPE, :INIT, :COMMENT);");
@@ -275,6 +291,7 @@ int DataBaseManager::getVariableList(QList<Variable* >& varList){
     query.prepare("SELECT DATA, TYPE, INIT, COMMENT FROM DATA WHERE PROJECT_ID = :PROJECT_ID;");
     query.bindValue(":PROJECT_ID", myProjectId);
     query.exec();
+    globalLogger->writeLog(query.executedQuery().toUtf8());
     while (query.next()){
         varList.append(new Variable(query.value(0).toString(),query.value(1).toString(),query.value(2).toString(),query.value(3).toString()));
     }
@@ -298,6 +315,7 @@ int DataBaseManager::saveActorList(QList<Actor *> &actorList)
         query1.bindValue(":ICON", NULL);
         query1.bindValue(":PROTOTIP", actorList.at(i)->baseModule);
         query1.exec();
+        globalLogger->writeLog(query1.executedQuery().toUtf8());
 
         QSqlQuery query2;
         for (int j = 0; j < actorList.at(i)->variableList.count(); j++){
@@ -317,6 +335,7 @@ int DataBaseManager::saveActorList(QList<Actor *> &actorList)
                 vaMode = "R";
             query2.bindValue(":MODE", vaMode);
             query2.exec();
+            globalLogger->writeLog(query2.executedQuery().toUtf8());
         }
     }
     db.close();
@@ -334,10 +353,12 @@ int DataBaseManager::getActorList(QList<Actor *> &actorList)
     query1.prepare("SELECT NAMEPR, CLASPR, EXTNAME, DATE, TIME, ICON, PROTOTIP FROM ACTOR WHERE CLASPR = 'a' AND PROJECT_ID = :PROJECT_ID;");
     query1.bindValue(":PROJECT_ID", myProjectId);
     query1.exec();
+    globalLogger->writeLog(query1.executedQuery().toUtf8());
     while (query1.next()){
         query2.prepare("SELECT NEV, DATA, MODE FROM PASPORT WHERE NAMEPR = :NAMEPR ORDER BY NEV");
         query2.bindValue(":NAMEPR", query1.value(0).toString());
         query2.exec();
+        globalLogger->writeLog(query2.executedQuery().toUtf8());
         QList<Variable* > myVariableList;
         QStringList myVAList;
         while (query2.next()){
@@ -378,7 +399,9 @@ Actor* DataBaseManager::getActor(QString namepr)
     query1.prepare("SELECT CLASPR, EXTNAME, DATE, TIME, ICON, PROTOTIP FROM ACTOR WHERE NAMEPR = :NAMEPR;");
     query1.bindValue(":NAMEPR", namepr);
     query1.exec();
+    globalLogger->writeLog(query1.executedQuery().toUtf8());
     if(!query1.first()){
+        globalLogger->writeLog("Запрошен несуществующий актор.", Logger::Critical);
         db.close();
         return NULL;
     }
@@ -387,6 +410,7 @@ Actor* DataBaseManager::getActor(QString namepr)
     query2.prepare("SELECT NEV, DATA, MODE FROM PASPORT WHERE NAMEPR = :NAMEPR ORDER BY NEV");
     query2.bindValue(":NAMEPR", namepr);
     query2.exec();
+    globalLogger->writeLog(query2.executedQuery().toUtf8());
     QList<Variable* > myVariableList;
     QStringList myVAList;
     while (query2.next()){
@@ -418,30 +442,31 @@ int DataBaseManager::savePredicateList(QList<Predicate *> &predList)
 {
     bool ok = db.open();
     if (!ok) return db.lastError().number();
-    QSqlQuery query1;
+    QSqlQuery query;
     for (int i = 0; i < predList.count(); i++){
-        query1.clear();
-        query1.prepare("INSERT INTO ACTOR (PROJECT_ID, NAMEPR, CLASPR, EXTNAME, DATE, TIME, ICON, PROTOTIP)"
+        query.prepare("INSERT INTO ACTOR (PROJECT_ID, NAMEPR, CLASPR, EXTNAME, DATE, TIME, ICON, PROTOTIP)"
                       "VALUES (:PROJECT_ID, :NAMEPR, :CLASPR, :EXTNAME, CURDATE(), CURTIME(), :ICON, :PROTOTIP);");
-        query1.bindValue(":PROJECT_ID", myProjectId);
-        query1.bindValue(":NAMEPR", predList.at(i)->name);
-        query1.bindValue(":CLASPR", "p");
-        query1.bindValue(":EXTNAME", predList.at(i)->extName);
-        query1.bindValue(":ICON", NULL);
-        query1.bindValue(":PROTOTIP", predList.at(i)->baseModule);
-        query1.exec();
+        query.bindValue(":PROJECT_ID", myProjectId);
+        query.bindValue(":NAMEPR", predList.at(i)->name);
+        query.bindValue(":CLASPR", "p");
+        query.bindValue(":EXTNAME", predList.at(i)->extName);
+        query.bindValue(":ICON", NULL);
+        query.bindValue(":PROTOTIP", predList.at(i)->baseModule);
+        query.exec();
+        globalLogger->writeLog(query.executedQuery().toUtf8());
 
-        QSqlQuery query2;
+        QSqlQuery query;
         for (int j = 0; j < predList.at(i)->variableList.count(); j++){
-            query2.clear();
-            query2.prepare("INSERT INTO PASPORT (PROJECT_ID, NAMEPR, NEV, DATA, MODE)"
+            query.clear();
+            query.prepare("INSERT INTO PASPORT (PROJECT_ID, NAMEPR, NEV, DATA, MODE)"
                            "VALUES (:PROJECT_ID, :NAMEPR, :NEV, :DATA, :MODE);");
-            query2.bindValue(":PROJECT_ID", myProjectId);
-            query2.bindValue(":NAMEPR", predList.at(i)->name);
-            query2.bindValue(":NEV", j);
-            query2.bindValue(":DATA", predList.at(i)->variableList.at(j)->name);
-            query2.bindValue(":MODE", "i");
-            query2.exec();
+            query.bindValue(":PROJECT_ID", myProjectId);
+            query.bindValue(":NAMEPR", predList.at(i)->name);
+            query.bindValue(":NEV", j);
+            query.bindValue(":DATA", predList.at(i)->variableList.at(j)->name);
+            query.bindValue(":MODE", "i");
+            query.exec();
+            globalLogger->writeLog(query.executedQuery().toUtf8());
         }
     }
     db.close();
@@ -459,10 +484,12 @@ int DataBaseManager::getPredicateList(QList<Predicate *> &predList)
     query1.prepare("SELECT NAMEPR, CLASPR, EXTNAME, DATE, TIME, ICON, PROTOTIP FROM ACTOR WHERE CLASPR = 'p' AND PROJECT_ID = :PROJECT_ID;");
     query1.bindValue(":PROJECT_ID", myProjectId);
     query1.exec();
+    globalLogger->writeLog(query1.executedQuery().toUtf8());
     while (query1.next()){
         query2.prepare("SELECT NEV, DATA, MODE FROM PASPORT WHERE NAMEPR = :NAMEPR ORDER BY NEV");
         query2.bindValue(":NAMEPR", query1.value(0).toString());
         query2.exec();
+        globalLogger->writeLog(query2.executedQuery().toUtf8());
         QList<Variable* > myVariableList;
         while (query2.next()){
             for (int i = 0; i < varList.count(); i++)
@@ -476,7 +503,6 @@ int DataBaseManager::getPredicateList(QList<Predicate *> &predList)
                                       query1.value(6).toString() == "" ? Predicate::inlineType : Predicate::normalType,
                                       query1.value(6).toString(),
                                       myVariableList));
-        query2.clear();
     }
     db.close();
     return db.lastError().number();
@@ -494,9 +520,11 @@ Predicate* DataBaseManager::getPredicate(QString namepr)
     query1.bindValue(":NAMEPR", namepr);
     query1.bindValue(":PROJECT_ID", myProjectId);
     query1.exec();
+    globalLogger->writeLog(query1.executedQuery().toUtf8());
 
     if (!query1.first()) {
         db.close();
+        globalLogger->writeLog("Запрошен несуществующий предикат.", Logger::Critical);
         return NULL;
     }
 
@@ -504,6 +532,7 @@ Predicate* DataBaseManager::getPredicate(QString namepr)
     query2.prepare("SELECT NEV, DATA, MODE FROM PASPORT WHERE NAMEPR = :NAMEPR ORDER BY NEV");
     query2.bindValue(":NAMEPR", namepr);
     query2.exec();
+    globalLogger->writeLog(query2.executedQuery().toUtf8());
     QList<Variable* > myVariableList;
     while (query2.next()){
         for (int i = 0; i < varList.count(); i++)
@@ -532,6 +561,7 @@ int DataBaseManager::registerModule(QString uniqName, QString fileName, QString 
     query.bindValue(":NAMEPR",   fileName);
     query.bindValue(":COMMENT",  comment);
     query.exec();
+    globalLogger->writeLog(query.executedQuery().toUtf8());
 
     for (int i = 0; i < paramList.count(); i++){
         query.clear();
@@ -552,6 +582,7 @@ int DataBaseManager::registerModule(QString uniqName, QString fileName, QString 
         query.bindValue(":MODE",        vaMode);
         query.bindValue(":COMMENT",     parameter.at(3));
         query.exec();
+        globalLogger->writeLog(query.executedQuery().toUtf8());
     }
 
     db.close();
@@ -567,11 +598,13 @@ int DataBaseManager::getRegisteredModules(QList<BaseModule*> &moduleList)
     query1.prepare("SELECT PROTOTIP, NAMEPR, COMMENT FROM BAZMOD WHERE PROJECT_ID = :PROJECT_ID;");
     query1.bindValue(":PROJECT_ID", myProjectId);
     query1.exec();
+    globalLogger->writeLog(query1.executedQuery().toUtf8());
     while (query1.next()){
         query2.prepare("SELECT TYPE, DATA, MODE, COMMENT FROM DATABAZ WHERE PROTOTIP = :PROTOTIP AND PROJECT_ID = :PROJECT_ID;");
         query2.bindValue(":PROTOTIP", query1.value(0).toString());
         query2.bindValue(":PROJECT_ID", myProjectId);
         query2.exec();
+        globalLogger->writeLog(query2.executedQuery().toUtf8());
         QStringList parameterList;
         while (query2.next()){
             QString vaMode;
@@ -605,14 +638,17 @@ int DataBaseManager::saveStruct(Graph *graph)
     query.bindValue(":NAMEPR", graph->name);
     query.bindValue(":PROJECT_ID", myProjectId);
     query.exec();
+    globalLogger->writeLog(query.executedQuery().toUtf8());
     query.prepare("DELETE FROM GRAPHTOP WHERE NAMEPR = :NAMEPR AND PROJECT_ID = :PROJECT_ID;");
     query.bindValue(":NAMEPR", graph->name);
     query.bindValue(":PROJECT_ID", myProjectId);
     query.exec();
+    globalLogger->writeLog(query.executedQuery().toUtf8());
     query.prepare("DELETE FROM GRAPHPRE WHERE NAMEPR = :NAMEPR AND PROJECT_ID = :PROJECT_ID;");
     query.bindValue(":NAMEPR", graph->name);
     query.bindValue(":PROJECT_ID", myProjectId);
     query.exec();
+    globalLogger->writeLog(query.executedQuery().toUtf8());
 
     foreach (Arc* arc, graph->arcList){
         if (!predicateList.contains(arc->predicate)){
@@ -624,6 +660,7 @@ int DataBaseManager::saveStruct(Graph *graph)
             query.bindValue(":NPRED", i);
             query.bindValue(":NAME", arc->predicate);
             query.exec();
+            globalLogger->writeLog(query.executedQuery().toUtf8());
         }
         query.prepare("INSERT INTO GRAPH (PROJECT_ID, NAMEPR, NFROM, NTO, NPRED, PRIOR, ARCTYPE)"
                       "VALUES (:PROJECT_ID, :NAMEPR, :NFROM, :NTO, :NPRED, :PRIOR, :ARCTYPE);");
@@ -646,6 +683,7 @@ int DataBaseManager::saveStruct(Graph *graph)
         }
         query.bindValue(":ARCTYPE", arcType);
         query.exec();
+        globalLogger->writeLog(query.executedQuery().toUtf8());
     }
 
     int rootTop = -1;
@@ -659,6 +697,7 @@ int DataBaseManager::saveStruct(Graph *graph)
         if (top->isRoot)
             rootTop = top->number;
         query.exec();
+        globalLogger->writeLog(query.executedQuery().toUtf8());
     }
     query.prepare("INSERT INTO GRAPH (PROJECT_ID, NAMEPR, NFROM, NTO, NPRED, PRIOR, ARCTYPE)"
                   "VALUES (:PROJECT_ID, :NAMEPR, :NFROM, :NTO, :NPRED, :PRIOR, :ARCTYPE);");
@@ -670,7 +709,19 @@ int DataBaseManager::saveStruct(Graph *graph)
     query.bindValue(":PRIOR", 0);
     query.bindValue(":ARCTYPE", 0);
     query.exec();
+    globalLogger->writeLog(query.executedQuery().toUtf8());
     db.close();
 
     return db.lastError().number();
+}
+
+QSqlError DataBaseManager::lastError()
+{
+    return db.lastError();
+}
+
+DataBaseManager::~DataBaseManager()
+{
+    if (db.isOpen())
+        db.close();
 }

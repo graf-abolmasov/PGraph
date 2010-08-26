@@ -28,6 +28,7 @@ private:
     int myProjectId;
 public:
     DataBaseManager();
+    ~DataBaseManager();
 
     void setProjectId(int pid)
         { myProjectId = pid; }
@@ -35,7 +36,7 @@ public:
         { return myProjectId; }
 
     int getGraphList(QList<Graph* > &graphList);
-    int getGraph(QString extName, Graph &graph);
+    bool getGraph(QString extName, Graph &graph);
     bool saveGraph(Graph* graph);
     bool updateGraph(Graph* graph);
 
@@ -57,6 +58,8 @@ public:
     int getRegisteredModules(QList<BaseModule*> &moduleList);
 
     int saveStruct(Graph *graph);
+
+    QSqlError lastError();
 };
 
 extern DataBaseManager* globalDBManager;
