@@ -65,12 +65,11 @@ private slots:
     void setItemIcon();
     void showTopPropDialog();
     void makeAsRoot();
-    void deleteItem();
+    void deleteTop();
     void showArcPropDialog();
     void deleteArc();
     void deleteSync();
     void deleteComment();
-    void deleteMultiProcTop();
     void showMultiProcTopDialog();
     void itemSelected(QGraphicsItem *item);
     void textInserted(QComment *);

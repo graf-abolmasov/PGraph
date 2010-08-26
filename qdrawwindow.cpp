@@ -83,7 +83,7 @@ void TDrawWindow::createActions()
 
     deleteAction = new QAction(QIcon(";/images/delete.png"), tr("Удалить"), this);
     deleteAction->setStatusTip(tr("Удаляет вершину"));
-    connect(deleteAction, SIGNAL(triggered()), this, SLOT(deleteItem()));
+    connect(deleteAction, SIGNAL(triggered()), this, SLOT(deleteTop()));
 
     setArcPropertyAction = new QAction(tr("Свойства"), this);
     setArcPropertyAction->setStatusTip(tr("Изменить свойства дуги"));
@@ -103,14 +103,14 @@ void TDrawWindow::createActions()
 
     deleteMultiProcTopAction = new QAction(QIcon(";/images/delete.png"), tr("Удалить"), this);
     deleteMultiProcTopAction->setStatusTip(tr("Удалить многопоточную вершину"));
-    connect(deleteMultiProcTopAction, SIGNAL(triggered()), this, SLOT(deleteMultiProcTop()));
+    connect(deleteMultiProcTopAction, SIGNAL(triggered()), this, SLOT(deleteTop()));
 
     setMultiProcTopAction = new QAction(tr("Свойства"), this);
     setMultiProcTopAction->setStatusTip(tr("Изменить совйства многопоточной вершины"));
     connect(setMultiProcTopAction, SIGNAL(triggered()), this, SLOT(showMultiProcTopDialog()));
 }
 
-void TDrawWindow::deleteItem()
+void TDrawWindow::deleteTop()
 {
     foreach (QGraphicsItem *item, scene->selectedItems()) {
         if (item->type() == QTop::Type) {
@@ -422,9 +422,4 @@ void TDrawWindow::showMultiProcTopDialog()
     dlg.prepareForm(top);
     if (dlg.exec())
         top = dlg.getResult();
-}
-
-void TDrawWindow::deleteMultiProcTop()
-{
-
 }
