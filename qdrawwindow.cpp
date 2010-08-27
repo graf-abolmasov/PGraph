@@ -10,6 +10,9 @@
 #include "qterminatearctop.h"
 #include "qnormaltop.h"
 #include "multiproctoppropertydialog.h"
+#include "globalvariables.h"
+
+QStringList globalPredicateList;
 
 TDrawWindow::TDrawWindow()
 {
@@ -370,6 +373,8 @@ void TDrawWindow::loadGraph(QString extName, DataBaseManager* dbManager)
         qarc->setPriority(arc->priority);
         qarc->setArcType(QArc::ArcType(arc->type));
         qarc->predicate = dbManager->getPredicate(arc->predicate);
+        if (qarc->predicate != NULL && !globalPredicateList.contains(qarc->predicate->extName))
+            globalPredicateList.append(qarc->predicate->extName);
         startTop->addArc(qarc);
         endTop->addArc(qarc);
     }
@@ -381,22 +386,22 @@ void TDrawWindow::loadGraph(QString extName, DataBaseManager* dbManager)
     }
 }
 
-void TDrawWindow::saveGraph(QString name, QString extName, DataBaseManager *dbManager, bool update)
+bool TDrawWindow::saveGraph(QString name, QString extName, DataBaseManager *dbManager, bool update)
 {
     Graph* graph = getGraph();
     graph->extName = extName;
     graph->name = name;
     if (update)
-        dbManager->updateGraph(graph);
+        return dbManager->updateGraph(graph);
     else
-        dbManager->saveGraph(graph);
+        return dbManager->saveGraph(graph);
 }
 
-void TDrawWindow::saveStruct(QString name, DataBaseManager *dbManager)
+bool TDrawWindow::saveStruct(QString name, DataBaseManager *dbManager)
 {
     Graph* graph = getGraph();
     graph->name = name;
-    dbManager->saveStruct(graph);
+    return dbManager->saveStruct(graph);
 }
 
 void TDrawWindow::showMultiProcTopDialog()

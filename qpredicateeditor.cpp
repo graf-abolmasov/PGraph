@@ -3,6 +3,7 @@
 #include "databasemanager.h"
 #include "qvariabledialog.h"
 #include "commonutils.h"
+#include "globalvariables.h"
 
 QPredicateEditor::QPredicateEditor(QWidget *parent) :
     QDialog(parent),

@@ -10,7 +10,7 @@
 #include "qactoreditor.h"
 #include "qpredicateeditor.h"
 #include "databasemanager.h"
-
+#include "globalvariables.h"
 
 QObjectEditor::QObjectEditor(QWidget *parent) :
     QDialog(parent),

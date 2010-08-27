@@ -1,6 +1,7 @@
 #include "qopengraphdialog.h"
 #include "ui_qopengraphdialog.h"
 #include "databasemanager.h"
+#include "globalvariables.h"
 
 QOpenGraphDialog::QOpenGraphDialog(QWidget *parent) :
     QDialog(parent),

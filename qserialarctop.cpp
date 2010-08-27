@@ -2,6 +2,7 @@
 #include "qserialarctop.h"
 #include "qarc.h"
 #include "arcpropertydialog.h"
+#include "globalvariables.h"
 
 void QSerialArcTop::contextMenuEvent(QGraphicsSceneContextMenuEvent *event){
     scene()->clearSelection();
@@ -10,21 +11,17 @@ void QSerialArcTop::contextMenuEvent(QGraphicsSceneContextMenuEvent *event){
 }
 
 QSerialArcTop::QSerialArcTop(QMenu *contextMenu, QGraphicsItem *parent, QGraphicsScene *scene)
-    : QGraphicsPolygonItem(parent, scene)
+    : QGraphicsRectItem(parent, scene)
 {
     myContextMenu = contextMenu;
-    QPolygonF myPolygon;
-    myPolygon << QPointF(-8, 8) << QPointF(8, 8)
-              << QPointF(8,-8) << QPointF(-8, -8)
-              << QPointF(-8, 8);
+    setRect(-8, -8, 16, 16);
     setFlag(QGraphicsItem::ItemIsSelectable, true);
     setFlag(QGraphicsItem::ItemIsMovable, false);
     setBrush(QBrush(Qt::gray, Qt::SolidPattern));
-    setPolygon(myPolygon);
 }
 
 QRectF QSerialArcTop::boundingRect() const {
-    return QGraphicsPolygonItem::boundingRect().adjusted(-2, -2, 2, 2);
+    return rect().adjusted(-2, -2, 2, 2);
 }
 
 QVariant QSerialArcTop::itemChange(GraphicsItemChange change, const QVariant &value){
@@ -49,3 +46,12 @@ void QSerialArcTop::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
     if (dlg.exec())
         dlg.getResult();
 }
+
+void QSerialArcTop::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+    QGraphicsRectItem::paint(painter, option, widget);
+    QArc* myArc = qgraphicsitem_cast<QArc *>(parentItem());
+    if (myArc->predicate != NULL)
+        painter->drawText(rect().toRect(), Qt::AlignCenter, QString::number(globalPredicateList.indexOf(myArc->predicate->extName) + 1));
+}
+

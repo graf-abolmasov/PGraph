@@ -117,6 +117,4 @@ private slots:
     void pointerGroupClicked(int id);  //Действие при выборе стрелки или линии
 };
 
-    extern QStatusBar *globalStatusBar;
-
 #endif // QMYWINDOW_H

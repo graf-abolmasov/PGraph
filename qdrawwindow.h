@@ -56,8 +56,8 @@ public:
     QDiagramScene::Mode mode(){return myMode;}
     Graph* getGraph();
     void loadGraph(QString extName, DataBaseManager* dbManager);
-    void saveGraph(QString name, QString extName, DataBaseManager* dbManager, bool update = false);
-    void saveStruct(QString name, DataBaseManager* dbManager);
+    bool saveGraph(QString name, QString extName, DataBaseManager* dbManager, bool update = false);
+    bool saveStruct(QString name, DataBaseManager* dbManager);
 signals:
     void sceneChanged();
 

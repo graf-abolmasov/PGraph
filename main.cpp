@@ -7,6 +7,7 @@
 #include "commonutils.h"
 #include "md5.h"
 #include "logger.h"
+#include "globalvariables.h"
 
 int main(int argc, char *argv[])
 {  	

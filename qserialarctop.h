@@ -5,7 +5,7 @@
 
 #define ARC_TOP_TYPE  UserType+5
 
-class QSerialArcTop : public QGraphicsPolygonItem
+class QSerialArcTop : public QGraphicsRectItem
 {
 public:
     enum { Type = ARC_TOP_TYPE };
@@ -16,6 +16,7 @@ public:
 protected:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 private:
     QMenu *myContextMenu;

@@ -1,4 +1,5 @@
 #include "qmultiproctop.h"
+#include "multiproctoppropertydialog.h"
 
 QMultiProcTop::QMultiProcTop(QMenu *contextMenu,
                              QGraphicsItem *parent, QGraphicsScene *scene)
@@ -81,6 +82,15 @@ void QMultiProcTop::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
     painter->drawText(QRect(-25, -15, 50, 30), Qt::AlignCenter, QString::number(procCount));
 
 
+}
+
+void QMultiProcTop::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+{
+    MultiProcTopPropertyDialog dlg;
+    QMultiProcTop* top = qgraphicsitem_cast<QMultiProcTop *>(scene()->selectedItems().first());
+    dlg.prepareForm(top);
+    if (dlg.exec())
+        top = dlg.getResult();
 }
 
 Top* QMultiProcTop::toTop()

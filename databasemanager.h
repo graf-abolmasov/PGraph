@@ -57,11 +57,9 @@ public:
     int registerModule(QString uniqName, QString fileName, QString comment, QStringList &paramList);
     int getRegisteredModules(QList<BaseModule*> &moduleList);
 
-    int saveStruct(Graph *graph);
+    bool saveStruct(Graph *graph);
 
     QSqlError lastError();
 };
-
-extern DataBaseManager* globalDBManager;
 
 #endif // DATABASEMANAGER_H

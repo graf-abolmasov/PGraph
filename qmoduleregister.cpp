@@ -3,6 +3,7 @@
 #include "databasemanager.h"
 #include "commonutils.h"
 #include "basemodule.h"
+#include "globalvariables.h"
 
 
 QModuleRegister::QModuleRegister(QWidget *parent) :

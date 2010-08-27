@@ -2,6 +2,7 @@
 #include "ui_qdatatypedialog.h"
 #include "qdatatypeeditor.h"
 #include "databasemanager.h"
+#include "globalvariables.h"
 #include <QtCore>
 
 QDataTypeDialog::QDataTypeDialog(QWidget *parent) :

@@ -16,6 +16,7 @@ public:
 protected:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 private:
     QMenu *myContextMenu;

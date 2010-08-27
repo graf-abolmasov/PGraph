@@ -1,6 +1,7 @@
 #include "toppropertydialog.h"
 #include "ui_toppropertydialog.h"
 #include "databasemanager.h"
+#include "globalvariables.h"
 
 TopPropertyDialog::TopPropertyDialog(QWidget *parent) :
     QDialog(parent),

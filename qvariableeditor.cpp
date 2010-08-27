@@ -4,6 +4,7 @@
 #include "datatype.h"
 #include "databasemanager.h"
 #include <QList>
+#include "globalvariables.h"
 
 
 QVariableEditor::QVariableEditor(QWidget *parent) :

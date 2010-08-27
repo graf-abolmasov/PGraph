@@ -3,6 +3,7 @@
 #include "databasemanager.h"
 #include "qvariabledialog.h"
 #include "commonutils.h"
+#include "globalvariables.h"
 
 QActorEditor::QActorEditor(QWidget *parent) :
     QDialog(parent),
