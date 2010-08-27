@@ -64,6 +64,8 @@ void TDrawWindow::createMenus()
 
     commentMenu = new QMenu();
     commentMenu->addAction(deleteCommentAction);
+    commentMenu->addSeparator();
+    commentMenu->addAction(setFontAction);
 
     multiProcMenu = new QMenu();
     multiProcMenu->addAction(deleteMultiProcTopAction);
@@ -104,6 +106,9 @@ void TDrawWindow::createActions()
     deleteCommentAction = new QAction(QIcon(";/images/delete.png"), tr("Удалить"), this);
     deleteCommentAction->setStatusTip(tr("Удаляет комментарий"));
     connect(deleteCommentAction, SIGNAL(triggered()), this, SLOT(deleteComment()));
+
+    setFontAction = new QAction(tr("Шрифт"), this);
+    connect(setFontAction, SIGNAL(triggered()), this, SLOT(showFontDialog()));
 
     deleteMultiProcTopAction = new QAction(QIcon(";/images/delete.png"), tr("Удалить"), this);
     deleteMultiProcTopAction->setStatusTip(tr("Удалить многопоточную вершину"));
@@ -380,7 +385,7 @@ void TDrawWindow::loadGraph(QString extName, DataBaseManager* dbManager)
     }
 
     foreach (Comment* comment, graph.commentList) {
-        QComment *qcomment = new QComment(NULL, NULL, scene);
+        QComment *qcomment = new QComment(commentMenu, NULL, scene);
         qcomment->setPos(comment->x, comment->y);
         qcomment->setPlainText(comment->text);
     }
@@ -509,4 +514,13 @@ void TDrawWindow::alignVCenter()
     center /= topList.count();
     foreach (QTop* top, topList)
         top->moveBy(0, center - top->scenePos().y(), true);
+}
+
+void TDrawWindow::showFontDialog()
+{
+    QFontDialog dlg;
+    QComment* comment = qgraphicsitem_cast<QComment *>(scene->selectedItems().first());
+    dlg.setCurrentFont(comment->font());
+    if (dlg.exec())
+        comment->setFont(dlg.selectedFont());
 }
