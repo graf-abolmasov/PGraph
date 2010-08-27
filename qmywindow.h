@@ -64,6 +64,8 @@ private:
     QAction* alignVTopAct;
     QAction* alignVCenterAct;
     QAction* alignVBottomAct;
+    QAction* distribVerticallyAct;
+    QAction* distribHorizontallyAct;
 
     QToolBar *mainToolBar;
     QToolBar *leftToolBar;
@@ -125,10 +127,12 @@ private slots:
     void alignHLeft();          // Выравниевание к самому левому объекту из группы
     void alignHCenter();        // Выравниевание к центральному объекту из группы
     void alignHRight();         // Выравниевание к самому правому объекту из группы
-
-    void alignVTop();          // Выравниевание к самому верхнему объекту из группы
+    void alignVTop();           // Выравниевание к самому верхнему объекту из группы
     void alignVCenter();        // Выравниевание к центральному объекту из группы
-    void alignVBottom();         // Выравниевание к самому нижнему объекту из группы
+    void alignVBottom();        // Выравниевание к самому нижнему объекту из группы
+    void distribVertically();   // Распределяет по вертикали через одинаковые расстояния
+    void distribHorizontally(); // Распределяет по горизонтили через одинаковые расстояния
+
 
     void pointerGroupClicked(int id);  //Действие при выборе инструмента
 };

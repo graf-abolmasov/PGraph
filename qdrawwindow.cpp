@@ -524,3 +524,64 @@ void TDrawWindow::showFontDialog()
     if (dlg.exec())
         comment->setFont(dlg.selectedFont());
 }
+
+bool topLeftThan(const QTop* top1, const QTop* top2)
+{
+    return top1->scenePos().x() < top2->scenePos().x();
+}
+
+void TDrawWindow::distribHorizontally()
+{
+    QList<QTop *> topList;
+    foreach (QGraphicsItem* item, scene->selectedItems())
+        if (item->type() == QTop::Type)
+           topList.append(qgraphicsitem_cast<QTop* >(item));
+    if (topList.count() == 0) return;
+
+    qSort(topList.begin(), topList.end(), topLeftThan);
+
+    float left = topList.first()->mapRectToScene(topList.first()->rect()).left();
+    float right = topList.last()->mapRectToScene(topList.last()->rect()).right();
+
+    float totalWidth = 0;
+    foreach (QTop* top, topList) {
+        totalWidth += top->rect().width();
+    }
+    float dist = (fabs(left - right) - totalWidth) / (topList.count() - 1);
+
+    foreach (QTop* top, topList){
+        top->moveBy(left - top->mapRectToScene(top->rect()).left(), 0, true);
+        left += top->rect().width() + dist;
+    }
+}
+
+bool topUpperThan(const QTop* top1, const QTop* top2)
+{
+    return top1->scenePos().y() < top2->scenePos().y();
+}
+
+void TDrawWindow::distribVertically()
+{
+    QList<QTop *> topList;
+    foreach (QGraphicsItem* item, scene->selectedItems())
+        if (item->type() == QTop::Type)
+           topList.append(qgraphicsitem_cast<QTop* >(item));
+    if (topList.count() == 0) return;
+
+    qSort(topList.begin(), topList.end(), topUpperThan);
+
+    float topEdge = topList.first()->mapRectToScene(topList.first()->rect()).top();
+    float bottom = topList.last()->mapRectToScene(topList.last()->rect()).bottom();
+
+    float totalHeight = 0;
+    foreach (QTop* top, topList)
+        totalHeight += top->rect().height();
+
+    float dist = (fabs(topEdge - bottom) - totalHeight) / (topList.count() - 1);
+
+    foreach (QTop* top, topList){
+        float myTop = top->mapRectToScene(top->rect()).top();
+        top->moveBy(0, topEdge - myTop, true);
+        topEdge += top->rect().height() + dist;
+    }
+}
