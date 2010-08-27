@@ -40,6 +40,7 @@ private:
     QAction *deleteCommentAction;
     QAction *deleteMultiProcTopAction;
     QAction *setMultiProcTopAction;
+    QAction *setFontAction;
 
     QDiagramScene::Mode myMode;
 
@@ -78,6 +79,7 @@ private slots:
     void deleteSync();
     void deleteComment();
     void showMultiProcTopDialog();
+    void showFontDialog();
     void itemSelected(QGraphicsItem *item);
     void textInserted(QComment *);
 };
