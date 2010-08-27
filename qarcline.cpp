@@ -12,10 +12,3 @@ QPainterPath QArcLine::shape() const {
     path.addRect(QGraphicsLineItem::shape().boundingRect().adjusted(-5, -5, 5, 5));
     return path;
 }
-
-void QArcLine::setSelected(bool selected)
-{
-    scene()->clearSelection();
-    foreach (QGraphicsLineItem *line, qgraphicsitem_cast<QArc* >(parentItem())->lines)
-        line->setSelected(selected);
-}
