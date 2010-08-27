@@ -57,8 +57,17 @@ private:
     QToolButton *addMultiProcTopButton;
     QButtonGroup *pointerTypeGroup;
 
+    //LayoutToolBar
+    QAction* alignHLeftAct;
+    QAction* alignHCenterAct;
+    QAction* alignHRightAct;
+    QAction* alignVTopAct;
+    QAction* alignVCenterAct;
+    QAction* alignVBottomAct;
+
     QToolBar *mainToolBar;
     QToolBar *leftToolBar;
+    QToolBar *layoutToolBar;
 
     void createMenus();
     void createActions();
@@ -112,9 +121,16 @@ private slots:
     void CMHelpContents(){}	// Помощь->Содержание
     void CMHelpAbout(); 	// +Помощь->О программе
     void updateMenus();         // Действие при активации дочернего окна
-    void switchLayoutDirection();
 
-    void pointerGroupClicked(int id);  //Действие при выборе стрелки или линии
+    void alignHLeft();          // Выравниевание к самому левому объекту из группы
+    void alignHCenter();        // Выравниевание к центральному объекту из группы
+    void alignHRight();         // Выравниевание к самому правому объекту из группы
+
+    void alignVTop();          // Выравниевание к самому верхнему объекту из группы
+    void alignVCenter();        // Выравниевание к центральному объекту из группы
+    void alignVBottom();         // Выравниевание к самому нижнему объекту из группы
+
+    void pointerGroupClicked(int id);  //Действие при выборе инструмента
 };
 
 #endif // QMYWINDOW_H

@@ -58,6 +58,13 @@ public:
     void loadGraph(QString extName, DataBaseManager* dbManager);
     bool saveGraph(QString name, QString extName, DataBaseManager* dbManager, bool update = false);
     bool saveStruct(QString name, DataBaseManager* dbManager);
+
+    void alignHLeft();
+    void alignHCenter();
+    void alignHRight();
+    void alignVTop();
+    void alignVCenter();
+    void alignVBottom();
 signals:
     void sceneChanged();
 

@@ -164,6 +164,31 @@ void TMyWindow::createActions()
     addMultiProcTopButton = new QToolButton;
     addMultiProcTopButton->setCheckable(true);
     addMultiProcTopButton->setIcon(QIcon(":/images/multiproctop.png"));
+
+    //AlignToolBar
+    alignHLeftAct = new QAction(QIcon(":/images/shape_align_left.png"), tr("Выровнять к левому краю"), this);
+    alignHLeftAct->setStatusTip(tr("Выровнять вершины к левому краю"));
+    connect(alignHLeftAct, SIGNAL(triggered()), this, SLOT(alignHLeft()));
+
+    alignHRightAct = new QAction(QIcon(":/images/shape_align_right.png"), tr("Выровнять к правому краю"), this);
+    alignHRightAct->setStatusTip(tr("Выровнять вершины к правому краю"));
+    connect(alignHRightAct, SIGNAL(triggered()), this, SLOT(alignHRight()));
+
+    alignHCenterAct = new QAction(QIcon(":/images/shape_align_center.png"), tr("Выровнять к центру по горизонтали"), this);
+    alignHCenterAct->setStatusTip(tr("Выровнять вершины к центру по горизонтали"));
+    connect(alignHCenterAct, SIGNAL(triggered()), this, SLOT(alignHCenter()));
+
+    alignVTopAct = new QAction(QIcon(":/images/shape_align_top.png"), tr("Выровнять к верхнему краю"), this);
+    alignVTopAct->setStatusTip(tr("Выровнять вершины к верхнему краю"));
+    connect(alignVTopAct, SIGNAL(triggered()), this, SLOT(alignVTop()));
+
+    alignVBottomAct = new QAction(QIcon(":/images/shape_align_bottom.png"), tr("Выровнять к нижнему краю"), this);
+    alignVBottomAct->setStatusTip(tr("Выровнять вершины к нижнему краю"));
+    connect(alignVBottomAct, SIGNAL(triggered()), this, SLOT(alignVBottom()));
+
+    alignVCenterAct = new QAction(QIcon(":/images/shape_align_middle.png"), tr("Выровнять к центру по вертикали"), this);
+    alignVCenterAct->setStatusTip(tr("Выровнять вершины к центру по вертикали"));
+    connect(alignVCenterAct, SIGNAL(triggered()), this, SLOT(alignVCenter()));
 }
 
 TDrawWindow* TMyWindow::createDrawWindow()
@@ -207,6 +232,16 @@ void TMyWindow::createToolBar()
     leftToolBar->addWidget(addSyncArcButton);
     leftToolBar->addSeparator();
     leftToolBar->addWidget(addCommentButton);
+
+    layoutToolBar = addToolBar(tr("Размещение"));
+    layoutToolBar->addAction(alignHLeftAct);
+    layoutToolBar->addAction(alignHCenterAct);
+    layoutToolBar->addAction(alignHRightAct);
+    layoutToolBar->addSeparator();
+    layoutToolBar->addAction(alignVTopAct);
+    layoutToolBar->addAction(alignVCenterAct);
+    layoutToolBar->addAction(alignVBottomAct);
+
 }
 
 void TMyWindow::CMGNew()
@@ -220,14 +255,6 @@ void TMyWindow::CMGNew()
 TDrawWindow *TMyWindow::activeDrawWindow()
 {
    return qobject_cast<TDrawWindow *>(centralWidget());
-}
-
-void TMyWindow::switchLayoutDirection()
-{
-    if (layoutDirection() == Qt::LeftToRight)
-        qApp->setLayoutDirection(Qt::RightToLeft);
-    else
-        qApp->setLayoutDirection(Qt::LeftToRight);
 }
 
 void TMyWindow::pointerGroupClicked(int)
@@ -359,4 +386,32 @@ void TMyWindow::CMHelpAbout()
                           tr("<p>Copyright &copy; 2010 FuzzyLogic Team. All rights reserved.</p>"
                           "<p>The program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.</p>"));
 
+}
+
+void TMyWindow::alignHLeft()
+{
+    activeDrawWindow()->alignHLeft();
+}
+
+void TMyWindow::alignHRight()
+{
+    activeDrawWindow()->alignHRight();
+}
+void TMyWindow::alignHCenter()
+{
+    activeDrawWindow()->alignHCenter();
+}
+
+void TMyWindow::alignVTop()
+{
+    activeDrawWindow()->alignVTop();
+}
+
+void TMyWindow::alignVCenter()
+{
+    activeDrawWindow()->alignVCenter();
+}
+void TMyWindow::alignVBottom()
+{
+    activeDrawWindow()->alignVBottom();
 }

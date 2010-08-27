@@ -33,7 +33,6 @@ public:
 
 class QArc : public QGraphicsLineItem
 {
-    friend class QDiagramScene;
 public:
     enum { Type = ARC_TYPE };
     enum ArcType { SerialArc, ParallelArc, TerminateArc };
@@ -72,6 +71,8 @@ public:
     void setPen(const QPen &pen);
     Predicate* predicate;
     Arc* toArc();
+    bool autoBuild(QTop* top, float dx, float dy);
+    bool remake(QTop *, float dx, float dy);
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                QWidget *widget = 0);
@@ -84,8 +85,6 @@ private:
     QPolygonF arcHead;
     QGraphicsItem *arcTop;
     int myPriority;  //приоритет
-    bool autoBuild(QTop* top, float dx, float dy);
-    bool remake(QTop *, float dx, float dy);
 };
 
 #endif

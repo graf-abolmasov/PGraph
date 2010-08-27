@@ -26,6 +26,14 @@ int dvec2log(float dx, float dy){
   @param dy - перемещение по Y
 */
 bool QArc::autoBuild(QTop* top, float dx, float dy){
+
+    //особый случай, когда начало и конец совпадают
+    if (myStartTop == top && myEndTop == top){
+        foreach (QArcLine* line, lines)
+            line->setLine(line->line().translated(dx, dy));
+        return true;
+    }
+
     QPointF startPoint;
     QPointF endPoint;
     if (top == startItem()){
@@ -124,10 +132,12 @@ bool QArc::remake(QTop* aMovedTop, float dx, float dy){
 
     if ((myStartTop == aMovedTop) && (myEndTop == aMovedTop)){
         foreach (QArcLine* line, lines){
-            line->setLine(line->line().translated(dx/2, dy/2));
+            line->setLine(line->line().translated(dx, dy));
         }
         return true;
     }
+    //Отоключаем этот алгоритм если надо
+    //return false;
 
     if (lines.count() == 1 || lines.count() == 3){
         //старый алгоритм
