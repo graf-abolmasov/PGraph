@@ -351,6 +351,10 @@ void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
         case QTop::Type:
             top = qgraphicsitem_cast<QTop* >(selectedItems().first());
             status.append(tr("Номер вершины ") + QString::number(top->number));
+            status.append(tr(" Left ") + QString::number(top->mapRectToScene(top->rect()).left()));
+            status.append(tr(" Top ") + QString::number(top->mapRectToScene(top->rect()).top()));
+            status.append(tr(" Right ") + QString::number(top->mapRectToScene(top->rect()).right()));
+            status.append(tr(" Bottom ") + QString::number(top->mapRectToScene(top->rect()).bottom()));
             if (top->actor != NULL)
                 status.append(tr(" Актор ") + top->actor->extName);
             break;

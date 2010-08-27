@@ -66,6 +66,8 @@ public:
     void alignVTop();
     void alignVCenter();
     void alignVBottom();
+    void distribVertically();
+    void distribHorizontally();
 signals:
     void sceneChanged();
 

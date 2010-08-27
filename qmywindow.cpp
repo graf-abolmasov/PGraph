@@ -166,29 +166,37 @@ void TMyWindow::createActions()
     addMultiProcTopButton->setIcon(QIcon(":/images/multiproctop.png"));
 
     //AlignToolBar
-    alignHLeftAct = new QAction(QIcon(":/images/shape_align_left.png"), tr("Выровнять к левому краю"), this);
-    alignHLeftAct->setStatusTip(tr("Выровнять вершины к левому краю"));
+    alignHLeftAct = new QAction(QIcon(":/images/shape_align_left.png"), tr("Выровнить к левому краю"), this);
+    alignHLeftAct->setStatusTip(tr("Выровнить вершины к левому краю"));
     connect(alignHLeftAct, SIGNAL(triggered()), this, SLOT(alignHLeft()));
 
-    alignHRightAct = new QAction(QIcon(":/images/shape_align_right.png"), tr("Выровнять к правому краю"), this);
-    alignHRightAct->setStatusTip(tr("Выровнять вершины к правому краю"));
+    alignHRightAct = new QAction(QIcon(":/images/shape_align_right.png"), tr("Выровнить к правому краю"), this);
+    alignHRightAct->setStatusTip(tr("Выровнить вершины к правому краю"));
     connect(alignHRightAct, SIGNAL(triggered()), this, SLOT(alignHRight()));
 
-    alignHCenterAct = new QAction(QIcon(":/images/shape_align_center.png"), tr("Выровнять к центру по горизонтали"), this);
-    alignHCenterAct->setStatusTip(tr("Выровнять вершины к центру по горизонтали"));
+    alignHCenterAct = new QAction(QIcon(":/images/shape_align_center.png"), tr("Выровнить к центру по горизонтали"), this);
+    alignHCenterAct->setStatusTip(tr("Выровнить вершины к центру по горизонтали"));
     connect(alignHCenterAct, SIGNAL(triggered()), this, SLOT(alignHCenter()));
 
-    alignVTopAct = new QAction(QIcon(":/images/shape_align_top.png"), tr("Выровнять к верхнему краю"), this);
-    alignVTopAct->setStatusTip(tr("Выровнять вершины к верхнему краю"));
+    alignVTopAct = new QAction(QIcon(":/images/shape_align_top.png"), tr("Выровнить к верхнему краю"), this);
+    alignVTopAct->setStatusTip(tr("Выровнить вершины к верхнему краю"));
     connect(alignVTopAct, SIGNAL(triggered()), this, SLOT(alignVTop()));
 
-    alignVBottomAct = new QAction(QIcon(":/images/shape_align_bottom.png"), tr("Выровнять к нижнему краю"), this);
-    alignVBottomAct->setStatusTip(tr("Выровнять вершины к нижнему краю"));
+    alignVBottomAct = new QAction(QIcon(":/images/shape_align_bottom.png"), tr("Выровнить к нижнему краю"), this);
+    alignVBottomAct->setStatusTip(tr("Выровнить вершины к нижнему краю"));
     connect(alignVBottomAct, SIGNAL(triggered()), this, SLOT(alignVBottom()));
 
-    alignVCenterAct = new QAction(QIcon(":/images/shape_align_middle.png"), tr("Выровнять к центру по вертикали"), this);
-    alignVCenterAct->setStatusTip(tr("Выровнять вершины к центру по вертикали"));
+    alignVCenterAct = new QAction(QIcon(":/images/shape_align_middle.png"), tr("Выровнить к центру по вертикали"), this);
+    alignVCenterAct->setStatusTip(tr("Выровнить вершины к центру по вертикали"));
     connect(alignVCenterAct, SIGNAL(triggered()), this, SLOT(alignVCenter()));
+
+    distribVerticallyAct = new QAction(QIcon(":/images/shape_distrib_vertically.png"), tr("Распределить по вертикали"), this);
+    distribVerticallyAct->setStatusTip(tr("Распределить вершиные по вертикали на одинаковом расстоянии"));
+    connect(distribVerticallyAct, SIGNAL(triggered()), this, SLOT(distribVertically()));
+
+    distribHorizontallyAct = new QAction(QIcon(":/images/shape_distrib_horizontally.png"), tr("Распределить по горизонтали"), this);
+    distribHorizontallyAct->setStatusTip(tr("Распределить вершиные по горизонтали на одинаковом расстоянии"));
+    connect(distribHorizontallyAct, SIGNAL(triggered()), this, SLOT(distribHorizontally()));
 }
 
 TDrawWindow* TMyWindow::createDrawWindow()
@@ -241,6 +249,9 @@ void TMyWindow::createToolBar()
     layoutToolBar->addAction(alignVTopAct);
     layoutToolBar->addAction(alignVCenterAct);
     layoutToolBar->addAction(alignVBottomAct);
+    layoutToolBar->addSeparator();
+    layoutToolBar->addAction(distribHorizontallyAct);
+    layoutToolBar->addAction(distribVerticallyAct);
 
 }
 
@@ -414,4 +425,14 @@ void TMyWindow::alignVCenter()
 void TMyWindow::alignVBottom()
 {
     activeDrawWindow()->alignVBottom();
+}
+
+void TMyWindow::distribHorizontally()
+{
+    activeDrawWindow()->distribHorizontally();
+}
+
+void TMyWindow::distribVertically()
+{
+    activeDrawWindow()->distribVertically();
 }
