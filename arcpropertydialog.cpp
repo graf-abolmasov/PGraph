@@ -2,6 +2,7 @@
 #include "ui_arcpropertydialog.h"
 #include "qarc.h"
 #include "databasemanager.h"
+#include "globalvariables.h"
 
 ArcPropertyDialog::ArcPropertyDialog(QWidget *parent) :
     QDialog(parent),
@@ -68,6 +69,7 @@ void ArcPropertyDialog::prepareForm(QArc *arc)
             arc->predicate = NULL;
         }
     } else ui->predicateList->setCurrentRow(0);
+    ui->predicateList->setFocus(Qt::MouseFocusReason);
 }
 
 QArc* ArcPropertyDialog::getResult()
@@ -91,9 +93,12 @@ void ArcPropertyDialog::on_buttonBox_accepted()
                 arcList.at(i)->setPriority(arcList.at(i)->priority() + 1);
     }
     myArc->setPriority(ui->prioritySpnBox->value());
-    if (ui->predicateList->currentRow() > -1)
+    if (ui->predicateList->currentRow() > -1) {
         myArc->predicate = myPredicateList.at(ui->predicateList->currentRow());
-    else
+        if (myArc->predicate != NULL && !globalPredicateList.contains(myArc->predicate->extName))
+            globalPredicateList.append(myArc->predicate->extName);
+
+    } else
         myArc->predicate = NULL;
 }
 

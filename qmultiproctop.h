@@ -19,6 +19,7 @@ public:
     Top* toTop();
     int procCount;
 protected:
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
 private:
 };

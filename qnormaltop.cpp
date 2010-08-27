@@ -1,4 +1,5 @@
 #include "qnormaltop.h"
+#include "toppropertydialog.h"
 
 QNormalTop::QNormalTop(QMenu *contextMenu, QGraphicsItem *parent, QGraphicsScene *scene)
         : QTop(contextMenu, parent, scene)
@@ -142,6 +143,15 @@ void QNormalTop::setAsRoot(bool flag)
         p.setWidth(2);
         setPen(p);
     }
+}
+
+void QNormalTop::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+{
+    TopPropertyDialog dlg;
+    QNormalTop* top = qgraphicsitem_cast<QNormalTop *>(scene()->selectedItems().first());
+    dlg.prepareForm(top);
+    if (dlg.exec())
+        top = dlg.getResult();
 }
 
 Top* QNormalTop::toTop()

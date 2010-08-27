@@ -129,7 +129,7 @@ bool QArc::remake(QTop* aMovedTop, float dx, float dy){
         return true;
     }
 
-    if (lines.count() == 1){
+    if (lines.count() == 1 || lines.count() == 3){
         //старый алгоритм
         //переработано, дополнено, прокоментировано
         //и как ни странно - не работает
@@ -198,7 +198,7 @@ bool QArc::remake(QTop* aMovedTop, float dx, float dy){
                 pnts[2] += QPointF(dx, dy);
             }
             else flag = false;
-            break;
+            break;*/
             case 3:
             lgolddir = dvec2log(pnts[3].x() - pnts[2].x(), pnts[3].y() - pnts[2].y());
             lgdir    = dvec2log(pnts[3].x() + dx - pnts[1].x(), pnts[3].y() + dy - pnts[1].y());
@@ -211,7 +211,7 @@ bool QArc::remake(QTop* aMovedTop, float dx, float dy){
                 }
             }
             else flag = false;
-            break;*/
+            break;
         }
         if (flag) {
             if (fMovedTo){

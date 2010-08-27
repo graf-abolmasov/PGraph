@@ -8,6 +8,7 @@
 #include "qarc.h"
 #include "qnormaltop.h"
 #include "commonutils.h"
+#include "globalvariables.h"
 
 MultiProcTopPropertyDialog::MultiProcTopPropertyDialog(QWidget *parent) :
     QDialog(parent),

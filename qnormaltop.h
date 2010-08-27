@@ -18,6 +18,7 @@ public:
     void setIcon(QImage &icon);
     Top* toTop();
 protected:
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
 private:
     int procCount;

@@ -2,6 +2,7 @@
 #include <QtGui>
 #include "qarc.h"
 #include "arcpropertydialog.h"
+#include "globalvariables.h"
 
 void QParallelArcTop::contextMenuEvent(QGraphicsSceneContextMenuEvent *event){
     scene()->clearSelection();
@@ -44,4 +45,12 @@ void QParallelArcTop::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
     dlg.prepareForm(arc);
     if (dlg.exec())
         dlg.getResult();
+}
+
+void QParallelArcTop::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+    QGraphicsEllipseItem::paint(painter, option, widget);
+    QArc* myArc = qgraphicsitem_cast<QArc *>(parentItem());
+    if (myArc->predicate != NULL)
+        painter->drawText(rect().toRect(), Qt::AlignCenter, QString::number(globalPredicateList.indexOf(myArc->predicate->extName) + 1));
 }

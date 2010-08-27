@@ -3,6 +3,7 @@
 #include "qmywindow.h"
 #include "qparallelarctop.h"
 #include "qterminatearctop.h"
+#include "globalvariables.h"
 
 QDiagramScene::QDiagramScene(QObject *parent)
     : QGraphicsScene(parent)
@@ -353,7 +354,7 @@ void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
             status.append(tr(" Приоритет ") + QString::number(arc->priority()) +
                           tr(" Ширина пера ") + QString::number(arc->pen().width()));
             if (arc->predicate != NULL)
-                status.append(tr("Предикат ") + arc->predicate->extName);
+               status.append(tr(" Предикат ") + arc->predicate->extName);
             break;
         case QArc::Type:
             arc = qgraphicsitem_cast<QArc*>(selectedItems().first());

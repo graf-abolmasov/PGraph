@@ -14,6 +14,7 @@
 #include <QtGui>
 #include "commonutils.h"
 #include "logger.h"
+#include "globalvariables.h"
 
 DataBaseManager* globalDBManager;
 
@@ -108,7 +109,11 @@ bool DataBaseManager::getGraph(QString extName, Graph &graph)
 
 bool DataBaseManager::saveGraph(Graph *graph)
 {
-    if (!db.open()) return false;
+    bool ok = db.open();
+    if (!ok) {
+        globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+        return false;
+    }
     QSqlQuery query;
 
     query.prepare("INSERT INTO actor (PROJECT_ID, NAMEPR, CLASPR, EXTNAME, DATE, TIME, ICON, PROTOTIP, BAZIS)"
@@ -186,7 +191,9 @@ bool DataBaseManager::saveGraph(Graph *graph)
         globalLogger->writeLog(query.executedQuery().toUtf8());
     }
     db.close();
-    return db.lastError().number();
+    ok = (db.lastError().type() == QSqlError::NoError);
+    if (!ok) globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+    return ok;
 }
 
 bool DataBaseManager::updateGraph(Graph *graph)
@@ -207,7 +214,7 @@ int DataBaseManager::getGraphList(QList<Graph* > &graphList)
     bool ok = db.open();
     if (!ok) return db.lastError().number();
     QSqlQuery query;
-    query.prepare("SELECT NAMEPR, EXTNAME FROM ACTOR WHERE CLASPR = 'g' AND PROJECT_ID = :PROJECT_ID;");
+    query.prepare("SELECT NAMEPR, EXTNAME FROM ACTOR WHERE CLASPR = 'g' AND PROJECT_ID = :PROJECT_ID ORDER BY EXTNAME;");
     query.bindValue(":PROJECT_ID", myProjectId);
     query.exec();
     globalLogger->writeLog(query.executedQuery().toUtf8());
@@ -250,7 +257,7 @@ int DataBaseManager::getDataTypeList(QList<DataType*>& typeList){
     if (!ok) return db.lastError().number();
     QSqlQuery query;
     typeList.clear();
-    query.prepare("SELECT PROJECT_ID, TYPE, TYPEDEF FROM TYPSYS WHERE PROJECT_ID = :PROJECT_ID;");
+    query.prepare("SELECT PROJECT_ID, TYPE, TYPEDEF FROM TYPSYS WHERE PROJECT_ID = :PROJECT_ID ORDER BY TYPE;");
     query.bindValue(":PROJECT_ID", myProjectId);
     query.exec();
     globalLogger->writeLog(query.executedQuery().toUtf8());
@@ -288,7 +295,7 @@ int DataBaseManager::getVariableList(QList<Variable* >& varList){
     bool ok = db.open();
     if (!ok) return db.lastError().number();
     QSqlQuery query;
-    query.prepare("SELECT DATA, TYPE, INIT, COMMENT FROM DATA WHERE PROJECT_ID = :PROJECT_ID;");
+    query.prepare("SELECT DATA, TYPE, INIT, COMMENT FROM DATA WHERE PROJECT_ID = :PROJECT_ID ORDER BY DATA;");
     query.bindValue(":PROJECT_ID", myProjectId);
     query.exec();
     globalLogger->writeLog(query.executedQuery().toUtf8());
@@ -350,7 +357,7 @@ int DataBaseManager::getActorList(QList<Actor *> &actorList)
     if (!ok) return db.lastError().number();
     QSqlQuery query1;
     QSqlQuery query2;
-    query1.prepare("SELECT NAMEPR, CLASPR, EXTNAME, DATE, TIME, ICON, PROTOTIP FROM ACTOR WHERE CLASPR = 'a' AND PROJECT_ID = :PROJECT_ID;");
+    query1.prepare("SELECT NAMEPR, CLASPR, EXTNAME, DATE, TIME, ICON, PROTOTIP FROM ACTOR WHERE CLASPR = 'a' AND PROJECT_ID = :PROJECT_ID ORDER BY EXTNAME;");
     query1.bindValue(":PROJECT_ID", myProjectId);
     query1.exec();
     globalLogger->writeLog(query1.executedQuery().toUtf8());
@@ -481,7 +488,7 @@ int DataBaseManager::getPredicateList(QList<Predicate *> &predList)
     if (!ok) return db.lastError().number();
     QSqlQuery query1;
     QSqlQuery query2;
-    query1.prepare("SELECT NAMEPR, CLASPR, EXTNAME, DATE, TIME, ICON, PROTOTIP FROM ACTOR WHERE CLASPR = 'p' AND PROJECT_ID = :PROJECT_ID;");
+    query1.prepare("SELECT NAMEPR, CLASPR, EXTNAME, DATE, TIME, ICON, PROTOTIP FROM ACTOR WHERE CLASPR = 'p' AND PROJECT_ID = :PROJECT_ID ORDER BY EXTNAME;");
     query1.bindValue(":PROJECT_ID", myProjectId);
     query1.exec();
     globalLogger->writeLog(query1.executedQuery().toUtf8());
@@ -626,10 +633,13 @@ int DataBaseManager::getRegisteredModules(QList<BaseModule*> &moduleList)
     return db.lastError().number();
 }
 
-int DataBaseManager::saveStruct(Graph *graph)
+bool DataBaseManager::saveStruct(Graph *graph)
 {
     bool ok = db.open();
-    if (!ok) return db.lastError().number();
+    if (!ok) {
+        globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+        return false;
+    }
     QSqlQuery query;
     QStringList predicateList;
     int i = 0;
@@ -660,6 +670,7 @@ int DataBaseManager::saveStruct(Graph *graph)
             query.bindValue(":NPRED", i);
             query.bindValue(":NAME", arc->predicate);
             query.exec();
+            i++;
             globalLogger->writeLog(query.executedQuery().toUtf8());
         }
         query.prepare("INSERT INTO GRAPH (PROJECT_ID, NAMEPR, NFROM, NTO, NPRED, PRIOR, ARCTYPE)"
@@ -710,9 +721,11 @@ int DataBaseManager::saveStruct(Graph *graph)
     query.bindValue(":ARCTYPE", 0);
     query.exec();
     globalLogger->writeLog(query.executedQuery().toUtf8());
-    db.close();
 
-    return db.lastError().number();
+    db.close();
+    ok = (db.lastError().type() == QSqlError::NoError);
+    if (!ok) globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+    return ok;
 }
 
 QSqlError DataBaseManager::lastError()

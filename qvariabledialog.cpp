@@ -2,6 +2,7 @@
 #include "ui_qvariabledialog.h"
 #include "qvariableeditor.h"
 #include "databasemanager.h"
+#include "globalvariables.h"
 
 QVariableDialog::QVariableDialog(QWidget *parent) :
     QDialog(parent),

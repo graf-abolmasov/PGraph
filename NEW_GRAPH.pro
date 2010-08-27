@@ -76,7 +76,8 @@ HEADERS += qmywindow.h \
     qnormaltop.h \
     multiproctoppropertydialog.h \
     graph.h \
-    logger.h
+    logger.h \
+    globalvariables.h
 RESOURCES += resources.qrc
 FORMS += toppropertydialog.ui \
     qobjecteditor.ui \

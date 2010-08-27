@@ -6,6 +6,7 @@
 #include "qsavegraphdialog.h"
 #include "qopengraphdialog.h"
 #include "commonutils.h"
+#include "globalvariables.h"
 
 QStatusBar *globalStatusBar;
 
@@ -251,9 +252,12 @@ void TMyWindow::CMGSaveAs()
 {
     QSaveGraphDialog dialog;
     if (dialog.exec()){
-        setMyGraphExtName(dialog.getResult());
-        setMyGraphName("G" + getCRC(myGraphExtName.toUtf8()));
-        activeDrawWindow()->saveGraph(myGraphName, myGraphExtName, globalDBManager);
+        if (dialog.getResult() != ""){
+            setMyGraphExtName(dialog.getResult());
+            setMyGraphName("G" + getCRC(myGraphExtName.toUtf8()));
+            if (activeDrawWindow()->saveGraph(myGraphName, myGraphExtName, globalDBManager))
+                globalStatusBar->showMessage(tr("Сохранено как ") + myGraphName, 3000);
+        }
     }
 }
 
@@ -315,13 +319,15 @@ void TMyWindow::CMSaveStruct()
         QMessageBox::warning(this, "Ошибка", "Сохраните граф", QMessageBox::Ok);
         return;
     }
-    activeDrawWindow()->saveStruct(myGraphName, globalDBManager);
+    if (activeDrawWindow()->saveStruct(myGraphName, globalDBManager))
+        globalStatusBar->showMessage(tr("Структура записана"), 2000);
 }
 
 void TMyWindow::CMGSave()
 {
     if (myGraphName != "")
-        activeDrawWindow()->saveGraph(myGraphName, myGraphExtName, globalDBManager, true);
+        if (activeDrawWindow()->saveGraph(myGraphName, myGraphExtName, globalDBManager, true))
+            globalStatusBar->showMessage(tr("Сохранено"), 2000);
 }
 
 void TMyWindow::setMyGraphName(QString name)

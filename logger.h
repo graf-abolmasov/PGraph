@@ -16,6 +16,4 @@ private:
     DebugLevel myDebugLevel;
 };
 
-extern Logger *globalLogger;
-
 #endif // LOGGER_H
