@@ -230,7 +230,7 @@ void TDrawWindow::showArcPropDialog()
     QArc* arc = qgraphicsitem_cast<QArc *>(scene->selectedItems().first()->parentItem());
     dlg.prepareForm(arc);
     if (dlg.exec()){
-        dlg.getResult();
+        arc = dlg.getResult();
     }
 }
 
@@ -411,4 +411,102 @@ void TDrawWindow::showMultiProcTopDialog()
     dlg.prepareForm(top);
     if (dlg.exec())
         top = dlg.getResult();
+}
+
+void TDrawWindow::alignHLeft()
+{
+    QList<QTop *> topList;
+    foreach (QGraphicsItem* item, scene->selectedItems())
+        if (item->type() == QTop::Type)
+           topList.append(qgraphicsitem_cast<QTop* >(item));
+    if (topList.count() == 0) return;
+    float left = topList.first()->mapRectToScene(topList.first()->rect()).left();
+    foreach (QTop* top, topList) {
+        if (left > top->mapRectToScene(top->rect()).left())
+            left = top->mapRectToScene(top->rect()).left();
+    }
+
+    foreach (QTop* top, topList)
+        top->moveBy(left - top->mapRectToScene(top->rect()).left(), 0, true);
+}
+
+void TDrawWindow::alignHRight()
+{
+    QList<QTop *> topList;
+    foreach (QGraphicsItem* item, scene->selectedItems())
+        if (item->type() == QTop::Type)
+           topList.append(qgraphicsitem_cast<QTop* >(item));
+    if (topList.count() == 0) return;
+    float right = topList.first()->mapRectToScene(topList.first()->rect()).right();
+    foreach (QTop* top, topList) {
+        if (right < top->mapRectToScene(top->rect()).right())
+            right = top->mapRectToScene(top->rect()).right();
+    }
+
+    foreach (QTop* top, topList)
+        top->moveBy(right - top->mapRectToScene(top->rect()).right(), 0, true);
+}
+
+void TDrawWindow::alignHCenter()
+{
+    QList<QTop *> topList;
+    foreach (QGraphicsItem* item, scene->selectedItems())
+        if (item->type() == QTop::Type)
+           topList.append(qgraphicsitem_cast<QTop* >(item));
+    if (topList.count() == 0) return;
+    float center = 0;
+    foreach (QTop* top, topList)
+        center += top->scenePos().x();
+    center /= topList.count();
+    foreach (QTop* top, topList)
+        top->moveBy(center - top->scenePos().x(), 0, true);
+}
+
+void TDrawWindow::alignVTop()
+{
+    QList<QTop *> topList;
+    foreach (QGraphicsItem* item, scene->selectedItems())
+        if (item->type() == QTop::Type)
+           topList.append(qgraphicsitem_cast<QTop* >(item));
+    if (topList.count() == 0) return;
+    float topEdge = topList.first()->mapRectToScene(topList.first()->rect()).top();
+    foreach (QTop* top, topList) {
+        if (topEdge > top->mapRectToScene(top->rect()).top())
+            topEdge = top->mapRectToScene(top->rect()).top();
+    }
+
+    foreach (QTop* top, topList)
+        top->moveBy(0, topEdge - top->mapRectToScene(top->rect()).top(), true);
+}
+
+void TDrawWindow::alignVBottom()
+{
+    QList<QTop *> topList;
+    foreach (QGraphicsItem* item, scene->selectedItems())
+        if (item->type() == QTop::Type)
+           topList.append(qgraphicsitem_cast<QTop* >(item));
+    if (topList.count() == 0) return;
+    float bottom = topList.first()->mapRectToScene(topList.first()->rect()).bottom();
+    foreach (QTop* top, topList) {
+        if (bottom < top->mapRectToScene(top->rect()).bottom())
+            bottom = top->mapRectToScene(top->rect()).bottom();
+    }
+    if (topList.count() == 0) return;
+    foreach (QTop* top, topList)
+        top->moveBy(0, bottom - top->mapRectToScene(top->rect()).bottom(), true);
+}
+
+void TDrawWindow::alignVCenter()
+{
+    QList<QTop *> topList;
+    foreach (QGraphicsItem* item, scene->selectedItems())
+        if (item->type() == QTop::Type)
+           topList.append(qgraphicsitem_cast<QTop* >(item));
+    if (topList.count() == 0) return;
+    float center = 0;
+    foreach (QTop* top, topList)
+        center += top->scenePos().y();
+    center /= topList.count();
+    foreach (QTop* top, topList)
+        top->moveBy(0, center - top->scenePos().y(), true);
 }

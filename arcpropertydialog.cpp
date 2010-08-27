@@ -74,11 +74,6 @@ void ArcPropertyDialog::prepareForm(QArc *arc)
 
 QArc* ArcPropertyDialog::getResult()
 {
-    return myArc;
-}
-
-void ArcPropertyDialog::on_buttonBox_accepted()
-{
     if (ui->serialRadioBtn->isChecked()) myArc->setArcType(QArc::SerialArc);
     if (ui->parallelRadioBtn->isChecked()) myArc->setArcType(QArc::ParallelArc);
     if (ui->terminateRadioBtn->isChecked()) myArc->setArcType(QArc::TerminateArc);
@@ -100,6 +95,12 @@ void ArcPropertyDialog::on_buttonBox_accepted()
 
     } else
         myArc->predicate = NULL;
+    return myArc;
+}
+
+void ArcPropertyDialog::on_buttonBox_accepted()
+{
+
 }
 
 void ArcPropertyDialog::on_predicateList_itemDoubleClicked(QListWidgetItem* item)

@@ -205,36 +205,7 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
         QPointF new_pos = mouseEvent->scenePos();
 
         QLineF vector(old_pos, new_pos);
-        float dx = vector.dx();
-        float dy = vector.dy();
-
-        top->moveBy(dx, dy);
-
-        QList<QGraphicsItem* > itemList = collidingItems(top, Qt::IntersectsItemBoundingRect);
-        foreach(QGraphicsItem* item, itemList){
-            if (item->type() == QTop::Type){
-                top->moveBy(-dx, -dy);
-                mouseEvent->ignore();
-                return;
-            }
-        }
-
-        bool isOK = false; //false - если дугу надо полностью переделать
-
-        QList<QArc *> brokenLines; //список содержит дуги, нуждающиеся в полной переделке
-        foreach (QArc *arc, top->allArcs()){
-           isOK = arc->remake(top, dx, dy);
-           if (!isOK)
-               brokenLines.append(arc);
-        }
-
-        foreach (QArc *arc, brokenLines)
-            arc->autoBuild(top, dx, dy);
-
-        //необходимо для правильной перерисовки.
-        foreach (QArc *arc, top->allArcs())
-            arc->updateBounds();
-
+        top->moveBy(vector.dx(), vector.dy());
     }
     else if (myMode == InsertSync && line != NULL) {
         QLineF newLine(line->line().p1(), mouseEvent->scenePos());

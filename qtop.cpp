@@ -158,6 +158,38 @@ QList<QArc *> QTop::getArcsAtBound(int i){
     return result;
 }
 
+bool QTop::moveBy(qreal dx, qreal dy, bool forceRebuild)
+{
+    setPos(pos().x() + dx, pos().y() + dy);
+
+    QList<QGraphicsItem* > itemList = scene()->collidingItems(this, Qt::IntersectsItemBoundingRect);
+    foreach(QGraphicsItem* item, itemList){
+        if (item->type() == QTop::Type){
+            setPos(pos().x() - dx, pos().y() - dy);
+            return false;
+        }
+    }
+
+    bool isOK = false; //false - если дугу надо полностью переделать
+
+    QList<QArc *> brokenLines; //список содержит дуги, нуждающиеся в полной переделке
+    foreach (QArc *arc, allArcs()) {
+        if (!forceRebuild)
+            isOK = arc->remake(this, dx, dy);
+        if (!isOK)
+            brokenLines.append(arc);
+    }
+
+    foreach (QArc *arc, brokenLines)
+        arc->autoBuild(this, dx, dy);
+
+    //необходимо для правильной перерисовки.
+    foreach (QArc *arc, allArcs())
+        arc->updateBounds();
+
+    return true;
+}
+
 /*QList<QArc *> QTop::getArcsAtBound(QLineF bound){
     QPointF intersectPoint;
     QList<QArc *> result;

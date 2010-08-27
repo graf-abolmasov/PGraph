@@ -44,7 +44,7 @@ void QSerialArcTop::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
     QArc* arc = qgraphicsitem_cast<QArc *>(parentItem());
     dlg.prepareForm(arc);
     if (dlg.exec())
-        dlg.getResult();
+        arc = dlg.getResult();
 }
 
 void QSerialArcTop::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
