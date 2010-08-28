@@ -4,6 +4,7 @@
 #include "qparallelarctop.h"
 #include "qterminatearctop.h"
 #include "globalvariables.h"
+#include "undocommand.h"
 
 QDiagramScene::QDiagramScene(QObject *parent)
     : QGraphicsScene(parent)
@@ -109,80 +110,19 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
     else if ((myMode == MoveItem) && (mouseEvent->buttons() == Qt::LeftButton) &&
              (selectedItems().count() == 1) && (selectedItems().first()->type() == QArcLine::Type)) {
         QArcLine *selectedLine = qgraphicsitem_cast<QArcLine *>(selectedItems().first());
-        QArc *arc = qgraphicsitem_cast<QArc *>(selectedLine->parentItem());
-
         QLineF vector(mouseEvent->lastScenePos(), mouseEvent->scenePos());
         float dx = vector.dx();
         float dy = vector.dy();
 
-        QArcLine *prevLine;
-        QArcLine *nextLine;
-        if (arc->lines.count() == 1){
-            prevLine = NULL;
-            nextLine = NULL;
-        } else {
-            if (selectedLine == arc->lines.first()){
-                nextLine = prevLine = arc->lines.at(1);
-                prevLine = NULL;
-            } else if (selectedLine == arc->lines.last()){
-                prevLine = arc->lines.at(arc->lines.indexOf(selectedLine) - 1);
-                nextLine = NULL;
-            } else {
-                prevLine = arc->lines.at(arc->lines.indexOf(selectedLine) - 1);
-                nextLine = arc->lines.at(arc->lines.indexOf(selectedLine) + 1);
-            }
-        }
+        QArc *arc = qgraphicsitem_cast<QArc *>(selectedLine->parentItem());
+
         //проверим чтобы начальная точка не вылезла из вершины!
         if ((arc->endItem()->sceneBoundingRect().adjusted(8, 8, -8, -8).contains(arc->lines.last()->line().p2() + QPointF(dx, dy)) &&
-              arc->startItem()->sceneBoundingRect().adjusted(8, 8, -8, -8).contains(arc->lines.first()->line().p1() + QPointF(dx, dy))) &&
-             (arc->contains(arc->mapFromScene(mouseEvent->lastScenePos())))){
-
-            //вправо-влево можно двигать только вертикальные линии (пока)
-            if (selectedLine->line().p1().x() == selectedLine->line().p2().x()){
-                if (prevLine != NULL)
-                    prevLine->setLine(QLineF(prevLine->line().p1(),
-                                             QPointF(prevLine->line().p2().x() + dx,
-                                                     prevLine->line().p1().y())
-                                             )
-                                      );
-                if (nextLine != NULL)
-                    nextLine->setLine(QLineF(QPointF(nextLine->line().p1().x() + dx,
-                                                     nextLine->line().p1().y()
-                                                     ),
-                                             nextLine->line().p2())
-                                      );
-                selectedLine->setLine(QLineF(QPointF(selectedLine->line().p1().x() + dx,
-                                                     selectedLine->line().p1().y()),
-                                             QPointF(selectedLine->line().p2().x() + dx,
-                                                     selectedLine->line().p2().y())
-                                             )
-                                      );
-            }
-
-            //вверх-вниз можно двигать только горизонтальные линии (пока)
-            if (selectedLine->line().p1().y() == selectedLine->line().p2().y()){
-                if (prevLine != NULL)
-                    prevLine->setLine(QLineF(prevLine->line().p1(),
-                                             QPointF(prevLine->line().p2().x(),
-                                                     prevLine->line().p2().y() + dy)
-                                             )
-                                      );
-                if (nextLine != NULL)
-                    nextLine->setLine(QLineF(QPointF(nextLine->line().p1().x(),
-                                                     nextLine->line().p1().y() + dy),
-                                             nextLine->line().p2()
-                                             )
-                                      );
-                selectedLine->setLine(QLineF(QPointF(selectedLine->line().p1().x(),
-                                                     selectedLine->line().p1().y() + dy),
-                                             QPointF(selectedLine->line().p2().x(),
-                                                     selectedLine->line().p2().y() + dy)
-                                             )
-                                      );
-            }
+             arc->startItem()->sceneBoundingRect().adjusted(8, 8, -8, -8).contains(arc->lines.first()->line().p1() + QPointF(dx, dy))) &&
+            (arc->contains(arc->mapFromScene(mouseEvent->lastScenePos())))) {
+            emit itemMoved(selectedLine, vector);
         };
 
-        arc->updateBounds();
     }
     //режим перетаскивания вершины
     else if ((myMode == MoveItem) &&
@@ -193,10 +133,8 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
         QTop *top = qgraphicsitem_cast<QTop *>(selectedItems().first());
         QPointF old_pos = mouseEvent->lastScenePos();
         QPointF new_pos = mouseEvent->scenePos();
-
         QLineF vector(old_pos, new_pos);
-        top->moveBy(vector.dx(), vector.dy());
-        emit itemMoved(top);
+        emit itemMoved(top, vector);
     }
     else if (myMode == InsertSync && line != NULL) {
         QLineF newLine(line->line().p1(), mouseEvent->scenePos());
@@ -322,16 +260,15 @@ void QDiagramScene::keyReleaseEvent (QKeyEvent *keyEvent){
         foreach (QGraphicsItem *item, deleteList)
             delete item;*/
         QGraphicsItem *item = selectedItems().first();
-        clearSelection();
         switch (item->type()){
         case QTop::Type:
         case QArc::Type:
         case QSyncArc::Type:
-            delete item;
+            emit itemDeleted(item);
             break;
         case QTerminateArcTop::Type:
         case QArcLine::Type:
-            delete item->parentItem();
+            emit itemDeleted(item->parentItem());
             break;
         }
     }

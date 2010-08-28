@@ -85,7 +85,7 @@ private slots:
     void showMultiProcTopDialog();
     void showFontDialog();
     void itemInserted(QGraphicsItem *item);
-    void itemMoved(QGraphicsItem *item);
+    void itemMoved(QGraphicsItem *item, QLineF vector);
     void itemDeleted(QGraphicsItem *item);
     void textInserted(QComment *);
 };

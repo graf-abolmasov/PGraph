@@ -88,14 +88,16 @@ void QTop::removeArc(QArc *arc){
   Удаляет все дуги, входящие и выходящие из вершины
 */
 void QTop::removeArcs(){
-    qDeleteAll(arcs);
+    arcs.clear();
+    //qDeleteAll(arcs);
 }
 
 /*!
   Удаляет все дуги синхронизации, входящие и выходящие из вершины
 */
 void QTop::removeSyncs(){
-    qDeleteAll(sync);
+    sync.clear();
+    //qDeleteAll(sync);
 }
 
 /*!
@@ -103,9 +105,6 @@ void QTop::removeSyncs(){
   @param arc - дуга
 */
 void QTop::addArc(QArc *arc){
-    if (arc->startItem() == this)
-        foreach(QArc *qarc, outArcs())
-            qarc->setPriority(qarc->priority() + 1);
     if (!arcs.contains(arc))
         arcs.append(arc);
 }
@@ -262,6 +261,6 @@ Top::Top(float x, float y, float sizeX, float sizeY, int number, int procCount, 
 
 QTop::~QTop()
 {
-    removeArcs();
-    removeSyncs();
+    qDeleteAll(arcs);
+    qDeleteAll(sync);
 }

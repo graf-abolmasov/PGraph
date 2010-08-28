@@ -114,6 +114,7 @@ QString itemTypeToString(QGraphicsItem *item)
     case QTop::Type:
         return QObject::tr("вершина");
     case QArc::Type:
+    case QArcLine::Type:
         return QObject::tr("дуга");
     case QComment::Type:
         return QObject::tr("комметарий");
