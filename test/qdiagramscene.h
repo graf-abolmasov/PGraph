@@ -49,7 +49,7 @@ public slots:
 signals:
     void itemInserted(QGraphicsItem *item);
     void itemSelected(QGraphicsItem *item);
-    void itemMoved(QGraphicsItem *item);
+    void itemMoved(QGraphicsItem *item, QLineF vector);
     void itemDeleted(QGraphicsItem *item);
     void textInserted(QComment *item);
 

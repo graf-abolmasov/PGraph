@@ -34,13 +34,13 @@ TDrawWindow::TDrawWindow()
     connect(scene, SIGNAL(itemInserted(QGraphicsItem*)),
             this, SLOT(itemInserted(QGraphicsItem *)));
     //обработчик перемещения объекта
-    connect(scene, SIGNAL(itemMoved(QGraphicsItem*)),
-        this, SLOT(itemMoved(QGraphicsItem*)));
+    connect(scene, SIGNAL(itemMoved(QGraphicsItem*, QLineF)),
+        this, SLOT(itemMoved(QGraphicsItem*, QLineF)));
     //обрабочик добавления текста
     connect(scene, SIGNAL(textInserted(QComment *)),
         this, SLOT(textInserted(QComment *)));
     //передаем событие изменения объекта выше, кому надо
-    connect(scene, SIGNAL(itemChanged(QGraphicsItem *)),
+    connect(scene, SIGNAL(itemSelected(QGraphicsItem*)),
         this, SIGNAL(itemChanged(QGraphicsItem*)));
 
 
@@ -131,23 +131,23 @@ void TDrawWindow::createActions()
 void TDrawWindow::deleteTop()
 {
     QGraphicsItem *item = scene->selectedItems().first();
-        if (item->type() == QTop::Type) {
-            QUndoCommand *deleteTop = new DeleteCommand(item, scene);
-            undoStack->push(deleteTop);
-            emit itemDeleted(item);
-            emit sceneChanged();
-        }
+    if (item->type() == QTop::Type) {
+        QUndoCommand *deleteTop = new DeleteCommand(item, scene);
+        undoStack->push(deleteTop);
+        emit itemDeleted(item);
+        emit sceneChanged();
+    }
 }
 
 void TDrawWindow::deleteArc()
 {
-    foreach (QGraphicsItem *item, scene->selectedItems()) {
-        if (item->type() ==  QSerialArcTop::Type) {
-            QArc *arc = qgraphicsitem_cast<QArc *>(item->parentItem());
-            delete arc;
-        }        
+    QGraphicsItem *item = scene->selectedItems().first();
+    if (item->type() == QSerialArcTop::Type) {
+        QUndoCommand *deleteArc = new DeleteCommand(item->parentItem(), scene);
+        undoStack->push(deleteArc);
+        emit itemDeleted(item->parentItem());
+        emit sceneChanged();
     }
-    emit sceneChanged();
 }
 
 void TDrawWindow::deleteSync()
@@ -162,16 +162,18 @@ void TDrawWindow::deleteSync()
 
 void TDrawWindow::deleteComment()
 {
-    foreach (QGraphicsItem *item, scene->selectedItems()) {
-        if (item->type() ==  QComment::Type) {
-            scene->removeItem(item);
-        }
+    QGraphicsItem *item = scene->selectedItems().first();
+    if (item->type() == QComment::Type) {
+        QUndoCommand *deleteComment = new DeleteCommand(item, scene);
+        undoStack->push(deleteComment);
+        emit itemDeleted(item);
+        emit sceneChanged();
     }
-    emit sceneChanged();
 }
 
-void TDrawWindow::textInserted(QComment *)
+void TDrawWindow::textInserted(QComment *comment)
 {
+    itemInserted(comment);
     emit sceneChanged();
 }
 
@@ -441,7 +443,7 @@ void TDrawWindow::alignHLeft()
     }
 
     foreach (QTop* top, topList)
-        top->moveBy(left - top->mapRectToScene(top->rect()).left(), 0, true);
+        itemMoved(top, QLineF(0, 0, left - top->mapRectToScene(top->rect()).left(), 0));
     emit sceneChanged();
 }
 
@@ -459,7 +461,7 @@ void TDrawWindow::alignHRight()
     }
 
     foreach (QTop* top, topList)
-        top->moveBy(right - top->mapRectToScene(top->rect()).right(), 0, true);
+        itemMoved(top, QLineF(0, 0, right - top->mapRectToScene(top->rect()).right(), 0));
     emit sceneChanged();
 }
 
@@ -475,7 +477,7 @@ void TDrawWindow::alignHCenter()
         center += top->scenePos().x();
     center /= topList.count();
     foreach (QTop* top, topList)
-        top->moveBy(center - top->scenePos().x(), 0, true);
+        itemMoved(top, QLineF(0, 0, center - top->scenePos().x(), 0));
     emit sceneChanged();
 }
 
@@ -493,7 +495,7 @@ void TDrawWindow::alignVTop()
     }
 
     foreach (QTop* top, topList)
-        top->moveBy(0, topEdge - top->mapRectToScene(top->rect()).top(), true);
+        itemMoved(top, QLineF(0, 0, 0, topEdge - top->mapRectToScene(top->rect()).top()));
     emit sceneChanged();
 }
 
@@ -511,7 +513,7 @@ void TDrawWindow::alignVBottom()
     }
     if (topList.count() == 0) return;
     foreach (QTop* top, topList)
-        top->moveBy(0, bottom - top->mapRectToScene(top->rect()).bottom(), true);
+        itemMoved(top, QLineF(0, 0, 0, bottom - top->mapRectToScene(top->rect()).bottom()));
     emit sceneChanged();
 }
 
@@ -527,7 +529,7 @@ void TDrawWindow::alignVCenter()
         center += top->scenePos().y();
     center /= topList.count();
     foreach (QTop* top, topList)
-        top->moveBy(0, center - top->scenePos().y(), true);
+        itemMoved(top, QLineF(0, 0, 0, center - top->scenePos().y()));
     emit sceneChanged();
 }
 
@@ -565,7 +567,7 @@ void TDrawWindow::distribHorizontally()
     float dist = (fabs(left - right) - totalWidth) / (topList.count() - 1);
 
     foreach (QTop* top, topList){
-        top->moveBy(left - top->mapRectToScene(top->rect()).left(), 0, true);
+        itemMoved(top, QLineF(0, 0, left - top->mapRectToScene(top->rect()).left(), 0));
         left += top->rect().width() + dist;
     }
     emit sceneChanged();
@@ -596,8 +598,7 @@ void TDrawWindow::distribVertically()
     float dist = (fabs(topEdge - bottom) - totalHeight) / (topList.count() - 1);
 
     foreach (QTop* top, topList){
-        float myTop = top->mapRectToScene(top->rect()).top();
-        top->moveBy(0, topEdge - myTop, true);
+        itemMoved(top, QLineF(0, 0, 0, topEdge - top->mapRectToScene(top->rect()).top()));
         topEdge += top->rect().height() + dist;
     }
     emit sceneChanged();
@@ -616,8 +617,10 @@ void TDrawWindow::itemDeleted(QGraphicsItem *item)
     emit sceneChanged();
 }
 
-void TDrawWindow::itemMoved(QGraphicsItem *item)
+void TDrawWindow::itemMoved(QGraphicsItem *item, QLineF vector)
 {
+    QUndoCommand *moveCommnad = new MoveCommand(item, scene,  vector);
+    undoStack->push(moveCommnad);
     //передаем сообщение, что сцена изменилась
     emit sceneChanged();
     //передаем сообщение, какой объект двигали выше
