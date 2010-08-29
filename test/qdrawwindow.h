@@ -87,7 +87,6 @@ private slots:
     void itemInserted(QGraphicsItem *item);
     void itemMoved(QGraphicsItem *item, QLineF vector);
     void itemDeleted(QGraphicsItem *item);
-    void textInserted(QComment *);
 };
 
 #endif // QDRAWWINDOW_H

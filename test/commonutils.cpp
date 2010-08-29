@@ -117,7 +117,7 @@ QString itemTypeToString(QGraphicsItem *item)
     case QArcLine::Type:
         return QObject::tr("дуга");
     case QComment::Type:
-        return QObject::tr("комметарий");
+        return QObject::tr("комментарий");
     }
     return "undefined";
 }

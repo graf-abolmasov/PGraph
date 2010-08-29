@@ -150,7 +150,7 @@ QList<QArc *> QTop::getArcsAtBound(int i){
     return result;
 }
 
-bool QTop::moveBy(qreal dx, qreal dy, bool forceRebuild)
+bool QTop::moveBy(qreal dx, qreal dy)
 {
     setPos(pos().x() + dx, pos().y() + dy);
 
@@ -166,8 +166,7 @@ bool QTop::moveBy(qreal dx, qreal dy, bool forceRebuild)
 
     QList<QArc *> brokenLines; //список содержит дуги, нуждающиеся в полной переделке
     foreach (QArc *arc, allArcs()) {
-        if (!forceRebuild)
-            isOK = arc->remake(this, dx, dy);
+        isOK = arc->remake(this, dx, dy);
         if (!isOK)
             brokenLines.append(arc);
     }

@@ -10,13 +10,10 @@ QDiagramScene::QDiagramScene(QObject *parent)
     : QGraphicsScene(parent)
 {
     myMode = MoveItem;
-
     setItemIndexMethod(NoIndex);
-
-    line = 0;
-    textItem = 0;
-    newArc = 0;
-
+    line = NULL;
+    //textItem = NULL;
+    newArc = NULL;
     myRootTop = NULL;
 }
 
@@ -31,10 +28,10 @@ void QDiagramScene::editorLostFocus(QComment *item)
     cursor.clearSelection();
     item->setTextCursor(cursor);
 
-    if (item->toPlainText().isEmpty()) {
-        removeItem(item);
-        item->deleteLater();
-    }
+    //вставить комманду "изменениt к комментария"
+
+    if (item->toPlainText().isEmpty())
+        emit itemDeleted(item);
 }
 
 void QDiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
@@ -55,17 +52,7 @@ void QDiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
         break;
 
     case InsertText:
-        textItem = new QComment(myCommentMenu);
-        textItem->setTextInteractionFlags(Qt::TextEditorInteraction);
-        textItem->setZValue(1000.0);
-        connect(textItem, SIGNAL(lostFocus(QComment *)),
-                this, SLOT(editorLostFocus(QComment *)));
-        connect(textItem, SIGNAL(selectedChange(QGraphicsItem *)),
-                this, SIGNAL(itemSelected(QGraphicsItem *)));
-        addItem(textItem);
-        textItem->setPos(mouseEvent->scenePos());
-        emit textInserted(textItem);
-
+        addComment(mouseEvent->scenePos());
     case InsertSync:
         line = new QArcLine(QLineF(mouseEvent->scenePos(),
                                     mouseEvent->scenePos()));
@@ -84,9 +71,9 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
         QLineF vector(line->line().p1(), mouseEvent->scenePos());
         float dx = vector.dx();
         float dy = vector.dy();
-        int angel = int(vector.angle() / 45.0);
+        int sector = int(vector.angle() / 45.0);
         QLineF newLine;
-        switch (angel) {
+        switch (sector) {
         case 0:;
         case 7:;
         case 3:;
@@ -111,18 +98,10 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
              (selectedItems().count() == 1) && (selectedItems().first()->type() == QArcLine::Type)) {
         QArcLine *selectedLine = qgraphicsitem_cast<QArcLine *>(selectedItems().first());
         QLineF vector(mouseEvent->lastScenePos(), mouseEvent->scenePos());
-        float dx = vector.dx();
-        float dy = vector.dy();
-
         QArc *arc = qgraphicsitem_cast<QArc *>(selectedLine->parentItem());
 
-        //проверим чтобы начальная точка не вылезла из вершины!
-        if ((arc->endItem()->sceneBoundingRect().adjusted(8, 8, -8, -8).contains(arc->lines.last()->line().p2() + QPointF(dx, dy)) &&
-             arc->startItem()->sceneBoundingRect().adjusted(8, 8, -8, -8).contains(arc->lines.first()->line().p1() + QPointF(dx, dy))) &&
-            (arc->contains(arc->mapFromScene(mouseEvent->lastScenePos())))) {
-            emit itemMoved(selectedLine, vector);
-        };
-
+        if (selectedLine->contains(selectedLine->mapFromScene(mouseEvent->lastScenePos())))
+            arc->moveLine(selectedLine, vector.dx(), vector.dy());
     }
     //режим перетаскивания вершины
     else if ((myMode == MoveItem) &&
@@ -131,15 +110,18 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
              (selectedItems().first()->type() == QTop::Type) &&
              (selectedItems().first()->contains(selectedItems().first()->mapFromScene(mouseEvent->lastScenePos())))) {
         QTop *top = qgraphicsitem_cast<QTop *>(selectedItems().first());
-        QPointF old_pos = mouseEvent->lastScenePos();
-        QPointF new_pos = mouseEvent->scenePos();
-        QLineF vector(old_pos, new_pos);
+        QLineF vector(mouseEvent->lastScenePos(), mouseEvent->scenePos());
         emit itemMoved(top, vector);
     }
     else if (myMode == InsertSync && line != NULL) {
         QLineF newLine(line->line().p1(), mouseEvent->scenePos());
         line->setLine(newLine);
     }
+    else if ((myMode == MoveItem) &&
+             (mouseEvent->buttons() == Qt::LeftButton) &&
+             (selectedItems().count() == 1) &&
+             (selectedItems().first()->type() == QComment::Type))
+        emit itemMoved(selectedItems().first(), QLineF(mouseEvent->lastScenePos(), mouseEvent->scenePos()));
 }
 
 void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
@@ -260,15 +242,6 @@ void QDiagramScene::keyReleaseEvent (QKeyEvent *keyEvent){
     QGraphicsScene::keyReleaseEvent(keyEvent);
 }
 
-bool QDiagramScene::isItemChange(int type)
-{
-    foreach (QGraphicsItem *item, selectedItems()) {
-        if (item->type() == type)
-            return true;
-    }
-    return false;
-}
-
 void QDiagramScene::setTopMenu(QMenu *menu)
 {
     myTopMenu = menu;
@@ -312,10 +285,17 @@ QTop* QDiagramScene::addTop(const QPointF &point)
         top = new QMultiProcTop(myMultiProcTopMenu);
         break;
     }
-    //addItem(top);
     top->setPos(point);
     emit itemInserted(top);
     return top;
 }
 
-
+QComment* QDiagramScene::addComment(const QPointF &point)
+{
+    QComment* textItem = new QComment(myCommentMenu);
+    textItem->setTextInteractionFlags(Qt::TextEditorInteraction);
+    connect(textItem, SIGNAL(lostFocus(QComment*)), this, SLOT(editorLostFocus(QComment*)));
+    textItem->setPos(point);
+    emit itemInserted(textItem);
+    return textItem;
+}

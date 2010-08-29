@@ -54,7 +54,7 @@ public:
     QPainterPath opaqueArea() const;
     virtual Top* toTop() = 0;
     QList<QArc *> getArcsAtBound(int i);
-    bool moveBy(qreal dx, qreal dy, bool forceRebuild = false);
+    bool moveBy(qreal dx, qreal dy);
 protected:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);

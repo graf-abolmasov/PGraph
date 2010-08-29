@@ -51,24 +51,20 @@ signals:
     void itemSelected(QGraphicsItem *item);
     void itemMoved(QGraphicsItem *item, QLineF vector);
     void itemDeleted(QGraphicsItem *item);
-    void textInserted(QComment *item);
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent);
     void mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent);
-    void keyReleaseEvent (QKeyEvent *keyEvent);
+    void keyReleaseEvent(QKeyEvent *keyEvent);
 
 private:
     Mode myMode;
 
     QNormalTop* myRootTop;
 
-    QComment *textItem;
     QArc *newArc;
     QArcLine *line;
-
-    bool isItemChange(int type);
 
     QMenu *myTopMenu;
     QMenu *myArcMenu;
@@ -78,6 +74,7 @@ private:
 
     QTop* addTop(const QPointF &point);
     QArc* addArc(const QPointF &point);
+    QComment* addComment(const QPointF &point);
 };
 
 #endif

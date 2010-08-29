@@ -123,75 +123,11 @@ void MoveCommand::undo()
     switch (myItem->type()){
     case QTop::Type: {
             QTop* top = qgraphicsitem_cast<QTop* >(myItem);
-            top->moveBy(-myDisplacementVector.dx(), -myDisplacementVector.dy(), true);
+            top->moveBy(-myDisplacementVector.dx(), -myDisplacementVector.dy());
         }
         break;
-    case QArcLine::Type:{
-            QArc* arc = qgraphicsitem_cast<QArc *>(myItem->parentItem());
-            QArcLine *selectedLine = qgraphicsitem_cast<QArcLine *>(myItem);
-            QArcLine *prevLine;
-            QArcLine *nextLine;
-            if (arc->lines.count() == 1){
-                prevLine = NULL;
-                nextLine = NULL;
-            } else {
-                if (selectedLine == arc->lines.first()){
-                    nextLine = prevLine = arc->lines.at(1);
-                    prevLine = NULL;
-                } else if (selectedLine == arc->lines.last()){
-                    prevLine = arc->lines.at(arc->lines.indexOf(selectedLine) - 1);
-                    nextLine = NULL;
-                } else {
-                    prevLine = arc->lines.at(arc->lines.indexOf(selectedLine) - 1);
-                    nextLine = arc->lines.at(arc->lines.indexOf(selectedLine) + 1);
-                }
-            }
-
-            //вправо-влево можно двигать только вертикальные линии (пока)
-            if (selectedLine->line().p1().x() == selectedLine->line().p2().x()){
-                if (prevLine != NULL)
-                    prevLine->setLine(QLineF(prevLine->line().p1(),
-                                             QPointF(prevLine->line().p2().x() - myDisplacementVector.dx(),
-                                                     prevLine->line().p1().y())
-                                             )
-                                      );
-                if (nextLine != NULL)
-                    nextLine->setLine(QLineF(QPointF(nextLine->line().p1().x() - myDisplacementVector.dx(),
-                                                     nextLine->line().p1().y()
-                                                     ),
-                                             nextLine->line().p2())
-                                      );
-                selectedLine->setLine(QLineF(QPointF(selectedLine->line().p1().x() - myDisplacementVector.dx(),
-                                                     selectedLine->line().p1().y()),
-                                             QPointF(selectedLine->line().p2().x() - myDisplacementVector.dx(),
-                                                     selectedLine->line().p2().y())
-                                             )
-                                      );
-            }
-
-            //вверх-вниз можно двигать только горизонтальные линии (пока)
-            if (selectedLine->line().p1().y() == selectedLine->line().p2().y()){
-                if (prevLine != NULL)
-                    prevLine->setLine(QLineF(prevLine->line().p1(),
-                                             QPointF(prevLine->line().p2().x(),
-                                                     prevLine->line().p2().y() - myDisplacementVector.dy())
-                                             )
-                                      );
-                if (nextLine != NULL)
-                    nextLine->setLine(QLineF(QPointF(nextLine->line().p1().x(),
-                                                     nextLine->line().p1().y() - myDisplacementVector.dy()),
-                                             nextLine->line().p2()
-                                             )
-                                      );
-                selectedLine->setLine(QLineF(QPointF(selectedLine->line().p1().x(),
-                                                     selectedLine->line().p1().y() - myDisplacementVector.dy()),
-                                             QPointF(selectedLine->line().p2().x(),
-                                                     selectedLine->line().p2().y() - myDisplacementVector.dy())
-                                             )
-                                      );
-            }
-
-            arc->updateBounds();
+    case QComment::Type:{
+            myItem->moveBy(-myDisplacementVector.dx(), -myDisplacementVector.dy());
         }
         break;
     }
@@ -202,75 +138,11 @@ void MoveCommand::redo()
     switch (myItem->type()){
     case QTop::Type:{
             QTop* top = qgraphicsitem_cast<QTop* >(myItem);
-            top->moveBy(myDisplacementVector.dx(), myDisplacementVector.dy(), true);
+            top->moveBy(myDisplacementVector.dx(), myDisplacementVector.dy());
         }
         break;
-    case QArcLine::Type:{
-            QArc* arc = qgraphicsitem_cast<QArc *>(myItem->parentItem());
-            QArcLine *selectedLine = qgraphicsitem_cast<QArcLine *>(myItem);
-            QArcLine *prevLine;
-            QArcLine *nextLine;
-            if (arc->lines.count() == 1){
-                prevLine = NULL;
-                nextLine = NULL;
-            } else {
-                if (selectedLine == arc->lines.first()){
-                    nextLine = prevLine = arc->lines.at(1);
-                    prevLine = NULL;
-                } else if (selectedLine == arc->lines.last()){
-                    prevLine = arc->lines.at(arc->lines.indexOf(selectedLine) - 1);
-                    nextLine = NULL;
-                } else {
-                    prevLine = arc->lines.at(arc->lines.indexOf(selectedLine) - 1);
-                    nextLine = arc->lines.at(arc->lines.indexOf(selectedLine) + 1);
-                }
-            }
-
-            //вправо-влево можно двигать только вертикальные линии (пока)
-            if (selectedLine->line().p1().x() == selectedLine->line().p2().x()){
-                if (prevLine != NULL)
-                    prevLine->setLine(QLineF(prevLine->line().p1(),
-                                             QPointF(prevLine->line().p2().x() + myDisplacementVector.dx(),
-                                                     prevLine->line().p1().y())
-                                             )
-                                      );
-                if (nextLine != NULL)
-                    nextLine->setLine(QLineF(QPointF(nextLine->line().p1().x() + myDisplacementVector.dx(),
-                                                     nextLine->line().p1().y()
-                                                     ),
-                                             nextLine->line().p2())
-                                      );
-                selectedLine->setLine(QLineF(QPointF(selectedLine->line().p1().x() + myDisplacementVector.dx(),
-                                                     selectedLine->line().p1().y()),
-                                             QPointF(selectedLine->line().p2().x() + myDisplacementVector.dx(),
-                                                     selectedLine->line().p2().y())
-                                             )
-                                      );
-            }
-
-            //вверх-вниз можно двигать только горизонтальные линии (пока)
-            if (selectedLine->line().p1().y() == selectedLine->line().p2().y()){
-                if (prevLine != NULL)
-                    prevLine->setLine(QLineF(prevLine->line().p1(),
-                                             QPointF(prevLine->line().p2().x(),
-                                                     prevLine->line().p2().y() + myDisplacementVector.dy())
-                                             )
-                                      );
-                if (nextLine != NULL)
-                    nextLine->setLine(QLineF(QPointF(nextLine->line().p1().x(),
-                                                     nextLine->line().p1().y() + myDisplacementVector.dy()),
-                                             nextLine->line().p2()
-                                             )
-                                      );
-                selectedLine->setLine(QLineF(QPointF(selectedLine->line().p1().x(),
-                                                     selectedLine->line().p1().y() + myDisplacementVector.dy()),
-                                             QPointF(selectedLine->line().p2().x(),
-                                                     selectedLine->line().p2().y() + myDisplacementVector.dy())
-                                             )
-                                      );
-            }
-
-            arc->updateBounds();
+    case QComment::Type:{
+            myItem->moveBy(myDisplacementVector.dx(), myDisplacementVector.dy());
         }
         break;
     }

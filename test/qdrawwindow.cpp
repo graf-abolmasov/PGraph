@@ -36,9 +36,6 @@ TDrawWindow::TDrawWindow()
     //обработчик перемещения объекта
     connect(scene, SIGNAL(itemMoved(QGraphicsItem*, QLineF)),
         this, SLOT(itemMoved(QGraphicsItem*, QLineF)));
-    //обрабочик добавления текста
-    connect(scene, SIGNAL(textInserted(QComment *)),
-        this, SLOT(textInserted(QComment *)));
     //передаем событие изменения объекта выше, кому надо
     connect(scene, SIGNAL(itemSelected(QGraphicsItem*)),
         this, SIGNAL(itemChanged(QGraphicsItem*)));
@@ -157,11 +154,6 @@ void TDrawWindow::deleteComment()
     QGraphicsItem *item = scene->selectedItems().first();
     if (item->type() == QComment::Type)
         emit itemDeleted(item);
-}
-
-void TDrawWindow::textInserted(QComment *comment)
-{
-    itemInserted(comment);
 }
 
 /*!
@@ -535,10 +527,14 @@ bool topLeftThan(const QTop* top1, const QTop* top2)
     return top1->scenePos().x() < top2->scenePos().x();
 }
 
+bool arcPriorLessThan(const QArc* arc1, const QArc* arc2)
+{
+    return (arc1->priority() < arc2->priority());
+}
+
 void TDrawWindow::distribHorizontally()
 {
     QList<QTop *> topList;
-    //мухи от отдельно катлеты отдельно.
     foreach (QGraphicsItem* item, scene->selectedItems())
         if (item->type() == QTop::Type)
            topList.append(qgraphicsitem_cast<QTop* >(item));
@@ -566,8 +562,90 @@ void TDrawWindow::distribHorizontally()
         }
     }
     //Если одна вершина - то дуги у этой вершины
-    else if (topList.count() = 1) {
+    else if (topList.count() == 1) {
+        QTop* top = qgraphicsitem_cast<QTop* >(scene->selectedItems().first());
+        QList<QArc *> arcs = top->allArcs();
+        //распределяем дуги сверху
+        QPolygonF myPolygon(top->rect());
+        QPointF intersectPoint;
+        QLineF topEdge = QLineF(myPolygon.at(0) + top->scenePos(), myPolygon.at(1) + top->scenePos());
+        QList<QArc* > inArcs;
+        QList<QArc* > outArcs;
+        foreach (QArc *arc, arcs) {
+            QLineF arcLine;
+            if (arc->lines.count() == 0)
+                continue;
+            if (top == arc->startItem()) {
+                arcLine = arc->lines.first()->line();
+                QLineF::IntersectType intersectType = topEdge.intersect(arcLine, &intersectPoint);
+                if (intersectType == QLineF::BoundedIntersection)
+                    outArcs.append(arc);
+            }
+            if (top == arc->endItem()) {
+                arcLine = arc->lines.last()->line();
+                QLineF::IntersectType intersectType = topEdge.intersect(arcLine, &intersectPoint);
+                if (intersectType == QLineF::BoundedIntersection)
+                    inArcs.append(arc);
+            }
+        }
+        qSort(inArcs.begin(), inArcs.end(), arcPriorLessThan);
+        qSort(outArcs.begin(), outArcs.end(), arcPriorLessThan);
 
+        //Вычисляем промежуток между дугами
+        double dist = top->rect().width()/(inArcs.count() + outArcs.count() + 1);
+        foreach (QArc* arc, inArcs) {
+            QArcLine *line = arc->lines.last();
+            QPointF new_p1(top->mapRectToScene(top->rect()).topLeft().x() + (inArcs.indexOf(arc) + 1) * dist, line->line().y1());
+            QLineF vector(line->line().p1(), new_p1);
+            arc->moveLine(line, vector.dx(), vector.dy());
+        }
+
+        int delta = inArcs.count();
+        foreach (QArc* arc, outArcs) {
+            QArcLine *line = arc->lines.first();
+            QPointF new_p1(top->mapRectToScene(top->rect()).topLeft().x() + (outArcs.indexOf(arc) + 1 + delta) * dist, line->line().y1());
+            QLineF vector(line->line().p1(), new_p1);
+            arc->moveLine(line, vector.dx(), vector.dy());
+        }
+
+        //распределяем дуги снизу
+        inArcs.clear();
+        outArcs.clear();
+        QLineF rightEdge = QLineF(myPolygon.at(2) + top->scenePos(), myPolygon.at(3) + top->scenePos());
+        foreach (QArc *arc, arcs) {
+            QLineF arcLine;
+            if (arc->lines.count() == 0)
+                continue;
+            if (top == arc->startItem()) {
+                arcLine = arc->lines.first()->line();
+                QLineF::IntersectType intersectType = rightEdge.intersect(arcLine, &intersectPoint);
+                if (intersectType == QLineF::BoundedIntersection)
+                    outArcs.append(arc);
+            }
+            if (top == arc->endItem()) {
+                arcLine = arc->lines.last()->line();
+                QLineF::IntersectType intersectType = rightEdge.intersect(arcLine, &intersectPoint);
+                if (intersectType == QLineF::BoundedIntersection)
+                    inArcs.append(arc);
+            }
+        }
+
+        //Вычисляем промежуток между дугами
+        dist = top->rect().width()/(inArcs.count() + outArcs.count() + 1);
+        foreach (QArc* arc, inArcs) {
+            QArcLine *line = arc->lines.last();
+            QPointF new_p1(top->mapRectToScene(top->rect()).topLeft().x() + (inArcs.indexOf(arc) + 1) * dist, line->line().y1());
+            QLineF vector(line->line().p1(), new_p1);
+            arc->moveLine(line, vector.dx(), vector.dy());
+        }
+
+        delta = inArcs.count();
+        foreach (QArc* arc, outArcs) {
+            QArcLine *line = arc->lines.first();
+            QPointF new_p1(top->mapRectToScene(top->rect()).topLeft().x() + (outArcs.indexOf(arc) + 1) * dist, line->line().y1());
+            QLineF vector(line->line().p1(), new_p1);
+            arc->moveLine(line, vector.dx(), vector.dy());
+        }
     }
     emit sceneChanged();
 }
@@ -583,22 +661,109 @@ void TDrawWindow::distribVertically()
     foreach (QGraphicsItem* item, scene->selectedItems())
         if (item->type() == QTop::Type)
            topList.append(qgraphicsitem_cast<QTop* >(item));
-    if (topList.count() == 0) return;
+    if (topList.count() > 1) {
 
-    qSort(topList.begin(), topList.end(), topUpperThan);
+        qSort(topList.begin(), topList.end(), topUpperThan);
 
-    float topEdge = topList.first()->mapRectToScene(topList.first()->rect()).top();
-    float bottom = topList.last()->mapRectToScene(topList.last()->rect()).bottom();
+        float topEdge = topList.first()->mapRectToScene(topList.first()->rect()).top();
+        float bottom = topList.last()->mapRectToScene(topList.last()->rect()).bottom();
 
-    float totalHeight = 0;
-    foreach (QTop* top, topList)
-        totalHeight += top->rect().height();
+        float totalHeight = 0;
+        foreach (QTop* top, topList)
+            totalHeight += top->rect().height();
 
-    float dist = (fabs(topEdge - bottom) - totalHeight) / (topList.count() - 1);
+        float dist = (fabs(topEdge - bottom) - totalHeight) / (topList.count() - 1);
 
-    foreach (QTop* top, topList){
-        itemMoved(top, QLineF(0, 0, 0, topEdge - top->mapRectToScene(top->rect()).top()));
-        topEdge += top->rect().height() + dist;
+        foreach (QTop* top, topList){
+            itemMoved(top, QLineF(0, 0, 0, topEdge - top->mapRectToScene(top->rect()).top()));
+            topEdge += top->rect().height() + dist;
+        }
+    }
+    //Если одна вершина - то дуги у этой вершины
+    else if (topList.count() == 1) {
+        QTop* top = qgraphicsitem_cast<QTop* >(scene->selectedItems().first());
+        QList<QArc *> arcs = top->allArcs();
+        //распределяем дуги справа
+        QPolygonF myPolygon(top->rect());
+        QPointF intersectPoint;
+        QLineF leftEdge = QLineF(myPolygon.at(1) + top->scenePos(), myPolygon.at(2) + top->scenePos());
+        QList<QArc* > inArcs;
+        QList<QArc* > outArcs;
+        foreach (QArc *arc, arcs) {
+            QLineF arcLine;
+            if (arc->lines.count() == 0)
+                continue;
+            if (top == arc->startItem()) {
+                arcLine = arc->lines.first()->line();
+                QLineF::IntersectType intersectType = leftEdge.intersect(arcLine, &intersectPoint);
+                if (intersectType == QLineF::BoundedIntersection)
+                    outArcs.append(arc);
+            }
+            if (top == arc->endItem()) {
+                arcLine = arc->lines.last()->line();
+                QLineF::IntersectType intersectType = leftEdge.intersect(arcLine, &intersectPoint);
+                if (intersectType == QLineF::BoundedIntersection)
+                    inArcs.append(arc);
+            }
+        }
+        qSort(inArcs.begin(), inArcs.end(), arcPriorLessThan);
+        qSort(outArcs.begin(), outArcs.end(), arcPriorLessThan);
+
+        //Вычисляем промежуток между дугами
+        double dist = top->rect().height()/(inArcs.count() + outArcs.count() + 1);
+        foreach (QArc* arc, inArcs) {
+            QArcLine* line = arc->lines.last();
+            QPointF new_p1(line->line().x1(), top->mapRectToScene(top->rect()).bottomLeft().y() - (inArcs.indexOf(arc) + 1) * dist);
+            QLineF vector(line->line().p1(), new_p1);
+            arc->moveLine(line, vector.dx(), vector.dy());
+        }
+
+        int delta = inArcs.count();
+        foreach (QArc* arc, outArcs) {
+            QArcLine* line = arc->lines.first();
+            QPointF new_p1(line->line().x1(), top->mapRectToScene(top->rect()).bottomLeft().y() - (outArcs.indexOf(arc) + 1 + delta) * dist);
+            QLineF vector(line->line().p1(), new_p1);
+            arc->moveLine(line, vector.dx(), vector.dy());
+        }
+
+        //распределяем дуги слева
+        inArcs.clear();
+        outArcs.clear();
+        QLineF bottomEdge = QLineF(myPolygon.at(3) + top->scenePos(), myPolygon.at(4) + top->scenePos());
+        foreach (QArc *arc, arcs) {
+            QLineF arcLine;
+            if (arc->lines.count() == 0)
+                continue;
+            if (top == arc->startItem()) {
+                arcLine = arc->lines.first()->line();
+                QLineF::IntersectType intersectType = bottomEdge.intersect(arcLine, &intersectPoint);
+                if (intersectType == QLineF::BoundedIntersection)
+                    outArcs.append(arc);
+            }
+            if (top == arc->endItem()) {
+                arcLine = arc->lines.last()->line();
+                QLineF::IntersectType intersectType = bottomEdge.intersect(arcLine, &intersectPoint);
+                if (intersectType == QLineF::BoundedIntersection)
+                    inArcs.append(arc);
+            }
+        }
+
+        //Вычисляем промежуток между дугами
+        dist = top->rect().height()/(inArcs.count() + outArcs.count() + 1);
+        foreach (QArc* arc, inArcs) {
+            QArcLine* line = arc->lines.last();
+            QPointF new_p1(line->line().x1(), top->mapRectToScene(top->rect()).bottomLeft().y() - (inArcs.indexOf(arc) + 1) * dist);
+            QLineF vector(line->line().p1(), new_p1);
+            arc->moveLine(line, vector.dx(), vector.dy());
+        }
+
+        delta = inArcs.count();
+        foreach (QArc* arc, outArcs) {
+            QArcLine* line = arc->lines.first();
+            QPointF new_p1(line->line().x1(), top->mapRectToScene(top->rect()).bottomLeft().y() - (outArcs.indexOf(arc) + 1 + delta) * dist);
+            QLineF vector(line->line().p1(), new_p1);
+            arc->moveLine(line, vector.dx(), vector.dy());
+        }
     }
     emit sceneChanged();
 }
