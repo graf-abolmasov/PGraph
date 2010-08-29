@@ -50,7 +50,7 @@ public:
     void updateBounds();
     int type() const
         { return Type; }
-    int priority()
+    int priority() const
         { return myPriority; }
     void setStartTop(QTop* startTop)
         { myStartTop = startTop; }
@@ -73,6 +73,7 @@ public:
     Arc* toArc();
     bool autoBuild(QTop* top, float dx, float dy);
     bool remake(QTop *, float dx, float dy);
+    bool moveLine(QArcLine* line, float dx, float dy);
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                QWidget *widget = 0);

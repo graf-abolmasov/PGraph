@@ -133,10 +133,8 @@ bool QArc::remake(QTop* aMovedTop, float dx, float dy){
         }
         return true;
     }
-    //Отоключаем этот алгоритм если надо
-    //return false;
 
-    if (lines.count() == 1 || lines.count() == 3){
+    if (lines.count() < 4){
         //старый алгоритм
         //переработано, дополнено, прокоментировано
         //и как ни странно - не работает
@@ -155,8 +153,10 @@ bool QArc::remake(QTop* aMovedTop, float dx, float dy){
         QPointF startIntersectPoint;
         QPointF endIntersectPoint;
 
-        startBorder.intersect(lines.first()->line(), &startIntersectPoint);
-        endBorder.intersect(lines.last()->line(), &endIntersectPoint);
+        if (startBorder.intersect(lines.first()->line(), &startIntersectPoint) != QLineF::BoundedIntersection)
+            return false;
+        if (endBorder.intersect(lines.last()->line(), &endIntersectPoint) != QLineF::BoundedIntersection)
+            return false;
 
         QPointF deltaStartPoint = lines.first()->line().p1() - startIntersectPoint;
         QPointF deltaEndPoint = lines.last()->line().p2() - endIntersectPoint;
@@ -197,7 +197,7 @@ bool QArc::remake(QTop* aMovedTop, float dx, float dy){
             }
             else flag = false;
             break;
-            /*case 2:
+            case 2:
             lgolddir = dvec2log(pnts[2].x() - pnts[0].x(), pnts[2].y() - pnts[0].y());
             lgdir    = dvec2log(pnts[2].x() + dx - pnts[0].x(), pnts[2].y() + dy - pnts[0].y());
             if (lgolddir == lgdir){
@@ -205,7 +205,7 @@ bool QArc::remake(QTop* aMovedTop, float dx, float dy){
                 pnts[2] += QPointF(dx, dy);
             }
             else flag = false;
-            break;*/
+            break;
             case 3:
             lgolddir = dvec2log(pnts[3].x() - pnts[2].x(), pnts[3].y() - pnts[2].y());
             lgdir    = dvec2log(pnts[3].x() + dx - pnts[1].x(), pnts[3].y() + dy - pnts[1].y());
@@ -599,4 +599,87 @@ Arc::Arc(ArcType type, int priority, int startTop, int endTop, QString predicate
     this->endTop = endTop;
     this->predicate = predicate;
     this->lines = lines;
+}
+
+/*!
+   Перемещает, если можно, часть дуги
+   @param line перемещаемая линия
+   @param dx перемещение по оси Ох
+   @param dy перемещение по оси Oy
+   @return true - если переместить удалось
+*/
+bool QArc::moveLine(QArcLine *line, float dx, float dy)
+{
+    if (!lines.contains(line)) return false;
+    QArcLine *selectedLine = line;
+    QArcLine *prevLine = NULL;
+    QArcLine *nextLine = NULL;
+    if (lines.count() == 1){
+        prevLine = NULL;
+        nextLine = NULL;
+        if (!(myEndTop->sceneBoundingRect().adjusted(8, 8, -8, -8).contains(line->line().p2() + QPointF(dx, dy)) &&
+            myStartTop->sceneBoundingRect().adjusted(8, 8, -8, -8).contains(line->line().p1() + QPointF(dx, dy))))
+            return false;
+    } else {
+        if (selectedLine == lines.first()){
+            nextLine = lines.at(1);
+            prevLine = NULL;
+            if (!myStartTop->sceneBoundingRect().adjusted(8, 8, -8, -8).contains(line->line().p1() + QPointF(dx, dy)))
+                return false;
+        } else if (selectedLine == lines.last()){
+            prevLine = lines.at(lines.indexOf(selectedLine) - 1);
+            nextLine = NULL;
+            if (!myEndTop->sceneBoundingRect().adjusted(8, 8, -8, -8).contains(line->line().p2() + QPointF(dx, dy)))
+                return false;
+        } else {
+            prevLine = lines.at(lines.indexOf(selectedLine) - 1);
+            nextLine = lines.at(lines.indexOf(selectedLine) + 1);
+        }
+    }
+
+    //вправо-влево можно двигать только вертикальные линии (пока)
+    if (selectedLine->line().p1().x() == selectedLine->line().p2().x()){
+        if (prevLine != NULL)
+            prevLine->setLine(QLineF(prevLine->line().p1(),
+                                     QPointF(prevLine->line().p2().x() + dx,
+                                             prevLine->line().p1().y())
+                                     )
+                              );
+        if (nextLine != NULL)
+            nextLine->setLine(QLineF(QPointF(nextLine->line().p1().x() + dx,
+                                             nextLine->line().p1().y()
+                                             ),
+                                     nextLine->line().p2())
+                              );
+        selectedLine->setLine(QLineF(QPointF(selectedLine->line().p1().x() + dx,
+                                             selectedLine->line().p1().y()),
+                                     QPointF(selectedLine->line().p2().x() + dx,
+                                             selectedLine->line().p2().y())
+                                     )
+                              );
+    }
+
+    //вверх-вниз можно двигать только горизонтальные линии (пока)
+    if (selectedLine->line().p1().y() == selectedLine->line().p2().y()){
+        if (prevLine != NULL)
+            prevLine->setLine(QLineF(prevLine->line().p1(),
+                                     QPointF(prevLine->line().p2().x(),
+                                             prevLine->line().p2().y() + dy)
+                                     )
+                              );
+        if (nextLine != NULL)
+            nextLine->setLine(QLineF(QPointF(nextLine->line().p1().x(),
+                                             nextLine->line().p1().y() + dy),
+                                     nextLine->line().p2()
+                                     )
+                              );
+        selectedLine->setLine(QLineF(QPointF(selectedLine->line().p1().x(),
+                                             selectedLine->line().p1().y() + dy),
+                                     QPointF(selectedLine->line().p2().x(),
+                                             selectedLine->line().p2().y() + dy)
+                                     )
+                              );
+    }
+    updateBounds();
+    return true;
 }
