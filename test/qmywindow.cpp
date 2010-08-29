@@ -465,8 +465,6 @@ void TMyWindow::createUndoView()
 {
     undoView = new QUndoView();
     undoView->setWindowTitle(tr("Список команд"));
-    undoView->show();
-    undoView->setAttribute(Qt::WA_QuitOnClose, false);
 }
 
 void TMyWindow::getInfo(QGraphicsItem *item)

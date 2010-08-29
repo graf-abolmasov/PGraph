@@ -199,11 +199,11 @@ void MoveCommand::undo()
 
 void MoveCommand::redo()
 {
-    QTop* top = NULL;
     switch (myItem->type()){
-    case QTop::Type:
-        top = qgraphicsitem_cast<QTop* >(myItem);
-        top->moveBy(myDisplacementVector.dx(), myDisplacementVector.dy(), true);
+    case QTop::Type:{
+            QTop* top = qgraphicsitem_cast<QTop* >(myItem);
+            top->moveBy(myDisplacementVector.dx(), myDisplacementVector.dy(), true);
+        }
         break;
     case QArcLine::Type:{
             QArc* arc = qgraphicsitem_cast<QArc *>(myItem->parentItem());
