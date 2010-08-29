@@ -42,6 +42,9 @@ TDrawWindow::TDrawWindow()
     //передаем событие изменения объекта выше, кому надо
     connect(scene, SIGNAL(itemSelected(QGraphicsItem*)),
         this, SIGNAL(itemChanged(QGraphicsItem*)));
+    //обработчик удаления объекта
+    connect(scene, SIGNAL(itemDeleted(QGraphicsItem*)),
+        this, SLOT(itemDeleted(QGraphicsItem*)));
 
 
     view->setScene(scene);
@@ -131,50 +134,34 @@ void TDrawWindow::createActions()
 void TDrawWindow::deleteTop()
 {
     QGraphicsItem *item = scene->selectedItems().first();
-    if (item->type() == QTop::Type) {
-        QUndoCommand *deleteTop = new DeleteCommand(item, scene);
-        undoStack->push(deleteTop);
-        emit itemDeleted(item);
-        emit sceneChanged();
-    }
+    if (item->type() == QTop::Type)
+        itemDeleted(item);
 }
 
 void TDrawWindow::deleteArc()
 {
     QGraphicsItem *item = scene->selectedItems().first();
-    if (item->type() == QSerialArcTop::Type) {
-        QUndoCommand *deleteArc = new DeleteCommand(item->parentItem(), scene);
-        undoStack->push(deleteArc);
-        emit itemDeleted(item->parentItem());
-        emit sceneChanged();
-    }
+    if (item->type() == QSerialArcTop::Type)
+        itemDeleted(item->parentItem());
 }
 
 void TDrawWindow::deleteSync()
 {
-    foreach (QGraphicsItem *item, scene->selectedItems()) {
-        if (item->type() ==  QSyncArc::Type) {
-            delete item;
-        }
-    }
-    emit sceneChanged();
+    QGraphicsItem *item = scene->selectedItems().first();
+    if (item->type() ==  QSyncArc::Type)
+        itemDeleted(item);
 }
 
 void TDrawWindow::deleteComment()
 {
     QGraphicsItem *item = scene->selectedItems().first();
-    if (item->type() == QComment::Type) {
-        QUndoCommand *deleteComment = new DeleteCommand(item, scene);
-        undoStack->push(deleteComment);
+    if (item->type() == QComment::Type)
         emit itemDeleted(item);
-        emit sceneChanged();
-    }
 }
 
 void TDrawWindow::textInserted(QComment *comment)
 {
     itemInserted(comment);
-    emit sceneChanged();
 }
 
 /*!
@@ -243,17 +230,18 @@ void TDrawWindow::showArcPropDialog()
     ArcPropertyDialog dlg;
     QArc* arc = qgraphicsitem_cast<QArc *>(scene->selectedItems().first()->parentItem());
     dlg.prepareForm(arc);
-    if (dlg.exec()){
+    if (dlg.exec())
         arc = dlg.getResult();
-    }
 }
 
 /*!
   Реакция на нажатие пункта меню: Сделать корневой
 */
-void TDrawWindow::makeAsRoot(){
+void TDrawWindow::makeAsRoot()
+{
     scene->setRootTop(qgraphicsitem_cast<QNormalTop* >(scene->selectedItems().first()));
     emit sceneChanged();
+    emit itemChanged(scene->selectedItems().first());
 }
 
 /*!
@@ -550,25 +538,36 @@ bool topLeftThan(const QTop* top1, const QTop* top2)
 void TDrawWindow::distribHorizontally()
 {
     QList<QTop *> topList;
+    //мухи от отдельно катлеты отдельно.
     foreach (QGraphicsItem* item, scene->selectedItems())
         if (item->type() == QTop::Type)
            topList.append(qgraphicsitem_cast<QTop* >(item));
-    if (topList.count() == 0) return;
+        //else if (item->type() == QArcLine::Type || item->type() == QSerialArcTop::Type)
+        //    arcList.append(qgraphicsitem_cast<QArc* >(item->parentItem()));
 
-    qSort(topList.begin(), topList.end(), topLeftThan);
+    //Если выделено несколько вершин - распределяем вершины
+    if (topList.count() > 1) {
+        //хитрый ход!
+        //Сортируем вершины в списке. Самая верхняя вершина - первая. Нижняя - последняя.
+        qSort(topList.begin(), topList.end(), topLeftThan);
 
-    float left = topList.first()->mapRectToScene(topList.first()->rect()).left();
-    float right = topList.last()->mapRectToScene(topList.last()->rect()).right();
+        float left = topList.first()->mapRectToScene(topList.first()->rect()).left();
+        float right = topList.last()->mapRectToScene(topList.last()->rect()).right();
 
-    float totalWidth = 0;
-    foreach (QTop* top, topList) {
-        totalWidth += top->rect().width();
+        float totalWidth = 0;
+        foreach (QTop* top, topList) {
+            totalWidth += top->rect().width();
+        }
+        float dist = (fabs(left - right) - totalWidth) / (topList.count() - 1);
+
+        foreach (QTop* top, topList){
+            itemMoved(top, QLineF(0, 0, left - top->mapRectToScene(top->rect()).left(), 0));
+            left += top->rect().width() + dist;
+        }
     }
-    float dist = (fabs(left - right) - totalWidth) / (topList.count() - 1);
+    //Если одна вершина - то дуги у этой вершины
+    else if (topList.count() = 1) {
 
-    foreach (QTop* top, topList){
-        itemMoved(top, QLineF(0, 0, left - top->mapRectToScene(top->rect()).left(), 0));
-        left += top->rect().width() + dist;
     }
     emit sceneChanged();
 }
@@ -614,6 +613,8 @@ void TDrawWindow::itemInserted(QGraphicsItem *item)
 
 void TDrawWindow::itemDeleted(QGraphicsItem *item)
 {
+    QUndoCommand *deleteCommand = new DeleteCommand(item, scene);
+    undoStack->push(deleteCommand);
     emit sceneChanged();
 }
 

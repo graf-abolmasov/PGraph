@@ -173,6 +173,7 @@ void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
                 newArc->addLine(line);
             }
         }
+
         //плохая ситуация, когда начало и конец совпадают, но дуга имеет явно неправилную форму
         if ((newArc != NULL) && (newArc->endItem() != NULL) && (newArc->startItem() != NULL) &&
             newArc->startItem()->collidesWithItem(newArc->endItem()) && (newArc->lines.count() == 1)){
@@ -241,29 +242,12 @@ void QDiagramScene::keyReleaseEvent (QKeyEvent *keyEvent){
     }
 
     if (selectedItems().count() > 0 && (keyEvent->key() == Qt::Key_Delete)) {
-        /*QList<QGraphicsItem* > deleteList;
-        foreach (QGraphicsItem *item, selectedItems()){
-            switch (item->type()){
-            case QTop::Type:
-            case QArc::Type:
-            case QSyncArc::Type:
-                if (!deleteList.contains(item))
-                    deleteList.append(item);
-                break;
-            case QTerminateArcTop::Type:
-            case QArcLine::Type:
-                if (!deleteList.contains(item->parentItem()))
-                    deleteList.append(item->parentItem());
-                break;
-            }
-        }
-        foreach (QGraphicsItem *item, deleteList)
-            delete item;*/
         QGraphicsItem *item = selectedItems().first();
         switch (item->type()){
         case QTop::Type:
         case QArc::Type:
         case QSyncArc::Type:
+        case QComment::Type:
             emit itemDeleted(item);
             break;
         case QTerminateArcTop::Type:
@@ -328,7 +312,7 @@ QTop* QDiagramScene::addTop(const QPointF &point)
         top = new QMultiProcTop(myMultiProcTopMenu);
         break;
     }
-    addItem(top);
+    //addItem(top);
     top->setPos(point);
     emit itemInserted(top);
     return top;
