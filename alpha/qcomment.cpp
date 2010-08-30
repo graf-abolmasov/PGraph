@@ -6,7 +6,7 @@ QComment::QComment(QMenu *menu, QGraphicsItem *parent, QGraphicsScene *scene)
     : QGraphicsTextItem(parent, scene)
 {
     myContextMenu = menu;
-    setZValue(1);
+    setZValue(2);
     setFlag(QGraphicsItem::ItemIsMovable);
     setFlag(QGraphicsItem::ItemIsSelectable);
 }

@@ -92,6 +92,7 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
             ;
         }
         line->setLine(newLine);
+        line->setSelected(true);
     }
     //режим перетаскивания дуги
     else if ((myMode == MoveItem) && (mouseEvent->buttons() == Qt::LeftButton) &&
@@ -283,6 +284,8 @@ QTop* QDiagramScene::addTop(const QPointF &point)
         break;
     case InsertMultiProcTop:
         top = new QMultiProcTop(myMultiProcTopMenu);
+        break;
+    default:
         break;
     }
     top->setPos(point);

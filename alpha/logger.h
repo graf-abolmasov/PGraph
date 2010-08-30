@@ -14,6 +14,7 @@ public:
 private:
     QFile *logFile;
     DebugLevel myDebugLevel;
+    bool toConsole;
 };
 
 #endif // LOGGER_H

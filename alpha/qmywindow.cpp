@@ -361,7 +361,7 @@ void TMyWindow::CMExit()
 void TMyWindow::CMSaveStruct()
 {
     if (myGraphName == "") {
-        QMessageBox::warning(this, "Ошибка", "Сохраните граф", QMessageBox::Ok);
+        QMessageBox::warning(this, tr("Ошибка"), tr("Сохраните граф"), QMessageBox::Ok);
         return;
     }
     if (activeDrawWindow()->saveStruct(myGraphName, globalDBManager))

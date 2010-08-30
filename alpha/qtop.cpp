@@ -15,7 +15,7 @@ QTop::QTop(QMenu *contextMenu,
     p.setWidth(2);
     setPen(p);
     setBrush(QBrush(QColor::fromRgb(220, 220, 220), Qt::SolidPattern));
-    setZValue(1);
+    setZValue(2);
 
     setFlag(QGraphicsItem::ItemIsMovable, true);
     setFlag(QGraphicsItem::ItemIsSelectable, true);

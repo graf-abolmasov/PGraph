@@ -288,7 +288,7 @@ bool DataBaseManager::saveVariableList(QList<Variable*>& varList){
         query.clear();
     }
     db.close();
-    return (db.lastError().number() == QSqlError::NoError);
+    return (db.lastError().type() == QSqlError::NoError);
 }
 
 int DataBaseManager::getVariableList(QList<Variable* >& varList){
@@ -311,6 +311,9 @@ int DataBaseManager::saveActorList(QList<Actor *> &actorList)
     bool ok = db.open();
     if (!ok) return db.lastError().number();
     QSqlQuery query1;
+    query1.prepare("DELETE FROM ACTOR WHERE PROJECT_ID = :PROJECT_ID AND CLASPR = 'a'");
+    query1.bindValue(":PROJECT_ID", myProjectId);
+    query1.exec();
     for (int i = 0; i < actorList.count(); i++){
         query1.clear();
         query1.prepare("INSERT INTO ACTOR (PROJECT_ID, NAMEPR, CLASPR, EXTNAME, DATE, TIME, ICON, PROTOTIP)"
@@ -450,6 +453,9 @@ int DataBaseManager::savePredicateList(QList<Predicate *> &predList)
     bool ok = db.open();
     if (!ok) return db.lastError().number();
     QSqlQuery query;
+    query.prepare("DELETE FROM ACTOR WHERE PROJECT_ID = :PROJECT_ID AND CLASPR = 'p'");
+    query.bindValue(":PROJECT_ID", myProjectId);
+    query.exec();
     for (int i = 0; i < predList.count(); i++){
         query.prepare("INSERT INTO ACTOR (PROJECT_ID, NAMEPR, CLASPR, EXTNAME, DATE, TIME, ICON, PROTOTIP)"
                       "VALUES (:PROJECT_ID, :NAMEPR, :CLASPR, :EXTNAME, CURDATE(), CURTIME(), :ICON, :PROTOTIP);");
@@ -462,7 +468,6 @@ int DataBaseManager::savePredicateList(QList<Predicate *> &predList)
         query.exec();
         globalLogger->writeLog(query.executedQuery().toUtf8());
 
-        QSqlQuery query;
         for (int j = 0; j < predList.at(i)->variableList.count(); j++){
             query.clear();
             query.prepare("INSERT INTO PASPORT (PROJECT_ID, NAMEPR, NEV, DATA, MODE)"
