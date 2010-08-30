@@ -9,16 +9,19 @@
 #include "globalvariables.h"
 
 QStatusBar *globalStatusBar;
+QLabel *globalInfoLabel;
 
 TMyWindow::TMyWindow()
 {
     globalStatusBar = new QStatusBar(this);
     setStatusBar(globalStatusBar);
 
-    createDrawWindow();
     createActions();
     createMenus();
     createToolBar();
+    createUndoView();
+    createDockWindows();
+    createDrawWindow();
 
     setWindowIcon(QIcon(":/images/G.png"));
     setMyGraphName("");
@@ -204,7 +207,23 @@ TDrawWindow* TMyWindow::createDrawWindow()
     TDrawWindow *newDrawWindow = new TDrawWindow;
     setCentralWidget(newDrawWindow);
     connect(newDrawWindow, SIGNAL(sceneChanged()),
-            this, SLOT(updateMenus()));
+            this, SLOT(sceneChanged()));
+    connect(newDrawWindow, SIGNAL(itemChanged(QGraphicsItem*)),
+            this, SLOT(getInfo(QGraphicsItem*)));
+    connect(newDrawWindow, SIGNAL(selectionChanged(QList<QGraphicsItem*>)),
+            this, SLOT(updateAlignToolBar(QList<QGraphicsItem*>)));
+    undoView->setStack(activeDrawWindow()->undoStack);
+
+    alignHLeftAct->setEnabled(false);
+    alignHCenterAct->setEnabled(false);
+    alignHRightAct->setEnabled(false);
+    alignVTopAct->setEnabled(false);
+    alignVCenterAct->setEnabled(false);
+    alignVBottomAct->setEnabled(false);
+    distribVerticallyAct->setEnabled(false);
+    distribHorizontallyAct->setEnabled(false);
+
+    globalInfoLabel->setText("\n\n\n\n\n\n\n\n\n\n");
     return newDrawWindow;
 }
 
@@ -221,7 +240,7 @@ void TMyWindow::createToolBar()
     mainToolBar->addAction(compileAct);
 
     pointerTypeGroup = new QButtonGroup;
-    pointerTypeGroup->addButton(addTopButton, int(QDiagramScene::InsertItem));
+    pointerTypeGroup->addButton(addTopButton, int(QDiagramScene::InsertNormalTop));
     pointerTypeGroup->addButton(addCommentButton, int(QDiagramScene::InsertText));
     pointerTypeGroup->addButton(pointerButton, int(QDiagramScene::MoveItem));
     pointerTypeGroup->addButton(addArcButton, int(QDiagramScene::InsertLine));
@@ -273,10 +292,11 @@ void TMyWindow::pointerGroupClicked(int)
     activeDrawWindow()->setMode(QDiagramScene::Mode(pointerTypeGroup->checkedId()));
 }
 
-void TMyWindow::updateMenus()
+void TMyWindow::sceneChanged()
 {
     if (activeDrawWindow())
         pointerTypeGroup->button(int(activeDrawWindow()->mode()))->setChecked(true);
+    setWindowTitle(myGraphExtName == "" ?  tr("Untitled* - Граф-редактор") : myGraphExtName + tr("* - Граф-редактор"));
 }
 
 void TMyWindow::CMGSaveAsImage()
@@ -354,7 +374,7 @@ void TMyWindow::CMExit()
 void TMyWindow::CMSaveStruct()
 {
     if (myGraphName == "") {
-        QMessageBox::warning(this, "Ошибка", "Сохраните граф", QMessageBox::Ok);
+        QMessageBox::warning(this, tr("Ошибка"), tr("Сохраните граф"), QMessageBox::Ok);
         return;
     }
     if (activeDrawWindow()->saveStruct(myGraphName, globalDBManager))
@@ -384,7 +404,7 @@ void TMyWindow::setMyGraphExtName(QString extName)
 {
     myGraphExtName = extName;
     if (myGraphExtName == "")
-        setWindowTitle(tr("Граф-редактор"));
+        setWindowTitle(tr("Untitled - Граф-редактор"));
     else
         setWindowTitle(myGraphExtName + tr(" - Граф-редактор"));
 }
@@ -396,6 +416,23 @@ void TMyWindow::CMHelpAbout()
                           "<p>Внутренняя версия ") + QApplication::applicationVersion() +
                           tr("<p>Copyright &copy; 2010 FuzzyLogic Team. All rights reserved.</p>"
                           "<p>The program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.</p>"));
+
+}
+
+void TMyWindow::createDockWindows()
+{
+    QDockWidget *dock = new QDockWidget(tr("Инфо"), this);
+    globalInfoLabel = new QLabel(dock);
+    globalInfoLabel->setWordWrap(true);
+    globalInfoLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+    dock->setAllowedAreas(Qt::RightDockWidgetArea);
+    dock->setWidget(globalInfoLabel);
+    addDockWidget(Qt::RightDockWidgetArea, dock);
+
+    dock = new QDockWidget(tr("Список команд"), this);
+    dock->setAllowedAreas(Qt::RightDockWidgetArea);
+    dock->setWidget(undoView);
+    addDockWidget(Qt::RightDockWidgetArea, dock);
 
 }
 
@@ -435,4 +472,132 @@ void TMyWindow::distribHorizontally()
 void TMyWindow::distribVertically()
 {
     activeDrawWindow()->distribVertically();
+}
+
+void TMyWindow::createUndoView()
+{
+    undoView = new QUndoView();
+    undoView->setWindowTitle(tr("Список команд"));
+}
+
+void TMyWindow::getInfo(QGraphicsItem *item)
+{
+    QArc *arc = NULL;
+    QTop *top = NULL;
+    QSyncArc *syncArc = NULL;
+    QString status = tr("");
+    QString info = tr("");
+    QString arcTypeStr;
+    if (item != NULL) {
+        switch (item->type()) {
+        case QArc::Type:
+            arc = qgraphicsitem_cast<QArc*>(item);
+        case QArcLine::Type:
+        case QSerialArcTop::Type:
+            if (!arc)
+                arc = qgraphicsitem_cast<QArc*>(item->parentItem());
+            switch (arc->arcType()) {
+            case QArc::SerialArc:
+                arcTypeStr = tr("последовательная");
+                break;
+            case QArc::ParallelArc:
+                arcTypeStr = tr("параллельная");
+                break;
+            case QArc::TerminateArc:
+                arcTypeStr = tr("терминирующая");
+                break;
+            }
+            status.append(tr("Дуга ") + arcTypeStr);
+            info.append(tr("Дуга\nТип: ") + arcTypeStr + "\n");
+            if (arc->startItem() != NULL) {
+                status.append(tr(" Начальная вершина ") + QString::number(arc->startItem()->number));
+                info.append(tr("Начальная вершина: ") + QString::number(arc->startItem()->number) + "\n");
+            }
+            if (arc->endItem() != NULL) {
+                status.append(tr(" Конечная вершина ") + QString::number(arc->endItem()->number));
+                info.append(tr("Конечная вершина: ") + QString::number(arc->endItem()->number) + "\n");
+            }
+            status.append(tr(" Приоритет ") + QString::number(arc->priority()) +
+                          tr(" Ширина пера ") + QString::number(arc->pen().width()));
+            info.append(tr("Приоритет: ") + QString::number(arc->priority()) + "\n" +
+                        tr("Ширина пера ") + QString::number(arc->pen().width()) + "\n");
+            if (arc->predicate != NULL) {
+                status.append(tr(" Предикат ") + arc->predicate->extName);
+                info.append(tr("Предикат: ") + arc->predicate->extName + "\n");
+            }
+            info.append(tr("Число изломов: ") + QString::number(arc->lines.count()) + "\n");
+            break;
+
+    case QTop::Type:
+            top = qgraphicsitem_cast<QTop* >(item);
+            status.append(tr("Номер вершины ") + QString::number(top->number));
+            info.append(tr("Номер вершины ") + QString::number(top->number) + "\n");
+            if (top->actor != NULL) {
+                status.append(tr(" Актор ") + top->actor->extName);
+                info.append(tr("Актор: ") + top->actor->extName + "\n");
+            }
+            info.append(tr("Число дуг: ") + QString::number(top->allArcs().count()) + "\n");
+            info.append(tr("Число исход. дуг: ") + QString::number(top->outArcs().count()) + "\n");
+            info.append(tr("Число вход. дуг: ") + QString::number(top->inArcs().count()) + "\n");
+            info.append(tr("Left: ") + QString::number(top->mapRectToScene(top->rect()).left()) + "\n");
+            info.append(tr("Top: ") + QString::number(top->mapRectToScene(top->rect()).top()) + "\n");
+            info.append(tr("Right: ") + QString::number(top->mapRectToScene(top->rect()).right()) + "\n");
+            info.append(tr("Bottom: ") + QString::number(top->mapRectToScene(top->rect()).bottom()) + "\n");
+            break;
+    case QSyncArc::Type:
+            syncArc = qgraphicsitem_cast<QSyncArc* >(item);
+            break;
+        }
+    }
+
+    globalStatusBar->showMessage(status);
+    globalInfoLabel->setText(info);
+}
+
+void TMyWindow::updateAlignToolBar(QList<QGraphicsItem *> items)
+{
+    alignHLeftAct->setEnabled(false);
+    alignHCenterAct->setEnabled(false);
+    alignHRightAct->setEnabled(false);
+    alignVTopAct->setEnabled(false);
+    alignVCenterAct->setEnabled(false);
+    alignVBottomAct->setEnabled(false);
+    distribVerticallyAct->setEnabled(false);
+    distribHorizontallyAct->setEnabled(false);
+
+    items.count() > 0 ? getInfo(items.first()) : getInfo(NULL);
+
+    QList<QGraphicsItem* > arcList;
+    QList<QGraphicsItem* > topList;
+    foreach (QGraphicsItem *item, items)
+        switch (item->type()){
+        case QTop::Type:
+            topList.append(item);
+            break;
+        case QArcLine::Type:
+        case QSerialArcTop::Type:
+        case QArc::Type:
+        case QComment::Type:
+        case QSyncArc::Type:
+        default:
+            arcList.append(item);
+            break;
+        }
+    if (arcList.count() > 0) return;
+    if (topList.count() == 1 ) {
+        QTop* top = qgraphicsitem_cast<QTop* >(topList.first());
+        if (top->allArcs().count() > 0) {
+            distribVerticallyAct->setEnabled(true);
+            distribHorizontallyAct->setEnabled(true);
+        }
+    } else if (topList.count() > 1 ) {
+        alignHLeftAct->setEnabled(true);
+        alignHCenterAct->setEnabled(true);
+        alignHRightAct->setEnabled(true);
+        alignVTopAct->setEnabled(true);
+        alignVCenterAct->setEnabled(true);
+        alignVBottomAct->setEnabled(true);
+        distribVerticallyAct->setEnabled(true);
+        distribHorizontallyAct->setEnabled(true);
+    }
 }

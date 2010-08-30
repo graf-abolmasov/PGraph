@@ -1,6 +1,7 @@
 #include "commonutils.h"
 #include "md5.h"
 
+
 QString getCRC(QByteArray in)
 {
     int i;
@@ -105,4 +106,18 @@ QString getCRC(QByteArray in)
     }
 
     return QString::number(res, 16).toUpper();
+}
+
+QString itemTypeToString(QGraphicsItem *item)
+{
+    switch (item->type()) {
+    case QTop::Type:
+        return QObject::tr("вершина");
+    case QArc::Type:
+    case QArcLine::Type:
+        return QObject::tr("дуга");
+    case QComment::Type:
+        return QObject::tr("комментарий");
+    }
+    return "undefined";
 }

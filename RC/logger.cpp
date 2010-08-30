@@ -1,4 +1,5 @@
 #include "logger.h"
+#include "qdebug.h"
 
 Logger *globalLogger;
 
@@ -6,11 +7,18 @@ Logger::Logger()
 {
     QSettings myLoggerSettings("graph.ini", QSettings::IniFormat);
     logFile = NULL;
+    toConsole = false;
     if (myLoggerSettings.value("Logger/WriteLog", false).toBool()) {
         myDebugLevel = DebugLevel(myLoggerSettings.value("Logger/DebugLevel", int(Critical)).toInt());
-        logFile = new QFile(myLoggerSettings.value("Logger/FileName", "log.txt").toString());
-        logFile->reset();
-        logFile->open(QFile::WriteOnly);
+        QString fileName = myLoggerSettings.value("Logger/FileName", "log.txt").toString();
+        if (fileName == "console")
+            toConsole = true;
+        else {
+            toConsole = false;
+            logFile = new QFile();
+            logFile->reset();
+            logFile->open(QFile::WriteOnly);
+        }
     }
 }
 
@@ -20,7 +28,8 @@ void Logger::writeLog(QString message, DebugLevel level)
         QString text;
         text.append(QDateTime::currentDateTime().toUTC().toString() + ": " + message + "\r\n");
         logFile->write(text.toUtf8());
-    }
+    } else if (toConsole && level <= myDebugLevel)
+        qDebug() << (QDateTime::currentDateTime().toUTC().toString() + ": " + message + "\r\n");
 }
 
 Logger::~Logger()

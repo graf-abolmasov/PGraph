@@ -36,6 +36,7 @@ private:
     QAction *makeAsRootAction;
     QAction *setArcPropertyAction;
     QAction *deleteArcAction;
+    QAction *rebuildArcAction;
     QAction *deleteSyncAction;
     QAction *deleteCommentAction;
     QAction *deleteMultiProcTopAction;
@@ -51,6 +52,7 @@ private:
     QList<QMultiProcTop* > allMultiProcTop();
 
 public:
+    QUndoStack *undoStack;
     TDrawWindow();
     void saveAsImage(QString filename);
     void setMode(QDiagramScene::Mode mode);
@@ -70,6 +72,8 @@ public:
     void distribHorizontally();
 signals:
     void sceneChanged();
+    void itemChanged(QGraphicsItem *item);
+    void selectionChanged(QList<QGraphicsItem *>);
 
 private slots:
     void setItemIcon();
@@ -78,12 +82,15 @@ private slots:
     void deleteTop();
     void showArcPropDialog();
     void deleteArc();
+    void rebuildArc();
     void deleteSync();
     void deleteComment();
     void showMultiProcTopDialog();
     void showFontDialog();
-    void itemSelected(QGraphicsItem *item);
-    void textInserted(QComment *);
+    void itemInserted(QGraphicsItem *item);
+    void itemMoved(QGraphicsItem *item, QLineF vector);
+    void itemDeleted(QGraphicsItem *item);
+    void selectionChanged();
 };
 
 #endif // QDRAWWINDOW_H

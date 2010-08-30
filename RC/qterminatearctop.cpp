@@ -17,6 +17,7 @@ QTerminateArcTop::QTerminateArcTop(QMenu *contextMenu, QGraphicsItem *parent, QG
     setFlag(QGraphicsItem::ItemIsMovable, false);
     setPen(QPen(Qt::black, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
     setLine(9,-9,-9,9);
+    setZValue(2);
 }
 
 QRectF QTerminateArcTop::boundingRect() const {

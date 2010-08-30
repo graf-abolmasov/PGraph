@@ -26,6 +26,7 @@ private:
     QList<Variable* > myVariableList;
     QComboBox* varTypeCmbBox;
     QList<DataType*> myTypeList;
+    Variable* myVar;
 
 private slots:
     void on_variablesTable_currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn);
