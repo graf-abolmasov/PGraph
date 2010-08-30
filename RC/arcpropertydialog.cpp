@@ -43,6 +43,7 @@ void ArcPropertyDialog::prepareForm(QArc *arc)
         ui->terminateRadioBtn->setChecked(true);
         break;
     }
+
     ui->prioritySpnBox->setValue(arc->priority());
     ui->prioritySpnBox->setMaximum(myArc->startItem()->outArcs().count());
 
