@@ -18,6 +18,7 @@ QParallelArcTop::QParallelArcTop(QMenu *contextMenu, QGraphicsItem *parent, QGra
     setFlag(QGraphicsItem::ItemIsSelectable, true);
     setFlag(QGraphicsItem::ItemIsMovable, false);
     setBrush(QBrush(Qt::gray, Qt::SolidPattern));
+    setZValue(2);
 }
 
 QRectF QParallelArcTop::boundingRect() const {

@@ -33,13 +33,12 @@ public:
 
 signals:
     void lostFocus(QComment *item);
-    void selectedChange(QGraphicsItem *item);
 
 protected:
-    QVariant itemChange(GraphicsItemChange change, const QVariant &value);
     void focusOutEvent(QFocusEvent *event);
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
 private:
     QMenu* myContextMenu;

@@ -15,7 +15,7 @@ QTop::QTop(QMenu *contextMenu,
     p.setWidth(2);
     setPen(p);
     setBrush(QBrush(QColor::fromRgb(220, 220, 220), Qt::SolidPattern));
-    setZValue(1);
+    setZValue(2);
 
     setFlag(QGraphicsItem::ItemIsMovable, true);
     setFlag(QGraphicsItem::ItemIsSelectable, true);
@@ -88,24 +88,16 @@ void QTop::removeArc(QArc *arc){
   Удаляет все дуги, входящие и выходящие из вершины
 */
 void QTop::removeArcs(){
-    foreach (QArc *arc, arcs) {
-        arc->startItem()->removeArc(arc);
-        arc->endItem()->removeArc(arc);
-        scene()->removeItem(arc);
-        delete arc;
-    }
+    arcs.clear();
+    //qDeleteAll(arcs);
 }
 
 /*!
   Удаляет все дуги синхронизации, входящие и выходящие из вершины
 */
 void QTop::removeSyncs(){
-    foreach (QSyncArc *arc, sync) {
-        arc->startItem()->removeSync(arc);
-        arc->endItem()->removeSync(arc);
-        scene()->removeItem(arc);
-        delete arc;
-    }
+    sync.clear();
+    //qDeleteAll(sync);
 }
 
 /*!
@@ -158,7 +150,7 @@ QList<QArc *> QTop::getArcsAtBound(int i){
     return result;
 }
 
-bool QTop::moveBy(qreal dx, qreal dy, bool forceRebuild)
+bool QTop::moveBy(qreal dx, qreal dy)
 {
     setPos(pos().x() + dx, pos().y() + dy);
 
@@ -174,8 +166,7 @@ bool QTop::moveBy(qreal dx, qreal dy, bool forceRebuild)
 
     QList<QArc *> brokenLines; //список содержит дуги, нуждающиеся в полной переделке
     foreach (QArc *arc, allArcs()) {
-        if (!forceRebuild)
-            isOK = arc->remake(this, dx, dy);
+        isOK = arc->remake(this, dx, dy);
         if (!isOK)
             brokenLines.append(arc);
     }
@@ -269,6 +260,6 @@ Top::Top(float x, float y, float sizeX, float sizeY, int number, int procCount, 
 
 QTop::~QTop()
 {
-    removeArcs();
-    removeSyncs();
+    qDeleteAll(arcs);
+    qDeleteAll(sync);
 }
