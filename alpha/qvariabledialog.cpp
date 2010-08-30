@@ -107,15 +107,16 @@ void QVariableDialog::on_deleteButton_clicked()
 
 void QVariableDialog::on_buttonBox_accepted()
 {
+    int idx = ui->variablesTable->currentRow();
     ui->variablesTable->setCurrentCell(-1, -1);
+    myVar = myVariableList.at(idx);
     if (!globalDBManager->saveVariableList(myVariableList))
-        QMessageBox::warning(this, "Ошибка", "Произошла ошибка при сохранении в информационный фонд", QMessageBox::Ok);
+        QMessageBox::warning(this, tr("Ошибка"), tr("Произошла ошибка при сохранении в информационный фонд"), QMessageBox::Ok);
 }
 
 Variable* QVariableDialog::getVariable()
 {
-    Variable* var = myVariableList.at(ui->variablesTable->currentRow());
-    return var;
+    return myVar;
 }
 
 void QVariableDialog::on_variablesTable_cellChanged(int row, int column)

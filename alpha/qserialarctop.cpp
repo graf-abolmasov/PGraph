@@ -18,6 +18,7 @@ QSerialArcTop::QSerialArcTop(QMenu *contextMenu, QGraphicsItem *parent, QGraphic
     setFlag(QGraphicsItem::ItemIsSelectable, true);
     setFlag(QGraphicsItem::ItemIsMovable, false);
     setBrush(QBrush(Qt::gray, Qt::SolidPattern));
+    setZValue(2);
 }
 
 QRectF QSerialArcTop::boundingRect() const {

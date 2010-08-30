@@ -530,7 +530,7 @@ QArcLine* QArc::newLine(QPointF p1, QPointF p2){
     currentLine->setPen(pen());
     currentLine->setFlag(QGraphicsItem::ItemIsMovable, true);
     currentLine->setFlag(QGraphicsItem::ItemIsSelectable, true);
-    currentLine->setZValue(-1000);
+    currentLine->setZValue(0);
     return currentLine;
 }
 
