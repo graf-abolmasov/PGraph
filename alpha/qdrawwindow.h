@@ -36,6 +36,7 @@ private:
     QAction *makeAsRootAction;
     QAction *setArcPropertyAction;
     QAction *deleteArcAction;
+    QAction *rebuildArcAction;
     QAction *deleteSyncAction;
     QAction *deleteCommentAction;
     QAction *deleteMultiProcTopAction;
@@ -72,6 +73,7 @@ public:
 signals:
     void sceneChanged();
     void itemChanged(QGraphicsItem *item);
+    void selectionChanged(QList<QGraphicsItem *>);
 
 private slots:
     void setItemIcon();
@@ -80,6 +82,7 @@ private slots:
     void deleteTop();
     void showArcPropDialog();
     void deleteArc();
+    void rebuildArc();
     void deleteSync();
     void deleteComment();
     void showMultiProcTopDialog();
@@ -87,6 +90,7 @@ private slots:
     void itemInserted(QGraphicsItem *item);
     void itemMoved(QGraphicsItem *item, QLineF vector);
     void itemDeleted(QGraphicsItem *item);
+    void selectionChanged();
 };
 
 #endif // QDRAWWINDOW_H

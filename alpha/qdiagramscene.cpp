@@ -50,7 +50,6 @@ void QDiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
             newArc = new QArc(NULL, NULL, myArcMenu, 0, this);
         line = newArc->newLine(mouseEvent->scenePos(), mouseEvent->scenePos());
         break;
-
     case InsertText:
         addComment(mouseEvent->scenePos());
     case InsertSync:
@@ -204,9 +203,9 @@ void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
     }
 
     //пишем информация в статус бар
-    if (selectedItems().count() == 1) {
+    /*if (selectedItems().count() == 1) {
         emit itemSelected(selectedItems().first());
-    }
+    }*/
     QGraphicsScene::mouseReleaseEvent(mouseEvent);
 }
 

@@ -39,6 +39,7 @@ TDrawWindow::TDrawWindow()
     //передаем событие изменения объекта выше, кому надо
     connect(scene, SIGNAL(itemSelected(QGraphicsItem*)),
         this, SIGNAL(itemChanged(QGraphicsItem*)));
+    connect(scene, SIGNAL(selectionChanged()), this, SLOT(selectionChanged()));
     //обработчик удаления объекта
     connect(scene, SIGNAL(itemDeleted(QGraphicsItem*)),
         this, SLOT(itemDeleted(QGraphicsItem*)));
@@ -67,6 +68,7 @@ void TDrawWindow::createMenus()
     arcMenu->addAction(deleteArcAction);
     arcMenu->addSeparator();
     arcMenu->addAction(setArcPropertyAction);
+    arcMenu->addAction(rebuildArcAction);
 
     syncArcMenu = new QMenu();
     syncArcMenu->addAction(deleteSyncAction);
@@ -107,6 +109,10 @@ void TDrawWindow::createActions()
     deleteArcAction = new QAction(QIcon(";/images/delete.png"), tr("Удалить"), this);
     deleteArcAction->setStatusTip(tr("Удаляет дугу"));
     connect(deleteArcAction, SIGNAL(triggered()), this, SLOT(deleteArc()));
+
+    rebuildArcAction = new QAction(tr("Перестроить"), this);
+    rebuildArcAction->setStatusTip(tr("Перестраивает дугу по внутреннему алгоритму"));
+    connect(rebuildArcAction, SIGNAL(triggered()), this, SLOT(rebuildArc()));
 
     deleteSyncAction = new QAction(QIcon(";/images/delete.png"), tr("Удалить"), this);
     deleteSyncAction->setStatusTip(tr("Удалить дугу синхронизации"));
@@ -153,7 +159,7 @@ void TDrawWindow::deleteComment()
 {
     QGraphicsItem *item = scene->selectedItems().first();
     if (item->type() == QComment::Type)
-        emit itemDeleted(item);
+        itemDeleted(item);
 }
 
 /*!
@@ -161,8 +167,11 @@ void TDrawWindow::deleteComment()
 */
 void TDrawWindow::setMode(QDiagramScene::Mode mode)
 {
-    scene->setMode(mode);
-    myMode = mode;
+    if (myMode != mode) {
+        scene->setMode(mode);
+        myMode = mode;
+        emit sceneChanged();
+    }
 }
 
 /*!
@@ -194,8 +203,10 @@ void TDrawWindow::showTopPropDialog(){
     TopPropertyDialog dlg;
     QNormalTop* top = qgraphicsitem_cast<QNormalTop *>(scene->selectedItems().first());
     dlg.prepareForm(top);
-    if (dlg.exec())
+    if (dlg.exec()) {
         top = dlg.getResult();
+        emit sceneChanged();
+    }
 }
 
 
@@ -222,8 +233,10 @@ void TDrawWindow::showArcPropDialog()
     ArcPropertyDialog dlg;
     QArc* arc = qgraphicsitem_cast<QArc *>(scene->selectedItems().first()->parentItem());
     dlg.prepareForm(arc);
-    if (dlg.exec())
+    if (dlg.exec()) {
         arc = dlg.getResult();
+        emit sceneChanged();
+    }
 }
 
 /*!
@@ -379,7 +392,6 @@ void TDrawWindow::loadGraph(QString extName, DataBaseManager* dbManager)
         qcomment->setPos(comment->x, comment->y);
         qcomment->setPlainText(comment->text);
     }
-    emit sceneChanged();
 }
 
 bool TDrawWindow::saveGraph(QString name, QString extName, DataBaseManager *dbManager, bool update)
@@ -405,8 +417,10 @@ void TDrawWindow::showMultiProcTopDialog()
     MultiProcTopPropertyDialog dlg;
     QMultiProcTop* top = qgraphicsitem_cast<QMultiProcTop *>(scene->selectedItems().first());
     dlg.prepareForm(top);
-    if (dlg.exec())
+    if (dlg.exec()) {
         top = dlg.getResult();
+        emit sceneChanged();
+    }
 }
 
 void TDrawWindow::alignHLeft()
@@ -791,4 +805,19 @@ void TDrawWindow::itemMoved(QGraphicsItem *item, QLineF vector)
     emit sceneChanged();
     //передаем сообщение, какой объект двигали выше
     emit itemChanged(item);
+}
+
+void TDrawWindow::rebuildArc()
+{
+    QGraphicsItem *item = scene->selectedItems().first();
+    if (item->type() == QSerialArcTop::Type) {
+        QArc* arc = qgraphicsitem_cast<QArc* >(item->parentItem());
+        arc->autoBuild(arc->startItem(), 0, 0);
+        emit sceneChanged();
+    }
+}
+
+void TDrawWindow::selectionChanged()
+{
+    emit selectionChanged(scene->selectedItems());
 }

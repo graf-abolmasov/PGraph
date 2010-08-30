@@ -126,7 +126,7 @@ private slots:
     void CMRun(){}              // +Запуск->Построение и запуск
     void CMHelpContents(){}	// Помощь->Содержание
     void CMHelpAbout(); 	// +Помощь->О программе
-    void sceneChanged();         // Действие при активации дочернего окна
+    void sceneChanged();        // Действие при изменении сцены
 
     void alignHLeft();          // Выравниевание к самому левому объекту из группы
     void alignHCenter();        // Выравниевание к центральному объекту из группы
@@ -136,6 +136,8 @@ private slots:
     void alignVBottom();        // Выравниевание к самому нижнему объекту из группы
     void distribVertically();   // Распределяет по вертикали через одинаковые расстояния
     void distribHorizontally(); // Распределяет по горизонтили через одинаковые расстояния
+
+    void updateAlignToolBar(QList<QGraphicsItem *> items);
 
     void getInfo(QGraphicsItem *item);
 
