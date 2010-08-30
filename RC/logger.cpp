@@ -15,7 +15,7 @@ Logger::Logger()
             toConsole = true;
         else {
             toConsole = false;
-            logFile = new QFile();
+            logFile = new QFile(fileName);
             logFile->reset();
             logFile->open(QFile::WriteOnly);
         }
