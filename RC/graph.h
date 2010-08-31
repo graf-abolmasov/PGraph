@@ -11,10 +11,8 @@ class Graph
 {
 public:
     Graph(QString name, QString extName, QList<Top* > &topList, QList<Arc* > &arcList, QList<Comment* > &commentList, QList<QSyncArc* > &syncArcList, QList<QMultiProcTop* > &multiProcTopList);
-
     QString name;
     QString extName;
-
     QList<Top* >           topList;
     QList<Arc* >           arcList;
     QList<Comment* >       commentList;

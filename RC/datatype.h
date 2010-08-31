@@ -5,7 +5,6 @@
 class DataType
 {
 public:
-    DataType();
     DataType(QString name, QString typedefStr);
     QString name;
     QString typedefStr;

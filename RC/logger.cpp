@@ -10,14 +10,14 @@ Logger::Logger()
     toConsole = false;
     if (myLoggerSettings.value("Logger/WriteLog", false).toBool()) {
         myDebugLevel = DebugLevel(myLoggerSettings.value("Logger/DebugLevel", int(Critical)).toInt());
-        QString fileName = myLoggerSettings.value("Logger/FileName", "log.txt").toString();
+        QString fileName = myLoggerSettings.value("Logger/FileName", "console").toString();
         if (fileName == "console")
             toConsole = true;
         else {
             toConsole = false;
             logFile = new QFile(fileName);
-            logFile->reset();
             logFile->open(QFile::WriteOnly);
+            logFile->reset();
         }
     }
 }
