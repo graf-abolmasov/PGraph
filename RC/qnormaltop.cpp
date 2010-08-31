@@ -39,7 +39,8 @@ void QNormalTop::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
     }
 }
 
-float QNormalTop::getMinWidth(){
+float QNormalTop::getMinWidth() const
+{
     QList<QArc* > arcListAtBound2 = getArcsAtBound(1);
     QList<QArc* > arcListAtBound1 = getArcsAtBound(3);
     QList<QArc* > arcList;
@@ -78,7 +79,8 @@ float QNormalTop::getMinWidth(){
     return xMax > xMin ? xMax*2 : xMin*2;
 }
 
-float QNormalTop::getMinHeight(){
+float QNormalTop::getMinHeight() const
+{
     QList<QArc* > arcListAtBound2 = getArcsAtBound(2);
     QList<QArc* > arcListAtBound1 = getArcsAtBound(4);
     QList<QArc* > arcList;
@@ -154,7 +156,7 @@ void QNormalTop::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
         top = dlg.getResult();
 }
 
-Top* QNormalTop::toTop()
+Top* QNormalTop::toTop() const
 {
     QPointF pos = scenePos();
     float sizeX = rect().width();

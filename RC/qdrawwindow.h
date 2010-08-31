@@ -56,7 +56,8 @@ public:
     TDrawWindow();
     void saveAsImage(QString filename);
     void setMode(QDiagramScene::Mode mode);
-    QDiagramScene::Mode mode(){return myMode;}
+    QDiagramScene::Mode mode() const
+        { return myMode; }
     Graph* getGraph();
     void loadGraph(QString extName, DataBaseManager* dbManager);
     bool saveGraph(QString name, QString extName, DataBaseManager* dbManager, bool update = false);

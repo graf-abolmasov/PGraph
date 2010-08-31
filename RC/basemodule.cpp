@@ -1,7 +1,5 @@
 #include "basemodule.h"
 
-BaseModule::BaseModule(){}
-
 BaseModule::BaseModule(QString name, QString unicName, QString comment, QStringList parameterList)
 {
     this->name = name;

@@ -32,7 +32,7 @@ void QDataTypeEditor::prepareForm(DataType *type)
         ui->typedefTxtEdt->document()->setPlainText(type->typedefStr);
         myDataType = type;
     } else
-        myDataType = new DataType();
+        myDataType = new DataType("", "");
 }
 
 DataType* QDataTypeEditor::getResult()

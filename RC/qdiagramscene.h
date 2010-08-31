@@ -39,7 +39,7 @@ public:
     void setRootTop(QNormalTop* top);
 
     //!Указатель на корневую вершину
-    QNormalTop* rootTop()
+    QNormalTop* rootTop() const
         { return myRootTop; }
 
 public slots:
@@ -65,6 +65,8 @@ private:
 
     QArc *newArc;
     QArcLine *line;
+    QGraphicsRectItem *selectionRect;
+    QLineF displacementVector;
 
     QMenu *myTopMenu;
     QMenu *myArcMenu;

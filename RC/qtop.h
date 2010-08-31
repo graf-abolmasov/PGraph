@@ -42,18 +42,18 @@ public:
     void removeSyncs();
     void addArc(QArc *arc);
     void addSync(QSyncArc *arc);
-    QLineF getIntersectBound(QLineF line);
+    QLineF getIntersectBound(QLineF line) const;
     int type() const
         { return Type; }
-    QList<QArc *> allArcs()
+    QList<QArc *> allArcs() const
         { return arcs; }
-    QList<QArc *> inArcs();
-    QList<QArc *> outArcs();
+    QList<QArc *> inArcs() const;
+    QList<QArc *> outArcs() const;
     QRectF boundingRect() const;
     QPainterPath shape() const;
     QPainterPath opaqueArea() const;
-    virtual Top* toTop() = 0;
-    QList<QArc *> getArcsAtBound(int i);
+    virtual Top* toTop() const = 0;
+    QList<QArc *> getArcsAtBound(int i) const;
     bool moveBy(qreal dx, qreal dy);
 protected:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);

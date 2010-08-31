@@ -8,7 +8,6 @@ class Variable
 {
 public:
     Variable(QString name, QString type, QVariant initValue, QString comment);
-
     QString name;
     QString type;
     QVariant initValue;

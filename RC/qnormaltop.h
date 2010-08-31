@@ -13,10 +13,10 @@ public:
     int type() const
         { return Type; }
     void setAsRoot(bool flag);
-    float getMinWidth();
-    float getMinHeight();
+    float getMinWidth() const;
+    float getMinHeight() const;
     void setIcon(QImage &icon);
-    Top* toTop();
+    Top* toTop() const;
 protected:
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);

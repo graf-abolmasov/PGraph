@@ -45,7 +45,7 @@ void MultiProcTopPropertyDialog::prepareForm(QMultiProcTop *top)
     foreach(Graph* graph, myGraphList){
         QList<Variable* > varList;
         QStringList varAMList;
-        myActorList.append(new Actor(graph->name, graph->extName, Actor::normalType, "", varList, varAMList));
+        myActorList.append(new Actor(graph->name, graph->extName, Actor::graphType, "", varList, varAMList));
     }
     ui->actorsListWidget->addItem(tr("Нет"));
     for (int i = 1 ; i < myActorList.count(); i++){
@@ -88,6 +88,9 @@ void MultiProcTopPropertyDialog::on_actorsListWidget_currentRowChanged(int curre
             break;
         case Actor::normalType:
             type = tr("normal");
+            break;
+        case Actor::graphType:
+            type = tr("graph");
             break;
         }
         info.append(tr("Type: ") + type + "\r\n");

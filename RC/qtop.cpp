@@ -125,7 +125,7 @@ QVariant QTop::itemChange(GraphicsItemChange change, const QVariant &value){
     return value;
 }
 
-QList<QArc *> QTop::getArcsAtBound(int i){
+QList<QArc *> QTop::getArcsAtBound(int i) const {
     QList<QArc *> result;
     QPolygonF myPolygon(rect());
 
@@ -204,7 +204,8 @@ bool QTop::moveBy(qreal dx, qreal dy)
   Возвращает границу с которой пересекается линия
   @param line - линия
 */
-QLineF QTop::getIntersectBound(QLineF line){
+QLineF QTop::getIntersectBound(QLineF line) const
+{
     int i;
     QLineF result;
     QPointF intersectPoint;
@@ -224,7 +225,8 @@ QLineF QTop::getIntersectBound(QLineF line){
 /*!
   Возвращает список исходящих дуг
 */
-QList<QArc *> QTop::inArcs(){
+QList<QArc *> QTop::inArcs() const
+{
     QList<QArc *> result;
     foreach(QArc *arc, arcs){
         if (arc->endItem() == this)
@@ -236,7 +238,8 @@ QList<QArc *> QTop::inArcs(){
 /*!
   Возвращяет список входящих дуг
 */
-QList<QArc *> QTop::outArcs(){
+QList<QArc *> QTop::outArcs() const
+{
     QList<QArc *> result;
     foreach(QArc *arc, arcs){
         if (arc->startItem() == this)

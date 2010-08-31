@@ -8,7 +8,7 @@
 class Actor
 {
 public:
-    enum Type {normalType, inlineType};
+    enum Type {normalType, inlineType, graphType};
     Actor(QString name, QString extName, Type type, QString baseModule, QList<Variable*> variableList, QStringList varAMList);
     QString extName;
     QString name;

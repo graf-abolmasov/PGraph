@@ -6,7 +6,6 @@
 class BaseModule
 {
 public:
-    BaseModule();
     BaseModule(QString name, QString unicName, QString comment, QStringList parameterList);
     QString name;
     QString unicName;

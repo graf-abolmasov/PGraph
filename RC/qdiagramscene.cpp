@@ -12,8 +12,8 @@ QDiagramScene::QDiagramScene(QObject *parent)
     myMode = MoveItem;
     setItemIndexMethod(NoIndex);
     line = NULL;
-    //textItem = NULL;
     newArc = NULL;
+    selectionRect = NULL;
     myRootTop = NULL;
 }
 
@@ -57,6 +57,14 @@ void QDiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
                                     mouseEvent->scenePos()));
         addItem(line);
         break;
+    case MoveItem:
+        if (itemAt(mouseEvent->scenePos()) == NULL) {
+            clearSelection();
+            selectionRect = new QGraphicsRectItem(0, 0, 0, 0, NULL, this);
+            selectionRect->setPos(mouseEvent->scenePos().x(), mouseEvent->scenePos().y());
+            selectionRect->setPen(Qt::DashLine);
+        }
+        break;
     default:
         ;
     }
@@ -65,8 +73,13 @@ void QDiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
 void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
+    //режим выделения области
+    if (myMode == MoveItem && selectionRect != NULL) {
+        QRectF newRect(0, 0, mouseEvent->scenePos().x() - selectionRect->scenePos().x(), mouseEvent->scenePos().y() - selectionRect->scenePos().y());
+        selectionRect->setRect(newRect.normalized());
+    }
     //режим рисования дуги
-    if (myMode == InsertLine && line != NULL && mouseEvent->buttons() == Qt::LeftButton) {
+    else if (myMode == InsertLine && line != NULL && mouseEvent->buttons() == Qt::LeftButton) {
         QLineF vector(line->line().p1(), mouseEvent->scenePos());
         float dx = vector.dx();
         float dy = vector.dy();
@@ -126,7 +139,14 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
 void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
-    if (line != NULL && newArc != NULL && myMode == InsertLine) {
+    if (myMode == MoveItem && selectionRect != NULL) {
+        QPainterPath selectedPath;
+        selectedPath.addPolygon(selectionRect->mapToScene(selectionRect->rect()));
+        setSelectionArea(selectedPath);
+        delete selectionRect;
+        selectionRect = NULL;
+    }
+    else if (line != NULL && newArc != NULL && myMode == InsertLine) {
         //дуга должна начинаться с вершины!
         if (newArc->startItem() == NULL){
             QList<QGraphicsItem *> startItems = items(line->line().p1());
@@ -202,10 +222,6 @@ void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
         line = 0;
     }
 
-    //пишем информация в статус бар
-    /*if (selectedItems().count() == 1) {
-        emit itemSelected(selectedItems().first());
-    }*/
     QGraphicsScene::mouseReleaseEvent(mouseEvent);
 }
 

@@ -16,7 +16,7 @@ public:
     QMultiProcTop(QMenu *contextMenu, QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
     int type() const
         { return Type; }
-    Top* toTop();
+    Top* toTop() const;
     int procCount;
 protected:
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);

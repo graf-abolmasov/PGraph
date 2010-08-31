@@ -93,7 +93,7 @@ void QMultiProcTop::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
         top = dlg.getResult();
 }
 
-Top* QMultiProcTop::toTop()
+Top* QMultiProcTop::toTop() const
 {
     return new Top(scenePos().x(), scenePos().y(), rect().width(), rect().height(), number, procCount, false, actor == NULL ? "" : actor->name, "M");
 }
