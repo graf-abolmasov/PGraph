@@ -164,13 +164,11 @@ bool MoveCommand::mergeWith(const QUndoCommand *command)
     if (myItems.count() != items.count())
         return false;
 
-    foreach (QGraphicsItem* myItem, myItems){
+    foreach (QGraphicsItem* myItem, myItems)
         if (!items.contains(myItem))
             return false;
-    }
 
-    myDisplacementVector.setP1(myDisplacementVector.p1());
-    myDisplacementVector.setP2(moveCommand->myDisplacementVector.p2());
+    myDisplacementVector.setP2(moveCommand->myDisplacementVector.p2() - (moveCommand->myDisplacementVector.p1() - myDisplacementVector.p2()));
 
     setText(QObject::tr("> ") + itemTypeToString(items.first()) + " (" + QString::number(myDisplacementVector.p1().x()) + ", " + QString::number(myDisplacementVector.p1().y()) + ")->" +
                                                           "(" + QString::number(myDisplacementVector.p2().x()) + ", " + QString::number(myDisplacementVector.p2().y()) + ")");
