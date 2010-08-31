@@ -1,4 +1,5 @@
 #include "undocommand.h"
+#include "windows.h"
 
 AddCommand::AddCommand(QGraphicsItem *item, QGraphicsScene *scene, QUndoCommand *parent)
     : QUndoCommand(parent)
@@ -108,58 +109,70 @@ DeleteCommand::~DeleteCommand()
 
 }
 
-MoveCommand::MoveCommand(QGraphicsItem *item, QGraphicsScene *graphicsScene, QLineF vector, QUndoCommand *parent)
+MoveCommand::MoveCommand(QList<QGraphicsItem *>items, QGraphicsScene *graphicsScene, QLineF vector, QUndoCommand *parent)
     : QUndoCommand(parent)
 {
     myGraphicsScene = graphicsScene;
-    myItem = item;
+    myItems = items;
     myDisplacementVector = vector;
-    setText(QObject::tr("> ") + itemTypeToString(item) + " (" + QString::number(myDisplacementVector.p1().x()) + ", " + QString::number(myDisplacementVector.p1().y()) + ")->" +
+    setText(QObject::tr("> ") + itemTypeToString(items.first()) + " (" + QString::number(myDisplacementVector.p1().x()) + ", " + QString::number(myDisplacementVector.p1().y()) + ")->" +
             "(" + QString::number(myDisplacementVector.p2().x()) + ", " + QString::number(myDisplacementVector.p2().y()) + ")");
 }
 
 void MoveCommand::undo()
 {
-    switch (myItem->type()){
-    case QTop::Type: {
-            QTop* top = qgraphicsitem_cast<QTop* >(myItem);
-            top->moveBy(-myDisplacementVector.dx(), -myDisplacementVector.dy());
+    for(int i = myItems.count()-1; i >= 0 ; i--) {
+        QGraphicsItem* myItem = myItems.at(i);
+        switch (myItem->type()){
+        case QTop::Type: {
+                QTop* top = qgraphicsitem_cast<QTop* >(myItem);
+                top->moveBy(-myDisplacementVector.dx(), -myDisplacementVector.dy());
+            }
+            break;
+        case QComment::Type:{
+                myItem->moveBy(-myDisplacementVector.dx(), -myDisplacementVector.dy());
+            }
+            break;
         }
-        break;
-    case QComment::Type:{
-            myItem->moveBy(-myDisplacementVector.dx(), -myDisplacementVector.dy());
-        }
-        break;
     }
 }
 
 void MoveCommand::redo()
 {
-    switch (myItem->type()){
-    case QTop::Type:{
-            QTop* top = qgraphicsitem_cast<QTop* >(myItem);
-            top->moveBy(myDisplacementVector.dx(), myDisplacementVector.dy());
+
+    for(int i = 0; i < myItems.count(); i++) {
+        QGraphicsItem* myItem = myItems.at(i);
+        switch (myItem->type()){
+        case QTop::Type:{
+                QTop* top = qgraphicsitem_cast<QTop* >(myItem);
+                top->moveBy(myDisplacementVector.dx(), myDisplacementVector.dy());
+            }
+            break;
+        case QComment::Type:{
+                myItem->moveBy(myDisplacementVector.dx(), myDisplacementVector.dy());
+            }
+            break;
         }
-        break;
-    case QComment::Type:{
-            myItem->moveBy(myDisplacementVector.dx(), myDisplacementVector.dy());
-        }
-        break;
     }
 }
 
 bool MoveCommand::mergeWith(const QUndoCommand *command)
 {
     const MoveCommand *moveCommand = static_cast<const MoveCommand *>(command);
-    QGraphicsItem *item = moveCommand->myItem;
+    QList<QGraphicsItem* > items = moveCommand->myItems;
 
-    if (myItem != item)
+    if (myItems.count() != items.count())
         return false;
+
+    foreach (QGraphicsItem* myItem, myItems){
+        if (!items.contains(myItem))
+            return false;
+    }
 
     myDisplacementVector.setP1(myDisplacementVector.p1());
     myDisplacementVector.setP2(moveCommand->myDisplacementVector.p2());
 
-    setText(QObject::tr("> ") + itemTypeToString(item) + " (" + QString::number(myDisplacementVector.p1().x()) + ", " + QString::number(myDisplacementVector.p1().y()) + ")->" +
+    setText(QObject::tr("> ") + itemTypeToString(items.first()) + " (" + QString::number(myDisplacementVector.p1().x()) + ", " + QString::number(myDisplacementVector.p1().y()) + ")->" +
                                                           "(" + QString::number(myDisplacementVector.p2().x()) + ", " + QString::number(myDisplacementVector.p2().y()) + ")");
 
     return true;

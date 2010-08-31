@@ -2,6 +2,7 @@
 #include <QtGui>
 
 #include "qtop.h"
+#include <Windows.h>
 
 int QTop::counter = 0;
 
@@ -153,14 +154,6 @@ QList<QArc *> QTop::getArcsAtBound(int i) const {
 bool QTop::moveBy(qreal dx, qreal dy)
 {
     setPos(pos().x() + dx, pos().y() + dy);
-
-    QList<QGraphicsItem* > itemList = scene()->collidingItems(this, Qt::IntersectsItemBoundingRect);
-    foreach(QGraphicsItem* item, itemList){
-        if (item->type() == QTop::Type){
-            setPos(pos().x() - dx, pos().y() - dy);
-            return false;
-        }
-    }
 
     bool isOK = false; //false - если дугу надо полностью переделать
 

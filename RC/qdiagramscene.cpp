@@ -44,7 +44,6 @@ void QDiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
     case InsertMultiProcTop:
         addTop(mouseEvent->scenePos());
         break;
-
     case InsertLine:
         if (newArc == NULL)
             newArc = new QArc(NULL, NULL, myArcMenu, 0, this);
@@ -54,7 +53,7 @@ void QDiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
         addComment(mouseEvent->scenePos());
     case InsertSync:
         line = new QArcLine(QLineF(mouseEvent->scenePos(),
-                                    mouseEvent->scenePos()));
+                                   mouseEvent->scenePos()));
         addItem(line);
         break;
     case MoveItem:
@@ -65,8 +64,6 @@ void QDiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
             selectionRect->setPen(Qt::DashLine);
         }
         break;
-    default:
-        ;
     }
     QGraphicsScene::mousePressEvent(mouseEvent);
 }
@@ -106,25 +103,61 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
         line->setLine(newLine);
         line->setSelected(true);
     }
+    //режим перетаскивания вершины
+    else if ((myMode == MoveItem) &&
+             (mouseEvent->buttons() == Qt::LeftButton) &&
+             //(selectedItems().count() == 1) &&
+             (selectedItems().first()->type() == QTop::Type)) {
+        QLineF vector(mouseEvent->lastScenePos(), mouseEvent->scenePos());
+        bool allowMove = false;
+
+        //находится ли курсор внутри какого-нибудь элемента
+        QList<QGraphicsItem* > items = selectedItems();
+        foreach (QGraphicsItem* item, items)
+            if (item->contains(item->mapFromScene(mouseEvent->lastScenePos()))) {
+            allowMove = true;
+            break;
+        }
+
+        //если да, то
+        if (allowMove) {
+            //не пересечется ли како-нибудь элемент с уже имеющимся на сцене?
+            foreach (QGraphicsItem* item, items) {
+                //передвинем временно элемент
+                item->setPos(item->scenePos().x() + vector.dx(), item->scenePos().y() + vector.dy());
+                //надем пересекающиеся с ним элементы
+                QList<QGraphicsItem* > itemList = collidingItems(item, Qt::IntersectsItemBoundingRect);
+                foreach(QGraphicsItem* item, itemList) {
+                    //если есть ходябы одна вершина
+                    if (item->type() == QTop::Type){
+                        //запретим перемещение
+                        allowMove = false;
+                        break;
+                    }
+                }
+                //вернем на место вершину
+                item->setPos(item->scenePos().x() - vector.dx(), item->scenePos().y() - vector.dy());
+                //если хотябы одна вершина пересекается, тьо остальные не проверяем
+                if (!allowMove)
+                    break;
+            }
+        }
+
+        //если все хорошо, перемещаем все вершины
+        if (allowMove)
+            emit itemsMoved(selectedItems(), vector);
+    }
     //режим перетаскивания дуги
-    else if ((myMode == MoveItem) && (mouseEvent->buttons() == Qt::LeftButton) &&
-             (selectedItems().count() == 1) && (selectedItems().first()->type() == QArcLine::Type)) {
+    else if ((myMode == MoveItem) &&
+             (mouseEvent->buttons() == Qt::LeftButton) &&
+             (selectedItems().count() == 1) &&
+             (selectedItems().first()->type() == QArcLine::Type)) {
         QArcLine *selectedLine = qgraphicsitem_cast<QArcLine *>(selectedItems().first());
         QLineF vector(mouseEvent->lastScenePos(), mouseEvent->scenePos());
         QArc *arc = qgraphicsitem_cast<QArc *>(selectedLine->parentItem());
 
         if (selectedLine->contains(selectedLine->mapFromScene(mouseEvent->lastScenePos())))
             arc->moveLine(selectedLine, vector.dx(), vector.dy());
-    }
-    //режим перетаскивания вершины
-    else if ((myMode == MoveItem) &&
-             (mouseEvent->buttons() == Qt::LeftButton) &&
-             (selectedItems().count() == 1) &&
-             (selectedItems().first()->type() == QTop::Type) &&
-             (selectedItems().first()->contains(selectedItems().first()->mapFromScene(mouseEvent->lastScenePos())))) {
-        QTop *top = qgraphicsitem_cast<QTop *>(selectedItems().first());
-        QLineF vector(mouseEvent->lastScenePos(), mouseEvent->scenePos());
-        emit itemMoved(top, vector);
     }
     else if (myMode == InsertSync && line != NULL) {
         QLineF newLine(line->line().p1(), mouseEvent->scenePos());
@@ -142,7 +175,12 @@ void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
     if (myMode == MoveItem && selectionRect != NULL) {
         QPainterPath selectedPath;
         selectedPath.addPolygon(selectionRect->mapToScene(selectionRect->rect()));
-        setSelectionArea(selectedPath);
+        QList<QGraphicsItem* > itemsInRect = items(selectedPath, Qt::ContainsItemShape);
+        clearSelection();
+        foreach (QGraphicsItem* item, itemsInRect){
+            if (item->type() == QTop::Type)
+                item->setSelected(true);
+        }
         delete selectionRect;
         selectionRect = NULL;
     }

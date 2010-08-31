@@ -121,3 +121,13 @@ QString itemTypeToString(QGraphicsItem *item)
     }
     return "undefined";
 }
+
+bool topUpperThan(const QTop* top1, const QTop* top2)
+{
+    return top1->scenePos().y() < top2->scenePos().y();
+}
+
+bool topLeftThan(const QTop* top1, const QTop* top2)
+{
+    return top1->scenePos().x() < top2->scenePos().x();
+}

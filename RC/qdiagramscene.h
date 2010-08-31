@@ -47,10 +47,11 @@ public slots:
     void editorLostFocus(QComment *item);
 
 signals:
+    //void itemSelected(QGraphicsItem *item);
     void itemInserted(QGraphicsItem *item);
-    void itemSelected(QGraphicsItem *item);
     void itemMoved(QGraphicsItem *item, QLineF vector);
     void itemDeleted(QGraphicsItem *item);
+    void itemsMoved(QList<QGraphicsItem*> items, QLineF vector);
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent);
