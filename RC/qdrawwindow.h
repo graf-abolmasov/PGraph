@@ -91,6 +91,8 @@ private slots:
     void itemInserted(QGraphicsItem *item);
     void itemMoved(QGraphicsItem *item, QLineF vector);
     void itemDeleted(QGraphicsItem *item);
+    void itemsMoved(QList<QGraphicsItem*> items, QLineF vector);
+
     void selectionChanged();
 };
 

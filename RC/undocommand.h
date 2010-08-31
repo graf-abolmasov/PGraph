@@ -42,7 +42,7 @@ class MoveCommand : public QUndoCommand
 public:
     enum {Id = MOVE_COMMAND_ID};
 
-    MoveCommand(QGraphicsItem *item, QGraphicsScene *graphicsScene, QLineF vector, QUndoCommand *parent = 0);
+    MoveCommand(QList<QGraphicsItem*> items, QGraphicsScene *graphicsScene, QLineF vector, QUndoCommand *parent = 0);
     ~MoveCommand();
     bool mergeWith(const QUndoCommand *command);
     void undo();
@@ -50,7 +50,7 @@ public:
     int id() const { return Id; }
 
 private:
-    QGraphicsItem *myItem;
+    QList<QGraphicsItem*> myItems;
     QGraphicsScene *myGraphicsScene;
     QLineF myDisplacementVector;
 };

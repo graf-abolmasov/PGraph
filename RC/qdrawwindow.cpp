@@ -12,6 +12,7 @@
 #include "multiproctoppropertydialog.h"
 #include "globalvariables.h"
 #include "undocommand.h"
+#include "commonutils.h"
 
 QStringList globalPredicateList;
 
@@ -36,9 +37,11 @@ TDrawWindow::TDrawWindow()
     //обработчик перемещения объекта
     connect(scene, SIGNAL(itemMoved(QGraphicsItem*, QLineF)),
         this, SLOT(itemMoved(QGraphicsItem*, QLineF)));
+    connect(scene, SIGNAL(itemsMoved(QList<QGraphicsItem*>, QLineF)),
+            this, SLOT(itemsMoved(QList<QGraphicsItem*>,QLineF)));
     //передаем событие изменения объекта выше, кому надо
-    connect(scene, SIGNAL(itemSelected(QGraphicsItem*)),
-        this, SIGNAL(itemChanged(QGraphicsItem*)));
+    /*connect(scene, SIGNAL(itemSelected(QGraphicsItem*)),
+        this, SIGNAL(itemChanged(QGraphicsItem*)));*/
     connect(scene, SIGNAL(selectionChanged()), this, SLOT(selectionChanged()));
     //обработчик удаления объекта
     connect(scene, SIGNAL(itemDeleted(QGraphicsItem*)),
@@ -536,11 +539,6 @@ void TDrawWindow::showFontDialog()
         comment->setFont(dlg.selectedFont());
 }
 
-bool topLeftThan(const QTop* top1, const QTop* top2)
-{
-    return top1->scenePos().x() < top2->scenePos().x();
-}
-
 bool arcPriorLessThan(const QArc* arc1, const QArc* arc2)
 {
     return (arc1->priority() < arc2->priority());
@@ -662,11 +660,6 @@ void TDrawWindow::distribHorizontally()
         }
     }
     emit sceneChanged();
-}
-
-bool topUpperThan(const QTop* top1, const QTop* top2)
-{
-    return top1->scenePos().y() < top2->scenePos().y();
 }
 
 void TDrawWindow::distribVertically()
@@ -799,12 +792,20 @@ void TDrawWindow::itemDeleted(QGraphicsItem *item)
 
 void TDrawWindow::itemMoved(QGraphicsItem *item, QLineF vector)
 {
-    QUndoCommand *moveCommnad = new MoveCommand(item, scene,  vector);
+    QList<QGraphicsItem*> items;
+    items.append(item);
+    QUndoCommand *moveCommnad = new MoveCommand(items, scene,  vector);
     undoStack->push(moveCommnad);
-    //передаем сообщение, что сцена изменилась
     emit sceneChanged();
-    //передаем сообщение, какой объект двигали выше
     emit itemChanged(item);
+}
+
+void TDrawWindow::itemsMoved(QList<QGraphicsItem *>items, QLineF vector)
+{
+    QUndoCommand *moveCommnad = new MoveCommand(items, scene,  vector);
+    undoStack->push(moveCommnad);
+    emit sceneChanged();
+    emit itemChanged(items.first());
 }
 
 void TDrawWindow::rebuildArc()

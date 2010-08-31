@@ -9,4 +9,6 @@
 #include "qcomment.h"
 QString getCRC(QByteArray in);
 QString itemTypeToString(QGraphicsItem *item);
+bool topUpperThan(const QTop* top1, const QTop* top2);
+bool topLeftThan(const QTop* top1, const QTop* top2);
 #endif // COMMONUTILS_H
