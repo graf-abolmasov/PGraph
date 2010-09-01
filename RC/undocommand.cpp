@@ -120,37 +120,70 @@ MoveCommand::MoveCommand(QList<QGraphicsItem *>items, QGraphicsScene *graphicsSc
 
 void MoveCommand::undo()
 {
-    for(int i = myItems.count()-1; i >= 0 ; i--) {
-        QGraphicsItem* myItem = myItems.at(i);
-        switch (myItem->type()){
+    if (myItems.count() == 1) {
+        switch (myItems.first()->type()) {
         case QTop::Type: {
-                QTop* top = qgraphicsitem_cast<QTop* >(myItem);
+                QTop* top = qgraphicsitem_cast<QTop* >(myItems.first());
                 top->moveBy(-myDisplacementVector.dx(), -myDisplacementVector.dy());
             }
             break;
-        case QComment::Type:{
-                myItem->moveBy(-myDisplacementVector.dx(), -myDisplacementVector.dy());
-            }
+        case QComment::Type:
+            myItems.first()->moveBy(-myDisplacementVector.dx(), -myDisplacementVector.dy());
             break;
+        }
+    }
+    else if (myItems.count() > 1) {
+        QSet<QArc* > arcs;
+        foreach (QGraphicsItem* item, myItems) {
+            QTop* top = qgraphicsitem_cast<QTop* >(item);
+            arcs.unite(top->allArcs().toSet());
+        }
+        foreach (QArc* arc, arcs) {
+            if (myItems.contains(arc->startItem()) && myItems.contains(arc->endItem()))
+                arc->freeze();
+            else
+                arcs.remove(arc);
+        }
+        foreach (QGraphicsItem* item, myItems) {
+            QTop* top = qgraphicsitem_cast<QTop* >(item);
+            top->moveBy(-myDisplacementVector.dx(), -myDisplacementVector.dy());
+        }
+        foreach (QArc* arc, arcs) {
+            arc->unfreeze();
         }
     }
 }
 
 void MoveCommand::redo()
 {
-
-    for(int i = 0; i < myItems.count(); i++) {
-        QGraphicsItem* myItem = myItems.at(i);
-        switch (myItem->type()){
-        case QTop::Type:{
-                QTop* top = qgraphicsitem_cast<QTop* >(myItem);
+    if (myItems.count() == 1) {
+        switch (myItems.first()->type()) {
+        case QTop::Type: {
+                QTop* top = qgraphicsitem_cast<QTop* >(myItems.first());
                 top->moveBy(myDisplacementVector.dx(), myDisplacementVector.dy());
             }
             break;
-        case QComment::Type:{
-                myItem->moveBy(myDisplacementVector.dx(), myDisplacementVector.dy());
-            }
+        case QComment::Type:
+            myItems.first()->moveBy(myDisplacementVector.dx(), myDisplacementVector.dy());
             break;
+        }
+    }
+    else if (myItems.count() > 1) {
+        QSet<QArc* > arcs;
+        foreach (QGraphicsItem* item, myItems) {
+            QTop* top = qgraphicsitem_cast<QTop* >(item);
+            arcs.unite(top->allArcs().toSet());
+        }
+        foreach (QArc* arc, arcs) {
+            if (myItems.contains(arc->startItem()) && myItems.contains(arc->endItem()))
+                arc->freeze();
+        }
+        foreach (QGraphicsItem* item, myItems) {
+            QTop* top = qgraphicsitem_cast<QTop* >(item);
+            top->moveBy(myDisplacementVector.dx(), myDisplacementVector.dy());
+        }
+        foreach (QArc* arc, arcs) {
+            arc->unfreeze();
         }
     }
 }

@@ -127,6 +127,12 @@ bool QArc::remake(QTop* aMovedTop, float dx, float dy){
     bool flag; //false - если надо все напрочь переделать
     int lgdir, lgolddir;
 
+    if (freezed) {
+        foreach (QArcLine* line, lines)
+            line->setLine(line->line().translated(dx/2, dy/2));
+        return true;
+    }
+
     if ((myStartTop == aMovedTop) && (myEndTop == aMovedTop)){
         foreach (QArcLine* line, lines)
             line->setLine(line->line().translated(dx, dy));
@@ -235,7 +241,7 @@ bool QArc::remake(QTop* aMovedTop, float dx, float dy){
         }
 
         //теперь в pts новые точки =) якобы. проверим это.
-        if (old_otr != otr) {
+        //if (old_otr != otr) {
             qDeleteAll(lines);
             lines.clear();
             currentLine = NULL;
@@ -247,13 +253,17 @@ bool QArc::remake(QTop* aMovedTop, float dx, float dy){
             newLine(pts[otr-1], pts[otr] + deltaEndPoint);
             addLine(currentLine);
             currentLine = NULL;
-        } else {
-            lines.first()->setLine(QLineF(pts[0] + deltaStartPoint, pts[1]));
-            for (j = 1; j < otr - 1; j++){
-                lines.at(j)->setLine(QLineF(pts[j], pts[j+1]));
+        /*} else {
+            if (otr == 1)
+                lines.first()->setLine(QLineF(pts[0] + deltaStartPoint, pts[1] + deltaEndPoint));
+            else {
+                lines.first()->setLine(QLineF(pts[0] + deltaStartPoint, pts[1]));
+                for (j = 1; j < otr - 1; j++){
+                    lines.at(j)->setLine(QLineF(pts[j], pts[j+1]));
+                }
+                lines.last()->setLine(QLineF(pts[otr-1], pts[otr] + deltaEndPoint));
             }
-            lines.last()->setLine(QLineF(pts[otr-1], pts[otr] + deltaEndPoint));
-        }
+        }*/
 
         return result;
     }
@@ -423,6 +433,8 @@ QArc::QArc(QTop *startItem, QTop *endItem, QMenu *contextMenu,
     myStartTop      = startItem;
     myEndTop        = endItem;
     myContextMenu   = contextMenu;
+
+    freezed = false;
 
     setPen(QPen(Qt::black, 2, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
 
@@ -691,4 +703,14 @@ bool QArc::moveLine(QArcLine *line, float dx, float dy)
     }
     updateBounds();
     return true;
+}
+
+void QArc::freeze()
+{
+    freezed = true;
+}
+
+void QArc::unfreeze()
+{
+    freezed = false;
 }
