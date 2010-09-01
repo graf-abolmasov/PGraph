@@ -9,17 +9,17 @@ QArcLine::QArcLine(QLineF line, QGraphicsItem *parent, QGraphicsScene *scene)
 
 QPainterPath QArcLine::shape() const {
     QPainterPath path;
-    path.addRect(QGraphicsLineItem::shape().boundingRect().adjusted(-5, -5, 5, 5));
+    path.addRect(QRectF(line().p1(), line().p2()).normalized().adjusted(-5, -5, 5, 5));
     return path;
 }
 
 void QArcLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    painter->setPen(pen());
+    QPen myPen = pen();
+    painter->setPen(myPen);
     painter->drawLine(line());
     if (isSelected()){
         painter->setBrush(Qt::green);
-        QPen myPen = pen();
         int lineWidth = myPen.width();
         myPen.setWidth(1);
         painter->setPen(myPen);
@@ -32,12 +32,8 @@ void QArcLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 
 QVariant QArcLine::itemChange(GraphicsItemChange change, const QVariant &value)
 {
-    if (change == QGraphicsItem::ItemSelectedHasChanged) {
-        if (isSelected())
-            setZValue(1);
-        else
-            setZValue(0);
-    }
+    if (change == QGraphicsItem::ItemSelectedHasChanged)
+        isSelected() ? setZValue(1) : setZValue(0);
 
     return value;
 }

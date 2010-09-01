@@ -434,19 +434,20 @@ QArc::~QArc(){
 /*!
   Возвращает прямоугольник включающий все отрезки дуги. необходимо для правильной отрисовки.
 */
-QRectF QArc::boundingRect() const{
-    qreal extra = (myPriority + 1)*(pen().width() + 20) / 2.0;
+QRectF QArc::boundingRect() const
+{
     QRectF rect;
     foreach (QArcLine* line, lines){
         rect = rect.united(line->boundingRect());
     }
-    return rect.normalized().adjusted(-extra, -extra, extra, extra);
+    return rect.normalized();
 }
 
 /*!
   Форма дуги
 */
-QPainterPath QArc::shape() const{
+QPainterPath QArc::shape() const
+{
     QPainterPath path;
     path.addPolygon(arcHead);
     foreach (QArcLine *line, lines)

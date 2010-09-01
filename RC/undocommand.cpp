@@ -1,5 +1,4 @@
 #include "undocommand.h"
-#include "windows.h"
 
 AddCommand::AddCommand(QGraphicsItem *item, QGraphicsScene *scene, QUndoCommand *parent)
     : QUndoCommand(parent)
