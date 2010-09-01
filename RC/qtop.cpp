@@ -90,7 +90,6 @@ void QTop::removeArc(QArc *arc){
 */
 void QTop::removeArcs(){
     arcs.clear();
-    //qDeleteAll(arcs);
 }
 
 /*!
@@ -98,7 +97,6 @@ void QTop::removeArcs(){
 */
 void QTop::removeSyncs(){
     sync.clear();
-    //qDeleteAll(sync);
 }
 
 /*!
@@ -209,7 +207,8 @@ QLineF QTop::getIntersectBound(QLineF line) const
         p2 = myPolygon.at(i) + scenePos();
         result.setPoints(p1, p2);
         QLineF::IntersectType intersectType = result.intersect(line, &intersectPoint);
-        if (intersectType == QLineF::BoundedIntersection) break;
+        if (intersectType == QLineF::BoundedIntersection)
+            break;
         p1 = p2;
     }
     return result;

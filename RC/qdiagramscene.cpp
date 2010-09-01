@@ -27,9 +27,6 @@ void QDiagramScene::editorLostFocus(QComment *item)
     QTextCursor cursor = item->textCursor();
     cursor.clearSelection();
     item->setTextCursor(cursor);
-
-    //вставить комманду "изменениt к комментария"
-
     if (item->toPlainText().isEmpty())
         emit itemDeleted(item);
 }
@@ -70,6 +67,8 @@ void QDiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
 void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
+    QList<QGraphicsItem* > mySelectedItems = selectedItems();
+
     //режим выделения области
     if (myMode == MoveItem && selectionRect != NULL) {
         QRectF newRect(0, 0, mouseEvent->scenePos().x() - selectionRect->scenePos().x(), mouseEvent->scenePos().y() - selectionRect->scenePos().y());
@@ -106,23 +105,21 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
     //режим перетаскивания вершины
     else if ((myMode == MoveItem) &&
              (mouseEvent->buttons() == Qt::LeftButton) &&
-             //(selectedItems().count() == 1) &&
-             (selectedItems().first()->type() == QTop::Type)) {
+             (mySelectedItems.first()->type() == QTop::Type)) {
         QLineF vector(mouseEvent->lastScenePos(), mouseEvent->scenePos());
         bool allowMove = false;
 
         //находится ли курсор внутри какого-нибудь элемента
-        QList<QGraphicsItem* > items = selectedItems();
-        foreach (QGraphicsItem* item, items)
+        foreach (QGraphicsItem* item, mySelectedItems)
             if (item->contains(item->mapFromScene(mouseEvent->lastScenePos()))) {
-            allowMove = true;
-            break;
-        }
+                allowMove = true;
+                break;
+            }
 
         //если да, то
         if (allowMove) {
             //не пересечется ли како-нибудь элемент с уже имеющимся на сцене?
-            foreach (QGraphicsItem* item, items) {
+            foreach (QGraphicsItem* item, mySelectedItems) {
                 //передвинем временно элемент
                 item->setPos(item->scenePos().x() + vector.dx(), item->scenePos().y() + vector.dy());
                 //надем пересекающиеся с ним элементы
@@ -137,7 +134,7 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
                 }
                 //вернем на место вершину
                 item->setPos(item->scenePos().x() - vector.dx(), item->scenePos().y() - vector.dy());
-                //если хотябы одна вершина пересекается, тьо остальные не проверяем
+                //если хотябы одна вершина пересекается, то остальные не проверяем
                 if (!allowMove)
                     break;
             }
@@ -145,14 +142,14 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
         //если все хорошо, перемещаем все вершины
         if (allowMove)
-            emit itemsMoved(selectedItems(), vector);
+            emit itemsMoved(mySelectedItems, vector);
     }
     //режим перетаскивания дуги
     else if ((myMode == MoveItem) &&
              (mouseEvent->buttons() == Qt::LeftButton) &&
-             (selectedItems().count() == 1) &&
-             (selectedItems().first()->type() == QArcLine::Type)) {
-        QArcLine *selectedLine = qgraphicsitem_cast<QArcLine *>(selectedItems().first());
+             (mySelectedItems.count() == 1) &&
+             (mySelectedItems.first()->type() == QArcLine::Type)) {
+        QArcLine *selectedLine = qgraphicsitem_cast<QArcLine *>(mySelectedItems.first());
         QLineF vector(mouseEvent->lastScenePos(), mouseEvent->scenePos());
         QArc *arc = qgraphicsitem_cast<QArc *>(selectedLine->parentItem());
 
@@ -165,9 +162,9 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
     }
     else if ((myMode == MoveItem) &&
              (mouseEvent->buttons() == Qt::LeftButton) &&
-             (selectedItems().count() == 1) &&
-             (selectedItems().first()->type() == QComment::Type))
-        emit itemMoved(selectedItems().first(), QLineF(mouseEvent->lastScenePos(), mouseEvent->scenePos()));
+             (mySelectedItems.count() == 1) &&
+             (mySelectedItems.first()->type() == QComment::Type))
+        emit itemMoved(mySelectedItems.first(), QLineF(mouseEvent->lastScenePos(), mouseEvent->scenePos()));
 }
 
 void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
@@ -292,7 +289,6 @@ void QDiagramScene::keyReleaseEvent (QKeyEvent *keyEvent){
             break;
         }
     }
-
     QGraphicsScene::keyReleaseEvent(keyEvent);
 }
 
