@@ -74,11 +74,14 @@ public:
     bool autoBuild(QTop* top, float dx, float dy);
     bool remake(QTop *, float dx, float dy);
     bool moveLine(QArcLine* line, float dx, float dy);
+    void freeze();
+    void unfreeze();
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                QWidget *widget = 0);
 
 private:
+    bool freezed;
     ArcType myArcType;
     QTop *myStartTop;
     QTop *myEndTop;
