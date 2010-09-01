@@ -2,7 +2,6 @@
 #include <QtGui>
 
 #include "qtop.h"
-#include <Windows.h>
 
 int QTop::counter = 0;
 

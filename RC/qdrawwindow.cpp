@@ -654,7 +654,7 @@ void TDrawWindow::distribHorizontally()
         delta = inArcs.count();
         foreach (QArc* arc, outArcs) {
             QArcLine *line = arc->lines.first();
-            QPointF new_p1(top->mapRectToScene(top->rect()).topLeft().x() + (outArcs.indexOf(arc) + 1) * dist, line->line().y1());
+            QPointF new_p1(top->mapRectToScene(top->rect()).topLeft().x() + (outArcs.indexOf(arc) + 1 + delta) * dist, line->line().y1());
             QLineF vector(line->line().p1(), new_p1);
             arc->moveLine(line, vector.dx(), vector.dy());
         }
