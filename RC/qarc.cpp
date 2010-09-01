@@ -139,6 +139,7 @@ bool QArc::remake(QTop* aMovedTop, float dx, float dy){
         //и как ни странно - не работает
         //заполняем структуры, необходимые для старого алгоритма
         int otr = lines.count();
+        int old_otr = otr;
         QPointF pts[4];
         int i;
         for(i =0; i < otr; i++){
@@ -234,17 +235,25 @@ bool QArc::remake(QTop* aMovedTop, float dx, float dy){
         }
 
         //теперь в pts новые точки =) якобы. проверим это.
-        qDeleteAll(lines);
-        lines.clear();
-        currentLine = NULL;
+        if (old_otr != otr) {
+            qDeleteAll(lines);
+            lines.clear();
+            currentLine = NULL;
 
-        newLine(pts[0] + deltaStartPoint, pts[1]);
-        for (j = 1; j < otr - 1; j++){
-            newLine(pts[j], pts[j+1]);
+            newLine(pts[0] + deltaStartPoint, pts[1]);
+            for (j = 1; j < otr - 1; j++){
+                newLine(pts[j], pts[j+1]);
+            }
+            newLine(pts[otr-1], pts[otr] + deltaEndPoint);
+            addLine(currentLine);
+            currentLine = NULL;
+        } else {
+            lines.first()->setLine(QLineF(pts[0] + deltaStartPoint, pts[1]));
+            for (j = 1; j < otr - 1; j++){
+                lines.at(j)->setLine(QLineF(pts[j], pts[j+1]));
+            }
+            lines.last()->setLine(QLineF(pts[otr-1], pts[otr] + deltaEndPoint));
         }
-        newLine(pts[otr-1], pts[otr] + deltaEndPoint);
-        addLine(currentLine);
-        currentLine = NULL;
 
         return result;
     }

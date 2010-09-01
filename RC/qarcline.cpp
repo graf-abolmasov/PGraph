@@ -9,7 +9,7 @@ QArcLine::QArcLine(QLineF line, QGraphicsItem *parent, QGraphicsScene *scene)
 
 QPainterPath QArcLine::shape() const {
     QPainterPath path;
-    path.addRect(QRectF(line().p1(), line().p2()).normalized().adjusted(-5, -5, 5, 5));
+    path.addRect(QRectF(line().p1(), line().p2()).normalized().adjusted(-4, -4, 4, 4));
     return path;
 }
 
