@@ -128,9 +128,8 @@ bool QArc::remake(QTop* aMovedTop, float dx, float dy){
     int lgdir, lgolddir;
 
     if ((myStartTop == aMovedTop) && (myEndTop == aMovedTop)){
-        foreach (QArcLine* line, lines){
+        foreach (QArcLine* line, lines)
             line->setLine(line->line().translated(dx, dy));
-        }
         return true;
     }
 
