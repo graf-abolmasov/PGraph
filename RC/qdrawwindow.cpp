@@ -208,6 +208,7 @@ void TDrawWindow::showTopPropDialog(){
     dlg.prepareForm(top);
     if (dlg.exec()) {
         top = dlg.getResult();
+        emit itemChanged(top);
         emit sceneChanged();
     }
 }
@@ -238,6 +239,7 @@ void TDrawWindow::showArcPropDialog()
     dlg.prepareForm(arc);
     if (dlg.exec()) {
         arc = dlg.getResult();
+        emit itemChanged(arc);
         emit sceneChanged();
     }
 }
@@ -439,8 +441,27 @@ void TDrawWindow::alignHLeft()
             left = top->mapRectToScene(top->rect()).left();
     }
 
-    foreach (QTop* top, topList)
-        itemMoved(top, QLineF(0, 0, left - top->mapRectToScene(top->rect()).left(), 0));
+    foreach (QTop* top, topList) {
+        QLineF vector(top->mapRectToScene(top->rect()).left() + top->rect().width()/2, top->scenePos().y(), left + top->rect().width()/2, top->scenePos().y());
+
+        bool allowMove = true;
+        top->setPos(top->scenePos().x() + vector.dx(), top->scenePos().y() + vector.dy());
+
+        //надем пересекающиеся элементы
+        QList<QGraphicsItem* > itemList = scene->collidingItems(top, Qt::IntersectsItemBoundingRect);
+        foreach(QGraphicsItem* item, itemList)
+            //если есть хотя бы одна вершина
+            if (item->type() == QTop::Type){
+                //запретим перемещение
+                allowMove = false;
+                break;
+            }
+
+        //вернем все на место
+        top->setPos(top->scenePos().x() - vector.dx(), top->scenePos().y() - vector.dy());
+        if (allowMove)
+            itemMoved(top, vector);
+    }
     emit sceneChanged();
 }
 
@@ -457,8 +478,27 @@ void TDrawWindow::alignHRight()
             right = top->mapRectToScene(top->rect()).right();
     }
 
-    foreach (QTop* top, topList)
-        itemMoved(top, QLineF(0, 0, right - top->mapRectToScene(top->rect()).right(), 0));
+    foreach (QTop* top, topList) {
+        QLineF vector(top->mapRectToScene(top->rect()).right() - top->rect().width()/2, top->scenePos().y(), right - top->rect().width()/2, top->scenePos().y());
+
+        bool allowMove = true;
+        top->setPos(top->scenePos().x() + vector.dx(), top->scenePos().y() + vector.dy());
+
+        //надем пересекающиеся элементы
+        QList<QGraphicsItem* > itemList = scene->collidingItems(top, Qt::IntersectsItemBoundingRect);
+        foreach(QGraphicsItem* item, itemList)
+            //если есть хотя бы одна вершина
+            if (item->type() == QTop::Type){
+                //запретим перемещение
+                allowMove = false;
+                break;
+            }
+
+        //вернем все на место
+        top->setPos(top->scenePos().x() - vector.dx(), top->scenePos().y() - vector.dy());
+        if (allowMove)
+            itemMoved(top, vector);
+    }
     emit sceneChanged();
 }
 
@@ -473,8 +513,28 @@ void TDrawWindow::alignHCenter()
     foreach (QTop* top, topList)
         center += top->scenePos().x();
     center /= topList.count();
-    foreach (QTop* top, topList)
-        itemMoved(top, QLineF(0, 0, center - top->scenePos().x(), 0));
+    foreach (QTop* top, topList) {
+        QLineF vector(top->scenePos().x(), top->scenePos().y(), center, top->scenePos().y());
+
+        bool allowMove = true;
+        top->setPos(top->scenePos().x() + vector.dx(), top->scenePos().y() + vector.dy());
+
+        //надем пересекающиеся элементы
+        QList<QGraphicsItem* > itemList = scene->collidingItems(top, Qt::IntersectsItemBoundingRect);
+        foreach(QGraphicsItem* item, itemList)
+            //если есть хотя бы одна вершина
+            if (item->type() == QTop::Type){
+                //запретим перемещение
+                allowMove = false;
+                break;
+            }
+
+        //вернем все на место
+        top->setPos(top->scenePos().x() - vector.dx(), top->scenePos().y() - vector.dy());
+        if (allowMove)
+            itemMoved(top, vector);
+    }
+
     emit sceneChanged();
 }
 
@@ -491,8 +551,27 @@ void TDrawWindow::alignVTop()
             topEdge = top->mapRectToScene(top->rect()).top();
     }
 
-    foreach (QTop* top, topList)
-        itemMoved(top, QLineF(0, 0, 0, topEdge - top->mapRectToScene(top->rect()).top()));
+    foreach (QTop* top, topList) {
+        QLineF vector(top->scenePos().x(), top->mapRectToScene(top->rect()).top() + top->rect().height()/2, top->scenePos().x(), topEdge + top->rect().height()/2);
+
+        bool allowMove = true;
+        top->setPos(top->scenePos().x() + vector.dx(), top->scenePos().y() + vector.dy());
+
+        //надем пересекающиеся элементы
+        QList<QGraphicsItem* > itemList = scene->collidingItems(top, Qt::IntersectsItemBoundingRect);
+        foreach(QGraphicsItem* item, itemList)
+            //если есть хотя бы одна вершина
+            if (item->type() == QTop::Type){
+                //запретим перемещение
+                allowMove = false;
+                break;
+            }
+
+        //вернем все на место
+        top->setPos(top->scenePos().x() - vector.dx(), top->scenePos().y() - vector.dy());
+        if (allowMove)
+            itemMoved(top, vector);
+    }
     emit sceneChanged();
 }
 
@@ -509,8 +588,27 @@ void TDrawWindow::alignVBottom()
             bottom = top->mapRectToScene(top->rect()).bottom();
     }
     if (topList.count() == 0) return;
-    foreach (QTop* top, topList)
-        itemMoved(top, QLineF(0, 0, 0, bottom - top->mapRectToScene(top->rect()).bottom()));
+    foreach (QTop* top, topList) {
+        QLineF vector(top->scenePos().x(), top->mapRectToScene(top->rect()).bottom() - top->rect().height()/2, top->scenePos().x(), bottom - top->rect().height()/2);
+
+        bool allowMove = true;
+        top->setPos(top->scenePos().x() + vector.dx(), top->scenePos().y() + vector.dy());
+
+        //надем пересекающиеся элементы
+        QList<QGraphicsItem* > itemList = scene->collidingItems(top, Qt::IntersectsItemBoundingRect);
+        foreach(QGraphicsItem* item, itemList)
+            //если есть хотя бы одна вершина
+            if (item->type() == QTop::Type){
+                //запретим перемещение
+                allowMove = false;
+                break;
+            }
+
+        //вернем все на место
+        top->setPos(top->scenePos().x() - vector.dx(), top->scenePos().y() - vector.dy());
+        if (allowMove)
+            itemMoved(top, vector);
+    }
     emit sceneChanged();
 }
 
@@ -525,8 +623,28 @@ void TDrawWindow::alignVCenter()
     foreach (QTop* top, topList)
         center += top->scenePos().y();
     center /= topList.count();
-    foreach (QTop* top, topList)
-        itemMoved(top, QLineF(0, 0, 0, center - top->scenePos().y()));
+    foreach (QTop* top, topList) {
+        QLineF vector(top->scenePos().x(), top->scenePos().y(), top->scenePos().x(), center);
+
+        bool allowMove = true;
+        top->setPos(top->scenePos().x() + vector.dx(), top->scenePos().y() + vector.dy());
+
+        //надем пересекающиеся элементы
+        QList<QGraphicsItem* > itemList = scene->collidingItems(top, Qt::IntersectsItemBoundingRect);
+        foreach(QGraphicsItem* item, itemList)
+            //если есть хотя бы одна вершина
+            if (item->type() == QTop::Type){
+                //запретим перемещение
+                allowMove = false;
+                break;
+            }
+
+        //вернем все на место
+        top->setPos(top->scenePos().x() - vector.dx(), top->scenePos().y() - vector.dy());
+        if (allowMove)
+            itemMoved(top, vector);
+    }
+
     emit sceneChanged();
 }
 
@@ -567,6 +685,9 @@ void TDrawWindow::distribHorizontally()
             totalWidth += top->rect().width();
         }
         float dist = (fabs(left - right) - totalWidth) / (topList.count() - 1);
+
+        //не получается распределить. мало места.
+        if (dist <= 0) return;
 
         foreach (QTop* top, topList){
             itemMoved(top, QLineF(0, 0, left - top->mapRectToScene(top->rect()).left(), 0));
@@ -680,6 +801,8 @@ void TDrawWindow::distribVertically()
             totalHeight += top->rect().height();
 
         float dist = (fabs(topEdge - bottom) - totalHeight) / (topList.count() - 1);
+        //не получается распределить. мало места.
+        if (dist <= 0) return;
 
         foreach (QTop* top, topList){
             itemMoved(top, QLineF(0, 0, 0, topEdge - top->mapRectToScene(top->rect()).top()));
@@ -814,6 +937,7 @@ void TDrawWindow::rebuildArc()
     if (item->type() == QSerialArcTop::Type) {
         QArc* arc = qgraphicsitem_cast<QArc* >(item->parentItem());
         arc->autoBuild(arc->startItem(), 0, 0);
+        emit itemChanged(arc);
         emit sceneChanged();
     }
 }
@@ -821,4 +945,12 @@ void TDrawWindow::rebuildArc()
 void TDrawWindow::selectionChanged()
 {
     emit selectionChanged(scene->selectedItems());
+}
+
+void TDrawWindow::scale(float s)
+{
+    QMatrix oldMatrix = view->matrix();
+    view->resetMatrix();
+    view->translate(oldMatrix.dx(), oldMatrix.dy());
+    view->scale(s, s);
 }

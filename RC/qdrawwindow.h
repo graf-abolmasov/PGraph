@@ -71,6 +71,7 @@ public:
     void alignVBottom();
     void distribVertically();
     void distribHorizontally();
+    void scale(float s);
 signals:
     void sceneChanged();
     void itemChanged(QGraphicsItem *item);
@@ -92,6 +93,7 @@ private slots:
     void itemMoved(QGraphicsItem *item, QLineF vector);
     void itemDeleted(QGraphicsItem *item);
     void itemsMoved(QList<QGraphicsItem*> items, QLineF vector);
+
 
     void selectionChanged();
 };

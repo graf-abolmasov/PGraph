@@ -118,26 +118,30 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
         //если да, то
         if (allowMove) {
-            //не пересечется ли како-нибудь элемент с уже имеющимся на сцене?
-            foreach (QGraphicsItem* item, mySelectedItems) {
-                //передвинем временно элемент
+            //не пересечется ли какqо-нибудь элемент с уже имеющимся на сцене?
+            //передвинем все элементы временно
+            foreach (QGraphicsItem* item, mySelectedItems)
                 item->setPos(item->scenePos().x() + vector.dx(), item->scenePos().y() + vector.dy());
-                //надем пересекающиеся с ним элементы
+
+            //надем пересекающиеся элементы
+            foreach (QGraphicsItem* item, mySelectedItems) {
                 QList<QGraphicsItem* > itemList = collidingItems(item, Qt::IntersectsItemBoundingRect);
                 foreach(QGraphicsItem* item, itemList) {
-                    //если есть ходябы одна вершина
+                    //если есть хотя бы одна вершина
                     if (item->type() == QTop::Type){
                         //запретим перемещение
                         allowMove = false;
                         break;
                     }
                 }
-                //вернем на место вершину
-                item->setPos(item->scenePos().x() - vector.dx(), item->scenePos().y() - vector.dy());
-                //если хотябы одна вершина пересекается, то остальные не проверяем
+                //если хотябы одна вершина пересеклась, то остальные не проверяем
                 if (!allowMove)
                     break;
             }
+
+            //вернем все на место
+            foreach (QGraphicsItem* item, mySelectedItems)
+                item->setPos(item->scenePos().x() - vector.dx(), item->scenePos().y() - vector.dy());
         }
 
         //если все хорошо, перемещаем все вершины

@@ -67,9 +67,14 @@ private:
     QAction* distribVerticallyAct;
     QAction* distribHorizontallyAct;
 
+    //scaleToolbar
+    QComboBox *sceneScaleCombo;
+    QSlider *scaleSlider;
+
     QToolBar *mainToolBar;
     QToolBar *leftToolBar;
     QToolBar *layoutToolBar;
+    QToolBar *scaleToolBar;
 
     QUndoView *undoView;
 
@@ -136,6 +141,9 @@ private slots:
     void alignVBottom();        // Выравниевание к самому нижнему объекту из группы
     void distribVertically();   // Распределяет по вертикали через одинаковые расстояния
     void distribHorizontally(); // Распределяет по горизонтили через одинаковые расстояния
+
+    void setFixedScale(const QString &scale);
+    void setFloatScale(const int scale);
 
     void updateAlignToolBar(QList<QGraphicsItem *> items);
 

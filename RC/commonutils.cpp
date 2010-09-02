@@ -131,3 +131,13 @@ bool topLeftThan(const QTop* top1, const QTop* top2)
 {
     return top1->scenePos().x() < top2->scenePos().x();
 }
+
+int dvec2log(float dx, float dy){
+    int res = 0;
+
+    if (dx > 0) res |= RIGHT;
+    else if (dx < 0) res |= LEFT;
+    if (dy > 0) res |= DOWN;
+    else if (dy < 0) res |= UP;
+    return res;
+}

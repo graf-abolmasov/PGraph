@@ -120,6 +120,7 @@ MoveCommand::MoveCommand(QList<QGraphicsItem *>items, QGraphicsScene *graphicsSc
 
 void MoveCommand::undo()
 {
+    //если элемент один то это либо один комментарий, либо одна вершина
     if (myItems.count() == 1) {
         switch (myItems.first()->type()) {
         case QTop::Type: {
@@ -132,30 +133,33 @@ void MoveCommand::undo()
             break;
         }
     }
+    //несколько м.б. только вершин
     else if (myItems.count() > 1) {
+
         QSet<QArc* > arcs;
+        //собираем все дуги
         foreach (QGraphicsItem* item, myItems) {
             QTop* top = qgraphicsitem_cast<QTop* >(item);
             arcs.unite(top->allArcs().toSet());
         }
-        foreach (QArc* arc, arcs) {
+        //замораживаем дуги у которых перемещаются обе вершины
+        foreach (QArc* arc, arcs)
             if (myItems.contains(arc->startItem()) && myItems.contains(arc->endItem()))
                 arc->freeze();
-            else
-                arcs.remove(arc);
-        }
+        //перемещаем вершины
         foreach (QGraphicsItem* item, myItems) {
             QTop* top = qgraphicsitem_cast<QTop* >(item);
             top->moveBy(-myDisplacementVector.dx(), -myDisplacementVector.dy());
         }
-        foreach (QArc* arc, arcs) {
+        //размораживаем все дуги
+        foreach (QArc* arc, arcs)
             arc->unfreeze();
-        }
     }
 }
 
 void MoveCommand::redo()
 {
+    //если элемент один то это либо один комментарий, либо одна вершина
     if (myItems.count() == 1) {
         switch (myItems.first()->type()) {
         case QTop::Type: {
@@ -168,23 +172,26 @@ void MoveCommand::redo()
             break;
         }
     }
+    //несколько м.б. только вершин
     else if (myItems.count() > 1) {
         QSet<QArc* > arcs;
+        //собираем все дуги
         foreach (QGraphicsItem* item, myItems) {
             QTop* top = qgraphicsitem_cast<QTop* >(item);
             arcs.unite(top->allArcs().toSet());
         }
-        foreach (QArc* arc, arcs) {
+        //замораживаем дуги у которых перемещаются обе вершины
+        foreach (QArc* arc, arcs)
             if (myItems.contains(arc->startItem()) && myItems.contains(arc->endItem()))
                 arc->freeze();
-        }
+        //перемещаем вершины
         foreach (QGraphicsItem* item, myItems) {
             QTop* top = qgraphicsitem_cast<QTop* >(item);
             top->moveBy(myDisplacementVector.dx(), myDisplacementVector.dy());
         }
-        foreach (QArc* arc, arcs) {
+        //размораживаем все дуги
+        foreach (QArc* arc, arcs)
             arc->unfreeze();
-        }
     }
 }
 
