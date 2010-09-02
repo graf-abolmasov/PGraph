@@ -8,13 +8,12 @@
 #include "commonutils.h"
 #include "globalvariables.h"
 
-QStatusBar *globalStatusBar;
 QLabel *globalInfoLabel;
 
 TMyWindow::TMyWindow()
 {
-    globalStatusBar = new QStatusBar(this);
-    setStatusBar(globalStatusBar);
+    QStatusBar* statusBar = new QStatusBar(this);
+    setStatusBar(statusBar);
 
     createActions();
     createMenus();
@@ -200,6 +199,21 @@ void TMyWindow::createActions()
     distribHorizontallyAct = new QAction(QIcon(":/images/shape_distrib_horizontally.png"), tr("Распределить по горизонтали"), this);
     distribHorizontallyAct->setStatusTip(tr("Распределить вершиные по горизонтали на одинаковом расстоянии"));
     connect(distribHorizontallyAct, SIGNAL(triggered()), this, SLOT(distribHorizontally()));
+
+    sceneScaleCombo = new QComboBox;
+    QStringList scales;
+    scales << tr("50%") << tr("75%") << tr("100%") << tr("125%") << tr("150%");
+    sceneScaleCombo->addItems(scales);
+    connect(sceneScaleCombo, SIGNAL(currentIndexChanged(QString)),
+            this, SLOT(setFixedScale(QString)));
+
+    scaleSlider = new QSlider;
+    scaleSlider->setRange(50, 200);
+    scaleSlider->setValue(100);
+    scaleSlider->setOrientation(Qt::Horizontal);
+    scaleSlider->setMaximumWidth(100);
+    connect(scaleSlider, SIGNAL(sliderMoved(int)), this, SLOT(setFloatScale(int)));
+
 }
 
 TDrawWindow* TMyWindow::createDrawWindow()
@@ -223,7 +237,8 @@ TDrawWindow* TMyWindow::createDrawWindow()
     distribVerticallyAct->setEnabled(false);
     distribHorizontallyAct->setEnabled(false);
 
-    globalInfoLabel->setText("\n\n\n\n\n\n\n\n\n\n");
+    globalInfoLabel->setText("\n\n\n\n\n\n\n");
+    sceneScaleCombo->setCurrentIndex(2);
     return newDrawWindow;
 }
 
@@ -272,6 +287,11 @@ void TMyWindow::createToolBar()
     layoutToolBar->addAction(distribHorizontallyAct);
     layoutToolBar->addAction(distribVerticallyAct);
 
+    scaleToolBar = addToolBar(tr("Масштаб"));
+    scaleToolBar->addWidget(new QLabel(tr("Масштаб: ")));
+    scaleToolBar->addWidget(sceneScaleCombo);
+    //scaleToolBar->addSeparator();
+    //scaleToolBar->addWidget(scaleSlider);
 }
 
 void TMyWindow::CMGNew()
@@ -314,7 +334,7 @@ void TMyWindow::CMGSaveAs()
             setMyGraphExtName(dialog.getResult());
             setMyGraphName("G" + getCRC(myGraphExtName.toUtf8()));
             if (activeDrawWindow()->saveGraph(myGraphName, myGraphExtName, globalDBManager))
-                globalStatusBar->showMessage(tr("Сохранено как ") + myGraphName, 3000);
+                statusBar()->showMessage(tr("Сохранено как ") + myGraphName, 3000);
         }
     }
 }
@@ -378,14 +398,14 @@ void TMyWindow::CMSaveStruct()
         return;
     }
     if (activeDrawWindow()->saveStruct(myGraphName, globalDBManager))
-        globalStatusBar->showMessage(tr("Структура записана"), 2000);
+        statusBar()->showMessage(tr("Структура записана"), 2000);
 }
 
 void TMyWindow::CMGSave()
 {
     if (myGraphName != "")
         if (activeDrawWindow()->saveGraph(myGraphName, myGraphExtName, globalDBManager, true))
-            globalStatusBar->showMessage(tr("Сохранено"), 2000);
+            statusBar()->showMessage(tr("Сохранено"), 2000);
 }
 
 void TMyWindow::setMyGraphName(QString name)
@@ -485,7 +505,6 @@ void TMyWindow::getInfo(QGraphicsItem *item)
     QArc *arc = NULL;
     QTop *top = NULL;
     QSyncArc *syncArc = NULL;
-    QString status = tr("");
     QString info = tr("");
     QString arcTypeStr;
     if (item != NULL) {
@@ -493,64 +512,85 @@ void TMyWindow::getInfo(QGraphicsItem *item)
         case QArc::Type:
             arc = qgraphicsitem_cast<QArc*>(item);
         case QArcLine::Type:
-        case QSerialArcTop::Type:
-            if (!arc)
-                arc = qgraphicsitem_cast<QArc*>(item->parentItem());
-            switch (arc->arcType()) {
-            case QArc::SerialArc:
-                arcTypeStr = tr("последовательная");
-                break;
-            case QArc::ParallelArc:
-                arcTypeStr = tr("параллельная");
-                break;
-            case QArc::TerminateArc:
-                arcTypeStr = tr("терминирующая");
-                break;
+        case QSerialArcTop::Type: {
+                if (!arc)
+                    arc = qgraphicsitem_cast<QArc*>(item->parentItem());
+                switch (arc->arcType()) {
+                case QArc::SerialArc:
+                    arcTypeStr = tr("последовательная");
+                    break;
+                case QArc::ParallelArc:
+                    arcTypeStr = tr("параллельная");
+                    break;
+                case QArc::TerminateArc:
+                    arcTypeStr = tr("терминирующая");
+                    break;
+                }
+                info.append(tr("Дуга\nТип: ") + arcTypeStr + "\n");
+                if (arc->startItem() != NULL) {
+                    info.append(tr("Начальная вершина: ") + QString::number(arc->startItem()->number) + "\n");
+                }
+                if (arc->endItem() != NULL) {
+                    info.append(tr("Конечная вершина: ") + QString::number(arc->endItem()->number) + "\n");
+                }
+                info.append(tr("Приоритет: ") + QString::number(arc->priority()) + "\n" +
+                            tr("Ширина пера ") + QString::number(arc->pen().width()) + "\n");
+                info.append(tr("Число изломов: ") + QString::number(arc->lines.count()) + "\n");
+                if (arc->predicate != NULL) {
+                    info.append(tr("\nО предикате\n"));
+                    QString predType = tr("");
+                    switch(arc->predicate->type) {
+                    case Predicate::inlineType:
+                        predType = tr("inline");
+                        break;
+                    case Predicate::normalType:
+                        predType = tr("обычный");
+                        break;
+                    }
+                    info.append(tr("Тип: ") + predType + "\n");
+                    info.append(tr("Название: ") + arc->predicate->extName + "\n");
+                    info.append(tr("Внутреннее имя: ") + arc->predicate->name + "\n");
+                    if (arc->predicate->type == Predicate::normalType)
+                        info.append(tr("Базовый модуль: ") + arc->predicate->baseModule + "\n");
+                }
             }
-            status.append(tr("Дуга ") + arcTypeStr);
-            info.append(tr("Дуга\nТип: ") + arcTypeStr + "\n");
-            if (arc->startItem() != NULL) {
-                status.append(tr(" Начальная вершина ") + QString::number(arc->startItem()->number));
-                info.append(tr("Начальная вершина: ") + QString::number(arc->startItem()->number) + "\n");
-            }
-            if (arc->endItem() != NULL) {
-                status.append(tr(" Конечная вершина ") + QString::number(arc->endItem()->number));
-                info.append(tr("Конечная вершина: ") + QString::number(arc->endItem()->number) + "\n");
-            }
-            status.append(tr(" Приоритет ") + QString::number(arc->priority()) +
-                          tr(" Ширина пера ") + QString::number(arc->pen().width()));
-            info.append(tr("Приоритет: ") + QString::number(arc->priority()) + "\n" +
-                        tr("Ширина пера ") + QString::number(arc->pen().width()) + "\n");
-            if (arc->predicate != NULL) {
-                status.append(tr(" Предикат ") + arc->predicate->extName);
-                info.append(tr("Предикат: ") + arc->predicate->extName + "\n");
-            }
-            info.append(tr("Число изломов: ") + QString::number(arc->lines.count()) + "\n");
             break;
 
-    case QTop::Type:
-            top = qgraphicsitem_cast<QTop* >(item);
-            status.append(tr("Номер вершины ") + QString::number(top->number));
-            info.append(tr("Номер вершины ") + QString::number(top->number) + "\n");
-            if (top->actor != NULL) {
-                status.append(tr(" Актор ") + top->actor->extName);
-                info.append(tr("Актор: ") + top->actor->extName + "\n");
+        case QTop::Type: {
+                top = qgraphicsitem_cast<QTop* >(item);
+                info.append(tr("Номер вершины ") + QString::number(top->number) + "\n");
+                info.append(tr("Число дуг: ") + QString::number(top->allArcs().count()) + "\n");
+                info.append(tr("Число исход. дуг: ") + QString::number(top->outArcs().count()) + "\n");
+                info.append(tr("Число вход. дуг: ") + QString::number(top->inArcs().count()) + "\n");
+                info.append(tr("Left: ") + QString::number(top->mapRectToScene(top->rect()).left()) + "\n");
+                info.append(tr("Top: ") + QString::number(top->mapRectToScene(top->rect()).top()) + "\n");
+                info.append(tr("Right: ") + QString::number(top->mapRectToScene(top->rect()).right()) + "\n");
+                info.append(tr("Bottom: ") + QString::number(top->mapRectToScene(top->rect()).bottom()) + "\n");
+                if (top->actor != NULL) {
+                    info.append(tr("\nОб акторе\n"));
+                    QString actType = tr("");
+                    switch(top->actor->type) {
+                    case Actor::inlineType:
+                        actType = tr("inline");
+                        break;
+                    case Actor::normalType:
+                        actType = tr("обычный");
+                        break;
+                    }
+                    info.append(tr("Тип: ") + actType + "\n");
+                    info.append(tr("Название: ") + top->actor->extName + "\n");
+                    info.append(tr("Внутреннее имя: ") + top->actor->name+ "\n");
+                    if (top->actor->type == Actor::normalType)
+                        info.append(tr("Базовый модуль: ") + top->actor->baseModule + "\n");
+                }
             }
-            info.append(tr("Число дуг: ") + QString::number(top->allArcs().count()) + "\n");
-            info.append(tr("Число исход. дуг: ") + QString::number(top->outArcs().count()) + "\n");
-            info.append(tr("Число вход. дуг: ") + QString::number(top->inArcs().count()) + "\n");
-            info.append(tr("Left: ") + QString::number(top->mapRectToScene(top->rect()).left()) + "\n");
-            info.append(tr("Top: ") + QString::number(top->mapRectToScene(top->rect()).top()) + "\n");
-            info.append(tr("Right: ") + QString::number(top->mapRectToScene(top->rect()).right()) + "\n");
-            info.append(tr("Bottom: ") + QString::number(top->mapRectToScene(top->rect()).bottom()) + "\n");
             break;
-    case QSyncArc::Type:
-            syncArc = qgraphicsitem_cast<QSyncArc* >(item);
-            break;
-        }
+        case QSyncArc::Type:
+        syncArc = qgraphicsitem_cast<QSyncArc* >(item);
+        break;
+    }
     }
 
-    globalStatusBar->showMessage(status);
     globalInfoLabel->setText(info);
 }
 
@@ -600,4 +640,16 @@ void TMyWindow::updateAlignToolBar(QList<QGraphicsItem *> items)
         distribVerticallyAct->setEnabled(true);
         distribHorizontallyAct->setEnabled(true);
     }
+}
+
+void TMyWindow::setFixedScale(const QString &scale)
+{
+    int newScale = scale.left(scale.indexOf(tr("%"))).toInt();
+    activeDrawWindow()->scale(newScale/100.0);
+    scaleSlider->setValue(newScale);
+}
+
+void TMyWindow::setFloatScale(const int scale)
+{
+    activeDrawWindow()->scale(scale/100.0);
 }

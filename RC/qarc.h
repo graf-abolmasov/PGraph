@@ -9,10 +9,6 @@
 #include "predicate.h"
 
 #define ARC_TYPE      UserType+4
-#define UP	0x80
-#define LEFT	0x20
-#define DOWN	0x08
-#define RIGHT	0x02
 
 class QTop;
 class QArcLine;

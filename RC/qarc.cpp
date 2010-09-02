@@ -5,19 +5,10 @@
 #include "qparallelarctop.h"
 #include "qserialarctop.h"
 #include "qterminatearctop.h"
+#include "commonutils.h"
 
 const qreal Pi = M_PI;
 const int MINDELTA = 40;
-
-int dvec2log(float dx, float dy){
-    int res = 0;
-
-    if (dx > 0) res |= RIGHT;
-    else if (dx < 0) res |= LEFT;
-    if (dy > 0) res |= DOWN;
-    else if (dy < 0) res |= UP;
-    return res;
-}
 
 /*!
   Упрощенный алгоритм перестройки дуги

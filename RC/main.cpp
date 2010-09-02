@@ -32,6 +32,7 @@ int main(int argc, char *argv[])
 
     TMyWindow w;
     w.show();
+    //w.showMaximized();
 
     int result = a.exec();
 
