@@ -8,8 +8,8 @@ Logger::Logger()
     QSettings myLoggerSettings("graph.ini", QSettings::IniFormat);
     logFile = NULL;
     toConsole = false;
-    if (myLoggerSettings.value("Logger/WriteLog", false).toBool()) {
-        myDebugLevel = DebugLevel(myLoggerSettings.value("Logger/DebugLevel", int(Critical)).toInt());
+    if (myLoggerSettings.value("Logger/WriteLog", true).toBool()) {
+        myDebugLevel = DebugLevel(myLoggerSettings.value("Logger/DebugLevel", int(All)).toInt());
         QString fileName = myLoggerSettings.value("Logger/FileName", "console").toString();
         if (fileName == "console")
             toConsole = true;
