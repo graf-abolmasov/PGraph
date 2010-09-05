@@ -30,6 +30,7 @@ int main(int argc, char *argv[])
         return -1;
     }
 
+
     TMyWindow w;
     w.show();
     //w.showMaximized();
