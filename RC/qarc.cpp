@@ -434,7 +434,8 @@ QArc::QArc(QTop *startItem, QTop *endItem, QMenu *contextMenu,
     arcTop->hide();
 }
 
-QArc::~QArc(){
+QArc::~QArc()
+{
     if (myStartTop != NULL)
         myStartTop->removeArc(this);
     if (myEndTop != NULL)
@@ -444,19 +445,20 @@ QArc::~QArc(){
 }
 
 /*!
-  Возвращает прямоугольник включающий все отрезки дуги. необходимо для правильной отрисовки.
+    Возвращает прямоугольник включающий все отрезки дуги.
+    Необходимо для правильной отрисовки.
 */
 QRectF QArc::boundingRect() const
 {
     QRectF rect;
-    foreach (QArcLine* line, lines){
+    foreach (QArcLine* line, lines)
         rect = rect.united(line->boundingRect());
-    }
+    rect.united(QRectF(arcHead.boundingRect()));
     return rect.normalized();
 }
 
 /*!
-  Форма дуги
+    Форма дуги
 */
 QPainterPath QArc::shape() const
 {
@@ -469,7 +471,8 @@ QPainterPath QArc::shape() const
     return path;
 }
 
-void QArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *){
+void QArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
+{
     if (lines.count() == 0) return;
 
     if ((myStartTop == NULL) || (myEndTop == NULL)) {
@@ -511,7 +514,8 @@ void QArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
   @param line - указатель на объект типа QArcLine
   @return true если добавилось
 */
-bool QArc::addLine(QArcLine *line){
+bool QArc::addLine(QArcLine *line)
+{
     if ((prevLine() != NULL) &&
         (prevLine()->line().p2() == line->line().p1()) &&
         (prevLine() != line) &&
@@ -532,7 +536,8 @@ bool QArc::addLine(QArcLine *line){
   @param p2 - конечная точка
   @return указатель на объект типа QArcLine
 */
-QArcLine* QArc::newLine(QPointF p1, QPointF p2){
+QArcLine* QArc::newLine(QPointF p1, QPointF p2)
+{
     if (currentLine == NULL)
         currentLine = new QArcLine(QLineF(p1, p2), this, scene());
     else {
@@ -696,11 +701,19 @@ bool QArc::moveLine(QArcLine *line, float dx, float dy)
     return true;
 }
 
+/*!
+    Замораживаем дугу.
+    Запрещаем перестройку дуг и изменение ее формы и числа изломов.
+    Если делать inline перестает работать.
+*/
 void QArc::freeze()
 {
     freezed = true;
 }
 
+/*!
+    Размораживаем дугу.
+*/
 void QArc::unfreeze()
 {
     freezed = false;
