@@ -19,7 +19,8 @@ QModuleRegister::QModuleRegister(QWidget *parent) :
     filters << "*.c" << "*.C";
     workingDir.setNameFilters(filters);
     workingDir.setFilter(QDir::Files);
-    workingDir.setCurrent(QApplication::applicationDirPath() + "\\C\\");
+    QSettings myLocSettings("graph.ini", QSettings::IniFormat);
+    workingDir.setCurrent(myLocSettings.value("Location/BaseDir", QApplication::applicationDirPath() + "\\BaseDir\\").toString());
     fileList = workingDir.entryInfoList();
 }
 

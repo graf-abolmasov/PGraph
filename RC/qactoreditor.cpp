@@ -173,7 +173,10 @@ void QActorEditor::on_buttonBox_accepted()
         ui->paramsInlineTable->setCurrentCell(-1, -1);
         myActor->name = "A" + getCRC(myActor->extName.toUtf8());
         //генерируем с++ файл
-        QFile output(QApplication::applicationDirPath() + "\\C\\" + myActor->name + ".cpp");
+        QSettings myLocSettings("graph.ini", QSettings::IniFormat);
+        QDir currentDir;
+        currentDir.setCurrent(myLocSettings.value("Location/BaseDir", QApplication::applicationDirPath() + "\\BaseDir\\").toString());
+        QFile output(currentDir.canonicalPath() + "/" + myActor->name + ".cpp");
         output.open(QFile::WriteOnly);
         QByteArray outputData;
         outputData.append("#include \"stype.h\"\r\n");
