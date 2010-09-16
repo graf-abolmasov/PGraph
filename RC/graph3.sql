@@ -2,12 +2,15 @@ SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
 
-CREATE SCHEMA IF NOT EXISTS `graph3` DEFAULT CHARACTER SET utf8;
+DROP SCHEMA IF EXISTS `graph3` ;
+CREATE SCHEMA IF NOT EXISTS `graph3` DEFAULT CHARACTER SET cp1251 ;
 USE `graph3` ;
 
 -- -----------------------------------------------------
 -- Table `graph3`.`project`
 -- -----------------------------------------------------
+DROP TABLE IF EXISTS `graph3`.`project` ;
+
 CREATE  TABLE IF NOT EXISTS `graph3`.`project` (
   `PROJECT_ID` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT ,
   `PROJECT_NAME` VARCHAR(200) NOT NULL ,
@@ -20,6 +23,8 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `graph3`.`actor`
 -- -----------------------------------------------------
+DROP TABLE IF EXISTS `graph3`.`actor` ;
+
 CREATE  TABLE IF NOT EXISTS `graph3`.`actor` (
   `PROJECT_ID` INT(11) UNSIGNED NOT NULL ,
   `NAMEPR` VARCHAR(9) NOT NULL DEFAULT '' ,
@@ -45,6 +50,8 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `graph3`.`bazis`
 -- -----------------------------------------------------
+DROP TABLE IF EXISTS `graph3`.`bazis` ;
+
 CREATE  TABLE IF NOT EXISTS `graph3`.`bazis` (
   `PROJECT_ID` INT(11) NOT NULL AUTO_INCREMENT ,
   `NAMEBAZ` CHAR(8) NOT NULL ,
@@ -58,6 +65,8 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `graph3`.`bazmod`
 -- -----------------------------------------------------
+DROP TABLE IF EXISTS `graph3`.`bazmod` ;
+
 CREATE  TABLE IF NOT EXISTS `graph3`.`bazmod` (
   `PROJECT_ID` INT(11) UNSIGNED NOT NULL ,
   `PROTOTIP` VARCHAR(9) NOT NULL ,
@@ -81,6 +90,8 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `graph3`.`data`
 -- -----------------------------------------------------
+DROP TABLE IF EXISTS `graph3`.`data` ;
+
 CREATE  TABLE IF NOT EXISTS `graph3`.`data` (
   `PROJECT_ID` INT(11) UNSIGNED NOT NULL ,
   `data` VARCHAR(64) CHARACTER SET 'cp1251' COLLATE 'cp1251_bin' NOT NULL ,
@@ -102,6 +113,8 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `graph3`.`databaz`
 -- -----------------------------------------------------
+DROP TABLE IF EXISTS `graph3`.`databaz` ;
+
 CREATE  TABLE IF NOT EXISTS `graph3`.`databaz` (
   `PROJECT_ID` INT(11) UNSIGNED NOT NULL ,
   `PROTOTIP` VARCHAR(9) NOT NULL ,
@@ -123,6 +136,8 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `graph3`.`graph`
 -- -----------------------------------------------------
+DROP TABLE IF EXISTS `graph3`.`graph` ;
+
 CREATE  TABLE IF NOT EXISTS `graph3`.`graph` (
   `PROJECT_ID` INT(11) UNSIGNED NOT NULL ,
   `NAMEPR` VARCHAR(9) NOT NULL ,
@@ -146,6 +161,8 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `graph3`.`graphpic`
 -- -----------------------------------------------------
+DROP TABLE IF EXISTS `graph3`.`graphpic` ;
+
 CREATE  TABLE IF NOT EXISTS `graph3`.`graphpic` (
   `PROJECT_ID` INT(11) UNSIGNED NOT NULL ,
   `ELTYP` VARCHAR(1) NOT NULL DEFAULT 'g' ,
@@ -178,6 +195,8 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `graph3`.`graphpre`
 -- -----------------------------------------------------
+DROP TABLE IF EXISTS `graph3`.`graphpre` ;
+
 CREATE  TABLE IF NOT EXISTS `graph3`.`graphpre` (
   `PROJECT_ID` INT(11) UNSIGNED NOT NULL ,
   `NAMEPR` VARCHAR(9) NOT NULL ,
@@ -197,6 +216,8 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `graph3`.`graphtop`
 -- -----------------------------------------------------
+DROP TABLE IF EXISTS `graph3`.`graphtop` ;
+
 CREATE  TABLE IF NOT EXISTS `graph3`.`graphtop` (
   `PROJECT_ID` INT(11) UNSIGNED NOT NULL ,
   `NAMEPR` VARCHAR(9) NOT NULL ,
@@ -217,6 +238,8 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `graph3`.`grh_err`
 -- -----------------------------------------------------
+DROP TABLE IF EXISTS `graph3`.`grh_err` ;
+
 CREATE  TABLE IF NOT EXISTS `graph3`.`grh_err` (
   `PROJECT_ID` INT(11) NOT NULL AUTO_INCREMENT ,
   `namepr` VARCHAR(100) NULL DEFAULT NULL ,
@@ -230,6 +253,8 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `graph3`.`gsp_shab`
 -- -----------------------------------------------------
+DROP TABLE IF EXISTS `graph3`.`gsp_shab` ;
+
 CREATE  TABLE IF NOT EXISTS `graph3`.`gsp_shab` (
   `PROJECT_ID` INT(11) NOT NULL AUTO_INCREMENT ,
   `NLEX` FLOAT NULL DEFAULT NULL ,
@@ -243,6 +268,8 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `graph3`.`pasport`
 -- -----------------------------------------------------
+DROP TABLE IF EXISTS `graph3`.`pasport` ;
+
 CREATE  TABLE IF NOT EXISTS `graph3`.`pasport` (
   `PROJECT_ID` INT(11) UNSIGNED NOT NULL ,
   `NAMEPR` VARCHAR(9) NOT NULL ,
@@ -264,6 +291,8 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `graph3`.`typsys`
 -- -----------------------------------------------------
+DROP TABLE IF EXISTS `graph3`.`typsys` ;
+
 CREATE  TABLE IF NOT EXISTS `graph3`.`typsys` (
   `PROJECT_ID` INT(11) UNSIGNED NOT NULL ,
   `TYPE` VARCHAR(8) NOT NULL ,
