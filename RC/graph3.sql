@@ -2,9 +2,7 @@ SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
 
-CREATE SCHEMA IF NOT EXISTS `mydb` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci ;
-CREATE SCHEMA IF NOT EXISTS `graph3` DEFAULT CHARACTER SET cp1251 ;
-USE `mydb` ;
+CREATE SCHEMA IF NOT EXISTS `graph3` DEFAULT CHARACTER SET utf8;
 USE `graph3` ;
 
 -- -----------------------------------------------------
@@ -15,8 +13,8 @@ CREATE  TABLE IF NOT EXISTS `graph3`.`project` (
   `PROJECT_NAME` VARCHAR(200) NOT NULL ,
   PRIMARY KEY (`PROJECT_ID`) )
 ENGINE = InnoDB
-AUTO_INCREMENT = 2
-DEFAULT CHARACTER SET = cp1251;
+AUTO_INCREMENT = 3
+DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
@@ -41,7 +39,7 @@ CREATE  TABLE IF NOT EXISTS `graph3`.`actor` (
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = cp1251;
+DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
@@ -77,7 +75,7 @@ CREATE  TABLE IF NOT EXISTS `graph3`.`bazmod` (
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = cp1251;
+DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
@@ -98,7 +96,7 @@ CREATE  TABLE IF NOT EXISTS `graph3`.`data` (
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = cp1251;
+DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
@@ -119,7 +117,7 @@ CREATE  TABLE IF NOT EXISTS `graph3`.`databaz` (
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = cp1251;
+DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
@@ -134,15 +132,15 @@ CREATE  TABLE IF NOT EXISTS `graph3`.`graph` (
   `PRIOR` INT(11) NOT NULL ,
   `EXCL` VARCHAR(8) NULL DEFAULT NULL ,
   `ARCTYPE` INT(11) UNSIGNED NOT NULL ,
+  PRIMARY KEY (`PROJECT_ID`, `NAMEPR`, `NFROM`, `NTO`, `NPRED`, `PRIOR`, `ARCTYPE`) ,
   INDEX `fk_graph_project1` (`PROJECT_ID` ASC) ,
-  PRIMARY KEY (`PROJECT_ID`, `NAMEPR`) ,
   CONSTRAINT `fk_graph_project1`
-    FOREIGN KEY (`PROJECT_ID` , `NAMEPR` )
-    REFERENCES `graph3`.`actor` (`PROJECT_ID` , `NAMEPR` )
+    FOREIGN KEY (`PROJECT_ID` )
+    REFERENCES `graph3`.`project` (`PROJECT_ID` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = cp1251;
+DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
@@ -174,7 +172,7 @@ CREATE  TABLE IF NOT EXISTS `graph3`.`graphpic` (
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = cp1251;
+DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
@@ -185,15 +183,15 @@ CREATE  TABLE IF NOT EXISTS `graph3`.`graphpre` (
   `NAMEPR` VARCHAR(9) NOT NULL ,
   `NPRED` VARCHAR(3) NOT NULL ,
   `NAME` VARCHAR(9) NOT NULL ,
+  PRIMARY KEY (`PROJECT_ID`, `NAMEPR`, `NPRED`, `NAME`) ,
   INDEX `fk_graphpre_project1` (`PROJECT_ID` ASC) ,
-  PRIMARY KEY (`NAMEPR`, `PROJECT_ID`) ,
   CONSTRAINT `fk_graphpre_project1`
-    FOREIGN KEY (`NAMEPR` , `PROJECT_ID` )
-    REFERENCES `graph3`.`actor` (`NAMEPR` , `PROJECT_ID` )
+    FOREIGN KEY (`PROJECT_ID` )
+    REFERENCES `graph3`.`project` (`PROJECT_ID` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = cp1251;
+DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
@@ -205,15 +203,15 @@ CREATE  TABLE IF NOT EXISTS `graph3`.`graphtop` (
   `NTOP` INT(11) NOT NULL ,
   `NAME` VARCHAR(9) NOT NULL ,
   `EXCL` FLOAT NULL DEFAULT NULL ,
+  PRIMARY KEY (`PROJECT_ID`, `NAMEPR`, `NTOP`, `NAME`) ,
   INDEX `fk_graphtop_project1` (`PROJECT_ID` ASC) ,
-  PRIMARY KEY (`PROJECT_ID`, `NAMEPR`) ,
   CONSTRAINT `fk_graphtop_project1`
-    FOREIGN KEY (`PROJECT_ID` , `NAMEPR` )
-    REFERENCES `graph3`.`actor` (`PROJECT_ID` , `NAMEPR` )
+    FOREIGN KEY (`PROJECT_ID` )
+    REFERENCES `graph3`.`project` (`PROJECT_ID` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = cp1251;
+DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
@@ -226,7 +224,7 @@ CREATE  TABLE IF NOT EXISTS `graph3`.`grh_err` (
   `CODERR` DOUBLE NOT NULL ,
   PRIMARY KEY (`PROJECT_ID`) )
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = cp1251;
+DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
@@ -239,7 +237,7 @@ CREATE  TABLE IF NOT EXISTS `graph3`.`gsp_shab` (
   `LEXEM` VARCHAR(255) NULL DEFAULT NULL ,
   PRIMARY KEY (`PROJECT_ID`) )
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = cp1251;
+DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
@@ -260,7 +258,7 @@ CREATE  TABLE IF NOT EXISTS `graph3`.`pasport` (
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = cp1251;
+DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
@@ -278,7 +276,7 @@ CREATE  TABLE IF NOT EXISTS `graph3`.`typsys` (
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = cp1251;
+DEFAULT CHARACTER SET = utf8;
 
 
 
