@@ -71,7 +71,11 @@ void QObjectEditor::changeEvent(QEvent *e)
 void QObjectEditor::prepareForm()
 {
     QList<Actor *> fullActorList;
-    globalDBManager->getActorList(fullActorList);
+    if (!globalDBManager->getActorList(fullActorList))
+        QMessageBox::critical(NULL,
+                              QObject::tr("Ошибка"),
+                              QObject::tr("Не удалось получить список акторов.\n") + globalDBManager->lastError().databaseText(),
+                              QMessageBox::Ok);
     foreach (Actor* actor, fullActorList){
         if (actor->type == Actor::normalType) {
             ui->actorList->addItem(QString(actor->extName).replace(QRegExp("(\r+|\n+)"), " "));
@@ -83,7 +87,11 @@ void QObjectEditor::prepareForm()
         }
     }
     QList<Predicate *> fullPredicateList;
-    globalDBManager->getPredicateList(fullPredicateList);
+    if (!globalDBManager->getPredicateList(fullPredicateList))
+        QMessageBox::critical(NULL,
+                                      QObject::tr("Ошибка"),
+                                      QObject::tr("Не удалось получить список предикатов.\n") + globalDBManager->lastError().databaseText(),
+                                      QMessageBox::Ok);
     foreach (Predicate* pred, fullPredicateList){
         if (pred->type == Predicate::normalType) {
             ui->predicateList->addItem(QString(pred->extName).replace(QRegExp("(\r+|\n+)"), " "));
@@ -267,9 +275,17 @@ void QObjectEditor::on_buttonBox_accepted()
     QList<Actor*> fullActorList;
     fullActorList.append(actorsList);
     fullActorList.append(iActorsList);
-    globalDBManager->saveActorList(fullActorList);
+    if (!globalDBManager->saveActorList(fullActorList))
+        QMessageBox::critical(NULL,
+                              QObject::tr("Ошибка"),
+                              QObject::tr("Не удалось сохранить список акторов.\n") + globalDBManager->lastError().databaseText(),
+                              QMessageBox::Ok);
     QList<Predicate*> fullPredicateList;
     fullPredicateList.append(predicatesList);
     fullPredicateList.append(iPredicateList);
-    globalDBManager->savePredicateList(fullPredicateList);
+    if (!globalDBManager->savePredicateList(fullPredicateList))
+        QMessageBox::critical(NULL,
+                              QObject::tr("Ошибка"),
+                              QObject::tr("Не удалось сохранить список предикаторв.\n") + globalDBManager->lastError().databaseText(),
+                              QMessageBox::Ok);
 }

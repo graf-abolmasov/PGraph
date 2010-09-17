@@ -48,13 +48,16 @@ void ArcPropertyDialog::prepareForm(QArc *arc)
     ui->prioritySpnBox->setMaximum(myArc->startItem()->outArcs().count());
 
     //Загружаем предикаты из базы данных
-    globalDBManager->getPredicateList(myPredicateList);
-    myPredicateList.insert(0, NULL);;
+    if (!globalDBManager->getPredicateList(myPredicateList))
+        QMessageBox::critical(NULL,
+                              QObject::tr("Ошибка"),
+                              QObject::tr("Не удалось получить список предикатов.\n") + globalDBManager->lastError().databaseText(),
+                              QMessageBox::Ok);
 
+    myPredicateList.insert(0, NULL);
     ui->predicateList->addItem(tr("Нет"));
-    for (int i = 1; i < myPredicateList.count(); i++){
+    for (int i = 1; i < myPredicateList.count(); i++)
         ui->predicateList->addItem(myPredicateList.at(i)->extName);
-    }
 
     if (arc->predicate != NULL) {
         int idx = -1;

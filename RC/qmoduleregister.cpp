@@ -45,7 +45,11 @@ void QModuleRegister::prepareForm()
 {
     QStringList moduleList;
     QList<BaseModule*> tempList;
-    globalDBManager->getRegisteredModules(tempList);
+    if (!globalDBManager->getRegisteredModules(tempList))
+        QMessageBox::critical(NULL,
+                              QObject::tr("Ошибка"),
+                              QObject::tr("Не удалось получить список базовых модулей.\n") + globalDBManager->lastError().databaseText(),
+                              QMessageBox::Ok);;
     for (int i = 0; i < tempList.count(); i++)
         moduleList.append(tempList.at(i)->name);
     int i = 0;
@@ -133,9 +137,13 @@ void QModuleRegister::on_buttonBox_accepted()
     }
 
     QString uniqName = "S" + getCRC(ui->fileList->currentItem()->text().toUtf8());
-    globalDBManager->registerModule(uniqName,
+    if (!globalDBManager->registerModule(uniqName,
                                     fileList.at(ui->fileList->currentRow()).baseName(),
-                                    ui->commentTxtEdt->document()->toPlainText(), paramList);
+                                    ui->commentTxtEdt->document()->toPlainText(), paramList))
+        QMessageBox::critical(NULL,
+                              QObject::tr("Ошибка"),
+                              QObject::tr("Не удалось зарегистрировать модуль.\n") + globalDBManager->lastError().databaseText(),
+                              QMessageBox::Ok);
 
     QFile output(uniqName + ".CPP");
     output.open(QFile::WriteOnly);

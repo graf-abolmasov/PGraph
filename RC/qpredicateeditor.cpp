@@ -59,7 +59,11 @@ void QPredicateEditor::prepareForm(Predicate *pred)
     switch(myMode){
     case Normal:
         ui->predicateNameEdt->setText(myPredicate->extName);
-        globalDBManager->getRegisteredModules(myModuleList);
+        if (!globalDBManager->getRegisteredModules(myModuleList))
+            QMessageBox::critical(NULL,
+                                  QObject::tr("Ошибка"),
+                                  QObject::tr("Не удалось получить список базовых модулей.\n") + globalDBManager->lastError().databaseText(),
+                                  QMessageBox::Ok);
         foreach(BaseModule* baseModule, myModuleList){
             ui->baseModuleList->insertItem(ui->baseModuleList->count(), baseModule->name);
             if (myPredicate->baseModule == baseModule->unicName){
@@ -77,7 +81,11 @@ void QPredicateEditor::prepareForm(Predicate *pred)
         }
         break;
     case Inline:
-        globalDBManager->getVariableList(myVariableList);
+        if (!globalDBManager->getVariableList(myVariableList))
+            QMessageBox::critical(NULL,
+                                  QObject::tr("Ошибка"),
+                                  QObject::tr("Не удалось получить список переменных.\n") + globalDBManager->lastError().databaseText(),
+                                  QMessageBox::Ok);
         ui->inlineModuleTxtEdt->blockSignals(true);
         ui->inlineModuleTxtEdt->setPlainText(myPredicate->extName);
         ui->inlineModuleTxtEdt->blockSignals(false);

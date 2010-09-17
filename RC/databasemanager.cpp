@@ -29,6 +29,8 @@ DataBaseManager::DataBaseManager()
     db.setDatabaseName(myDBSettings.value("DB/dbname", "graph3").toString());
     db.setUserName(myDBSettings.value("DB/login", "root").toString());
     db.setPassword(myDBSettings.value("DB/password", "Marina").toString());
+    db.open();
+    db.close();
 
     myProjectId = 1;
 }
@@ -198,7 +200,8 @@ bool DataBaseManager::saveGraph(Graph *graph)
 
 bool DataBaseManager::updateGraph(Graph *graph)
 {
-    if (!db.open()) return false;
+    if (!db.open())
+        return false;
     QSqlQuery query;
     query.prepare("DELETE FROM actor WHERE PROJECT_ID = :PROJECT_ID AND NAMEPR = :NAMEPR;");
     query.bindValue(":PROJECT_ID", myProjectId);
@@ -209,10 +212,10 @@ bool DataBaseManager::updateGraph(Graph *graph)
     return saveGraph(graph);
 }
 
-int DataBaseManager::getGraphList(QList<Graph* > &graphList)
+bool DataBaseManager::getGraphList(QList<Graph* > &graphList)
 {
-    bool ok = db.open();
-    if (!ok) return db.lastError().number();
+    if (!db.open())
+        return false;
     QSqlQuery query;
     query.prepare("SELECT NAMEPR, EXTNAME FROM actor WHERE CLASPR = 'g' AND PROJECT_ID = :PROJECT_ID ORDER BY EXTNAME;");
     query.bindValue(":PROJECT_ID", myProjectId);
@@ -227,12 +230,12 @@ int DataBaseManager::getGraphList(QList<Graph* > &graphList)
         graphList.append(new Graph(query.value(0).toString(), query.value(1).toString(), topList, arcList, commentList, syncArcList, multiProcTopList));
     }
     db.close();
-    return db.lastError().number();
+    return (db.lastError().type() == QSqlError::NoError);
 }
 
-int DataBaseManager::saveDataTypeList(QList<DataType*>& typeList){
-    bool ok = db.open();
-    if (!ok) return db.lastError().number();
+bool DataBaseManager::saveDataTypeList(QList<DataType*>& typeList){
+    if (!db.open())
+        return false;
     QSqlQuery query;
     query.prepare("DELETE FROM typsys WHERE PROJECT_ID = :PROJECT_ID;");
     query.bindValue(":PROJECT_ID", myProjectId);
@@ -249,12 +252,12 @@ int DataBaseManager::saveDataTypeList(QList<DataType*>& typeList){
         query.clear();
     }
     db.close();
-    return db.lastError().number();
+    return (db.lastError().type() == QSqlError::NoError);
 }
 
-int DataBaseManager::getDataTypeList(QList<DataType*>& typeList){
-    bool ok = db.open();
-    if (!ok) return db.lastError().number();
+bool DataBaseManager::getDataTypeList(QList<DataType*>& typeList){
+    if (!db.open())
+        return false;
     QSqlQuery query;
     typeList.clear();
     query.prepare("SELECT PROJECT_ID, TYPE, TYPEDEF FROM typsys WHERE PROJECT_ID = :PROJECT_ID ORDER BY TYPE;");
@@ -265,12 +268,13 @@ int DataBaseManager::getDataTypeList(QList<DataType*>& typeList){
         typeList.append(new DataType(query.value(1).toString(), query.value(2).toString()));
     }
     db.close();
-    return db.lastError().number();
+    return (db.lastError().type() == QSqlError::NoError);
 }
 
-bool DataBaseManager::saveVariableList(QList<Variable*>& varList){
-    bool ok = db.open();
-    if (!ok) return db.lastError().number();
+bool DataBaseManager::saveVariableList(QList<Variable*>& varList)
+{
+    if (!db.open())
+        return false;
     QSqlQuery query;
     query.prepare("DELETE FROM data WHERE PROJECT_ID = :PROJECT_ID;");
     query.bindValue(":PROJECT_ID", myProjectId);
@@ -291,9 +295,10 @@ bool DataBaseManager::saveVariableList(QList<Variable*>& varList){
     return (db.lastError().type() == QSqlError::NoError);
 }
 
-int DataBaseManager::getVariableList(QList<Variable* >& varList){
-    bool ok = db.open();
-    if (!ok) return db.lastError().number();
+bool DataBaseManager::getVariableList(QList<Variable* >& varList)
+{
+    if (!db.open())
+        return false;
     QSqlQuery query;
     query.prepare("SELECT DATA, TYPE, INIT, COMMENT FROM data WHERE PROJECT_ID = :PROJECT_ID ORDER BY DATA;");
     query.bindValue(":PROJECT_ID", myProjectId);
@@ -303,13 +308,13 @@ int DataBaseManager::getVariableList(QList<Variable* >& varList){
         varList.append(new Variable(query.value(0).toString(),query.value(1).toString(),query.value(2).toString(),query.value(3).toString()));
     }
     db.close();
-    return db.lastError().number();
+    return (db.lastError().type() == QSqlError::NoError);
 }
 
-int DataBaseManager::saveActorList(QList<Actor *> &actorList)
+bool DataBaseManager::saveActorList(QList<Actor *> &actorList)
 {
-    bool ok = db.open();
-    if (!ok) return db.lastError().number();
+    if (!db.open())
+        return false;
     QSqlQuery query1;
     query1.prepare("DELETE FROM actor WHERE PROJECT_ID = :PROJECT_ID AND CLASPR = 'a'");
     query1.bindValue(":PROJECT_ID", myProjectId);
@@ -349,15 +354,16 @@ int DataBaseManager::saveActorList(QList<Actor *> &actorList)
         }
     }
     db.close();
-    return db.lastError().number();
+    return (db.lastError().type() == QSqlError::NoError);
 }
 
-int DataBaseManager::getActorList(QList<Actor *> &actorList)
+bool DataBaseManager::getActorList(QList<Actor *> &actorList)
 {
     QList<Variable* > varList;
-    getVariableList(varList);
-    bool ok = db.open();
-    if (!ok) return db.lastError().number();
+    if (!getVariableList(varList))
+        return false;
+    if (!db.open())
+        return false;
     QSqlQuery query1;
     QSqlQuery query2;
     query1.prepare("SELECT NAMEPR, CLASPR, EXTNAME, DATE, TIME, ICON, PROTOTIP FROM actor WHERE CLASPR = 'a' AND PROJECT_ID = :PROJECT_ID ORDER BY EXTNAME;");
@@ -395,16 +401,17 @@ int DataBaseManager::getActorList(QList<Actor *> &actorList)
         query2.clear();
     }
     db.close();
-    return db.lastError().number();
+    return (db.lastError().type() == QSqlError::NoError);
 }
 
 Actor* DataBaseManager::getActor(QString namepr)
 {
     if (namepr == "") return NULL;
     QList<Variable* > varList;
-    getVariableList(varList);
-    bool ok = db.open();
-    if (!ok) return NULL;
+    if (!getVariableList(varList))
+        return false;
+    if (!db.open())
+        return NULL;
     QSqlQuery query1;
     query1.prepare("SELECT CLASPR, EXTNAME, DATE, TIME, ICON, PROTOTIP FROM actor WHERE NAMEPR = :NAMEPR;");
     query1.bindValue(":NAMEPR", namepr);
@@ -448,10 +455,10 @@ Actor* DataBaseManager::getActor(QString namepr)
     return newActor;
 }
 
-int DataBaseManager::savePredicateList(QList<Predicate *> &predList)
+bool DataBaseManager::savePredicateList(QList<Predicate *> &predList)
 {
-    bool ok = db.open();
-    if (!ok) return db.lastError().number();
+    if (!db.open())
+        return false;
     QSqlQuery query;
     query.prepare("DELETE FROM actor WHERE PROJECT_ID = :PROJECT_ID AND CLASPR = 'p'");
     query.bindValue(":PROJECT_ID", myProjectId);
@@ -482,15 +489,16 @@ int DataBaseManager::savePredicateList(QList<Predicate *> &predList)
         }
     }
     db.close();
-    return 0;
+    return (db.lastError().type() == QSqlError::NoError);
 }
 
-int DataBaseManager::getPredicateList(QList<Predicate *> &predList)
+bool DataBaseManager::getPredicateList(QList<Predicate *> &predList)
 {
     QList<Variable* > varList;
-    getVariableList(varList);
-    bool ok = db.open();
-    if (!ok) return db.lastError().number();
+    if (!getVariableList(varList))
+        return false;
+    if (!db.open())
+        return false;
     QSqlQuery query1;
     QSqlQuery query2;
     query1.prepare("SELECT NAMEPR, CLASPR, EXTNAME, DATE, TIME, ICON, PROTOTIP FROM actor WHERE CLASPR = 'p' AND PROJECT_ID = :PROJECT_ID ORDER BY EXTNAME;");
@@ -517,16 +525,17 @@ int DataBaseManager::getPredicateList(QList<Predicate *> &predList)
                                       myVariableList));
     }
     db.close();
-    return db.lastError().number();
+    return (db.lastError().type() == QSqlError::NoError);
 }
 
 Predicate* DataBaseManager::getPredicate(QString namepr)
 {
     if (namepr == "") return NULL;
     QList<Variable* > varList;
-    getVariableList(varList);
-    bool ok = db.open();
-    if (!ok) return NULL;
+    if (!getVariableList(varList))
+        return false;
+    if (!db.open())
+        return NULL;
     QSqlQuery query1;
     query1.prepare("SELECT CLASPR, EXTNAME, DATE, TIME, ICON, PROTOTIP FROM actor WHERE NAMEPR = :NAMEPR AND PROJECT_ID = :PROJECT_ID;");
     query1.bindValue(":NAMEPR", namepr);
@@ -561,10 +570,10 @@ Predicate* DataBaseManager::getPredicate(QString namepr)
                          myVariableList);
 }
 
-int DataBaseManager::registerModule(QString uniqName, QString fileName, QString comment, QStringList &paramList)
+bool DataBaseManager::registerModule(QString uniqName, QString fileName, QString comment, QStringList &paramList)
 {
-    bool ok = db.open();
-    if (!ok) return db.lastError().number();
+    if (!db.open())
+        return false;
     QSqlQuery query;
     query.prepare("INSERT INTO bazmod (PROJECT_ID, PROTOTIP, NAMEPR, COMMENT)"
                   "VALUES (:PROJECT_ID, :PROTOTIP, :NAMEPR, :COMMENT);");
@@ -598,13 +607,13 @@ int DataBaseManager::registerModule(QString uniqName, QString fileName, QString 
     }
 
     db.close();
-    return db.lastError().number();
+    return (db.lastError().type() == QSqlError::NoError);
 }
 
-int DataBaseManager::getRegisteredModules(QList<BaseModule*> &moduleList)
+bool DataBaseManager::getRegisteredModules(QList<BaseModule*> &moduleList)
 {
-    bool ok = db.open();
-    if (!ok) return db.lastError().number();
+    if (!db.open())
+        return false;
     QSqlQuery query1;
     QSqlQuery query2;
     query1.prepare("SELECT PROTOTIP, NAMEPR, COMMENT FROM bazmod WHERE PROJECT_ID = :PROJECT_ID;");
@@ -635,7 +644,7 @@ int DataBaseManager::getRegisteredModules(QList<BaseModule*> &moduleList)
         moduleList.append(new BaseModule(query1.value(1).toString(), query1.value(0).toString(), query1.value(2).toString(), parameterList));
     }
     db.close();
-    return db.lastError().number();
+    return (db.lastError().type() == QSqlError::NoError);
 }
 
 bool DataBaseManager::saveStruct(Graph *graph)

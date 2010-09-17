@@ -37,21 +37,35 @@ void MultiProcTopPropertyDialog::changeEvent(QEvent *e)
 void MultiProcTopPropertyDialog::prepareForm(QMultiProcTop *top)
 {
     myTop = top;
+    ui->procCountSpnBox->setValue(myTop->procCount);
 
-    globalDBManager->getActorList(myActorList);
+    //Добавляем пустой актор
     myActorList.insert(0, NULL);
-    QList<Graph* > myGraphList;
-    globalDBManager->getGraphList(myGraphList);
-    foreach(Graph* graph, myGraphList){
-        QList<Variable* > varList;
-        QStringList varAMList;
-        myActorList.append(new Actor(graph->name, graph->extName, Actor::graphType, "", varList, varAMList));
-    }
     ui->actorsListWidget->addItem(tr("Нет"));
-    for (int i = 1 ; i < myActorList.count(); i++){
-        ui->actorsListWidget->addItem(myActorList.at(i)->extName);
-    }
 
+    //Добавляем агрегаты
+    QList<Graph* > myGraphList;
+    if (globalDBManager->getGraphList(myGraphList))
+        foreach(Graph* graph, myGraphList){
+            QList<Variable* > varList;
+            QStringList varAMList;
+            myActorList.append(new Actor(graph->name, graph->extName, Actor::graphType, "", varList, varAMList));
+        }
+    else QMessageBox::critical(NULL,
+                               QObject::tr("Ошибка"),
+                               QObject::tr("Не удалось получить список агрегатов.\n") + globalDBManager->lastError().databaseText(),
+                               QMessageBox::Ok);
+
+    //Добавляем акторы
+    if (globalDBManager->getActorList(myActorList))
+        for (int i = 1 ; i < myActorList.count(); i++)
+            ui->actorsListWidget->addItem(myActorList.at(i)->extName);
+    else QMessageBox::critical(NULL,
+                               QObject::tr("Ошибка"),
+                               QObject::tr("Не удалось получить список акторов.\n") + globalDBManager->lastError().databaseText(),
+                               QMessageBox::Ok);
+
+    //Выделяем актор в списке
     if (top->actor != NULL){
         int idx = -1;
         for (int i = 1; i < myActorList.count(); i++)
@@ -66,8 +80,6 @@ void MultiProcTopPropertyDialog::prepareForm(QMultiProcTop *top)
             top->actor = NULL;
         }
     } else ui->actorsListWidget->setCurrentRow(0);
-
-    ui->procCountSpnBox->setValue(myTop->procCount);
 }
 
 QMultiProcTop* MultiProcTopPropertyDialog::getResult()

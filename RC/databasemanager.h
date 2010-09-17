@@ -35,27 +35,27 @@ public:
     int projectId()
         { return myProjectId; }
 
-    int getGraphList(QList<Graph* > &graphList);
+    bool getGraphList(QList<Graph* > &graphList);
     bool getGraph(QString extName, Graph &graph);
     bool saveGraph(Graph* graph);
     bool updateGraph(Graph* graph);
 
     bool saveVariableList(QList<Variable*>& varList);
-    int getVariableList(QList<Variable*>& varList);
+    bool getVariableList(QList<Variable*>& varList);
 
-    int saveDataTypeList(QList<DataType*>& typeList);
-    int getDataTypeList(QList<DataType*>& typeList);
+    bool saveDataTypeList(QList<DataType*>& typeList);
+    bool getDataTypeList(QList<DataType*>& typeList);
 
-    int saveActorList(QList<Actor*>& actorList);
-    int getActorList(QList<Actor*>& actorList);
+    bool saveActorList(QList<Actor*>& actorList);
+    bool getActorList(QList<Actor*>& actorList);
     Actor* getActor(QString namepr);
 
-    int savePredicateList(QList<Predicate*>& predList);
-    int getPredicateList(QList<Predicate*>& predList);
+    bool savePredicateList(QList<Predicate*>& predList);
+    bool getPredicateList(QList<Predicate*>& predList);
     Predicate* getPredicate(QString namepr);
 
-    int registerModule(QString uniqName, QString fileName, QString comment, QStringList &paramList);
-    int getRegisteredModules(QList<BaseModule*> &moduleList);
+    bool registerModule(QString uniqName, QString fileName, QString comment, QStringList &paramList);
+    bool getRegisteredModules(QList<BaseModule*> &moduleList);
 
     bool saveStruct(Graph *graph);
 
