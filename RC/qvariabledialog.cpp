@@ -35,8 +35,16 @@ void QVariableDialog::changeEvent(QEvent *e)
 void QVariableDialog::prepareForm(QString filter)
 {
     /*тут мы получаем данные из базы*/
-    globalDBManager->getVariableList(myVariableList);
-    globalDBManager->getDataTypeList(myTypeList);
+    if (!globalDBManager->getVariableList(myVariableList))
+        QMessageBox::critical(NULL,
+                              QObject::tr("Ошибка"),
+                              QObject::tr("Не удалось получить список переменных.\n") + globalDBManager->lastError().databaseText(),
+                              QMessageBox::Ok);
+    if (!globalDBManager->getDataTypeList(myTypeList))
+        QMessageBox::critical(NULL,
+                              QObject::tr("Ошибка"),
+                              QObject::tr("Не удалось получить список типов данных.\n") + globalDBManager->lastError().databaseText(),
+                              QMessageBox::Ok);;
     /*заполняем форму*/
     if (filter != "")
         foreach (Variable* var, myVariableList)

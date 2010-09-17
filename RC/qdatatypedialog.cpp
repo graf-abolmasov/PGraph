@@ -71,7 +71,11 @@ void QDataTypeDialog::on_pushButton_2_clicked()
 void QDataTypeDialog::prepareForm()
 {
     //тут писать получение из базы
-    globalDBManager->getDataTypeList(typeList);
+    if (!globalDBManager->getDataTypeList(typeList))
+        QMessageBox::critical(NULL,
+                              QObject::tr("Ошибка"),
+                              QObject::tr("Не удалось получить список типов данных.\n") + globalDBManager->lastError().databaseText(),
+                              QMessageBox::Ok);;
     //тут писать заполнение формы
     foreach (DataType* type, typeList){
         ui->tableWidget->insertRow(ui->tableWidget->rowCount());
@@ -97,7 +101,11 @@ void QDataTypeDialog::on_pushButton_3_clicked()
 void QDataTypeDialog::on_buttonBox_accepted()
 {
     //тут писать сохранение в базу
-    globalDBManager->saveDataTypeList(typeList);
+    if (!globalDBManager->saveDataTypeList(typeList))
+        QMessageBox::critical(NULL,
+                              QObject::tr("Ошибка"),
+                              QObject::tr("Не удалось сохранить список типов данных.\n") + globalDBManager->lastError().databaseText(),
+                              QMessageBox::Ok);;
 }
 
 void QDataTypeDialog::on_tableWidget_doubleClicked(QModelIndex index)

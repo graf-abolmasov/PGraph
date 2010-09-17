@@ -47,10 +47,13 @@ void QVariableEditor::updateInterface()
 
 void QVariableEditor::prepareForm(Variable *var)
 {
-    globalDBManager->getDataTypeList(typeList);
-    foreach (DataType* type, typeList){
+    if (!globalDBManager->getDataTypeList(typeList))
+        QMessageBox::critical(NULL,
+                              QObject::tr("Ошибка"),
+                              QObject::tr("Не удалось получить список типов данных.\n") + globalDBManager->lastError().databaseText(),
+                              QMessageBox::Ok);
+    foreach (DataType* type, typeList)
         ui->typeCmbBox->addItem(type->name, type->typedefStr);
-    }
 
     if (var != NULL) {
         ui->nameEdt->setText(var->name);

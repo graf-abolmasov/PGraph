@@ -63,25 +63,29 @@ void QActorEditor::prepareForm(Actor *actor)
     switch(myMode){
     case Normal:
         ui->actorNameEdt->setText(myActor->extName);
-        globalDBManager->getRegisteredModules(myModuleList);
-        foreach(BaseModule* baseModule, myModuleList){
-            ui->baseModuleList->insertItem(ui->baseModuleList->count(), baseModule->name);
-            if (myActor->baseModule == baseModule->unicName){
-                ui->baseModuleList->blockSignals(true);
-                ui->baseModuleList->setCurrentRow(ui->baseModuleList->count()-1);
-                for (int i = 0; i < myModuleList.at(ui->baseModuleList->currentRow())->parameterList.count(); i++){
-                    QStringList parameter = myModuleList.at(ui->baseModuleList->currentRow())->parameterList.at(i).split(";;");
-                    ui->paramsNormalTable->insertRow(i);
-                    ui->paramsNormalTable->setItem(i, 0, new QTableWidgetItem(parameter.at(1)));
-                    ui->paramsNormalTable->setItem(i, 1, new QTableWidgetItem(parameter.at(0)));
-                    ui->paramsNormalTable->setItem(i, 2, new QTableWidgetItem(myActor->variableList.at(i) == NULL ? "N/A" : myActor->variableList.at(i)->name));
+        //Получаем список базовых модулей
+        if (globalDBManager->getRegisteredModules(myModuleList)) {
+            ui->baseModuleList->blockSignals(true);
+            foreach(BaseModule* baseModule, myModuleList) {
+                ui->baseModuleList->insertItem(ui->baseModuleList->count(), baseModule->name);
+                if (myActor->baseModule == baseModule->unicName) {
+                    ui->baseModuleList->setCurrentRow(ui->baseModuleList->count()-1);
+                    for (int i = 0; i < myModuleList.at(ui->baseModuleList->currentRow())->parameterList.count(); i++){
+                        QStringList parameter = myModuleList.at(ui->baseModuleList->currentRow())->parameterList.at(i).split(";;");
+                        ui->paramsNormalTable->insertRow(i);
+                        ui->paramsNormalTable->setItem(i, 0, new QTableWidgetItem(parameter.at(1)));
+                        ui->paramsNormalTable->setItem(i, 1, new QTableWidgetItem(parameter.at(0)));
+                        ui->paramsNormalTable->setItem(i, 2, new QTableWidgetItem(myActor->variableList.at(i) == NULL ? "N/A" : myActor->variableList.at(i)->name));
+                    }
                 }
-                ui->baseModuleList->blockSignals(false);
-             }
-        }
+            }
+            ui->baseModuleList->blockSignals(false);
+        } else QMessageBox::critical(NULL,
+                                     QObject::tr("Ошибка"),
+                                     QObject::tr("Не удалось получить список базовых модулей.\n") + globalDBManager->lastError().databaseText(),
+                                     QMessageBox::Ok);
         break;
     case Inline:
-        globalDBManager->getVariableList(myVariableList);
         ui->inlineModuleTxtEdt->blockSignals(true);
         ui->inlineModuleTxtEdt->setPlainText(myActor->extName);
         for (int i = 0; i < myActor->variableList.count(); i++){
@@ -90,6 +94,12 @@ void QActorEditor::prepareForm(Actor *actor)
             ui->paramsInlineTable->setItem(i, 1, new QTableWidgetItem(myActor->variableList.at(i)->type));
             ui->paramsInlineTable->setItem(i, 2, new QTableWidgetItem(myActor->varAMList.at(i)));
         }
+        //Получаем список перемерных
+        if (!globalDBManager->getVariableList(myVariableList))
+            QMessageBox::critical(NULL,
+                                  QObject::tr("Ошибка"),
+                                  QObject::tr("Не удалось получить список переменных.\n") + globalDBManager->lastError().databaseText(),
+                                  QMessageBox::Ok);
         ui->inlineModuleTxtEdt->blockSignals(false);
         break;
     }

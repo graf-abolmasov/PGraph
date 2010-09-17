@@ -31,10 +31,19 @@ void TopPropertyDialog::changeEvent(QEvent *e)
 void TopPropertyDialog::prepareForm(QNormalTop* top){
     myTop = top;
 
-    globalDBManager->getActorList(myActorList);
+    if (!globalDBManager->getActorList(myActorList))
+        QMessageBox::critical(NULL,
+                              QObject::tr("Ошибка"),
+                              QObject::tr("Не удалось получить список акторов.\n") + globalDBManager->lastError().databaseText(),
+                              QMessageBox::Ok);
+
     myActorList.insert(0, NULL);
     QList<Graph* > myGraphList;
-    globalDBManager->getGraphList(myGraphList);
+    if (!globalDBManager->getGraphList(myGraphList))
+        QMessageBox::critical(NULL,
+                              QObject::tr("Ошибка"),
+                              QObject::tr("Не удалось получить список агрегатов.\n") + globalDBManager->lastError().databaseText(),
+                              QMessageBox::Ok);;
     foreach(Graph* graph, myGraphList){
         QList<Variable* > varList;
         QStringList varAMList;
