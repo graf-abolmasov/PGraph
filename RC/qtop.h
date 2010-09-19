@@ -62,8 +62,6 @@ private:
     QList<QArc *> arcs;
     QList<QSyncArc *> sync;
     QMenu *myContextMenu;
-    //QList<QArc *> getArcsAtBound(QLineF bound);
-    static int counter;
 };
 
 #endif

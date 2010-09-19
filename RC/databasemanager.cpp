@@ -12,6 +12,7 @@
 #include <QString>
 #include <QList>
 #include <QtGui>
+#include <QSqlDriver>
 #include "commonutils.h"
 #include "logger.h"
 #include "globalvariables.h"

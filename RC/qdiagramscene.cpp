@@ -36,10 +36,19 @@ void QDiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
     if (mouseEvent->button() != Qt::LeftButton)
         return;
 
+    bool allowAddTop = true;
+    QList<QGraphicsItem *> itemsAtPos = items(mouseEvent->scenePos());
     switch (myMode) {
     case InsertNormalTop:
     case InsertMultiProcTop:
-        addTop(mouseEvent->scenePos());
+        foreach (QGraphicsItem* item, itemsAtPos){
+            if (item->type() == QTop::Type) {
+                allowAddTop = false;
+                break;
+            }
+        }
+        if (allowAddTop)
+            addTop(mouseEvent->scenePos());
         break;
     case InsertLine:
         if (newArc == NULL)
@@ -341,6 +350,7 @@ QTop* QDiagramScene::addTop(const QPointF &point)
     default:
         break;
     }
+    top->number = getNextTopNumber();
     top->setPos(point);
     emit itemInserted(top);
     return top;
@@ -354,4 +364,16 @@ QComment* QDiagramScene::addComment(const QPointF &point)
     textItem->setPos(point);
     emit itemInserted(textItem);
     return textItem;
+}
+
+int QDiagramScene::getNextTopNumber()
+{
+    int maxNumber = -1;
+    for (int i = 0; i < items().count(); i++)
+        if (items().at(i)->type() == QTop::Type) {
+           QTop* top = qgraphicsitem_cast<QTop* >(items().at(i));
+           maxNumber = top->number > maxNumber ? top->number : maxNumber;
+        }
+
+    return maxNumber+1;
 }
