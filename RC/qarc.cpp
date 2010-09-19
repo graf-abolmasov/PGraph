@@ -136,7 +136,7 @@ bool QArc::remake(QTop* aMovedTop, float dx, float dy){
         //и как ни странно - не работает
         //заполняем структуры, необходимые для старого алгоритма
         int otr = lines.count();
-        int old_otr = otr;
+
         QPointF pts[4];
         int i;
         for(i =0; i < otr; i++){

@@ -78,6 +78,8 @@ private:
     QTop* addTop(const QPointF &point);
     QArc* addArc(const QPointF &point);
     QComment* addComment(const QPointF &point);
+
+    int getNextTopNumber();
 };
 
 #endif

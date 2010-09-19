@@ -453,7 +453,6 @@ void TMyWindow::createDockWindows()
     dock->setAllowedAreas(Qt::RightDockWidgetArea);
     dock->setWidget(undoView);
     addDockWidget(Qt::RightDockWidgetArea, dock);
-
 }
 
 void TMyWindow::alignHLeft()

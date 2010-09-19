@@ -3,8 +3,6 @@
 
 #include "qtop.h"
 
-int QTop::counter = 0;
-
 QTop::QTop(QMenu *contextMenu,
              QGraphicsItem *parent, QGraphicsScene *scene)
     : QGraphicsRectItem(parent, scene)
@@ -21,7 +19,7 @@ QTop::QTop(QMenu *contextMenu,
     setFlag(QGraphicsItem::ItemIsSelectable, true);
 
     isRoot  = false;
-    number = counter++;
+    number = -1;
     actor = NULL;
 }
 
