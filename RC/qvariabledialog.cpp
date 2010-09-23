@@ -117,7 +117,8 @@ void QVariableDialog::on_buttonBox_accepted()
 {
     int idx = ui->variablesTable->currentRow();
     ui->variablesTable->setCurrentCell(-1, -1);
-    myVar = myVariableList.at(idx);
+    if  (idx != -1)
+        myVar = myVariableList.at(idx);
     if (!globalDBManager->saveVariableList(myVariableList))
         QMessageBox::warning(this, tr("Ошибка"), tr("Произошла ошибка при сохранении в информационный фонд"), QMessageBox::Ok);
 }
