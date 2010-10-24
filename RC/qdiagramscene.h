@@ -65,7 +65,7 @@ private:
     QNormalTop* myRootTop;
 
     QArc *newArc;
-    QArcLine *line;
+    QGraphicsLineItem *line;
     QGraphicsRectItem *selectionRect;
     QLineF displacementVector;
 

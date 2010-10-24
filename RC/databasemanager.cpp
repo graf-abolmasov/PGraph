@@ -467,12 +467,11 @@ bool DataBaseManager::savePredicateList(QList<Predicate *> &predList)
     query.exec();
     for (int i = 0; i < predList.count(); i++){
         query.prepare("INSERT INTO actor (PROJECT_ID, NAMEPR, CLASPR, EXTNAME, DATE, TIME, ICON, PROTOTIP)"
-                      "VALUES (:PROJECT_ID, :NAMEPR, :CLASPR, :EXTNAME, CURDATE(), CURTIME(), :ICON, :PROTOTIP);");
+                      "VALUES (:PROJECT_ID, :NAMEPR, :CLASPR, :EXTNAME, CURDATE(), CURTIME(), NULL, :PROTOTIP);");
         query.bindValue(":PROJECT_ID", myProjectId);
         query.bindValue(":NAMEPR", predList.at(i)->name);
         query.bindValue(":CLASPR", "p");
         query.bindValue(":EXTNAME", predList.at(i)->extName);
-        query.bindValue(":ICON", NULL);
         query.bindValue(":PROTOTIP", predList.at(i)->baseModule);
         query.exec();
         globalLogger->writeLog(query.executedQuery().toUtf8());

@@ -71,6 +71,7 @@ public:
     bool moveLine(QArcLine* line, float dx, float dy);
     void freeze();
     void unfreeze();
+    void updateBounds();
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                QWidget *widget = 0);
@@ -84,7 +85,6 @@ private:
     QPolygonF arcHead;
     QGraphicsItem *arcTop;
     int myPriority;  //приоритет
-    void updateBounds();
 };
 
 #endif

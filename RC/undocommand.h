@@ -35,6 +35,7 @@ private:
     QGraphicsItem *myItem;
     QGraphicsScene *myGraphicsScene;
     QList<QArc *> arcs;
+    QList<QSyncArc *> syncs;
 };
 
 class MoveCommand : public QUndoCommand

@@ -11,12 +11,20 @@ AddCommand::AddCommand(QGraphicsItem *item, QGraphicsScene *scene, QUndoCommand 
 void AddCommand::undo()
 {
     QArc* arc = NULL;
+    QSyncArc* sync = NULL;
     switch (myItem->type()){
     case QArc::Type:
         arc = qgraphicsitem_cast<QArc* >(myItem);
         arc->startItem()->removeArc(arc);
         arc->endItem()->removeArc(arc);
+        break;
+    case QSyncArc::Type:
+        sync = qgraphicsitem_cast<QSyncArc* >(myItem);
+        sync->startItem()->removeSync(sync);
+        sync->endItem()->removeSync(sync);
+        break;
     }
+
     myGraphicsScene->removeItem(myItem);
     myGraphicsScene->clearSelection();
     myGraphicsScene->update();
@@ -25,6 +33,7 @@ void AddCommand::undo()
 void AddCommand::redo()
 {
     QArc* arc = NULL;
+    QSyncArc* sync = NULL;
     switch (myItem->type()){
     case QArc::Type:
         arc = qgraphicsitem_cast<QArc* >(myItem);
@@ -33,6 +42,12 @@ void AddCommand::redo()
         foreach(QArc *qarc, arc->startItem()->outArcs())
             qarc->setPriority(qarc->priority() + 1);
         arc->setPriority(1);
+        break;
+    case QSyncArc::Type:
+        sync = qgraphicsitem_cast<QSyncArc* >(myItem);
+        sync->startItem()->addSync(sync);
+        sync->endItem()->addSync(sync);
+        break;
     }
     myGraphicsScene->addItem(myItem);
     myGraphicsScene->clearSelection();
@@ -55,8 +70,9 @@ DeleteCommand::DeleteCommand(QGraphicsItem *item, QGraphicsScene *scene, QUndoCo
 void DeleteCommand::undo()
 {
     QArc* arc = NULL;
+    QSyncArc* sync = NULL;
     QTop* top = NULL;
-    switch (myItem->type()){
+    switch (myItem->type()) {
     case QArc::Type:
         arc = qgraphicsitem_cast<QArc* >(myItem);
         foreach(QArc *qarc, arc->startItem()->outArcs())
@@ -65,12 +81,23 @@ void DeleteCommand::undo()
         arc->startItem()->addArc(arc);
         arc->endItem()->addArc(arc);
         break;
+    case QSyncArc::Type:
+        sync = qgraphicsitem_cast<QSyncArc* >(myItem);
+        sync->startItem()->addSync(sync);
+        sync->endItem()->addSync(sync);
+        break;
+
     case QTop::Type:
         top = qgraphicsitem_cast<QTop* >(myItem);
         foreach (QArc* arc, arcs) {
             arc->startItem()->addArc(arc);
             arc->endItem()->addArc(arc);
             myGraphicsScene->addItem(arc);
+        }
+        foreach (QSyncArc* sync, syncs) {
+            sync->startItem()->addSync(sync);
+            sync->endItem()->addSync(sync);
+            myGraphicsScene->addItem(sync);
         }
     }
     myGraphicsScene->addItem(myItem);
@@ -81,6 +108,7 @@ void DeleteCommand::undo()
 void DeleteCommand::redo()
 {
     QArc* arc = NULL;
+    QSyncArc* sync = NULL;
     QTop* top = NULL;
     switch (myItem->type()){
     case QArc::Type:
@@ -88,14 +116,26 @@ void DeleteCommand::redo()
         arc->startItem()->removeArc(arc);
         arc->endItem()->removeArc(arc);
         break;
+    case QSyncArc::Type:
+        sync = qgraphicsitem_cast<QSyncArc* >(myItem);
+        sync->startItem()->removeSync(sync);
+        sync->endItem()->removeSync(sync);
+        break;
     case QTop::Type:
         top = qgraphicsitem_cast<QTop* >(myItem);
         arcs = top->allArcs();
+        syncs = top->allSync();
         top->removeArcs();
+        top->removeSyncs();
         foreach (QArc* arc, arcs) {
             arc->endItem()->removeArc(arc);
             arc->startItem()->removeArc(arc);
             myGraphicsScene->removeItem(arc);
+        }
+        foreach (QSyncArc* sync, syncs) {
+            sync->endItem()->removeSync(sync);
+            sync->startItem()->removeSync(sync);
+            myGraphicsScene->removeItem(sync);
         }
     }
     myGraphicsScene->removeItem(myItem);
@@ -210,7 +250,7 @@ bool MoveCommand::mergeWith(const QUndoCommand *command)
     myDisplacementVector.setP2(moveCommand->myDisplacementVector.p2() - (moveCommand->myDisplacementVector.p1() - myDisplacementVector.p2()));
 
     setText(QObject::tr("> ") + itemTypeToString(items.first()) + " (" + QString::number(myDisplacementVector.p1().x()) + ", " + QString::number(myDisplacementVector.p1().y()) + ")->" +
-                                                          "(" + QString::number(myDisplacementVector.p2().x()) + ", " + QString::number(myDisplacementVector.p2().y()) + ")");
+            "(" + QString::number(myDisplacementVector.p2().x()) + ", " + QString::number(myDisplacementVector.p2().y()) + ")");
 
     return true;
 }

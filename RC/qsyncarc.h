@@ -40,8 +40,7 @@ protected:
 private:
     QTop* myStartTop;
     QTop* myEndTop;
-    QPolygonF arrowHead;
-    QColor myColor;
+    QPolygonF arcHead;
     QMenu *myContextMenu;
 };
 
