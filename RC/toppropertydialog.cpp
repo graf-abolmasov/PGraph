@@ -47,7 +47,7 @@ void TopPropertyDialog::prepareForm(QNormalTop* top){
     foreach(Graph* graph, myGraphList){
         QList<Variable* > varList;
         QStringList varAMList;
-        myActorList.append(new Actor(graph->name, graph->extName, Actor::graphType, "", varList, varAMList));
+        myActorList.append(new Actor(graph->name, graph->extName, Actor::graphType, "", varList, varAMList, QImage()));
     }
     ui->actorsListWidget->addItem(tr("Нет"));
     for (int i = 1 ; i < myActorList.count(); i++){

@@ -25,6 +25,7 @@ TMyWindow::TMyWindow()
     setWindowIcon(QIcon(":/images/G.png"));
     setMyGraphName("");
     setMyGraphExtName("");
+    loadSetup();
 }
 
 TMyWindow::~TMyWindow()
@@ -161,7 +162,7 @@ void TMyWindow::createActions()
     addSyncArcButton = new QToolButton;
     addSyncArcButton->setCheckable(true);
     addSyncArcButton->setIcon(QIcon(":/images/syncarc.png"));
-    addSyncArcButton->setEnabled(false);
+    //addSyncArcButton->setEnabled(false);
 
     addMultiProcTopButton = new QToolButton;
     addMultiProcTopButton->setCheckable(true);
@@ -373,6 +374,7 @@ void TMyWindow::CMGOpen()
         CMGNew();
         setMyGraphExtName(dialog.getResult()->extName);
         setMyGraphName(dialog.getResult()->name);
+        recentGraphs[dialog.getResult()->name] = dialog.getResult()->extName;
         activeDrawWindow()->loadGraph(dialog.getResult()->extName, globalDBManager);
     }
 }
@@ -575,6 +577,8 @@ void TMyWindow::getInfo(QGraphicsItem *item)
                     case Actor::normalType:
                         actType = tr("обычный");
                         break;
+                    case Actor::graphType:
+                        break;
                     }
                     info.append(tr("Тип: ") + actType + "\n");
                     info.append(tr("Название: ") + top->actor->extName + "\n");
@@ -651,4 +655,16 @@ void TMyWindow::setFixedScale(const QString &scale)
 void TMyWindow::setFloatScale(const int scale)
 {
     activeDrawWindow()->scale(scale/100.0);
+}
+
+void TMyWindow::loadSetup()
+{
+    QSettings settings("graph.ini", QSettings::IniFormat);
+    recentGraphs = settings.value("IDE\recents", "").toMap();
+}
+
+void TMyWindow::saveSetup()
+{
+    QSettings settings("graph.ini", QSettings::IniFormat);
+    settings.setValue("IDE\recents", recentGraphs);
 }

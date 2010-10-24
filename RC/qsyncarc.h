@@ -30,7 +30,7 @@ public:
         { return myStartTop; }
     QTop* endItem() const
         { return myEndTop; }
-    void updatePosition();
+    bool remake(QTop* aMovedTop, float dx, float dy);
 
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,

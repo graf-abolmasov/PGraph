@@ -22,12 +22,12 @@ void QNormalTop::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
     painter->drawRect(rect());
 
     //рисуем иконку
-    if (!myIcon.isNull()) {
-        if ((myIcon.width() >= boundingRect().width()) ||
-            (myIcon.height() >= boundingRect().height())) {
-            painter->drawImage(boundingRect().adjusted(5, 5, -5, -5), myIcon);
+    if (actor != NULL && !actor->icon.isNull()) {
+        if ((actor->icon.width() >= boundingRect().width()) ||
+            (actor->icon.height() >= boundingRect().height())) {
+            painter->drawImage(boundingRect().adjusted(5, 5, -5, -5), actor->icon);
         } else {
-            painter->drawImage(-myIcon.width()/2, -myIcon.height()/2, myIcon);
+            painter->drawImage(-actor->icon.width()/2, -actor->icon.height()/2, actor->icon);
         }
     }
     //пишем текст
@@ -126,7 +126,8 @@ float QNormalTop::getMinHeight() const
   @param icon - иконка
 */
 void QNormalTop::setIcon(QImage &icon){
-    myIcon = icon;
+    if (actor != NULL)
+        actor->icon = icon;
 }
 
 /*!

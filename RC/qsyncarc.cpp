@@ -38,7 +38,7 @@ QRectF QSyncArc::boundingRect() const {
 
 void QSyncArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *options, QWidget *widget){
 
-    /*if (myStartItem->collidesWithItem(myEndItem))
+    if (myStartTop->collidesWithItem(myEndTop))
         return;
 
     QPen myPen = pen();
@@ -54,22 +54,10 @@ void QSyncArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *options,
     painter->setBrush(myColor);
 
     QLineF centerLine(line());
-    QPolygonF endPolygon = myEndItem->polygon();
-    QPointF p1 = endPolygon.first() + myEndItem->pos();
-    QPointF p2;
     QPointF intersectPoint;
-    QLineF polyLine;
-    for (int i = 1; i < endPolygon.count(); ++i) {
-        p2 = endPolygon.at(i) + myEndItem->pos();
-        polyLine = QLineF(p1, p2);
-        QLineF::IntersectType intersectType =
-                polyLine.intersect(centerLine, &intersectPoint);
-        if (intersectType == QLineF::BoundedIntersection)
-            break;
-        p1 = p2;
-    }
+    myStartTop->getIntersectBound(centerLine).intersect(centerLine, &intersectPoint);
 
-    setLine(QLineF(intersectPoint, myStartItem->pos()));
+    setLine(QLineF(intersectPoint, myStartTop->pos()));
 
     double angle = ::acos(line().dx() / line().length());
     if (line().dy() >= 0)
@@ -91,13 +79,7 @@ void QSyncArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *options,
         painter->drawLine(myLine);
         myLine.translate(0,-8.0);
         painter->drawLine(myLine);
-    }*/
-}
-
-void QSyncArc::updatePosition()
-{
-    /*QLineF line(mapFromItem(myStartItem, 0, 0), mapFromItem(myEndItem, 0, 0));
-    setLine(line);*/
+    }
 }
 
 QSyncArc::~QSyncArc()
@@ -106,4 +88,16 @@ QSyncArc::~QSyncArc()
         myStartTop->removeSync(this);
     if (myEndTop != NULL)
         myEndTop->removeSync(this);
+}
+
+bool QSyncArc::remake(QTop *aMovedTop, float dx, float dy)
+{
+    if (aMovedTop == myStartTop) {
+        QPointF newStartP = line().p1() + QPointF(dx, dy);
+        setLine(QLineF(newStartP, line().p2()));
+    } else if (aMovedTop == myEndTop) {
+        QPointF newEndP = line().p2() + QPointF(dx, dy);
+        setLine(QLineF(line().p1(), newEndP));
+    }
+    return true;
 }

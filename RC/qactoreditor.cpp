@@ -54,7 +54,7 @@ void QActorEditor::prepareForm(Actor *actor)
     QList<Variable*> newVariableList;
     QStringList newAMList;
     if (actor == NULL){
-        myActor = new Actor("", "", myMode == Normal ? Actor::normalType : Actor::inlineType, "", newVariableList, newAMList);
+        myActor = new Actor("", "", myMode == Normal ? Actor::normalType : Actor::inlineType, "", newVariableList, newAMList, QImage());
     } else {
         myActor = actor;
         ui->baseModuleList->setEnabled(false);

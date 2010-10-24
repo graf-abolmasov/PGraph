@@ -88,14 +88,15 @@ private:
     TDrawWindow *createDrawWindow();
     void CheckOption(){} 	// Установка/сброс галочки в пункте меню
     void CMHelp(){}		// Обработчик вызова помощи
-    void LoadSetup(){}		// Загрузка конфигурации программы
-    void SaveSetup(){}		// Сохранение конфигурации программы
+    void loadSetup();		// Загрузка конфигурации программы
+    void saveSetup();		// Сохранение конфигурации программы
 
-    //DataBaseManager* dbManager;
     QString myGraphName;
     void setMyGraphName(QString name);
     QString myGraphExtName;
     void setMyGraphExtName(QString extName);
+
+    QMap<QString, QVariant> recentGraphs;
 private slots:
     void CMGNew();              //+ Граф->Создать
     void CMGOpen();             //+ Граф->Открыть
