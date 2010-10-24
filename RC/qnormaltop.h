@@ -22,7 +22,6 @@ protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
 private:
     int procCount;
-    QImage myIcon;
 };
 
 

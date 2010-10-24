@@ -43,7 +43,6 @@ public:
     QRectF boundingRect() const;
     QPainterPath shape() const;
     void setPriority(int w);
-    void updateBounds();
     int type() const
         { return Type; }
     int priority() const
@@ -85,6 +84,7 @@ private:
     QPolygonF arcHead;
     QGraphicsItem *arcTop;
     int myPriority;  //приоритет
+    void updateBounds();
 };
 
 #endif

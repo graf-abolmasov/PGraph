@@ -58,8 +58,7 @@ void QDiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
     case InsertText:
         addComment(mouseEvent->scenePos());
     case InsertSync:
-        line = new QArcLine(QLineF(mouseEvent->scenePos(),
-                                   mouseEvent->scenePos()));
+        line = new QArcLine(QLineF(mouseEvent->scenePos(), mouseEvent->scenePos()));
         addItem(line);
         break;
     case MoveItem:
@@ -195,53 +194,6 @@ void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
         selectionRect = NULL;
     }
     else if (line != NULL && newArc != NULL && myMode == InsertLine) {
-        //дуга должна начинаться с вершины!
-        if (newArc->startItem() == NULL){
-            QList<QGraphicsItem *> startItems = items(line->line().p1());
-            while (startItems.count() > 0 && startItems.first()->type() != QTop::Type)
-                startItems.removeFirst();
-            if ((startItems.count() > 0) && (startItems.first()->type() == QTop::Type)) {
-                QTop *startItem = qgraphicsitem_cast<QTop *>(startItems.first());
-                newArc->setStartTop(startItem);
-                newArc->addLine(line);
-            } else {
-                delete line;
-                delete newArc;
-                newArc = NULL;
-                line = NULL;
-            }
-        }
-
-        //дуга должна заканчиваться вершиной
-        if ((newArc != NULL) && (newArc->endItem() == NULL) && (newArc->prevLine() != NULL)){
-            QList<QGraphicsItem *> endItems = items(line->line().p2());
-            while (endItems.count() > 0 && endItems.first()->type() != QTop::Type)
-                endItems.removeFirst();
-            if ((endItems.count() > 0) && (endItems.first()->type() == QTop::Type)){
-                QTop *endItem = qgraphicsitem_cast<QTop *>(endItems.first());
-                newArc->setEndTop(endItem);              
-                newArc->addLine(line);
-            }
-        }
-
-        //плохая ситуация, когда начало и конец совпадают, но дуга имеет явно неправилную форму
-        if ((newArc != NULL) && (newArc->endItem() != NULL) && (newArc->startItem() != NULL) &&
-            newArc->startItem()->collidesWithItem(newArc->endItem()) && (newArc->lines.count() == 1)){
-            delete newArc;
-            newArc = NULL;
-            line = NULL;
-        }
-
-        //условие выполнится когда у дуги будет начало и конец!
-        if ((newArc != NULL) && (newArc->endItem() != NULL) && (newArc->startItem() != NULL)){
-            newArc->updateBounds();
-            line->setSelected(false);
-            emit itemInserted(newArc);
-            newArc->currentLine = NULL;
-            newArc = NULL;
-            line = NULL;
-        }
-    } else if (line != NULL && myMode == InsertSync) {
         QList<QGraphicsItem *> startItems = items(line->line().p1());
         if (startItems.count() && startItems.first() == line)
             startItems.removeFirst();
@@ -257,13 +209,12 @@ void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
                 qgraphicsitem_cast<QTop *>(startItems.first());
             QTop *endItem =
                 qgraphicsitem_cast<QTop *>(endItems.first());
-            QSyncArc *arrow = new QSyncArc(startItem, endItem, mySyncArcMenu);
-            arrow->setLine(line->line());
-            startItem->addSync(arrow);
-            endItem->addSync(arrow);
-            arrow->setZValue(-1000.0);
-            addItem(arrow);
-            arrow->updatePosition();
+            QSyncArc *newSyncArc = new QSyncArc(startItem, endItem, mySyncArcMenu);
+            startItem->addSync(newSyncArc);
+            endItem->addSync(newSyncArc);
+            newSyncArc->setZValue(3);
+            newSyncArc->setLine(line->line());
+            addItem(newSyncArc);
         }
         removeItem(line);
         delete line;

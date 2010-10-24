@@ -47,6 +47,8 @@ public:
         { return Type; }
     QList<QArc *> allArcs() const
         { return arcs; }
+    QList<QSyncArc *> allSync() const
+        { return sync; }
     QList<QArc *> inArcs() const;
     QList<QArc *> outArcs() const;
     QRectF boundingRect() const;
@@ -57,7 +59,6 @@ public:
     bool moveBy(qreal dx, qreal dy);
 protected:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
-    QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 private:
     QList<QArc *> arcs;
     QList<QSyncArc *> sync;

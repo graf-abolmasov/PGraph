@@ -49,7 +49,7 @@ void MultiProcTopPropertyDialog::prepareForm(QMultiProcTop *top)
         foreach(Graph* graph, myGraphList){
             QList<Variable* > varList;
             QStringList varAMList;
-            myActorList.append(new Actor(graph->name, graph->extName, Actor::graphType, "", varList, varAMList));
+            myActorList.append(new Actor(graph->name, graph->extName, Actor::graphType, "", varList, varAMList, QImage()));
         }
     else QMessageBox::critical(NULL,
                                QObject::tr("Ошибка"),

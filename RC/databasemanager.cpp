@@ -120,14 +120,12 @@ bool DataBaseManager::saveGraph(Graph *graph)
     QSqlQuery query;
 
     query.prepare("INSERT INTO actor (PROJECT_ID, NAMEPR, CLASPR, EXTNAME, DATE, TIME, ICON, PROTOTIP, BAZIS)"
-                  "VALUES (:PROJECT_ID, :NAMEPR, :CLASPR, :EXTNAME, CURDATE(), CURTIME(), NULL, :PROTOTIP, :BAZIS)");
+                  "VALUES (:PROJECT_ID, :NAMEPR, :CLASPR, :EXTNAME, CURDATE(), CURTIME(), NULL, NULL, NULL)");
 
     query.bindValue(":PROJECT_ID", myProjectId);
     query.bindValue(":NAMEPR", graph->name);
     query.bindValue(":CLASPR",  "g");
     query.bindValue(":EXTNAME",  graph->extName);
-    query.bindValue(":PROTOTIP",  NULL);
-    query.bindValue(":BAZIS",  NULL);
     query.exec();
     globalLogger->writeLog(query.executedQuery().toUtf8());
 
@@ -328,6 +326,7 @@ bool DataBaseManager::saveActorList(QList<Actor *> &actorList)
         query1.bindValue(":NAMEPR", actorList.at(i)->name);
         query1.bindValue(":CLASPR", "a");
         query1.bindValue(":EXTNAME", actorList.at(i)->extName);
+        //query1.bindValue(":ICON", actorList.at(i)->icon.bits());
         query1.bindValue(":ICON", NULL);
         query1.bindValue(":PROTOTIP", actorList.at(i)->baseModule);
         query1.exec();
@@ -398,7 +397,8 @@ bool DataBaseManager::getActorList(QList<Actor *> &actorList)
                                    query1.value(6).toString() == "" ? Actor::inlineType : Actor::normalType,
                                    query1.value(6).toString(),
                                    myVariableList,
-                                   myVAList));
+                                   myVAList,
+                                   QImage()));
         query2.clear();
     }
     db.close();
@@ -451,7 +451,8 @@ Actor* DataBaseManager::getActor(QString namepr)
                                query1.value(5).toString() == "" ? Actor::inlineType : Actor::normalType,
                                query1.value(5).toString(),
                                myVariableList,
-                               myVAList);
+                               myVAList,
+                               QImage());
     db.close();
     return newActor;
 }

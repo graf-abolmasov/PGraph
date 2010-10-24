@@ -99,6 +99,7 @@ bool QArc::autoBuild(QTop* top, float dx, float dy){
         }
     }
     addLine(currentLine);
+    updateBounds();
 
     currentLine = NULL;
     return true;

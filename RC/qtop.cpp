@@ -111,16 +111,6 @@ void QTop::contextMenuEvent(QGraphicsSceneContextMenuEvent *event){
     myContextMenu->exec(event->screenPos());
 }
 
-QVariant QTop::itemChange(GraphicsItemChange change, const QVariant &value){
-    if (change == QGraphicsItem::ItemPositionChange) {
-        foreach (QSyncArc *arc, sync) {
-            arc->updatePosition();
-        }
-    }
-
-    return value;
-}
-
 QList<QArc *> QTop::getArcsAtBound(int i) const {
     QList<QArc *> result;
     QPolygonF myPolygon(rect());
@@ -162,9 +152,10 @@ bool QTop::moveBy(qreal dx, qreal dy)
     foreach (QArc *arc, brokenLines)
         arc->autoBuild(this, dx, dy);
 
-    //необходимо для правильной перерисовки.
-    foreach (QArc *arc, allArcs())
-        arc->updateBounds();
+    //перерисовываем дуги синхронизации
+    foreach (QSyncArc *arc, allSync()) {
+        arc->remake(this, dx, dy);
+    }
 
     return true;
 }
