@@ -9,8 +9,15 @@ QSyncArc::QSyncArc(QTop *startItem, QTop *endItem, QMenu *contextMenu, QGraphics
     myStartTop = startItem;
     myEndTop = endItem;
     setFlag(QGraphicsItem::ItemIsSelectable, true);
-    myColor = Qt::red;
-    setPen(QPen(myColor, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+
+    //делаем нужный пунктир
+    QPen myPen(Qt::red, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+    QVector<qreal> dashes;
+    qreal space = 4; //расстояние между штрихами
+    dashes << 6 << space; //длина штриха
+    myPen.setDashPattern(dashes);
+
+    setPen(myPen);
     myContextMenu = contextMenu;
 };
 
@@ -21,8 +28,8 @@ void QSyncArc::contextMenuEvent(QGraphicsSceneContextMenuEvent *event){
 }
 
 QPainterPath QSyncArc::shape() const {
-    QPainterPath path;
-    path.addRect(QGraphicsLineItem::shape().boundingRect().adjusted(-5, -5, 5, 5));
+    QPainterPath path = QGraphicsLineItem::shape();
+    path.addPolygon(arcHead);
     return path;
 }
 
@@ -41,44 +48,49 @@ void QSyncArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *options,
     if (myStartTop->collidesWithItem(myEndTop))
         return;
 
-    QPen myPen = pen();
-    myPen.setColor(myColor);
+    if ((myStartTop == NULL) || (myEndTop == NULL)) {
+        //пока рисуем(создаем) дугу
+    } else {
+        qreal arrowSize = 12; // размер стрелки
+        painter->setPen(pen());
+        painter->setBrush(pen().color());
+        painter->setRenderHints(QPainter::TextAntialiasing |
+                                QPainter::Antialiasing |
+                                QPainter::HighQualityAntialiasing);
 
-    myPen.setStyle(Qt::DashLine);
-    QVector<qreal> dashes;
-    qreal space = 4;
-    dashes << 6 << space;
-    myPen.setDashPattern(dashes);
-    qreal arrowSize = 12;
-    painter->setPen(myPen);
-    painter->setBrush(myColor);
-
-    QLineF centerLine(line());
-    QPointF intersectPoint;
-    myStartTop->getIntersectBound(centerLine).intersect(centerLine, &intersectPoint);
-
-    setLine(QLineF(intersectPoint, myStartTop->pos()));
-
-    double angle = ::acos(line().dx() / line().length());
-    if (line().dy() >= 0)
-        angle = (Pi * 2) - angle;
-
-        QPointF arrowP1 = line().p1() + QPointF(sin(angle + Pi / 3) * arrowSize,
-                                        cos(angle + Pi / 3) * arrowSize);
-        QPointF arrowP2 = line().p1() + QPointF(sin(angle + Pi - Pi / 3) * arrowSize,
-                                        cos(angle + Pi - Pi / 3) * arrowSize);
-
-        arrowHead.clear();
-        arrowHead << line().p1() << arrowP1 << arrowP2;
+        //рисуем линию
         painter->drawLine(line());
-        painter->drawPolygon(arrowHead);
-        if (isSelected()) {
-            painter->setPen(QPen(myColor, 1, Qt::DashLine));
-        QLineF myLine = line();
-        myLine.translate(0, 4.0);
-        painter->drawLine(myLine);
-        myLine.translate(0,-8.0);
-        painter->drawLine(myLine);
+
+        //вычисляем пложение стрелки
+        QPointF endIntersectPoint;
+        myEndTop->getIntersectBound(line()).intersect(line(), &endIntersectPoint);
+        QPointF startIntersectPoint;
+        myStartTop->getIntersectBound(line()).intersect(line(), &startIntersectPoint);
+        float koeff2 = QLineF(line().p2(), endIntersectPoint).length(); //ЫЫЫ =)
+        QPointF t = line().p2() - QPointF(cos(line().angle() * Pi / 180) * koeff2, -sin(line().angle() * Pi / 180) * koeff2);
+        double angle = acos(line().dx() / line().length());
+        if (line().dy() >= 0)
+            angle = (Pi * 2) - angle;
+        QPointF arcP1 = t - QPointF(sin(angle + Pi / 3) * arrowSize,
+                                    cos(angle + Pi / 3) * arrowSize);
+        QPointF arcP2 = t - QPointF(sin(angle + Pi - Pi / 3) * arrowSize,
+                                    cos(angle + Pi - Pi / 3) * arrowSize);
+        arcHead.clear();
+        arcHead << t << arcP1 << arcP2;
+        painter->drawPolygon(arcHead);
+
+        if (isSelected()){
+            painter->setBrush(Qt::green);
+            QPen myPen = pen();
+            int lineWidth = myPen.width();
+            myPen.setWidth(1);
+            myPen.setColor(Qt::black);
+            painter->setPen(myPen);
+            painter->drawEllipse(startIntersectPoint, lineWidth + 3, lineWidth + 3);
+            painter->drawEllipse(endIntersectPoint, lineWidth + 3, lineWidth + 3);
+            painter->setBrush(Qt::darkBlue);
+            painter->drawEllipse((line().p1() + line().p2()) / 2, lineWidth + 2, lineWidth + 2);
+        }
     }
 }
 

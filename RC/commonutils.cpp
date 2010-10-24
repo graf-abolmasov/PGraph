@@ -118,6 +118,8 @@ QString itemTypeToString(QGraphicsItem *item)
         return QObject::tr("дуга");
     case QComment::Type:
         return QObject::tr("комментарий");
+    case QSyncArc::Type:
+        return QObject::tr("синхронизация");
     }
     return "undefined";
 }

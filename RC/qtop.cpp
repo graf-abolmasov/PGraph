@@ -70,8 +70,8 @@ void QTop::removeArc(QArc *arc){
     if (index != -1) {
         arcs.removeAt(index);
 
+        //уменьшаем приоритет оставшихся исходящих дуг
         QList<QArc *> outArcsList = outArcs();
-
         if (arc->startItem() == this){
             for (int i = 0; i < outArcsList.count(); i++){
                 if (outArcsList.at(i)->priority() > arc->priority()){
