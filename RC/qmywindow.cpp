@@ -23,9 +23,7 @@ TMyWindow::TMyWindow()
     createDrawWindow();
 
     setWindowIcon(QIcon(":/images/G.png"));
-    setMyGraphName("");
-    setMyGraphExtName("");
-    loadSetup();
+    readSettings();
 }
 
 TMyWindow::~TMyWindow()
@@ -36,6 +34,7 @@ TMyWindow::~TMyWindow()
 void TMyWindow::createMenus()
 {
     grafMenu = menuBar()->addMenu(tr("Граф"));
+    connect(grafMenu, SIGNAL(aboutToShow()), this, SLOT(grafMenuAboutToShow()));
     grafMenu->addAction(newGraphAct);
     grafMenu->addAction(openGraphAct);
     grafMenu->addAction(saveGraphAct);
@@ -69,22 +68,22 @@ void TMyWindow::createActions()
 
     newGraphAct = new QAction(QIcon(":images/new.png"), tr("Создать"), this);
     newGraphAct->setShortcuts(QKeySequence::New);
-    newGraphAct->setStatusTip(tr("Создать пустой граф"));
+    newGraphAct->setStatusTip(tr("Создать граф"));
     connect(newGraphAct, SIGNAL(triggered()), this, SLOT(CMGNew()));
 
     openGraphAct = new QAction(QIcon(":/images/open.png"), tr("Открыть"), this);
     openGraphAct->setShortcuts(QKeySequence::Open);
-    openGraphAct->setStatusTip(tr("Открыть из базы"));
+    openGraphAct->setStatusTip(tr("Открыть граф"));
     connect(openGraphAct, SIGNAL(triggered()), this, SLOT(CMGOpen()));
 
     saveGraphAct = new QAction(QIcon(":/images/save.png"), tr("Сохранить"), this);
     saveGraphAct->setShortcuts(QKeySequence::Save);
-    saveGraphAct->setStatusTip(tr("Сохранить в базу"));
+    saveGraphAct->setStatusTip(tr("Сохранить граф"));
     connect(saveGraphAct, SIGNAL(triggered()), this, SLOT(CMGSave()));
 
     saveAsGraphAct = new QAction(tr("Cохранить как"), this);
     saveAsGraphAct->setShortcuts(QKeySequence::SaveAs);
-    saveAsGraphAct->setStatusTip(tr("Cохраняет в базу"));
+    saveAsGraphAct->setStatusTip(tr("Сохранить граф с новым именем"));
     connect(saveAsGraphAct, SIGNAL(triggered()), this, SLOT(CMGSaveAs()));
 
     saveAsImageGraphAct = new QAction(tr("Cохранить как картинку"), this);
@@ -93,7 +92,7 @@ void TMyWindow::createActions()
 
     exitAction = new QAction(tr("Выход"), this);
     exitAction->setShortcuts(QKeySequence::Close);
-    exitAction->setStatusTip(tr("Выйти из приложения"));
+    exitAction->setStatusTip(tr("Выход из редактора"));
     connect(exitAction, SIGNAL(triggered()), this, SLOT(CMExit()));
 
     viewContentAct = new QAction(tr("Дерево объектов"), this);
@@ -221,12 +220,17 @@ TDrawWindow* TMyWindow::createDrawWindow()
 {
     TDrawWindow *newDrawWindow = new TDrawWindow;
     setCentralWidget(newDrawWindow);
+    graphLoaded("", "");
+
     connect(newDrawWindow, SIGNAL(sceneChanged()),
             this, SLOT(sceneChanged()));
     connect(newDrawWindow, SIGNAL(itemChanged(QGraphicsItem*)),
             this, SLOT(getInfo(QGraphicsItem*)));
     connect(newDrawWindow, SIGNAL(selectionChanged(QList<QGraphicsItem*>)),
             this, SLOT(updateAlignToolBar(QList<QGraphicsItem*>)));
+    connect(newDrawWindow, SIGNAL(graphLoaded(QString,QString)), this,
+            SLOT(graphLoaded(QString,QString)));
+
     undoView->setStack(activeDrawWindow()->undoStack);
 
     alignHLeftAct->setEnabled(false);
@@ -291,6 +295,7 @@ void TMyWindow::createToolBar()
     scaleToolBar = addToolBar(tr("Масштаб"));
     scaleToolBar->addWidget(new QLabel(tr("Масштаб: ")));
     scaleToolBar->addWidget(sceneScaleCombo);
+    //Если нужен ползунковый регулятор масштаба
     //scaleToolBar->addSeparator();
     //scaleToolBar->addWidget(scaleSlider);
 }
@@ -299,8 +304,7 @@ void TMyWindow::CMGNew()
 {
     TDrawWindow *newDrawWindow = createDrawWindow();
     newDrawWindow->showMaximized();
-    setMyGraphExtName("");
-    setMyGraphName("");
+    graphLoaded("", "");
 }
 
 TDrawWindow *TMyWindow::activeDrawWindow()
@@ -317,7 +321,7 @@ void TMyWindow::sceneChanged()
 {
     if (activeDrawWindow())
         pointerTypeGroup->button(int(activeDrawWindow()->mode()))->setChecked(true);
-    setWindowTitle(myGraphExtName == "" ?  tr("Untitled* - Граф-редактор") : myGraphExtName + tr("* - Граф-редактор"));
+    setWindowTitle(activeDrawWindow()->myGraphName == "" ?  tr("Untitled* - Граф-редактор") : activeDrawWindow()->myGraphExtName + tr("* - Граф-редактор"));
 }
 
 void TMyWindow::CMGSaveAsImage()
@@ -332,10 +336,10 @@ void TMyWindow::CMGSaveAs()
     QSaveGraphDialog dialog;
     if (dialog.exec()){
         if (dialog.getResult() != ""){
-            setMyGraphExtName(dialog.getResult());
-            setMyGraphName("G" + getCRC(myGraphExtName.toUtf8()));
-            if (activeDrawWindow()->saveGraph(myGraphName, myGraphExtName, globalDBManager))
-                statusBar()->showMessage(tr("Сохранено как ") + myGraphName, 3000);
+            QString extName = dialog.getResult();
+            QString name = "G" + getCRC(dialog.getResult().toUtf8());
+            if (activeDrawWindow()->saveGraph(name, extName, globalDBManager))
+                statusBar()->showMessage(tr("Сохранено как ") + activeDrawWindow()->myGraphName, 3000);
         }
     }
 }
@@ -372,10 +376,8 @@ void TMyWindow::CMGOpen()
     dialog.prepareForm();
     if (dialog.exec()){
         CMGNew();
-        setMyGraphExtName(dialog.getResult()->extName);
-        setMyGraphName(dialog.getResult()->name);
+        activeDrawWindow()->loadGraph(dialog.getResult()->name, globalDBManager);
         recentGraphs[dialog.getResult()->name] = dialog.getResult()->extName;
-        activeDrawWindow()->loadGraph(dialog.getResult()->extName, globalDBManager);
     }
 }
 
@@ -395,40 +397,14 @@ void TMyWindow::CMExit()
 
 void TMyWindow::CMSaveStruct()
 {
-    if (myGraphName == "") {
-        QMessageBox::warning(this, tr("Ошибка"), tr("Сохраните граф"), QMessageBox::Ok);
-        return;
-    }
-    if (activeDrawWindow()->saveStruct(myGraphName, globalDBManager))
+    if (activeDrawWindow()->saveStruct(globalDBManager))
         statusBar()->showMessage(tr("Структура записана"), 2000);
 }
 
 void TMyWindow::CMGSave()
 {
-    if (myGraphName != "")
-        if (activeDrawWindow()->saveGraph(myGraphName, myGraphExtName, globalDBManager, true))
-            statusBar()->showMessage(tr("Сохранено"), 2000);
-}
-
-void TMyWindow::setMyGraphName(QString name)
-{
-    myGraphName = name;
-    if (myGraphName == ""){
-        buildMenu->setEnabled(false);
-        saveGraphAct->setEnabled(false);
-    } else {
-        buildMenu->setEnabled(true);
-        saveGraphAct->setEnabled(true);
-    }
-}
-
-void TMyWindow::setMyGraphExtName(QString extName)
-{
-    myGraphExtName = extName;
-    if (myGraphExtName == "")
-        setWindowTitle(tr("Untitled - Граф-редактор"));
-    else
-        setWindowTitle(myGraphExtName + tr(" - Граф-редактор"));
+    if (activeDrawWindow()->updateGraph(globalDBManager))
+        statusBar()->showMessage(tr("Сохранено как ") + activeDrawWindow()->myGraphName, 3000);
 }
 
 void TMyWindow::CMHelpAbout()
@@ -521,7 +497,7 @@ void TMyWindow::getInfo(QGraphicsItem *item)
                     arcTypeStr = tr("последовательная");
                     break;
                 case QArc::ParallelArc:
-                    arcTypeStr = tr("параллельная");
+                    arcTypeStr = tr("параллелная");
                     break;
                 case QArc::TerminateArc:
                     arcTypeStr = tr("терминирующая");
@@ -545,7 +521,7 @@ void TMyWindow::getInfo(QGraphicsItem *item)
                         predType = tr("inline");
                         break;
                     case Predicate::normalType:
-                        predType = tr("обычный");
+                        predType = tr("Обычный");
                         break;
                     }
                     info.append(tr("Тип: ") + predType + "\n");
@@ -571,19 +547,20 @@ void TMyWindow::getInfo(QGraphicsItem *item)
                     info.append(tr("\nОб акторе\n"));
                     QString actType = tr("");
                     switch(top->actor->type) {
-                    case Actor::inlineType:
+                    case Actor::InlineType:
                         actType = tr("inline");
                         break;
-                    case Actor::normalType:
-                        actType = tr("обычный");
+                    case Actor::NormalType:
+                        actType = tr("Обычный");
                         break;
-                    case Actor::graphType:
+                    case Actor::GraphType:
+                        actType = tr("Агрегат");
                         break;
                     }
                     info.append(tr("Тип: ") + actType + "\n");
                     info.append(tr("Название: ") + top->actor->extName + "\n");
                     info.append(tr("Внутреннее имя: ") + top->actor->name+ "\n");
-                    if (top->actor->type == Actor::normalType)
+                    if (top->actor->type == Actor::NormalType)
                         info.append(tr("Базовый модуль: ") + top->actor->baseModule + "\n");
                 }
             }
@@ -607,8 +584,6 @@ void TMyWindow::updateAlignToolBar(QList<QGraphicsItem *> items)
     alignVBottomAct->setEnabled(false);
     distribVerticallyAct->setEnabled(false);
     distribHorizontallyAct->setEnabled(false);
-
-    items.count() > 0 ? getInfo(items.first()) : getInfo(NULL);
 
     QList<QGraphicsItem* > arcList;
     QList<QGraphicsItem* > topList;
@@ -657,14 +632,44 @@ void TMyWindow::setFloatScale(const int scale)
     activeDrawWindow()->scale(scale/100.0);
 }
 
-void TMyWindow::loadSetup()
+void TMyWindow::readSettings()
 {
     QSettings settings("graph.ini", QSettings::IniFormat);
     recentGraphs = settings.value("IDE\recents", "").toMap();
 }
 
-void TMyWindow::saveSetup()
+void TMyWindow::writeSettings()
 {
+    /*
+      Сохраняем список недавних файлов
     QSettings settings("graph.ini", QSettings::IniFormat);
-    settings.setValue("IDE\recents", recentGraphs);
+    settings.setValue("IDE/Recents", recentGraphs);
+    */
+}
+
+void TMyWindow::graphLoaded(QString name, QString extName)
+{
+    if (name == ""){
+        buildMenu->setEnabled(false);
+        saveGraphAct->setEnabled(false);
+    } else {
+        buildMenu->setEnabled(true);
+        saveGraphAct->setEnabled(true);
+    }
+
+    if (extName == "")
+        setWindowTitle(tr("Untitled - Граф-редактор"));
+    else
+        setWindowTitle(extName + tr(" - Граф-редактор"));
+}
+
+void TMyWindow::closeEvent(QCloseEvent *event)
+{
+    writeSettings();
+    event->accept();
+}
+
+void TMyWindow::grafMenuAboutToShow()
+{
+
 }

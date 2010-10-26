@@ -16,6 +16,15 @@ QT_END_NAMESPACE
 
 class QTop;
 
+class SyncArc
+{
+    SyncArc(QString startGraph, int startTop, QString endGraph, int endTop);
+    QString startGraph;
+    int startTop;
+    QString endGraph;
+    int endTop;
+};
+
 class QSyncArc : public QGraphicsLineItem
 {
 public:

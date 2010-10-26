@@ -9,17 +9,12 @@ QNormalTop::QNormalTop(QMenu *contextMenu, QGraphicsItem *parent, QGraphicsScene
 
 void QNormalTop::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    if (option->state & QStyle::State_Selected) {
-        painter->setPen(Qt::DashLine);
-        painter->drawRect(boundingRect());
-    }
-
     painter->setRenderHints(QPainter::TextAntialiasing |
                             QPainter::Antialiasing |
                             QPainter::HighQualityAntialiasing);
     painter->setPen(pen());
     painter->setBrush(brush());
-    painter->drawRect(rect());
+    QGraphicsRectItem::paint(painter, option, widget);
 
     //рисуем иконку
     if (actor != NULL && !actor->icon.isNull()) {

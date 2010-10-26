@@ -35,13 +35,6 @@ QPainterPath QTop::shape() const
     return result;
 }
 
-QPainterPath QTop::opaqueArea() const
-{
-    QPainterPath result;
-    result.addRect(rect());
-    return result;
-}
-
 /*!
   Добавляет дугу синхронизации
 */
@@ -71,11 +64,13 @@ void QTop::removeArc(QArc *arc){
         arcs.removeAt(index);
 
         //уменьшаем приоритет оставшихся исходящих дуг
-        QList<QArc *> outArcsList = outArcs();
         if (arc->startItem() == this){
+            QList<QArc *> outArcsList = outArcs();
             for (int i = 0; i < outArcsList.count(); i++){
                 if (outArcsList.at(i)->priority() > arc->priority()){
                     outArcsList.at(i)->setPriority(outArcsList.at(i)->priority() - 1);
+                } else if (outArcsList.at(i)->priority() < arc->priority()){
+                    outArcsList.at(i)->setPriority(outArcsList.at(i)->priority());
                 }
             }
         }
@@ -101,14 +96,30 @@ void QTop::removeSyncs(){
   @param arc - дуга
 */
 void QTop::addArc(QArc *arc){
-    if (!arcs.contains(arc))
+    if (!arcs.contains(arc)) {
         arcs.append(arc);
+
+        //раздвигаем приоритет оставшихся исходящих дуг
+        if (arc->startItem() == this) {
+            QList<QArc *> outArcsList = outArcs();
+            for (int i = 0; i < outArcsList.count(); i++) {
+                if (arc == outArcsList.at(i))
+                    continue;
+                if (outArcsList.at(i)->priority() >= arc->priority()){
+                    outArcsList.at(i)->setPriority(outArcsList.at(i)->priority() + 1);
+                } else if (outArcsList.at(i)->priority() < arc->priority()){
+                    outArcsList.at(i)->setPriority(outArcsList.at(i)->priority());
+                }
+            }
+        }
+    }
 }
 
 void QTop::contextMenuEvent(QGraphicsSceneContextMenuEvent *event){
     scene()->clearSelection();
     setSelected(true);
-    myContextMenu->exec(event->screenPos());
+    if (myContextMenu != NULL)
+        myContextMenu->exec(event->screenPos());
 }
 
 QList<QArc *> QTop::getArcsAtBound(int i) const {

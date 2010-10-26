@@ -49,7 +49,7 @@ void MultiProcTopPropertyDialog::prepareForm(QMultiProcTop *top)
         foreach(Graph* graph, myGraphList){
             QList<Variable* > varList;
             QStringList varAMList;
-            myActorList.append(new Actor(graph->name, graph->extName, Actor::graphType, "", varList, varAMList, QImage()));
+            myActorList.append(new Actor(graph->name, graph->extName, Actor::GraphType, "", varList, varAMList, QImage()));
         }
     else QMessageBox::critical(NULL,
                                QObject::tr("Ошибка"),
@@ -57,13 +57,14 @@ void MultiProcTopPropertyDialog::prepareForm(QMultiProcTop *top)
                                QMessageBox::Ok);
 
     //Добавляем акторы
-    if (globalDBManager->getActorList(myActorList))
-        for (int i = 1 ; i < myActorList.count(); i++)
-            ui->actorsListWidget->addItem(myActorList.at(i)->extName);
-    else QMessageBox::critical(NULL,
-                               QObject::tr("Ошибка"),
-                               QObject::tr("Не удалось получить список акторов.\n") + globalDBManager->lastError().databaseText(),
-                               QMessageBox::Ok);
+    //Наверно это не нужно, т.к. в параллельных ветвях можно использовать только агрегаты
+//    if (globalDBManager->getActorList(myActorList))
+//        for (int i = 1 ; i < myActorList.count(); i++)
+//            ui->actorsListWidget->addItem(myActorList.at(i)->extName);
+//    else QMessageBox::critical(NULL,
+//                               QObject::tr("Ошибка"),
+//                               QObject::tr("Не удалось получить список акторов.\n") + globalDBManager->lastError().databaseText(),
+//                               QMessageBox::Ok);
 
     //Выделяем актор в списке
     if (top->actor != NULL){
@@ -95,14 +96,14 @@ void MultiProcTopPropertyDialog::on_actorsListWidget_currentRowChanged(int curre
         info.append(tr("Name: ") + actor->name + "\r\n");
         QString type;
         switch (actor->type){
-        case Actor::inlineType:
+        case Actor::InlineType:
             type = tr("inline");
             break;
-        case Actor::normalType:
-            type = tr("normal");
+        case Actor::NormalType:
+            type = tr("Обычный");
             break;
-        case Actor::graphType:
-            type = tr("graph");
+        case Actor::GraphType:
+            type = tr("Агрегат");
             break;
         }
         info.append(tr("Type: ") + type + "\r\n");

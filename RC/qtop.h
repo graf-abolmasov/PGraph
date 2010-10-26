@@ -53,7 +53,6 @@ public:
     QList<QArc *> outArcs() const;
     QRectF boundingRect() const;
     QPainterPath shape() const;
-    QPainterPath opaqueArea() const;
     virtual Top* toTop() const = 0;
     QList<QArc *> getArcsAtBound(int i) const;
     bool moveBy(qreal dx, qreal dy);

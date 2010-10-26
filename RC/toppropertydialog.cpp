@@ -47,7 +47,7 @@ void TopPropertyDialog::prepareForm(QNormalTop* top){
     foreach(Graph* graph, myGraphList){
         QList<Variable* > varList;
         QStringList varAMList;
-        myActorList.append(new Actor(graph->name, graph->extName, Actor::graphType, "", varList, varAMList, QImage()));
+        myActorList.append(new Actor(graph->name, graph->extName, Actor::GraphType, "", varList, varAMList, QImage()));
     }
     ui->actorsListWidget->addItem(tr("Нет"));
     for (int i = 1 ; i < myActorList.count(); i++){
@@ -95,13 +95,13 @@ void TopPropertyDialog::on_actorsListWidget_currentRowChanged(int currentRow)
         info.append(tr("Name: ") + actor->name + "\r\n");
         QString type;
         switch (actor->type){
-        case Actor::inlineType:
+        case Actor::InlineType:
             type = tr("inline");
             break;
-        case Actor::normalType:
+        case Actor::NormalType:
             type = tr("normal");
             break;
-        case Actor::graphType:
+        case Actor::GraphType:
             type = tr("graph");
             break;
         }        info.append(tr("Type: ") + type + "\r\n");

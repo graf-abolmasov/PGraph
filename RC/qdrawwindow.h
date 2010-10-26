@@ -30,10 +30,12 @@ private:
     QMenu *syncArcMenu;
     QMenu *multiProcMenu;
 
-    QAction *deleteAction;
+    QAction *deleteTopAction;
     QAction *setIconAction;
     QAction *setTopPropertyAction;
     QAction *makeAsRootAction;
+    QAction *viewSubGraphAct;
+    QAction *editSubGraphAct;
     QAction *setArcPropertyAction;
     QAction *deleteArcAction;
     QAction *rebuildArcAction;
@@ -52,16 +54,24 @@ private:
     QList<QMultiProcTop* > allMultiProcTop();
 
 public:
+    enum ShowRole {NormalEditor, ReadOnly, SelectTop};
+
+    ShowRole myRole;
+
     QUndoStack *undoStack;
-    TDrawWindow();
+    QString myGraphName;
+    QString myGraphExtName;
+
+    TDrawWindow(ShowRole role = NormalEditor, QWidget *parent = 0);
     void saveAsImage(QString filename);
     void setMode(QDiagramScene::Mode mode);
     QDiagramScene::Mode mode() const
         { return myMode; }
     Graph* getGraph();
-    void loadGraph(QString extName, DataBaseManager* dbManager);
-    bool saveGraph(QString name, QString extName, DataBaseManager* dbManager, bool update = false);
-    bool saveStruct(QString name, DataBaseManager* dbManager);
+    void loadGraph(QString name, DataBaseManager* dbManager);
+    bool saveGraph(QString name, QString extName, DataBaseManager* dbManager);
+    bool updateGraph(DataBaseManager *dbManager);
+    bool saveStruct(DataBaseManager* dbManager);
 
     void alignHLeft();
     void alignHCenter();
@@ -76,12 +86,16 @@ signals:
     void sceneChanged();
     void itemChanged(QGraphicsItem *item);
     void selectionChanged(QList<QGraphicsItem *>);
+    void graphLoaded(QString, QString);
 
 private slots:
+    void topMenuAboutToShow();
     void setItemIcon();
     void showTopPropDialog();
     void makeAsRoot();
     void deleteTop();
+    void viewSubGraph();
+    void editSubGraph();
     void showArcPropDialog();
     void deleteArc();
     void rebuildArc();
@@ -93,7 +107,6 @@ private slots:
     void itemMoved(QGraphicsItem *item, QLineF vector);
     void itemDeleted(QGraphicsItem *item);
     void itemsMoved(QList<QGraphicsItem*> items, QLineF vector);
-
 
     void selectionChanged();
 };

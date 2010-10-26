@@ -88,15 +88,14 @@ private:
     TDrawWindow *createDrawWindow();
     void CheckOption(){} 	// Установка/сброс галочки в пункте меню
     void CMHelp(){}		// Обработчик вызова помощи
-    void loadSetup();		// Загрузка конфигурации программы
-    void saveSetup();		// Сохранение конфигурации программы
-
-    QString myGraphName;
-    void setMyGraphName(QString name);
-    QString myGraphExtName;
-    void setMyGraphExtName(QString extName);
+    void readSettings();	//+ Загрузка конфигурации программы
+    void writeSettings();	//+ Сохранение конфигурации программы
 
     QMap<QString, QVariant> recentGraphs;
+
+protected:
+    void closeEvent(QCloseEvent *); // реакция на закрытие окна
+
 private slots:
     void CMGNew();              //+ Граф->Создать
     void CMGOpen();             //+ Граф->Открыть
@@ -106,13 +105,13 @@ private slots:
     void CMGChangeIcon(){}      // Граф->Сменить иконку
     void CMReporter(){}		// Граф->Создать отчет
     void CMIncap(){}		// Граф->Инкапсулировать
-    void CMExit();
-    void CMContent(){}		// +Объект->Дерево объектов
-    void CMShowGarbage(){}	// +Объект->Неиспользуемые объекты
-    void CMNewModule();   	// +Объект->Зарегистрировать модуль
-    void CMObjList();		// +Объект->Редактор объектов
-    void CMEdtVar();		// +Данные->Словарь данных
-    void CMEdtType();		// +Данные->Список типов
+    void CMExit();              //+ Граф->Выход
+    void CMContent(){}		//+ Объект->Дерево объектов
+    void CMShowGarbage(){}	//+ Объект->Неиспользуемые объекты
+    void CMNewModule();   	//+ Объект->Зарегистрировать модуль
+    void CMObjList();		//+ Объект->Редактор объектов
+    void CMEdtVar();		//+ Данные->Словарь данных
+    void CMEdtType();		//+ Данные->Список типов
     void CMGspUser(){}		// Данные->Gspuser.h
     void CMLibraries(){}	// Данные->Библиотеки
     void CMThickArcs(){}	// Настройки->Приоритеты дуг
@@ -126,12 +125,15 @@ private slots:
     void CMBuildOpt(){}		// Настройки->Построение...
     void CMFont(){}		// Настройки->Шрифт
     void CMSaveSetup(){}  	// Настройки->Сохранить
-    void CMDoUserDialog(){}	// +Запуск->Режим ручного ввода данных
-    void CMSaveStruct();        // +Запуск->Запись структуры
-    void CMCompile(){}          // +Запуск->Компиляция
-    void CMRun(){}              // +Запуск->Построение и запуск
+    void CMDoUserDialog(){}	//+ Запуск->Режим ручного ввода данных
+    void CMSaveStruct();        //+ Запуск->Запись структуры
+    void CMCompile(){}          //+ Запуск->Компиляция
+    void CMRun(){}              //+ Запуск->Построение и запуск
     void CMHelpContents(){}	// Помощь->Содержание
-    void CMHelpAbout(); 	// +Помощь->О программе
+    void CMHelpAbout(); 	//+ Помощь->О программе
+
+    void grafMenuAboutToShow(); // Вызывается перед показом меню Граф
+
     void sceneChanged();        // Действие при изменении сцены
 
     void alignHLeft();          // Выравниевание к самому левому объекту из группы
@@ -147,10 +149,11 @@ private slots:
     void setFloatScale(const int scale);
 
     void updateAlignToolBar(QList<QGraphicsItem *> items);
-
     void getInfo(QGraphicsItem *item);
 
     void pointerGroupClicked(int id);  //Действие при выборе инструмента
+
+    void graphLoaded(QString name, QString extName);
 };
 
 #endif // QMYWINDOW_H
