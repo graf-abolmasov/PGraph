@@ -13,6 +13,7 @@ public:
     int type() const
         { return Type;}
     QRectF boundingRect() const;
+    QPainterPath shape() const;
 protected:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);

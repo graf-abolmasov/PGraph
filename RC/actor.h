@@ -9,7 +9,7 @@
 class Actor
 {
 public:
-    enum Type {normalType, inlineType, graphType};
+    enum Type {NormalType, InlineType, GraphType};
     Actor(QString name, QString extName, Type type, QString baseModule, QList<Variable*> variableList, QStringList varAMList, QImage icon);
     QString extName;
     QString name;

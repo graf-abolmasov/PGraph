@@ -7,7 +7,8 @@
 void QSerialArcTop::contextMenuEvent(QGraphicsSceneContextMenuEvent *event){
     scene()->clearSelection();
     setSelected(true);
-    myContextMenu->exec(event->screenPos());
+    if (myContextMenu != NULL)
+        myContextMenu->exec(event->screenPos());
 }
 
 QSerialArcTop::QSerialArcTop(QMenu *contextMenu, QGraphicsItem *parent, QGraphicsScene *scene)
@@ -37,6 +38,13 @@ QVariant QSerialArcTop::itemChange(GraphicsItemChange change, const QVariant &va
     }
 
     return value;
+}
+
+QPainterPath QSerialArcTop::shape() const
+{
+    QPainterPath result;
+    result.addRect(rect().adjusted(-1,-1,1,1));
+    return result;
 }
 
 void QSerialArcTop::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)

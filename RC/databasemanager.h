@@ -36,7 +36,7 @@ public:
         { return myProjectId; }
 
     bool getGraphList(QList<Graph* > &graphList);
-    bool getGraph(QString extName, Graph &graph);
+    bool getGraph(Graph &graph);
     bool saveGraph(Graph* graph);
     bool updateGraph(Graph* graph);
 

@@ -36,7 +36,7 @@ DataBaseManager::DataBaseManager()
     myProjectId = 1;
 }
 
-bool DataBaseManager::getGraph(QString extName, Graph &graph)
+bool DataBaseManager::getGraph(Graph &graph)
 {
     bool ok = db.open();
     if (!ok) {
@@ -45,13 +45,11 @@ bool DataBaseManager::getGraph(QString extName, Graph &graph)
     }
     QSqlQuery query;
     query.prepare("SELECT ELTYP, ISTR, X, Y, SizeX, SizeY, ntop, isRoot, Actor, "
-                  " Nodes, ArcPrior, ArcFromTop, ArcToTop, ArcPred, ArcType "
-                  " FROM project pr JOIN actor ac ON pr.PROJECT_ID = ac.PROJECT_ID "
-                  " JOIN graphpic grp ON ac.NAMEPR = grp.NAMEPR "
-                  " WHERE ac.EXTNAME = :EXTNAME AND ac.CLASPR = 'g' AND pr.PROJECT_ID = :PROJECT_ID"
-                  " ORDER BY ELTYP DESC;");
+                  "Nodes, ArcPrior, ArcFromTop, ArcToTop, ArcPred, ArcType, EXTNAME "
+                  "FROM actor LEFT JOIN graphpic ON graphpic.namepr=actor.namepr WHERE actor.NAMEPR = :NAMEPR AND actor.PROJECT_ID = :PROJECT_ID "
+                  "ORDER BY ELTYP DESC;");
     query.bindValue(":PROJECT_ID", myProjectId);
-    query.bindValue(":EXTNAME", extName);
+    query.bindValue(":NAMEPR", graph.name);
     query.exec();
     globalLogger->writeLog(query.executedQuery().toUtf8());
     while (query.next()){
@@ -103,6 +101,7 @@ bool DataBaseManager::getGraph(QString extName, Graph &graph)
             Comment* comment = new Comment(query.value(2).toFloat(), query.value(3).toFloat(), query.value(1).toString());
             graph.commentList.append(comment);
         }
+        graph.extName = query.value(15).toString();
     }
     db.close();
     ok = (db.lastError().type() == QSqlError::NoError);
@@ -394,7 +393,7 @@ bool DataBaseManager::getActorList(QList<Actor *> &actorList)
         }
         actorList.append(new Actor(query1.value(0).toString(),
                                    query1.value(2).toString(),
-                                   query1.value(6).toString() == "" ? Actor::inlineType : Actor::normalType,
+                                   query1.value(6).toString() == "" ? Actor::InlineType : Actor::NormalType,
                                    query1.value(6).toString(),
                                    myVariableList,
                                    myVAList,
@@ -446,9 +445,15 @@ Actor* DataBaseManager::getActor(QString namepr)
             vaMode = QObject::tr("Вычисляемый");
         myVAList.append(vaMode);
     }
+    Actor::Type actorType;
+    if (query1.value(0).toString() == "g") {
+        actorType = Actor::GraphType;
+    } else {
+        actorType = query1.value(5).toString() == "" ? Actor::InlineType : Actor::NormalType;
+    }
     Actor* newActor = new Actor(namepr,
                                query1.value(1).toString(),
-                               query1.value(5).toString() == "" ? Actor::inlineType : Actor::normalType,
+                               actorType,
                                query1.value(5).toString(),
                                myVariableList,
                                myVAList,

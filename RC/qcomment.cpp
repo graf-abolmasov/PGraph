@@ -29,9 +29,10 @@ void QComment::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
     scene()->clearSelection();
     setSelected(true);
-    if (textInteractionFlags() == Qt::NoTextInteraction)
-        myContextMenu->exec(event->screenPos());
-    else
+    if (textInteractionFlags() == Qt::NoTextInteraction) {
+        if (myContextMenu != NULL)
+            myContextMenu->exec(event->screenPos());
+    } else
         QGraphicsTextItem::contextMenuEvent(event);
 }
 

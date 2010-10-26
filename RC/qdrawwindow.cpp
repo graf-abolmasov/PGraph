@@ -16,13 +16,16 @@
 
 QStringList globalPredicateList;
 
-TDrawWindow::TDrawWindow()
+TDrawWindow::TDrawWindow(ShowRole role, QWidget *parent)
+    : QMainWindow(parent)
 {
+    myRole = role;
+
     createActions();
     createMenus();
     undoStack = new QUndoStack();
 
-    view = new QGraphicsView();
+    view = new QGraphicsView(this);
     scene = new QDiagramScene();
     scene->setTopMenu(topMenu);
     scene->setArcMenu(arcMenu);
@@ -39,102 +42,132 @@ TDrawWindow::TDrawWindow()
         this, SLOT(itemMoved(QGraphicsItem*, QLineF)));
     connect(scene, SIGNAL(itemsMoved(QList<QGraphicsItem*>, QLineF)),
             this, SLOT(itemsMoved(QList<QGraphicsItem*>,QLineF)));
-    //передаем событие изменения объекта выше, кому надо
-    /*connect(scene, SIGNAL(itemSelected(QGraphicsItem*)),
-        this, SIGNAL(itemChanged(QGraphicsItem*)));*/
     connect(scene, SIGNAL(selectionChanged()), this, SLOT(selectionChanged()));
     //обработчик удаления объекта
     connect(scene, SIGNAL(itemDeleted(QGraphicsItem*)),
         this, SLOT(itemDeleted(QGraphicsItem*)));
 
-
     view->setScene(scene);
     view->setAlignment(Qt::AlignCenter);
-    /*QBrush myBackgroundBrush = view->backgroundBrush();
+    /*
+      Рисуем сетку
+    QBrush myBackgroundBrush = view->backgroundBrush();
     myBackgroundBrush.setColor(Qt::lightGray);
     myBackgroundBrush.setStyle(Qt::CrossPattern);
-    view->setBackgroundBrush(myBackgroundBrush);*/
-    this->setCentralWidget(view);
-    setMode(QDiagramScene::MoveItem);
+    view->setBackgroundBrush(myBackgroundBrush);
+    */
+    setCentralWidget(view);
+    setWindowTitle("");
+    if (myRole == NormalEditor)
+        setMode(QDiagramScene::MoveItem);
+    else
+        setMode(QDiagramScene::ReadOnly);
+    
 }
 
 void TDrawWindow::createMenus()
 {
-    topMenu = new QMenu();
-    topMenu->addAction(deleteAction);
-    topMenu->addSeparator();
-    topMenu->addAction(setIconAction);
-    topMenu->addAction(setTopPropertyAction);
-    topMenu->addAction(makeAsRootAction);
+    //Режим только чтения
+    if (myRole == ReadOnly) {
+        topMenu = NULL;
+        arcMenu = NULL;
+        syncArcMenu = NULL;
+        commentMenu = NULL;
+        multiProcMenu = NULL;
+    }
 
-    arcMenu = new QMenu();
-    arcMenu->addAction(deleteArcAction);
-    arcMenu->addSeparator();
-    arcMenu->addAction(setArcPropertyAction);
-    arcMenu->addAction(rebuildArcAction);
+    //Обычный режим
+    if (myRole == NormalEditor) {
+        topMenu = new QMenu();
+        connect(topMenu, SIGNAL(aboutToShow()), this, SLOT(topMenuAboutToShow()));
+        topMenu->addAction(deleteTopAction);
+        topMenu->addSeparator();
+        topMenu->addAction(setIconAction);
+        topMenu->addAction(setTopPropertyAction);
+        topMenu->addAction(makeAsRootAction);
+        topMenu->addSeparator();
+        topMenu->addAction(viewSubGraphAct);
+        topMenu->addAction(editSubGraphAct);
 
-    syncArcMenu = new QMenu();
-    syncArcMenu->addAction(deleteSyncAction);
+        arcMenu = new QMenu();
+        arcMenu->addAction(deleteArcAction);
+        arcMenu->addSeparator();
+        arcMenu->addAction(setArcPropertyAction);
+        arcMenu->addAction(rebuildArcAction);
 
-    commentMenu = new QMenu();
-    commentMenu->addAction(deleteCommentAction);
-    commentMenu->addSeparator();
-    commentMenu->addAction(setFontAction);
+        syncArcMenu = new QMenu();
+        syncArcMenu->addAction(deleteSyncAction);
 
-    multiProcMenu = new QMenu();
-    multiProcMenu->addAction(deleteMultiProcTopAction);
-    multiProcMenu->addSeparator();
-    multiProcMenu->addAction(setMultiProcTopAction);
+        commentMenu = new QMenu();
+        commentMenu->addAction(deleteCommentAction);
+        commentMenu->addSeparator();
+        commentMenu->addAction(setFontAction);
+
+        multiProcMenu = new QMenu();
+        multiProcMenu->addAction(deleteMultiProcTopAction);
+        multiProcMenu->addSeparator();
+        multiProcMenu->addAction(setMultiProcTopAction);
+    }
 }
 
 void TDrawWindow::createActions()
 {
-    setIconAction = new QAction(tr("Загрузить иконку"), this);
-    setIconAction->setStatusTip(tr("Отображает иконку на вершине вместо текста"));
-    connect(setIconAction, SIGNAL(triggered()), this, SLOT(setItemIcon()));
+    if (myRole == NormalEditor) {
+        setIconAction = new QAction(tr("Загрузить иконку"), this);
+        setIconAction->setStatusTip(tr("Отображает иконку на вершине вместо текста"));
+        connect(setIconAction, SIGNAL(triggered()), this, SLOT(setItemIcon()));
 
-    setTopPropertyAction = new QAction(tr("Свойства"), this);
-    setTopPropertyAction->setStatusTip(tr("Изменить свойства вершины"));
-    connect(setTopPropertyAction, SIGNAL(triggered()), this, SLOT(showTopPropDialog()));
+        setTopPropertyAction = new QAction(tr("Свойства"), this);
+        setTopPropertyAction->setStatusTip(tr("Изменить свойства вершины"));
+        connect(setTopPropertyAction, SIGNAL(triggered()), this, SLOT(showTopPropDialog()));
 
-    makeAsRootAction = new QAction(tr("Сделать корневой"), this);
-    makeAsRootAction->setStatusTip(tr("Сделать корневой"));
-    connect(makeAsRootAction, SIGNAL(triggered()), this, SLOT(makeAsRoot()));
+        makeAsRootAction = new QAction(tr("Сделать корневой"), this);
+        makeAsRootAction->setStatusTip(tr("Сделать корневой"));
+        connect(makeAsRootAction, SIGNAL(triggered()), this, SLOT(makeAsRoot()));
 
-    deleteAction = new QAction(QIcon(";/images/delete.png"), tr("Удалить"), this);
-    deleteAction->setStatusTip(tr("Удаляет вершину"));
-    connect(deleteAction, SIGNAL(triggered()), this, SLOT(deleteTop()));
+        deleteTopAction = new QAction(QIcon(";/images/delete.png"), tr("Удалить"), this);
+        deleteTopAction->setStatusTip(tr("Удаляет вершину"));
+        connect(deleteTopAction, SIGNAL(triggered()), this, SLOT(deleteTop()));
 
-    setArcPropertyAction = new QAction(tr("Свойства"), this);
-    setArcPropertyAction->setStatusTip(tr("Изменить свойства дуги"));
-    connect(setArcPropertyAction, SIGNAL(triggered()), this, SLOT(showArcPropDialog()));
+        viewSubGraphAct = new QAction(tr("Просмотреть подграф"), this);
+        viewSubGraphAct->setStatusTip(tr("Открывает подграф для просмотра"));
+        connect(viewSubGraphAct, SIGNAL(triggered()), this, SLOT(viewSubGraph()));
 
-    deleteArcAction = new QAction(QIcon(";/images/delete.png"), tr("Удалить"), this);
-    deleteArcAction->setStatusTip(tr("Удаляет дугу"));
-    connect(deleteArcAction, SIGNAL(triggered()), this, SLOT(deleteArc()));
+        editSubGraphAct = new QAction(tr("Редактировать подграф"), this);
+        editSubGraphAct->setStatusTip(tr("Открывает подграф для редактирования"));
+        connect(editSubGraphAct, SIGNAL(triggered()), this, SLOT(editSubGraph()));
 
-    rebuildArcAction = new QAction(tr("Перестроить"), this);
-    rebuildArcAction->setStatusTip(tr("Перестраивает дугу по внутреннему алгоритму"));
-    connect(rebuildArcAction, SIGNAL(triggered()), this, SLOT(rebuildArc()));
+        setArcPropertyAction = new QAction(tr("Свойства"), this);
+        setArcPropertyAction->setStatusTip(tr("Изменить свойства дуги"));
+        connect(setArcPropertyAction, SIGNAL(triggered()), this, SLOT(showArcPropDialog()));
 
-    deleteSyncAction = new QAction(QIcon(";/images/delete.png"), tr("Удалить"), this);
-    deleteSyncAction->setStatusTip(tr("Удалить дугу синхронизации"));
-    connect(deleteSyncAction, SIGNAL(triggered()), this, SLOT(deleteSync()));
+        deleteArcAction = new QAction(QIcon(";/images/delete.png"), tr("Удалить"), this);
+        deleteArcAction->setStatusTip(tr("Удаляет дугу"));
+        connect(deleteArcAction, SIGNAL(triggered()), this, SLOT(deleteArc()));
 
-    deleteCommentAction = new QAction(QIcon(";/images/delete.png"), tr("Удалить"), this);
-    deleteCommentAction->setStatusTip(tr("Удаляет комментарий"));
-    connect(deleteCommentAction, SIGNAL(triggered()), this, SLOT(deleteComment()));
+        rebuildArcAction = new QAction(tr("Перестроить"), this);
+        rebuildArcAction->setStatusTip(tr("Перестраивает дугу по внутреннему алгоритму"));
+        connect(rebuildArcAction, SIGNAL(triggered()), this, SLOT(rebuildArc()));
 
-    setFontAction = new QAction(tr("Шрифт"), this);
-    connect(setFontAction, SIGNAL(triggered()), this, SLOT(showFontDialog()));
+        deleteSyncAction = new QAction(QIcon(";/images/delete.png"), tr("Удалить"), this);
+        deleteSyncAction->setStatusTip(tr("Удалить дугу синхронизации"));
+        connect(deleteSyncAction, SIGNAL(triggered()), this, SLOT(deleteSync()));
 
-    deleteMultiProcTopAction = new QAction(QIcon(";/images/delete.png"), tr("Удалить"), this);
-    deleteMultiProcTopAction->setStatusTip(tr("Удалить многопоточную вершину"));
-    connect(deleteMultiProcTopAction, SIGNAL(triggered()), this, SLOT(deleteTop()));
+        deleteCommentAction = new QAction(QIcon(";/images/delete.png"), tr("Удалить"), this);
+        deleteCommentAction->setStatusTip(tr("Удаляет комментарий"));
+        connect(deleteCommentAction, SIGNAL(triggered()), this, SLOT(deleteComment()));
 
-    setMultiProcTopAction = new QAction(tr("Свойства"), this);
-    setMultiProcTopAction->setStatusTip(tr("Изменить совйства многопоточной вершины"));
-    connect(setMultiProcTopAction, SIGNAL(triggered()), this, SLOT(showMultiProcTopDialog()));
+        setFontAction = new QAction(tr("Шрифт"), this);
+        connect(setFontAction, SIGNAL(triggered()), this, SLOT(showFontDialog()));
+
+        deleteMultiProcTopAction = new QAction(QIcon(";/images/delete.png"), tr("Удалить"), this);
+        deleteMultiProcTopAction->setStatusTip(tr("Удалить многопоточную вершину"));
+        connect(deleteMultiProcTopAction, SIGNAL(triggered()), this, SLOT(deleteTop()));
+
+        setMultiProcTopAction = new QAction(tr("Свойства"), this);
+        setMultiProcTopAction->setStatusTip(tr("Изменить совйства многопоточной вершины"));
+        connect(setMultiProcTopAction, SIGNAL(triggered()), this, SLOT(showMultiProcTopDialog()));
+    }
 }
 
 void TDrawWindow::deleteTop()
@@ -326,7 +359,7 @@ Graph* TDrawWindow::getGraph()
 
     QList<QSyncArc* > syncArcList = allSyncArcs();
     QList<QMultiProcTop* > multiProcTopList = allMultiProcTop();
-    Graph* result = new Graph("", "", topList, arcList, commentList, syncArcList, multiProcTopList);
+    Graph* result = new Graph(myGraphName, myGraphExtName, topList, arcList, commentList, syncArcList, multiProcTopList);
     return result;
 }
 
@@ -334,15 +367,16 @@ Graph* TDrawWindow::getGraph()
   Загружает граф в редактор
 */
 
-void TDrawWindow::loadGraph(QString extName, DataBaseManager* dbManager)
+void TDrawWindow::loadGraph(QString name, DataBaseManager* dbManager)
 {
+    scene->clear();
     QList<Top* > topList;
     QList<Arc* > arcList;
     QList<Comment* > commentList;
     QList<QSyncArc* > syncArcList;
     QList<QMultiProcTop* > multiProcTopList;
-    Graph graph("", "", topList, arcList, commentList, syncArcList, multiProcTopList);
-    dbManager->getGraph(extName, graph);
+    Graph graph(name, "", topList, arcList, commentList, syncArcList, multiProcTopList);
+    dbManager->getGraph(graph);
     foreach (Top* top, graph.topList) {
         if (top->type == "T") {
             QNormalTop *qtop = new QNormalTop(topMenu, NULL, scene);
@@ -363,6 +397,7 @@ void TDrawWindow::loadGraph(QString extName, DataBaseManager* dbManager)
         }
     }
 
+    QList<QPair<QArc*, int> > qarcList;
     foreach (Arc* arc, graph.arcList) {
         QTop *startTop = NULL;
         QTop *endTop = NULL;
@@ -383,13 +418,18 @@ void TDrawWindow::loadGraph(QString extName, DataBaseManager* dbManager)
         }
         qarc->addLine(qarc->currentLine);
         qarc->currentLine = NULL;
-        qarc->setPriority(arc->priority);
         qarc->setArcType(QArc::ArcType(arc->type));
         qarc->predicate = dbManager->getPredicate(arc->predicate);
         if (qarc->predicate != NULL && !globalPredicateList.contains(qarc->predicate->extName))
             globalPredicateList.append(qarc->predicate->extName);
         startTop->addArc(qarc);
         endTop->addArc(qarc);
+        qarcList.append(qMakePair(qarc, arc->priority));
+    }
+
+    //расставляем приоритеты дуг
+    for (int i = 0; i < qarcList.count(); i++) {
+        qarcList.at(i).first->setPriority(qarcList.at(i).second);
     }
 
     foreach (Comment* comment, graph.commentList) {
@@ -397,24 +437,45 @@ void TDrawWindow::loadGraph(QString extName, DataBaseManager* dbManager)
         qcomment->setPos(comment->x, comment->y);
         qcomment->setPlainText(comment->text);
     }
-}
 
-bool TDrawWindow::saveGraph(QString name, QString extName, DataBaseManager *dbManager, bool update)
-{
-    Graph* graph = getGraph();
-    graph->extName = extName;
-    graph->name = name;
-    if (update)
-        return dbManager->updateGraph(graph);
+    myGraphName = graph.name;
+    myGraphExtName = graph.extName;
+    if (myRole = ReadOnly)
+        setWindowTitle(myGraphExtName + tr(" - Read-only"));
     else
-        return dbManager->saveGraph(graph);
+        setWindowTitle(myGraphExtName);
+    emit graphLoaded(myGraphName, myGraphExtName);
 }
 
-bool TDrawWindow::saveStruct(QString name, DataBaseManager *dbManager)
+bool TDrawWindow::saveGraph(QString name, QString extName, DataBaseManager *dbManager)
+{
+    if (name == "" || extName == "") {
+        QMessageBox::critical(this, tr("Ошибка"), tr("Нельзя сохранить граф без имени."), QMessageBox::Ok);
+        return false;
+    }
+    myGraphExtName = extName;
+    myGraphName = name;
+    Graph* graph = getGraph();
+    bool result = dbManager->saveGraph(graph);
+    if (result)
+        emit graphLoaded(graph->name, graph->extName);
+    return result;
+}
+
+bool TDrawWindow::updateGraph(DataBaseManager *dbManager)
 {
     Graph* graph = getGraph();
-    graph->name = name;
-    return dbManager->saveStruct(graph);
+    if (graph->extName != "")
+        return dbManager->updateGraph(graph);
+    return false;
+}
+
+bool TDrawWindow::saveStruct(DataBaseManager *dbManager)
+{
+    Graph* graph = getGraph();
+    if (graph->name != "")
+        return dbManager->saveStruct(graph);
+    return false;
 }
 
 void TDrawWindow::showMultiProcTopDialog()
@@ -945,6 +1006,8 @@ void TDrawWindow::rebuildArc()
 void TDrawWindow::selectionChanged()
 {
     emit selectionChanged(scene->selectedItems());
+    if (scene->selectedItems().count() > 0)
+        emit itemChanged(scene->selectedItems().first());
 }
 
 void TDrawWindow::scale(float s)
@@ -953,4 +1016,45 @@ void TDrawWindow::scale(float s)
     view->resetMatrix();
     view->translate(oldMatrix.dx(), oldMatrix.dy());
     view->scale(s, s);
+}
+
+void TDrawWindow::topMenuAboutToShow()
+{
+    QGraphicsItem *item = scene->selectedItems().first();
+    if (item->type() == QTop::Type) {
+        QTop *top = qgraphicsitem_cast<QTop *>(item);
+        if (top->actor != NULL && top->actor->type == Actor::GraphType) {
+            viewSubGraphAct->setEnabled(true);
+            editSubGraphAct->setEnabled(true);
+        } else {
+            viewSubGraphAct->setEnabled(false);
+            editSubGraphAct->setEnabled(false);
+        }
+    }
+}
+
+void TDrawWindow::viewSubGraph()
+{
+    QGraphicsItem *item = scene->selectedItems().first();
+    if (item->type() == QTop::Type) {
+        QTop *top = qgraphicsitem_cast<QTop *>(item);
+        if (top->actor != NULL && top->actor->type == Actor::GraphType) {
+            TDrawWindow *drawWindow = new TDrawWindow(TDrawWindow::ReadOnly, this);
+            drawWindow->loadGraph(top->actor->name, globalDBManager);
+            connect(drawWindow, SIGNAL(itemChanged(QGraphicsItem*)), this, SIGNAL(itemChanged(QGraphicsItem*)));
+            drawWindow->show();
+        }
+    }
+}
+
+void TDrawWindow::editSubGraph()
+{
+    QGraphicsItem *item = scene->selectedItems().first();
+    if (item->type() == QTop::Type) {
+        QTop *top = qgraphicsitem_cast<QTop *>(item);
+        if (top->actor != NULL && top->actor->type == Actor::GraphType) {
+            QString name = top->actor->name;
+            loadGraph(name, globalDBManager);
+        }
+    }
 }

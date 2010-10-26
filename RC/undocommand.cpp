@@ -39,8 +39,8 @@ void AddCommand::redo()
         arc = qgraphicsitem_cast<QArc* >(myItem);
         arc->startItem()->addArc(arc);
         arc->endItem()->addArc(arc);
-        foreach(QArc *qarc, arc->startItem()->outArcs())
-            qarc->setPriority(qarc->priority() + 1);
+//        foreach(QArc *qarc, arc->startItem()->outArcs())
+//            qarc->setPriority(qarc->priority() + 1);
         arc->setPriority(1);
         break;
     case QSyncArc::Type:
@@ -75,9 +75,9 @@ void DeleteCommand::undo()
     switch (myItem->type()) {
     case QArc::Type:
         arc = qgraphicsitem_cast<QArc* >(myItem);
-        foreach(QArc *qarc, arc->startItem()->outArcs())
+        /*foreach(QArc *qarc, arc->startItem()->outArcs())
             if (qarc->priority() >= arc->priority())
-                qarc->setPriority(qarc->priority() + 1);
+                qarc->setPriority(qarc->priority() + 1);*/
         arc->startItem()->addArc(arc);
         arc->endItem()->addArc(arc);
         break;

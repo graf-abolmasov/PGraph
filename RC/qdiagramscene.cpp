@@ -19,6 +19,8 @@ QDiagramScene::QDiagramScene(QObject *parent)
 
 void QDiagramScene::setMode(Mode mode)
 {
+    if (myMode == ReadOnly)
+        return;
     myMode = mode;
 }
 
@@ -271,6 +273,9 @@ void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
 }
 
 void QDiagramScene::keyReleaseEvent (QKeyEvent *keyEvent){
+    if (myMode == ReadOnly)
+        return;
+
     if ((newArc != NULL) && (keyEvent->key() == Qt::Key_Escape)) {
         delete line;
         if (newArc->lines.count() > 1){

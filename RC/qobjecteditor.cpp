@@ -77,11 +77,11 @@ void QObjectEditor::prepareForm()
                               QObject::tr("Не удалось получить список акторов.\n") + globalDBManager->lastError().databaseText(),
                               QMessageBox::Ok);
     foreach (Actor* actor, fullActorList){
-        if (actor->type == Actor::normalType) {
+        if (actor->type == Actor::NormalType) {
             ui->actorList->addItem(QString(actor->extName).replace(QRegExp("(\r+|\n+)"), " "));
             actorsList.append(actor);
         }
-        if (actor->type == Actor::inlineType) {
+        if (actor->type == Actor::InlineType) {
             ui->inlineActorList->addItem(QString(actor->extName).replace(QRegExp("(\r+|\n+)"), " "));
             iActorsList.append(actor);
         }

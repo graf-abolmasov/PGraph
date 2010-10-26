@@ -6,7 +6,8 @@
 void QTerminateArcTop::contextMenuEvent(QGraphicsSceneContextMenuEvent *event){
     scene()->clearSelection();
     setSelected(true);
-    myContextMenu->exec(event->screenPos());
+    if (myContextMenu != NULL)
+        myContextMenu->exec(event->screenPos());
 }
 
 QTerminateArcTop::QTerminateArcTop(QMenu *contextMenu, QGraphicsItem *parent, QGraphicsScene *scene)

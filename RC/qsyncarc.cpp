@@ -24,7 +24,8 @@ QSyncArc::QSyncArc(QTop *startItem, QTop *endItem, QMenu *contextMenu, QGraphics
 void QSyncArc::contextMenuEvent(QGraphicsSceneContextMenuEvent *event){
     scene()->clearSelection();
     setSelected(true);
-    myContextMenu->exec(event->screenPos());
+    if (myContextMenu != NULL)
+        myContextMenu->exec(event->screenPos());
 }
 
 QPainterPath QSyncArc::shape() const {
@@ -112,4 +113,12 @@ bool QSyncArc::remake(QTop *aMovedTop, float dx, float dy)
         setLine(QLineF(line().p1(), newEndP));
     }
     return true;
+}
+
+SyncArc::SyncArc(QString startGraph, int startTop, QString endGraph, int endTop)
+{
+    this->startGraph = startGraph;
+    this->endTop = endTop;
+    this->endGraph = endGraph;
+    this->startTop = startTop;
 }
