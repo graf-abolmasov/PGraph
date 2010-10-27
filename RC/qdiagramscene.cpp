@@ -116,6 +116,7 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
     //режим перетаскивания вершины
     else if ((myMode == MoveItem) &&
              (mouseEvent->buttons() == Qt::LeftButton) &&
+             mySelectedItems.count() > 0 &&
              (mySelectedItems.first()->type() == QTop::Type)) {
         QLineF vector(mouseEvent->lastScenePos(), mouseEvent->scenePos());
         bool allowMove = false;
@@ -123,9 +124,9 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
         //находится ли курсор внутри какого-нибудь элемента
         foreach (QGraphicsItem* item, mySelectedItems)
             if (item->contains(item->mapFromScene(mouseEvent->lastScenePos()))) {
-                allowMove = true;
-                break;
-            }
+            allowMove = true;
+            break;
+        }
 
         //если да, то
         if (allowMove) {
@@ -256,9 +257,9 @@ void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
             endItems.first()->type() == QTop::Type &&
             startItems.first() != endItems.first()) {
             QTop *startItem =
-                qgraphicsitem_cast<QTop *>(startItems.first());
+                    qgraphicsitem_cast<QTop *>(startItems.first());
             QTop *endItem =
-                qgraphicsitem_cast<QTop *>(endItems.first());
+                    qgraphicsitem_cast<QTop *>(endItems.first());
             QSyncArc *newSyncArc = new QSyncArc(startItem, endItem, mySyncArcMenu);
             newSyncArc->setLine(line->line());
             newSyncArc->setZValue(1);
@@ -373,9 +374,9 @@ int QDiagramScene::getNextTopNumber()
     int maxNumber = -1;
     for (int i = 0; i < items().count(); i++)
         if (items().at(i)->type() == QTop::Type) {
-           QTop* top = qgraphicsitem_cast<QTop* >(items().at(i));
-           maxNumber = top->number > maxNumber ? top->number : maxNumber;
-        }
+        QTop* top = qgraphicsitem_cast<QTop* >(items().at(i));
+        maxNumber = top->number > maxNumber ? top->number : maxNumber;
+    }
 
     return maxNumber+1;
 }
