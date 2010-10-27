@@ -300,12 +300,6 @@ void TMyWindow::createToolBar()
     //scaleToolBar->addWidget(scaleSlider);
 }
 
-void TMyWindow::CMGNew()
-{
-    TDrawWindow *newDrawWindow = createDrawWindow();
-    newDrawWindow->showMaximized();
-    graphLoaded("", "");
-}
 
 TDrawWindow *TMyWindow::activeDrawWindow()
 {
@@ -317,11 +311,19 @@ void TMyWindow::pointerGroupClicked(int)
     activeDrawWindow()->setMode(QDiagramScene::Mode(pointerTypeGroup->checkedId()));
 }
 
+void TMyWindow::CMGNew()
+{
+    TDrawWindow *newDrawWindow = createDrawWindow();
+    newDrawWindow->showMaximized();
+    graphLoaded("", "");
+}
+
 void TMyWindow::sceneChanged()
 {
     if (activeDrawWindow())
         pointerTypeGroup->button(int(activeDrawWindow()->mode()))->setChecked(true);
     setWindowTitle(activeDrawWindow()->myGraphName == "" ?  tr("Untitled* - Граф-редактор") : activeDrawWindow()->myGraphExtName + tr("* - Граф-редактор"));
+    saveGraphAct->setEnabled(true);
 }
 
 void TMyWindow::CMGSaveAsImage()
@@ -338,8 +340,11 @@ void TMyWindow::CMGSaveAs()
         if (dialog.getResult() != ""){
             QString extName = dialog.getResult();
             QString name = "G" + getCRC(dialog.getResult().toUtf8());
-            if (activeDrawWindow()->saveGraph(name, extName, globalDBManager))
+            if (activeDrawWindow()->saveGraph(name, extName, globalDBManager)) {
+                setWindowTitle(activeDrawWindow()->myGraphExtName + tr(" - Граф-редактор"));
+                saveGraphAct->setEnabled(false);
                 statusBar()->showMessage(tr("Сохранено как ") + activeDrawWindow()->myGraphName, 3000);
+            }
         }
     }
 }
@@ -403,8 +408,11 @@ void TMyWindow::CMSaveStruct()
 
 void TMyWindow::CMGSave()
 {
-    if (activeDrawWindow()->updateGraph(globalDBManager))
+    if (activeDrawWindow()->updateGraph(globalDBManager)) {
+        setWindowTitle(activeDrawWindow()->myGraphExtName + tr(" - Граф-редактор"));
+        saveGraphAct->setEnabled(false);
         statusBar()->showMessage(tr("Сохранено как ") + activeDrawWindow()->myGraphName, 3000);
+    }
 }
 
 void TMyWindow::CMHelpAbout()
