@@ -2,6 +2,8 @@
 #include "qdiagramscene.h"
 #include <QSqlDatabase>
 #include <QSqlQuery>
+#include <QSqlResult>
+#include <QSqlRecord>
 #include <QDebug>
 #include <QMessageBox>
 #include <QSqlError>
@@ -27,7 +29,7 @@ DataBaseManager::DataBaseManager()
     QSettings myDBSettings("graph.ini", QSettings::IniFormat);
     db.setHostName(myDBSettings.value("DB/hostname", "localhost").toString());
     db.setPort(myDBSettings.value("DB/port", 3306).toInt());
-    db.setDatabaseName(myDBSettings.value("DB/dbname", "graph3").toString());
+    db.setDatabaseName(myDBSettings.value("DB/dbname", "graph4").toString());
     db.setUserName(myDBSettings.value("DB/login", "root").toString());
     db.setPassword(myDBSettings.value("DB/password", "Marina").toString());
     db.open();
@@ -43,66 +45,94 @@ bool DataBaseManager::getGraph(Graph &graph)
         globalLogger->writeLog(db.lastError().text(), Logger::Critical);
         return false;
     }
+
     QSqlQuery query;
-    query.prepare("SELECT ELTYP, ISTR, X, Y, SizeX, SizeY, ntop, isRoot, Actor, "
-                  "Nodes, ArcPrior, ArcFromTop, ArcToTop, ArcPred, ArcType, EXTNAME "
-                  "FROM actor LEFT JOIN graphpic ON graphpic.namepr=actor.namepr WHERE actor.NAMEPR = :NAMEPR AND actor.PROJECT_ID = :PROJECT_ID "
-                  "ORDER BY ELTYP DESC;");
+    //получаем список вершин
+    query.prepare("SELECT toppic.*, toppic.SizeX AS procCount FROM toppic "
+                  "WHERE toppic.NAMEPR=:NAMEPR AND toppic.PROJECT_ID=:PROJECT_ID");
     query.bindValue(":PROJECT_ID", myProjectId);
     query.bindValue(":NAMEPR", graph.name);
     query.exec();
     globalLogger->writeLog(query.executedQuery().toUtf8());
     while (query.next()){
-        if (query.value(0).toString() == "T"){
-            Top* top = new Top(query.value(2).toFloat(),
-                               query.value(3).toFloat(),
-                               query.value(4).toDouble(),
-                               query.value(5).toDouble(),
-                               query.value(6).toInt(),
+        QSqlRecord record = query.record();
+        if (record.value("Type").toString() == "T"){
+            Top* top = new Top(record.value("X").toFloat(),
+                               record.value("Y").toFloat(),
+                               record.value("SizeX").toFloat(),
+                               record.value("SizeY").toFloat(),
+                               record.value("ntop").toInt(),
                                -1,
-                               query.value(7).toBool(),
-                               query.value(8).toString(),
+                               record.value("isRoot").toBool(),
+                               record.value("Actor").toString(),
                                "T");
             graph.topList.append(top);
         }
 
-        if (query.value(0).toString() == "M"){
-            Top* top = new Top(query.value(2).toFloat(),
-                               query.value(3).toFloat(),
+        if (record.value("Type").toString() == "M"){
+            Top* top = new Top(record.value("X").toFloat(),
+                               record.value("Y").toFloat(),
                                -1,
                                -1,
-                               query.value(6).toInt(),
-                               10,
-                               query.value(7).toBool(),
-                               query.value(8).toString(),
+                               record.value("ntop").toInt(),
+                               record.value("procCount").toInt(),
+                               false,
+                               record.value("Actor").toString(),
                                "M");
             graph.topList.append(top);
         }
-
-        if (query.value(0).toString() == "A"){
-            Arc::ArcType arcType;
-            if (query.value(14).toString() == QObject::tr("S"))
-                arcType = Arc::SerialArc;
-            if (query.value(14).toString() == QObject::tr("P"))
-                arcType = Arc::ParallelArc;
-            if (query.value(14).toString() == QObject::tr("T"))
-                arcType = Arc::TerminateArc;
-            QStringList lines = query.value(9).toString().split(";;");
-            Arc* arc = new Arc(arcType,
-                               query.value(10).toInt(),
-                               query.value(11).toInt(),
-                               query.value(12).toInt(),
-                               query.value(13).toString(),
-                               lines);
-            graph.arcList.append(arc);
-        }
-
-        if (query.value(0).toString() == "C"){
-            Comment* comment = new Comment(query.value(2).toFloat(), query.value(3).toFloat(), query.value(1).toString());
-            graph.commentList.append(comment);
-        }
-        graph.extName = query.value(15).toString();
     }
+
+    //получаем список дуг управления
+    query.prepare("SELECT arcpic.* FROM arcpic "
+                  "WHERE arcpic.NAMEPR=:NAMEPR AND arcpic.PROJECT_ID=:PROJECT_ID ");
+    query.bindValue(":PROJECT_ID", myProjectId);
+    query.bindValue(":NAMEPR", graph.name);
+    query.exec();
+    globalLogger->writeLog(query.executedQuery().toUtf8());
+    while (query.next()){
+        QSqlRecord record = query.record();
+        Arc::ArcType arcType;
+        if (record.value("Type").toString() == QObject::tr("S"))
+            arcType = Arc::SerialArc;
+        if (record.value("Type").toString() == QObject::tr("P"))
+            arcType = Arc::ParallelArc;
+        if (record.value("Type").toString() == QObject::tr("T"))
+            arcType = Arc::TerminateArc;
+        QStringList lines = record.value("Nodes").toString().split(";;");
+        Arc* arc = new Arc(arcType,
+                           record.value("Priority").toInt(),
+                           record.value("FromTop").toInt(),
+                           record.value("ToTop").toInt(),
+                           record.value("Predicate").toString(),
+                           lines);
+        graph.arcList.append(arc);
+    }
+
+    //получаем список комментариев
+    query.prepare("SELECT commentpic.* FROM commentpic "
+                  "WHERE commentpic.NAMEPR=:NAMEPR AND commentpic.PROJECT_ID=:PROJECT_ID");
+    query.bindValue(":PROJECT_ID", myProjectId);
+    query.bindValue(":NAMEPR", graph.name);
+    query.exec();
+    globalLogger->writeLog(query.executedQuery().toUtf8());
+    while (query.next()){
+        QSqlRecord record = query.record();
+        Comment* comment = new Comment(record.value("X").toFloat(),
+                                       record.value("Y").toFloat(),
+                                       record.value("TEXT").toString());
+        graph.commentList.append(comment);
+    }
+
+    //Получаем полное название агрегата
+    query.prepare("SELECT EXTNAME FROM Actor "
+                  "WHERE Actor.NAMEPR=:NAMEPR AND Actor.PROJECT_ID=:PROJECT_ID ");
+    query.bindValue(":PROJECT_ID", myProjectId);
+    query.bindValue(":NAMEPR", graph.name);
+    query.exec();
+    query.next();
+    graph.extName = query.value(0).toString();
+
     db.close();
     ok = (db.lastError().type() == QSqlError::NoError);
     if (!ok) globalLogger->writeLog(db.lastError().text(), Logger::Critical);
@@ -129,46 +159,40 @@ bool DataBaseManager::saveGraph(Graph *graph)
     globalLogger->writeLog(query.executedQuery().toUtf8());
 
     foreach (Top* top, graph->topList){
-        query.prepare("INSERT INTO graphpic (PROJECT_ID, NAMEPR, ELTYP, ISTR, X, Y, SizeX, SizeY, ntop, isRoot, Actor, Nodes, ArcPrior, ArcFromTop, ArcToTop, ArcPred, ArcType) "
-                      "VALUES (:PROJECT_ID, :NAMEPR, :ELTYP, :ISTR, :X, :Y, :SizeX, :SizeY, :ntop, :isRoot, :Actor, NULL, NULL, NULL, NULL, NULL, NULL)");
+        query.prepare("INSERT INTO toppic (PROJECT_ID, NAMEPR, X, Y, SizeX, SizeY, ntop, isRoot, Actor, Type) "
+                      "VALUES (:PROJECT_ID, :NAMEPR, :X, :Y, :SizeX, :SizeY, :ntop, :isRoot, :Actor, :Type)");
 
         query.bindValue(":PROJECT_ID",  myProjectId);
         query.bindValue(":NAMEPR",      graph->name);
-        query.bindValue(":ELTYP",       top->type);
         query.bindValue(":X",           top->x);
         query.bindValue(":Y",           top->y);
-        query.bindValue(":ISTR",        QString::number(top->x) + " " +
-                                        QString::number(top->y) + " " +
-                                        QString::number(top->number));
-        query.bindValue(":SizeX",       top->sizeX);
+        query.bindValue(":SizeX",       top->type == "M" ? top->procCount : top->sizeX);
         query.bindValue(":SizeY",       top->sizeY);
         query.bindValue(":ntop",        top->number);
         query.bindValue(":isRoot",      top->isRoot ? 1 : 0 );
         query.bindValue(":Actor",       top->actor);
+        query.bindValue(":Type",        top->type);
         query.exec();
         globalLogger->writeLog(query.executedQuery().toUtf8());
     }
 
     foreach(Comment* comment, graph->commentList){
-        query.prepare("INSERT INTO graphpic (PROJECT_ID, NAMEPR, ELTYP, ISTR, X, Y, SizeX, SizeY, ntop, isRoot, Actor, Nodes, ArcPrior, ArcFromTop, ArcToTop, ArcPred, ArcType) "
-                      "VALUES (:PROJECT_ID, :NAMEPR, :ELTYP, :ISTR, :X, :Y, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)");
+        query.prepare("INSERT INTO commentpic (PROJECT_ID, NAMEPR, TEXT, X, Y) "
+                      "VALUES (:PROJECT_ID, :NAMEPR, :TEXT, :X, :Y)");
         query.bindValue(":PROJECT_ID", myProjectId);
         query.bindValue(":NAMEPR",     graph->name);
-        query.bindValue(":ELTYP",      "C");
         query.bindValue(":X",          comment->x);
         query.bindValue(":Y",          comment->y);
-        query.bindValue(":ISTR",       comment->text);
+        query.bindValue(":TEXT",       comment->text);
         query.exec();
         globalLogger->writeLog(query.executedQuery().toUtf8());
     }
 
     foreach (Arc* arc, graph->arcList){
-        query.prepare("INSERT INTO graphpic (PROJECT_ID, NAMEPR, ELTYP, ISTR, X, Y, SizeX, SizeY, ntop, isRoot, Actor, Nodes, ArcPrior, ArcFromTop, ArcToTop, ArcPred, ArcType) "
-                      "VALUES (:PROJECT_ID, :NAMEPR, :ELTYP, :ISTR, NULL, NULL, NULL, NULL, NULL, NULL, NULL, :Nodes, :ArcPrior, :ArcFromTop, :ArcToTop, :ArcPred, :ArcType)");
+        query.prepare("INSERT INTO arcpic (PROJECT_ID, NAMEPR, Nodes, Priority, FromTop, ToTop, Predicate, Type) "
+                      "VALUES (:PROJECT_ID, :NAMEPR, :Nodes, :Priority, :FromTop, :ToTop, :Predicate, :Type)");
         query.bindValue(":PROJECT_ID", myProjectId);
         query.bindValue(":NAMEPR",     graph->name);
-        query.bindValue(":ELTYP",      "A");
-        query.bindValue(":ISTR",       arc->lines.join(" "));
         QString arcType;
         switch (arc->type){
         case Arc::SerialArc:
@@ -181,12 +205,12 @@ bool DataBaseManager::saveGraph(Graph *graph)
             arcType = "T";
             break;
         }
-        query.bindValue(":ArcType",     arcType);
-        query.bindValue(":Nodes",       arc->lines.join(";;"));
-        query.bindValue(":ArcPrior",    arc->priority);
-        query.bindValue(":ArcFromTop",  arc->startTop);
-        query.bindValue(":ArcToTop",    arc->endTop);
-        query.bindValue(":ArcPred",     arc->predicate);
+        query.bindValue(":Type",      arcType);
+        query.bindValue(":Nodes",     arc->lines.join(";;"));
+        query.bindValue(":Priority",  arc->priority);
+        query.bindValue(":FromTop",   arc->startTop);
+        query.bindValue(":ToTop",     arc->endTop);
+        query.bindValue(":Predicate", arc->predicate);
         query.exec();
         globalLogger->writeLog(query.executedQuery().toUtf8());
     }

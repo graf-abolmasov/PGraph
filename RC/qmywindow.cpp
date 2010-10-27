@@ -311,19 +311,19 @@ void TMyWindow::pointerGroupClicked(int)
     activeDrawWindow()->setMode(QDiagramScene::Mode(pointerTypeGroup->checkedId()));
 }
 
-void TMyWindow::CMGNew()
-{
-    TDrawWindow *newDrawWindow = createDrawWindow();
-    newDrawWindow->showMaximized();
-    graphLoaded("", "");
-}
-
 void TMyWindow::sceneChanged()
 {
     if (activeDrawWindow())
         pointerTypeGroup->button(int(activeDrawWindow()->mode()))->setChecked(true);
     setWindowTitle(activeDrawWindow()->myGraphName == "" ?  tr("Untitled* - Граф-редактор") : activeDrawWindow()->myGraphExtName + tr("* - Граф-редактор"));
-    saveGraphAct->setEnabled(true);
+    saveGraphAct->setEnabled(activeDrawWindow()->myGraphName != "");
+}
+
+void TMyWindow::CMGNew()
+{
+    TDrawWindow *newDrawWindow = createDrawWindow();
+    newDrawWindow->showMaximized();
+    graphLoaded("", "");
 }
 
 void TMyWindow::CMGSaveAsImage()
