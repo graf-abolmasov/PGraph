@@ -54,7 +54,7 @@ public:
     bool getPredicateList(QList<Predicate*>& predList);
     Predicate* getPredicate(QString namepr);
 
-    bool registerModule(QString uniqName, QString fileName, QString comment, QStringList &paramList);
+    bool registerModule(const QString &uniqName, const QString &fileName, const QString &comment, QStringList &paramList);
     bool getRegisteredModules(QList<BaseModule*> &moduleList);
 
     bool saveStruct(Graph *graph);

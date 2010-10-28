@@ -46,6 +46,9 @@ void QDiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
         foreach (QGraphicsItem* item, itemsAtPos){
             if (item->type() == QTop::Type) {
                 allowAddTop = false;
+                setMode(MoveItem);
+                clearSelection();
+                item->setSelected(true);
                 break;
             }
         }
@@ -71,6 +74,10 @@ void QDiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
             selectionRect->setPos(mouseEvent->scenePos().x(), mouseEvent->scenePos().y());
             selectionRect->setPen(Qt::DashLine);
         }
+        break;
+    case ReadOnly:
+        break;
+    case SelectTop:
         break;
     }
     QGraphicsScene::mousePressEvent(mouseEvent);

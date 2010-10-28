@@ -92,7 +92,7 @@ void QActorEditor::prepareForm(Actor *actor)
             ui->paramsInlineTable->insertRow(i);
             ui->paramsInlineTable->setItem(i, 0, new QTableWidgetItem(myActor->variableList.at(i)->name));
             ui->paramsInlineTable->setItem(i, 1, new QTableWidgetItem(myActor->variableList.at(i)->type));
-            ui->paramsInlineTable->setItem(i, 2, new QTableWidgetItem(myActor->varAMList.at(i)));
+            ui->paramsInlineTable->setItem(i, 2, new QTableWidgetItem(myActor->varAccModeList.at(i)));
         }
         //Получаем список перемерных
         if (!globalDBManager->getVariableList(myVariableList))
@@ -122,11 +122,11 @@ void QActorEditor::on_baseModuleList_currentRowChanged(int currentRow)
     ui->paramsNormalTable->clearContents();
     ui->paramsNormalTable->setRowCount(0);
     myActor->variableList.clear();
-    myActor->varAMList.clear();
+    myActor->varAccModeList.clear();
     for (int i = 0; i < myModuleList.at(currentRow)->parameterList.count(); i++){
         myActor->variableList.append(NULL);
         QStringList parameter = myModuleList.at(currentRow)->parameterList.at(i).split(";;");
-        myActor->varAMList.append(parameter.at(2));
+        myActor->varAccModeList.append(parameter.at(2));
         ui->paramsNormalTable->insertRow(i);
         ui->paramsNormalTable->setItem(i, 0, new QTableWidgetItem(parameter.at(1)));
         ui->paramsNormalTable->setItem(i, 1, new QTableWidgetItem(parameter.at(0)));
@@ -212,12 +212,12 @@ void QActorEditor::on_inlineModuleTxtEdt_textChanged()
     ui->paramsInlineTable->setRowCount(0);
     int p = 0;
     myActor->variableList.clear();
-    myActor->varAMList.clear();
+    myActor->varAccModeList.clear();
     for (int i = 0; i < myVariableList.count(); i++){
         if (ui->inlineModuleTxtEdt->document()->toPlainText().contains(QRegExp("(\\s|\\b|\\W)" + myVariableList.at(i)->name + "(\\s|\\b|\\W)", Qt::CaseSensitive))){
             ui->paramsInlineTable->insertRow(p);
             myActor->variableList.append(myVariableList.at(i));
-            myActor->varAMList.append("");
+            myActor->varAccModeList.append("");
             ui->paramsInlineTable->setItem(p, 0, new QTableWidgetItem(myVariableList.at(i)->name));
             ui->paramsInlineTable->setItem(p, 1, new QTableWidgetItem(myVariableList.at(i)->type));
             ui->paramsInlineTable->setItem(p, 2, new QTableWidgetItem("N/A"));
@@ -231,7 +231,7 @@ void QActorEditor::on_paramsInlineTable_currentCellChanged(int currentRow, int c
     if (previousRow != -1){
         ui->paramsInlineTable->setCellWidget(previousRow, 2, NULL);
         ui->paramsInlineTable->item(previousRow, 2)->setText(paramTypeCmbBox->currentText());
-        myActor->varAMList.replace(previousRow, paramTypeCmbBox->currentText());
+        myActor->varAccModeList.replace(previousRow, paramTypeCmbBox->currentText());
         delete paramTypeCmbBox;
     }
 
