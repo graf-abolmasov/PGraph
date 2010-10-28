@@ -41,13 +41,14 @@ public:
     //!Указатель на корневую вершину
     QNormalTop* rootTop() const
         { return myRootTop; }
+    void setMode(Mode mode);
+    Mode mode() const
+        { return myMode; }
 
 public slots:
-    void setMode(Mode mode);
     void editorLostFocus(QComment *item);
 
 signals:
-    //void itemSelected(QGraphicsItem *item);
     void itemInserted(QGraphicsItem *item);
     void itemMoved(QGraphicsItem *item, QLineF vector);
     void itemDeleted(QGraphicsItem *item);

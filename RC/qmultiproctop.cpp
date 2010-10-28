@@ -80,8 +80,6 @@ void QMultiProcTop::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
     old_font.setBold(true);
     painter->setFont(old_font);
     painter->drawText(QRect(-25, -15, 50, 30), Qt::AlignCenter, QString::number(procCount));
-
-
 }
 
 void QMultiProcTop::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)

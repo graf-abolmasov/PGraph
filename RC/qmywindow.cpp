@@ -315,7 +315,7 @@ void TMyWindow::sceneChanged()
 {
     if (activeDrawWindow())
         pointerTypeGroup->button(int(activeDrawWindow()->mode()))->setChecked(true);
-    setWindowTitle(activeDrawWindow()->myGraphName == "" ?  tr("Untitled* - Граф-редактор") : activeDrawWindow()->myGraphExtName + tr("* - Граф-редактор"));
+    setWindowTitle(activeDrawWindow()->myGraphName.isEmpty() ?  tr("Untitled* - Граф-редактор") : activeDrawWindow()->myGraphExtName + tr("* - Граф-редактор"));
     saveGraphAct->setEnabled(activeDrawWindow()->myGraphName != "");
 }
 
@@ -657,7 +657,7 @@ void TMyWindow::writeSettings()
 
 void TMyWindow::graphLoaded(QString name, QString extName)
 {
-    if (name == ""){
+    if (name.isEmpty()){
         buildMenu->setEnabled(false);
         saveGraphAct->setEnabled(false);
     } else {
@@ -665,7 +665,7 @@ void TMyWindow::graphLoaded(QString name, QString extName)
         saveGraphAct->setEnabled(true);
     }
 
-    if (extName == "")
+    if (extName.isEmpty())
         setWindowTitle(tr("Untitled - Граф-редактор"));
     else
         setWindowTitle(extName + tr(" - Граф-редактор"));

@@ -58,13 +58,13 @@ void MultiProcTopPropertyDialog::prepareForm(QMultiProcTop *top)
 
     //Добавляем акторы
     //Наверно это не нужно, т.к. в параллельных ветвях можно использовать только агрегаты
-//    if (globalDBManager->getActorList(myActorList))
-//        for (int i = 1 ; i < myActorList.count(); i++)
-//            ui->actorsListWidget->addItem(myActorList.at(i)->extName);
-//    else QMessageBox::critical(NULL,
-//                               QObject::tr("Ошибка"),
-//                               QObject::tr("Не удалось получить список акторов.\n") + globalDBManager->lastError().databaseText(),
-//                               QMessageBox::Ok);
+    if (globalDBManager->getActorList(myActorList))
+        for (int i = 1 ; i < myActorList.count(); i++)
+            ui->actorsListWidget->addItem(myActorList.at(i)->extName);
+    else QMessageBox::critical(NULL,
+                               QObject::tr("Ошибка"),
+                               QObject::tr("Не удалось получить список акторов.\n") + globalDBManager->lastError().databaseText(),
+                               QMessageBox::Ok);
 
     //Выделяем актор в списке
     if (top->actor != NULL){

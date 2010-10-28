@@ -42,6 +42,9 @@ TDrawWindow::TDrawWindow(ShowRole role, QWidget *parent)
         this, SLOT(itemMoved(QGraphicsItem*, QLineF)));
     connect(scene, SIGNAL(itemsMoved(QList<QGraphicsItem*>, QLineF)),
             this, SLOT(itemsMoved(QList<QGraphicsItem*>,QLineF)));
+    //выбор объекта - тоже изменение сцены
+    connect(scene, SIGNAL(selectionChanged()),
+            this, SIGNAL(sceneChanged()));
     connect(scene, SIGNAL(selectionChanged()), this, SLOT(selectionChanged()));
     //обработчик удаления объекта
     connect(scene, SIGNAL(itemDeleted(QGraphicsItem*)),
@@ -203,9 +206,8 @@ void TDrawWindow::deleteComment()
 */
 void TDrawWindow::setMode(QDiagramScene::Mode mode)
 {
-    if (myMode != mode) {
+    if (scene->mode() != mode) {
         scene->setMode(mode);
-        myMode = mode;
         emit sceneChanged();
     }
 }
@@ -449,7 +451,7 @@ void TDrawWindow::loadGraph(QString name, DataBaseManager* dbManager)
 
 bool TDrawWindow::saveGraph(QString name, QString extName, DataBaseManager *dbManager)
 {
-    if (name == "" || extName == "") {
+    if (name.isEmpty() || extName.isEmpty()) {
         QMessageBox::critical(this, tr("Ошибка"), tr("Нельзя сохранить граф без имени."), QMessageBox::Ok);
         return false;
     }

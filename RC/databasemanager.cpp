@@ -365,11 +365,11 @@ bool DataBaseManager::saveActorList(QList<Actor *> &actorList)
             query2.bindValue(":NEV", j);
             query2.bindValue(":DATA", actorList.at(i)->variableList.at(j)->name);
             QString vaMode;
-            if (actorList.at(i)->varAMList.at(j) == QObject::tr("Исходный"))
+            if (actorList.at(i)->varAccModeList.at(j) == QObject::tr("Исходный"))
                 vaMode = "I";
-            else if (actorList.at(i)->varAMList.at(j) ==  QObject::tr("Модифицируемый"))
+            else if (actorList.at(i)->varAccModeList.at(j) ==  QObject::tr("Модифицируемый"))
                 vaMode = "M";
-            else if (actorList.at(i)->varAMList.at(j) ==  QObject::tr("Вычисляемый"))
+            else if (actorList.at(i)->varAccModeList.at(j) ==  QObject::tr("Вычисляемый"))
                 vaMode = "R";
             query2.bindValue(":MODE", vaMode);
             query2.exec();
@@ -417,7 +417,7 @@ bool DataBaseManager::getActorList(QList<Actor *> &actorList)
         }
         actorList.append(new Actor(query1.value(0).toString(),
                                    query1.value(2).toString(),
-                                   query1.value(6).toString() == "" ? Actor::InlineType : Actor::NormalType,
+                                   query1.value(6).toString().isEmpty() ? Actor::InlineType : Actor::NormalType,
                                    query1.value(6).toString(),
                                    myVariableList,
                                    myVAList,
@@ -430,7 +430,7 @@ bool DataBaseManager::getActorList(QList<Actor *> &actorList)
 
 Actor* DataBaseManager::getActor(QString namepr)
 {
-    if (namepr == "") return NULL;
+    if (namepr.isEmpty()) return NULL;
     QList<Variable* > varList;
     if (!getVariableList(varList))
         return false;
@@ -473,7 +473,7 @@ Actor* DataBaseManager::getActor(QString namepr)
     if (query1.value(0).toString() == "g") {
         actorType = Actor::GraphType;
     } else {
-        actorType = query1.value(5).toString() == "" ? Actor::InlineType : Actor::NormalType;
+        actorType = query1.value(5).toString().isEmpty() ? Actor::InlineType : Actor::NormalType;
     }
     Actor* newActor = new Actor(namepr,
                                query1.value(1).toString(),
@@ -550,7 +550,7 @@ bool DataBaseManager::getPredicateList(QList<Predicate *> &predList)
         }
         predList.append(new Predicate(query1.value(0).toString(),
                                       query1.value(2).toString(),
-                                      query1.value(6).toString() == "" ? Predicate::inlineType : Predicate::normalType,
+                                      query1.value(6).toString().isEmpty() ? Predicate::inlineType : Predicate::normalType,
                                       query1.value(6).toString(),
                                       myVariableList));
     }
@@ -560,7 +560,7 @@ bool DataBaseManager::getPredicateList(QList<Predicate *> &predList)
 
 Predicate* DataBaseManager::getPredicate(QString namepr)
 {
-    if (namepr == "") return NULL;
+    if (namepr.isEmpty()) return NULL;
     QList<Variable* > varList;
     if (!getVariableList(varList))
         return false;
@@ -595,12 +595,12 @@ Predicate* DataBaseManager::getPredicate(QString namepr)
     db.close();
     return new Predicate(namepr,
                          query1.value(1).toString(),
-                         query1.value(5).toString() == "" ? Predicate::inlineType : Predicate::normalType,
+                         query1.value(5).toString().isEmpty() ? Predicate::inlineType : Predicate::normalType,
                          query1.value(5).toString(),
                          myVariableList);
 }
 
-bool DataBaseManager::registerModule(QString uniqName, QString fileName, QString comment, QStringList &paramList)
+bool DataBaseManager::registerModule(const QString &uniqName, const QString &fileName, const QString &comment, QStringList &paramList)
 {
     if (!db.open())
         return false;

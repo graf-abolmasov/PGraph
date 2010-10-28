@@ -45,8 +45,6 @@ private:
     QAction *setMultiProcTopAction;
     QAction *setFontAction;
 
-    QDiagramScene::Mode myMode;
-
     QList<QTop* > allTops();
     QList<QArc* > allArcs();
     QList<QComment* > allComments();
@@ -66,7 +64,7 @@ public:
     void saveAsImage(QString filename);
     void setMode(QDiagramScene::Mode mode);
     QDiagramScene::Mode mode() const
-        { return myMode; }
+        { return scene->mode(); }
     Graph* getGraph();
     void loadGraph(QString name, DataBaseManager* dbManager);
     bool saveGraph(QString name, QString extName, DataBaseManager* dbManager);
