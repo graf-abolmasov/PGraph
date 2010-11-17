@@ -15,7 +15,7 @@ public:
     QString name;
     Type type;
     QList<Variable*> variableList;
-    QStringList varAMList;
+    QStringList varAccModeList;
     QString baseModule;
     QImage icon;
 };
