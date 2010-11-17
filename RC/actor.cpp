@@ -7,6 +7,6 @@ Actor::Actor(QString name, QString extName, Type type, QString baseModule, QList
     this->type = type;
     this->variableList = variableList;
     this->baseModule = baseModule;
-    this->varAMList = varAMList;
+    this->varAccModeList = varAMList;
     this->icon = icon;
 }
