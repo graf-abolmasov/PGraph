@@ -80,8 +80,7 @@ void QObjectEditor::prepareForm()
         if (actor->type == Actor::NormalType) {
             ui->actorList->addItem(QString(actor->extName).replace(QRegExp("(\r+|\n+)"), " "));
             actorsList.append(actor);
-        }
-        if (actor->type == Actor::InlineType) {
+        } else if (actor->type == Actor::InlineType) {
             ui->inlineActorList->addItem(QString(actor->extName).replace(QRegExp("(\r+|\n+)"), " "));
             iActorsList.append(actor);
         }
@@ -96,8 +95,7 @@ void QObjectEditor::prepareForm()
         if (pred->type == Predicate::normalType) {
             ui->predicateList->addItem(QString(pred->extName).replace(QRegExp("(\r+|\n+)"), " "));
             predicatesList.append(pred);
-        }
-        if (pred->type == Predicate::inlineType) {
+        } else if (pred->type == Predicate::inlineType) {
             ui->inlinePredicateList->addItem(QString(pred->extName).replace(QRegExp("(\r+|\n+)"), " "));
             iPredicateList.append(pred);
         }
