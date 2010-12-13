@@ -2,6 +2,8 @@
 #define QDATATYPEEDITOR_H
 
 #include <QDialog>
+#include <QtGui>
+#include <QtCore>
 #include "datatype.h"
 
 namespace Ui {

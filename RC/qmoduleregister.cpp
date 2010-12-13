@@ -157,6 +157,9 @@ void QModuleRegister::on_buttonBox_accepted()
                          ui->parametersTable->item(i, 3)->text());
     }
 
+    if (ui->fileList->count() == 0)
+        return;
+
     QString uniqName = "S" + getCRC(ui->fileList->currentItem()->text().toUtf8());
     if (!globalDBManager->registerModule(uniqName,
                                     fileList.at(ui->fileList->currentRow()).baseName(),

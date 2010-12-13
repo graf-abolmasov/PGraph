@@ -36,13 +36,8 @@ void QVariableEditor::on_pushButton_clicked()
     QDataTypeEditor *editor = new QDataTypeEditor();
     editor->prepareForm(NULL);
     if (editor->exec()){
-
+        prepareForm(myVariable);
     }
-}
-
-void QVariableEditor::updateInterface()
-{
-
 }
 
 void QVariableEditor::prepareForm(Variable *var)
@@ -67,17 +62,30 @@ void QVariableEditor::prepareForm(Variable *var)
             }
         }
         ui->typeCmbBox->setCurrentIndex(idx);
-        myVariable = var;
     }
-    else
-        myVariable = new Variable("", "", "", "");
+    myVariable = var;
+    ui->nameEdt->setFocus();
 }
 
 Variable* QVariableEditor::getResult()
 {
-    myVariable->name = ui->nameEdt->text();
-    myVariable->initValue = ui->initValueEdt->text();
-    myVariable->comment = ui->commentTxtEdt->document()->toPlainText();
-    myVariable->type = typeList.at(ui->typeCmbBox->currentIndex())->name;
+    if (!ui->nameEdt->text().isEmpty() &&
+        ui->typeCmbBox->currentIndex() >= 0) {
+        if (myVariable == NULL) {
+            myVariable = new Variable(ui->nameEdt->text(),
+                                      typeList.at(ui->typeCmbBox->currentIndex())->name,
+                                      ui->initValueEdt->text(),
+                                      ui->commentTxtEdt->document()->toPlainText());
+        } else {
+            myVariable->name = ui->nameEdt->text();
+            myVariable->type = typeList.at(ui->typeCmbBox->currentIndex())->name;
+            myVariable->initValue = ui->initValueEdt->text();
+            myVariable->comment = ui->commentTxtEdt->document()->toPlainText();
+        }
+    } else
+        QMessageBox::critical(NULL,
+                              QObject::tr("Ошибка"),
+                              QObject::tr("Укажите имя и тип переменной.\n"),
+                              QMessageBox::Ok);
     return myVariable;
 }

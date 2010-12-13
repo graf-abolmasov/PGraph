@@ -3,6 +3,8 @@
 #include "variable.h"
 
 #include <QDialog>
+#include <QtCore>
+#include <QtGui>
 
 namespace Ui {
     class QVariableEditor;
@@ -26,7 +28,6 @@ private:
 
     Variable* myVariable;
     QList<DataType*> typeList;
-    void updateInterface();
 
 private slots:
     void on_pushButton_clicked();

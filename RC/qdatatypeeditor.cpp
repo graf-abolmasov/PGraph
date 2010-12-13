@@ -30,9 +30,9 @@ void QDataTypeEditor::prepareForm(DataType *type)
     if (type != NULL) {
         ui->typeNameEdt->setText(type->name);
         ui->typedefTxtEdt->document()->setPlainText(type->typedefStr);
-        myDataType = type;
-    } else
-        myDataType = new DataType("", "");
+    }
+    myDataType = type;
+    ui->typeNameEdt->setFocus();
 }
 
 DataType* QDataTypeEditor::getResult()
@@ -42,6 +42,17 @@ DataType* QDataTypeEditor::getResult()
 
 void QDataTypeEditor::on_buttonBox_accepted()
 {
-    myDataType->name = ui->typeNameEdt->text();
-    myDataType->typedefStr = ui->typedefTxtEdt->document()->toPlainText();
+    if (!ui->typeNameEdt->text().isEmpty()) {
+        if (myDataType == NULL) {
+            myDataType = new DataType(ui->typeNameEdt->text(), ui->typedefTxtEdt->document()->toPlainText());
+        } else {
+            myDataType->name = ui->typeNameEdt->text();
+            myDataType->typedefStr = ui->typedefTxtEdt->document()->toPlainText();
+        }
+    }
+    else
+        QMessageBox::critical(NULL,
+                              QObject::tr("Ошибка"),
+                              QObject::tr("Укажите название типа.\n"),
+                              QMessageBox::Ok);
 }
