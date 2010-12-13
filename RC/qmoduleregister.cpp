@@ -16,7 +16,7 @@ QModuleRegister::QModuleRegister(QWidget *parent) :
     ui->parametersTable->setColumnWidth(3, 90);
 
     QStringList filters;
-    filters << "*.c" << "*.C";
+    filters << tr("*.c") << tr("*.C");
     workingDir.setNameFilters(filters);
     workingDir.setFilter(QDir::Files);
     QSettings myLocSettings("graph.ini", QSettings::IniFormat);
@@ -80,6 +80,7 @@ void QModuleRegister::on_fileList_currentRowChanged(int currentRow)
     int start = buff.indexOf(fileList.at(currentRow).baseName() + "(", 0, Qt::CaseSensitive) + fileList.at(currentRow).baseName().length() + 1;
     int end   = buff.indexOf(")", start, Qt::CaseSensitive);
     QString signature(buff.mid(start, end-start));
+    if (signature.isEmpty()) return;
     QStringList paramsList = signature.split(QRegExp(",{1,}\\s*"));
     for (int i = 0; i < paramsList.count(); i++){
         ui->parametersTable->insertRow(i);
@@ -87,8 +88,8 @@ void QModuleRegister::on_fileList_currentRowChanged(int currentRow)
         QString paramType = paramsList.at(i).split(QRegExp("\\*?\\s{1,}\\*?")).at(0);
         ui->parametersTable->setItem(i, 0, new QTableWidgetItem(paramName));
         ui->parametersTable->setItem(i, 1, new QTableWidgetItem(paramType));
-        ui->parametersTable->setItem(i, 2, new QTableWidgetItem(" "));
-        ui->parametersTable->setItem(i, 3, new QTableWidgetItem(" "));
+        ui->parametersTable->setItem(i, 2, new QTableWidgetItem(""));
+        ui->parametersTable->setItem(i, 3, new QTableWidgetItem(""));
     }
     file.close();
 }
@@ -128,6 +129,26 @@ void QModuleRegister::on_parametersTable_currentCellChanged(int currentRow, int 
 
 void QModuleRegister::on_buttonBox_accepted()
 {
+
+    ui->parametersTable->setCurrentCell(-1, -1);
+    bool readyToSave = true;//(ui->parametersTable->rowCount() > 0);
+    for (int i = 0; i < ui->parametersTable->rowCount(); i++){
+        if ((ui->parametersTable->item(i, 0)->text().isEmpty()) ||
+            (ui->parametersTable->item(i, 1)->text().isEmpty()) ||
+            (ui->parametersTable->item(i, 2)->text().isEmpty())){
+            readyToSave = false;
+            break;
+        }
+    }
+
+    if (!readyToSave) {
+        QMessageBox::critical(NULL,
+                              QObject::tr("Ошибка"),
+                              QObject::tr("Необходимо указать класс и коментарий к переменной.\n"),
+                              QMessageBox::Ok);
+        return;
+    }
+
     QStringList paramList;
     for (int i = 0; i < ui->parametersTable->rowCount(); i++){
         paramList.append(ui->parametersTable->item(i, 0)->text() + ";;" +
@@ -157,17 +178,21 @@ void QModuleRegister::on_buttonBox_accepted()
     outputData.append("#include \"graph.h\"\r\nextern int ");
     outputData.append(fileList.at(ui->fileList->currentRow()).baseName() + "(" + signature + ");\r\n");
     outputData.append("int " + uniqName + "(TPOData *D)\r\n{\r\n");
-    QStringList paramsList = signature.split(QRegExp(",{1,}\\s*"));
+    QStringList paramsList;
+    if (!signature.isEmpty())
+        paramsList = signature.split(QRegExp(",{1,}\\s*"));
     for (int i = 0; i < paramsList.count(); i++){
         QString paramName = paramsList.at(i).split(QRegExp("\\*\\s{1,}")).at(1);
         QString paramType = paramsList.at(i).split(QRegExp("\\*\\s{1,}")).at(0);
         outputData.append("  " + paramType + " " + paramName + " = (D->" + paramName + ");\r\n");
     }
-    outputData.append("\r\n  int result = " + fileList.at(ui->fileList->currentRow()).baseName() + "(&" + paramsList.first().split(QRegExp("\\*\\s{1,}")).at(1));
-    for (int i = 1; i < paramsList.count(); i++){
+    outputData.append("\r\n  int result = " + fileList.at(ui->fileList->currentRow()).baseName() + "(");
+    for (int i = 0; i < paramsList.count(); i++){
         QString paramName = paramsList.at(i).split(QRegExp("\\*\\s{1,}")).at(1);
-        outputData.append(",&" + paramName);
+        outputData.append("&" + paramName + ", ");
     }
+    if (!signature.isEmpty())
+        outputData.remove(outputData.size()-2, 2);
     outputData.append(");\r\n\r\n");
     for (int i = 0; i < paramsList.count(); i++){
         QString paramName = paramsList.at(i).split(QRegExp("\\*\\s{1,}")).at(1);
@@ -177,21 +202,4 @@ void QModuleRegister::on_buttonBox_accepted()
     output.write(outputData);
     output.close();
     input.close();
-}
-
-
-void QModuleRegister::on_buttonBox_clicked(QAbstractButton* button)
-{
-    ui->parametersTable->setCurrentCell(-1, -1);
-    bool readyToSave = (ui->parametersTable->rowCount() > 0);
-    for (int i = 0; i < ui->parametersTable->rowCount(); i++){
-        if ((ui->parametersTable->item(i, 0)->text().isEmpty()) ||
-            (ui->parametersTable->item(i, 1)->text().isEmpty()) ||
-            (ui->parametersTable->item(i, 2)->text().isEmpty())){
-            readyToSave = false;
-            break;
-        }
-    }
-
-    if (readyToSave) accept();
 }
