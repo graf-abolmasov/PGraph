@@ -71,6 +71,9 @@
     <property name="text">
      <string>Имя</string>
     </property>
+    <property name="buddy">
+     <cstring>nameEdt</cstring>
+    </property>
    </widget>
    <widget class="QLineEdit" name="nameEdt">
     <property name="geometry">
@@ -121,6 +124,9 @@
     <property name="text">
      <string>Тип</string>
     </property>
+    <property name="buddy">
+     <cstring>typeCmbBox</cstring>
+    </property>
    </widget>
    <widget class="QComboBox" name="typeCmbBox">
     <property name="geometry">
@@ -170,6 +176,9 @@
     </property>
     <property name="text">
      <string>Начальное значение</string>
+    </property>
+    <property name="buddy">
+     <cstring>initValueEdt</cstring>
     </property>
    </widget>
    <widget class="QLineEdit" name="initValueEdt">
@@ -224,6 +233,9 @@
     <property name="text">
      <string>Комментарий</string>
     </property>
+    <property name="buddy">
+     <cstring>commentTxtEdt</cstring>
+    </property>
    </widget>
    <widget class="QPlainTextEdit" name="commentTxtEdt">
     <property name="geometry">
@@ -242,9 +254,19 @@
     <property name="horizontalScrollBarPolicy">
      <enum>Qt::ScrollBarAlwaysOff</enum>
     </property>
+    <property name="tabChangesFocus">
+     <bool>true</bool>
+    </property>
    </widget>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>nameEdt</tabstop>
+  <tabstop>typeCmbBox</tabstop>
+  <tabstop>initValueEdt</tabstop>
+  <tabstop>commentTxtEdt</tabstop>
+  <tabstop>buttonBox</tabstop>
+ </tabstops>
  <resources>
   <include location="resources.qrc"/>
  </resources>

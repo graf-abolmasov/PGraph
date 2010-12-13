@@ -65,6 +65,9 @@
     <property name="text">
      <string>Имя типа:</string>
     </property>
+    <property name="buddy">
+     <cstring>typeNameEdt</cstring>
+    </property>
    </widget>
    <widget class="QLineEdit" name="typeNameEdt">
     <property name="geometry">
@@ -74,6 +77,9 @@
       <width>291</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::StrongFocus</enum>
     </property>
     <property name="readOnly">
      <bool>false</bool>
@@ -96,6 +102,9 @@
     <property name="text">
      <string>Определение типа (typedef)</string>
     </property>
+    <property name="buddy">
+     <cstring>typedefTxtEdt</cstring>
+    </property>
    </widget>
    <widget class="QPlainTextEdit" name="typedefTxtEdt">
     <property name="geometry">
@@ -106,9 +115,23 @@
       <height>171</height>
      </rect>
     </property>
+    <property name="focusPolicy">
+     <enum>Qt::StrongFocus</enum>
+    </property>
+    <property name="tabChangesFocus">
+     <bool>true</bool>
+    </property>
+    <property name="backgroundVisible">
+     <bool>false</bool>
+    </property>
    </widget>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>typeNameEdt</tabstop>
+  <tabstop>typedefTxtEdt</tabstop>
+  <tabstop>buttonBox</tabstop>
+ </tabstops>
  <resources>
   <include location="resources.qrc"/>
  </resources>

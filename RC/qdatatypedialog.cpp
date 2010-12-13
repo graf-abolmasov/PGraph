@@ -38,10 +38,12 @@ void QDataTypeDialog::on_pushButton_clicked()
     editor->prepareForm(NULL);
     if (editor->exec()){
         DataType* newDataType = editor->getResult();
-        typeList.append(newDataType);
-        ui->tableWidget->insertRow(ui->tableWidget->rowCount());
-        ui->tableWidget->setItem(ui->tableWidget->rowCount()-1,0,new QTableWidgetItem(newDataType->name,QTableWidgetItem::Type));
-        ui->tableWidget->setItem(ui->tableWidget->rowCount()-1,1,new QTableWidgetItem(newDataType->typedefStr,0));
+        if (newDataType != NULL) {
+            typeList.append(newDataType);
+            ui->tableWidget->insertRow(ui->tableWidget->rowCount());
+            ui->tableWidget->setItem(ui->tableWidget->rowCount()-1,0,new QTableWidgetItem(newDataType->name,QTableWidgetItem::Type));
+            ui->tableWidget->setItem(ui->tableWidget->rowCount()-1,1,new QTableWidgetItem(newDataType->typedefStr,0));
+        }
     }
     delete editor;
 }
@@ -60,9 +62,11 @@ void QDataTypeDialog::on_pushButton_2_clicked()
         editor->prepareForm(dataType);
         if (editor->exec()){
             DataType* newDataType = editor->getResult();
-            typeList.replace(idx, newDataType);
-            ui->tableWidget->setItem(idx,0,new QTableWidgetItem(newDataType->name, QTableWidgetItem::Type));
-            ui->tableWidget->setItem(idx,1,new QTableWidgetItem(newDataType->typedefStr,0));
+            if (newDataType != NULL) {
+                typeList.replace(idx, newDataType);
+                ui->tableWidget->setItem(idx,0,new QTableWidgetItem(newDataType->name, QTableWidgetItem::Type));
+                ui->tableWidget->setItem(idx,1,new QTableWidgetItem(newDataType->typedefStr,0));
+            }
         }
     }
     delete editor;
