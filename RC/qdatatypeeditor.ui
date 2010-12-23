@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>295</height>
+    <height>294</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -148,7 +148,7 @@
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
-     <y>274</y>
+     <y>256</y>
     </hint>
    </hints>
   </connection>
@@ -164,9 +164,28 @@
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
-     <y>274</y>
+     <y>256</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>typeNameEdt</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>QDataTypeEditor</receiver>
+   <slot>enableOkButton()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>184</x>
+     <y>31</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>19</x>
+     <y>256</y>
     </hint>
    </hints>
   </connection>
  </connections>
+ <slots>
+  <slot>enableOkButton()</slot>
+ </slots>
 </ui>

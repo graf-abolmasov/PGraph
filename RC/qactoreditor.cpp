@@ -84,6 +84,7 @@ void QActorEditor::prepareForm(Actor *actor)
                                      QObject::tr("Ошибка"),
                                      QObject::tr("Не удалось получить список базовых модулей.\n") + globalDBManager->lastError().databaseText(),
                                      QMessageBox::Ok);
+        ui->actorNameEdt->setFocus();
         break;
     case Inline:
         ui->inlineModuleTxtEdt->blockSignals(true);
@@ -101,8 +102,12 @@ void QActorEditor::prepareForm(Actor *actor)
                                   QObject::tr("Не удалось получить список переменных.\n") + globalDBManager->lastError().databaseText(),
                                   QMessageBox::Ok);
         ui->inlineModuleTxtEdt->blockSignals(false);
+        ui->inlineModuleTxtEdt->setFocus();
         break;
     }
+    QRegExp regExp("[A-Za-z1-9 ]{1,255}");
+    ui->actorNameEdt->setValidator(new QRegExpValidator(regExp, this));
+    enableOkButton();
 
 }
 
@@ -243,4 +248,16 @@ void QActorEditor::on_paramsInlineTable_currentCellChanged(int currentRow, int c
     if (ui->paramsInlineTable->item(currentRow, 2) != NULL)
         paramTypeCmbBox->setCurrentIndex(paramTypeCmbBox->findText(ui->paramsInlineTable->item(currentRow, 2)->text()));
     ui->paramsInlineTable->setCellWidget(currentRow, 2, paramTypeCmbBox);
+}
+
+void QActorEditor::enableOkButton()
+{
+    switch(myMode){
+    case Normal:
+        ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(ui->actorNameEdt->hasAcceptableInput());
+        break;
+    case Inline:
+        ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!ui->inlineModuleTxtEdt->document()->toPlainText().isEmpty());
+        break;
+    }
 }

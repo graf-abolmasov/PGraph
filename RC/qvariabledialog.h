@@ -32,7 +32,6 @@ private slots:
     void on_variablesTable_currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn);
     void on_variablesTable_cellChanged(int row, int column);
     void on_buttonBox_accepted();
-    //void on_variablesTable_doubleClicked(QModelIndex index);
     void on_deleteButton_clicked();
     void on_editButton_clicked();
     void on_newButton_clicked();

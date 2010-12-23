@@ -43,6 +43,7 @@ private slots:
     void on_paramsNormalTable_currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn);
     void on_baseModuleList_currentRowChanged(int currentRow);
     void on_varEditBtn_clicked();
+    void enableOkButton();
 };
 
 #endif // QActorEditor_H

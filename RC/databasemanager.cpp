@@ -40,6 +40,7 @@ DataBaseManager::DataBaseManager()
 
 bool DataBaseManager::getGraph(Graph &graph)
 {
+    globalLogger->writeLog("DataBaseManager::getGraph start", Logger::All);
     bool ok = db.open();
     if (!ok) {
         globalLogger->writeLog(db.lastError().text(), Logger::Critical);
@@ -136,6 +137,7 @@ bool DataBaseManager::getGraph(Graph &graph)
     db.close();
     ok = (db.lastError().type() == QSqlError::NoError);
     if (!ok) globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+    globalLogger->writeLog("DataBaseManager::getGraph end", Logger::All);
     return ok;
 }
 

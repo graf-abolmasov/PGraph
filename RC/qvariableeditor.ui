@@ -303,5 +303,40 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>nameEdt</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>QVariableEditor</receiver>
+   <slot>enableOkButton()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>145</x>
+     <y>29</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>167</x>
+     <y>149</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>typeCmbBox</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>QVariableEditor</receiver>
+   <slot>enableOkButton()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>145</x>
+     <y>80</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>167</x>
+     <y>149</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
+ <slots>
+  <slot>enableOkButton()</slot>
+ </slots>
 </ui>
