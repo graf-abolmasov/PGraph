@@ -152,6 +152,11 @@ void QPredicateEditor::on_varEditBtn_clicked()
 
 void QPredicateEditor::on_buttonBox_accepted()
 {
+    if (!ui->predicateNameEdt->text().isEmpty())
+        QMessageBox::critical(NULL,
+                              QObject::tr("Ошибка"),
+                              QObject::tr("Введие название предиката.\n") + globalDBManager->lastError().databaseText(),
+                              QMessageBox::Ok);
     switch(myMode){
     case Normal:
         myPredicate->extName = ui->predicateNameEdt->text();

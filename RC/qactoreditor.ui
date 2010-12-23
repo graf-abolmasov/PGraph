@@ -208,7 +208,7 @@
       <item>
        <widget class="QTableWidget" name="paramsNormalTable">
         <property name="focusPolicy">
-         <enum>Qt::WheelFocus</enum>
+         <enum>Qt::StrongFocus</enum>
         </property>
         <property name="editTriggers">
          <set>QAbstractItemView::NoEditTriggers</set>
@@ -590,6 +590,14 @@
    </widget>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>actorNameEdt</tabstop>
+  <tabstop>baseModuleList</tabstop>
+  <tabstop>paramsNormalTable</tabstop>
+  <tabstop>inlineModuleTxtEdt</tabstop>
+  <tabstop>paramsInlineTable</tabstop>
+  <tabstop>buttonBox</tabstop>
+ </tabstops>
  <resources>
   <include location="resources.qrc"/>
  </resources>
@@ -626,6 +634,38 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actorNameEdt</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>QActorEditor</receiver>
+   <slot>enableOkButton()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>331</x>
+     <y>31</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>276</x>
+     <y>270</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>inlineModuleTxtEdt</sender>
+   <signal>textChanged()</signal>
+   <receiver>QActorEditor</receiver>
+   <slot>enableOkButton()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>275</x>
+     <y>165</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>276</x>
+     <y>270</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <designerdata>
   <property name="gridDeltaX">
@@ -644,4 +684,7 @@
    <bool>true</bool>
   </property>
  </designerdata>
+ <slots>
+  <slot>enableOkButton()</slot>
+ </slots>
 </ui>

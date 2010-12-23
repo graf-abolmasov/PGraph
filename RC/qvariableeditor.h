@@ -31,6 +31,7 @@ private:
 
 private slots:
     void on_pushButton_clicked();
+    void enableOkButton();
 };
 
 #endif // QVARIABLEEDITOR_H

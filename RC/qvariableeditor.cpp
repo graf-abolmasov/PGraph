@@ -64,6 +64,9 @@ void QVariableEditor::prepareForm(Variable *var)
         ui->typeCmbBox->setCurrentIndex(idx);
     }
     myVariable = var;
+    QRegExp regExp("[_A-Za-z][_A-Za-z1-9]{0,31}");
+    ui->nameEdt->setValidator(new QRegExpValidator(regExp, this));
+    enableOkButton();
     ui->nameEdt->setFocus();
 }
 
@@ -88,4 +91,11 @@ Variable* QVariableEditor::getResult()
                               QObject::tr("Укажите имя и тип переменной.\n"),
                               QMessageBox::Ok);
     return myVariable;
+}
+
+void QVariableEditor::enableOkButton()
+{
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled((ui->nameEdt->hasAcceptableInput()) &&
+                                                            (ui->typeCmbBox->currentIndex() >= 0));
+
 }

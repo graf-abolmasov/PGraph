@@ -14,7 +14,7 @@
    <string>Справочник объектов</string>
   </property>
   <property name="windowIcon">
-   <iconset>
+   <iconset resource="resources.qrc">
     <normaloff>:/images/G.png</normaloff>:/images/G.png</iconset>
   </property>
   <widget class="QTabWidget" name="tab">
@@ -152,7 +152,17 @@
    </property>
   </widget>
  </widget>
- <resources/>
+ <tabstops>
+  <tabstop>tab</tabstop>
+  <tabstop>actorList</tabstop>
+  <tabstop>buttonBox</tabstop>
+  <tabstop>predicateList</tabstop>
+  <tabstop>inlineActorList</tabstop>
+  <tabstop>inlinePredicateList</tabstop>
+ </tabstops>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>buttonBox</sender>

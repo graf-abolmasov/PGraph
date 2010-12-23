@@ -28,6 +28,7 @@ private:
 
 private slots:
     void on_buttonBox_accepted();
+    void enableOkButton();
 };
 
 #endif // QDATATYPEEDITOR_H

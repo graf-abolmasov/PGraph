@@ -32,6 +32,9 @@ void QDataTypeEditor::prepareForm(DataType *type)
         ui->typedefTxtEdt->document()->setPlainText(type->typedefStr);
     }
     myDataType = type;
+    QRegExp regExp("[A-Za-z][A-Za-z1-9]{0,31}");
+    ui->typeNameEdt->setValidator(new QRegExpValidator(regExp, this));
+    enableOkButton();
     ui->typeNameEdt->setFocus();
 }
 
@@ -55,4 +58,9 @@ void QDataTypeEditor::on_buttonBox_accepted()
                               QObject::tr("Ошибка"),
                               QObject::tr("Укажите название типа.\n"),
                               QMessageBox::Ok);
+}
+
+void QDataTypeEditor::enableOkButton()
+{
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(ui->typeNameEdt->hasAcceptableInput());
 }

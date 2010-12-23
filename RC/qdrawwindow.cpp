@@ -369,16 +369,22 @@ Graph* TDrawWindow::getGraph()
   Загружает граф в редактор
 */
 
-void TDrawWindow::loadGraph(QString name, DataBaseManager* dbManager)
+void TDrawWindow::loadGraph(const QString &name, DataBaseManager* dbManager)
 {
+    globalLogger->writeLog("TDrawWindow::loadGraph start", Logger::All);
     scene->clear();
     QList<Top* > topList;
     QList<Arc* > arcList;
     QList<Comment* > commentList;
     QList<QSyncArc* > syncArcList;
     QList<QMultiProcTop* > multiProcTopList;
+
+    QList<Actor* > actorList;
+    QList<Predicate* > predicateList;
     Graph graph(name, "", topList, arcList, commentList, syncArcList, multiProcTopList);
     dbManager->getGraph(graph);
+    dbManager->getActorList(actorList);
+    dbManager->getPredicateList(predicateList);
     foreach (Top* top, graph.topList) {
         if (top->type == "T") {
             QNormalTop *qtop = new QNormalTop(topMenu, NULL, scene);
@@ -389,13 +395,23 @@ void TDrawWindow::loadGraph(QString name, DataBaseManager* dbManager)
             double h = top->sizeY;
             qtop->setRect(-w/2, -h/2, w, h);
             qtop->setPos(top->x, top->y);
-            qtop->actor = dbManager->getActor(top->actor);
+            foreach (Actor* actor, actorList) {
+                if (actor->name == top->actor) {
+                    qtop->actor = actor;
+                    break;
+                }
+            }
         } else if (top->type == "M") {
             QMultiProcTop *qtop = new QMultiProcTop(multiProcMenu, NULL, scene);
             qtop->number = top->number;
             qtop->setPos(top->x, top->y);
             qtop->procCount = top->procCount;
-            qtop->actor = dbManager->getActor(top->actor);
+            foreach (Actor* actor, actorList) {
+                if (actor->name == top->actor) {
+                    qtop->actor = actor;
+                    break;
+                }
+            }
         }
     }
 
@@ -421,7 +437,13 @@ void TDrawWindow::loadGraph(QString name, DataBaseManager* dbManager)
         qarc->addLine(qarc->currentLine);
         qarc->currentLine = NULL;
         qarc->setArcType(QArc::ArcType(arc->type));
-        qarc->predicate = dbManager->getPredicate(arc->predicate);
+        foreach (Predicate* predicate, predicateList) {
+            if (predicate->name == arc->predicate) {
+                qarc->predicate = predicate;
+                break;
+            }
+        }
+
         if (qarc->predicate != NULL && !globalPredicateList.contains(qarc->predicate->extName))
             globalPredicateList.append(qarc->predicate->extName);
         startTop->addArc(qarc);
