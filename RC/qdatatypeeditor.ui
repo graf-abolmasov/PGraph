@@ -10,6 +10,18 @@
     <height>294</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>400</width>
+    <height>294</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>400</width>
+    <height>294</height>
+   </size>
+  </property>
   <property name="windowTitle">
    <string>Редактор типа данных</string>
   </property>

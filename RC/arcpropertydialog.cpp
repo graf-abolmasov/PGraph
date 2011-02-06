@@ -57,7 +57,7 @@ void ArcPropertyDialog::prepareForm(QArc *arc)
     myPredicateList.insert(0, NULL);
     ui->predicateList->addItem(tr("Нет"));
     for (int i = 1; i < myPredicateList.count(); i++)
-        ui->predicateList->addItem(myPredicateList.at(i)->extName);
+        ui->predicateList->addItem(QString(myPredicateList.at(i)->extName).replace(QRegExp("(\r+|\n+)"), " "));
 
     if (arc->predicate != NULL) {
         int idx = -1;

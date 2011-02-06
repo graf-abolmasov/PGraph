@@ -131,7 +131,7 @@ void QModuleRegister::on_buttonBox_accepted()
 {
 
     ui->parametersTable->setCurrentCell(-1, -1);
-    bool readyToSave = true;//(ui->parametersTable->rowCount() > 0);
+    bool readyToSave = true;
     for (int i = 0; i < ui->parametersTable->rowCount(); i++){
         if ((ui->parametersTable->item(i, 0)->text().isEmpty()) ||
             (ui->parametersTable->item(i, 1)->text().isEmpty()) ||
@@ -181,24 +181,22 @@ void QModuleRegister::on_buttonBox_accepted()
     outputData.append("#include \"graph.h\"\r\nextern int ");
     outputData.append(fileList.at(ui->fileList->currentRow()).baseName() + "(" + signature + ");\r\n");
     outputData.append("int " + uniqName + "(TPOData *D)\r\n{\r\n");
-    QStringList paramsList;
-    if (!signature.isEmpty())
-        paramsList = signature.split(QRegExp(",{1,}\\s*"));
-    for (int i = 0; i < paramsList.count(); i++){
-        QString paramName = paramsList.at(i).split(QRegExp("\\*\\s{1,}")).at(1);
-        QString paramType = paramsList.at(i).split(QRegExp("\\*\\s{1,}")).at(0);
+
+    for (int i = 0; i < ui->parametersTable->rowCount(); i++){
+        QString paramName = ui->parametersTable->item(i, 0)->text();
+        QString paramType = ui->parametersTable->item(i, 1)->text();
         outputData.append("  " + paramType + " " + paramName + " = (D->" + paramName + ");\r\n");
     }
     outputData.append("\r\n  int result = " + fileList.at(ui->fileList->currentRow()).baseName() + "(");
-    for (int i = 0; i < paramsList.count(); i++){
-        QString paramName = paramsList.at(i).split(QRegExp("\\*\\s{1,}")).at(1);
+    for (int i = 0; i < ui->parametersTable->rowCount(); i++){
+        QString paramName = ui->parametersTable->item(i, 0)->text();
         outputData.append("&" + paramName + ", ");
     }
-    if (!signature.isEmpty())
+    if (ui->parametersTable->rowCount() != 0)
         outputData.remove(outputData.size()-2, 2);
     outputData.append(");\r\n\r\n");
-    for (int i = 0; i < paramsList.count(); i++){
-        QString paramName = paramsList.at(i).split(QRegExp("\\*\\s{1,}")).at(1);
+    for (int i = 0; i < ui->parametersTable->rowCount(); i++){
+        QString paramName = ui->parametersTable->item(i, 0)->text();
         outputData.append("  D->" + paramName + " = " + paramName + ";\r\n");
     }
     outputData.append("  return result;\r\n}\r\n");

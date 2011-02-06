@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
 {  	
     QApplication::addLibraryPath("./");
     QApplication a(argc, argv);
-    a.setApplicationVersion("31.08.2010 12.26");
+    a.setApplicationVersion("05.02.2011 14.45");
 
     QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
     QTranslator qtTranslator;
