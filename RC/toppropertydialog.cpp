@@ -51,7 +51,7 @@ void TopPropertyDialog::prepareForm(QNormalTop* top){
     }
     ui->actorsListWidget->addItem(tr("Нет"));
     for (int i = 1 ; i < myActorList.count(); i++){
-        ui->actorsListWidget->addItem(myActorList.at(i)->extName);
+        ui->actorsListWidget->addItem(QString(myActorList.at(i)->extName).replace(QRegExp("(\r+|\n+)"), " "));
     }
 
     if (top->actor != NULL){

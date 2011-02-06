@@ -464,7 +464,7 @@ void TDrawWindow::loadGraph(const QString &name, DataBaseManager* dbManager)
 
     myGraphName = graph.name;
     myGraphExtName = graph.extName;
-    if (myRole = ReadOnly)
+    if (myRole == ReadOnly)
         setWindowTitle(myGraphExtName + tr(" - Read-only"));
     else
         setWindowTitle(myGraphExtName);

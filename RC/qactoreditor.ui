@@ -243,21 +243,6 @@
         <attribute name="verticalHeaderDefaultSectionSize">
          <number>22</number>
         </attribute>
-        <attribute name="verticalHeaderDefaultSectionSize">
-         <number>22</number>
-        </attribute>
-        <attribute name="horizontalHeaderStretchLastSection">
-         <bool>true</bool>
-        </attribute>
-        <attribute name="horizontalHeaderCascadingSectionResizes">
-         <bool>true</bool>
-        </attribute>
-        <attribute name="horizontalHeaderMinimumSectionSize">
-         <number>160</number>
-        </attribute>
-        <attribute name="horizontalHeaderDefaultSectionSize">
-         <number>165</number>
-        </attribute>
         <column>
          <property name="text">
           <string>Имя параметра</string>
@@ -552,21 +537,6 @@
         </attribute>
         <attribute name="verticalHeaderDefaultSectionSize">
          <number>22</number>
-        </attribute>
-        <attribute name="verticalHeaderDefaultSectionSize">
-         <number>22</number>
-        </attribute>
-        <attribute name="horizontalHeaderStretchLastSection">
-         <bool>true</bool>
-        </attribute>
-        <attribute name="horizontalHeaderCascadingSectionResizes">
-         <bool>true</bool>
-        </attribute>
-        <attribute name="horizontalHeaderMinimumSectionSize">
-         <number>160</number>
-        </attribute>
-        <attribute name="horizontalHeaderDefaultSectionSize">
-         <number>160</number>
         </attribute>
         <column>
          <property name="text">

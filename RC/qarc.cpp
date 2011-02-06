@@ -454,7 +454,8 @@ QRectF QArc::boundingRect() const
     QRectF rect;
     foreach (QArcLine* line, lines)
         rect = rect.united(line->boundingRect());
-    rect.united(QRectF(arcHead.boundingRect()));
+    rect.united(arcHead.boundingRect());
+    rect.united(arcTop->boundingRect());
     return rect.normalized();
 }
 
@@ -594,6 +595,9 @@ void QArc::setArcType(ArcType type)
     }
 }
 
+/*!
+  Преобразует в простой формат дуги для сохранения в базу данных.
+*/
 Arc* QArc::toArc()
 {
     QStringList nodes;
