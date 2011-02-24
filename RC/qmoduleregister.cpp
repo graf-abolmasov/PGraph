@@ -204,3 +204,24 @@ void QModuleRegister::on_buttonBox_accepted()
     output.close();
     input.close();
 }
+
+void QModuleRegister::on_buttonBox_clicked(QAbstractButton* button)
+{
+    ui->parametersTable->setCurrentCell(-1, -1);
+    bool readyToSave = (ui->parametersTable->rowCount() > 0);
+    for (int i = 0; i < ui->parametersTable->rowCount(); i++){
+        if ((ui->parametersTable->item(i, 0)->text().isEmpty()) ||
+            (ui->parametersTable->item(i, 1)->text().isEmpty()) ||
+            (ui->parametersTable->item(i, 2)->text().isEmpty())){
+            readyToSave = false;
+            break;
+        }
+    }
+
+    if (readyToSave) accept();
+}
+
+void QModuleRegister::on_fileList_activated(QModelIndex index)
+{
+
+}
