@@ -7,6 +7,7 @@
 #include "qopengraphdialog.h"
 #include "commonutils.h"
 #include "globalvariables.h"
+// #include "compi.h"
 
 QLabel *globalInfoLabel;
 
@@ -55,8 +56,8 @@ void TMyWindow::createMenus()
 
     buildMenu = menuBar()->addMenu(tr("Запуск"));
     buildMenu->addAction(runAct);
-    buildMenu->addAction(compileAct);
     buildMenu->addAction(saveStructAct);
+    buildMenu->addAction(compileAct);
     buildMenu->addAction(manualInputAct);
 
     helpMenu = menuBar()->addMenu(tr("Помощь"));
@@ -122,12 +123,12 @@ void TMyWindow::createActions()
     runAct = new QAction(QIcon(":/images/build.png"), tr("Запуск"), this);
     runAct->setStatusTip(tr("Компиляция и запуск"));
     connect(runAct, SIGNAL(triggered()), this, SLOT(CMRun()));
-    runAct->setEnabled(false);
+    //// runAct->setEnabled(false);
 
     compileAct = new QAction(QIcon(":/images/compile.png"), tr("Компилировать"), this);
     compileAct->setStatusTip(tr("Компилировать в exe"));
     connect(compileAct, SIGNAL(triggered()), this, SLOT(CMCompile()));
-    compileAct->setEnabled(false);
+    //// compileAct->setEnabled(false);
 
     saveStructAct = new QAction(tr("Записать структуру"), this);
     saveStructAct->setStatusTip(tr("Записать структуру графа в базу"));
@@ -169,27 +170,27 @@ void TMyWindow::createActions()
 
     //AlignToolBar
     alignHLeftAct = new QAction(QIcon(":/images/shape_align_left.png"), tr("Выровнить к левому краю"), this);
-    alignHLeftAct->setStatusTip(tr("Выровнить вершины к левому краю"));
+    alignHLeftAct->setStatusTip(tr("Выровнять вершины по левому краю"));
     connect(alignHLeftAct, SIGNAL(triggered()), this, SLOT(alignHLeft()));
 
     alignHRightAct = new QAction(QIcon(":/images/shape_align_right.png"), tr("Выровнить к правому краю"), this);
-    alignHRightAct->setStatusTip(tr("Выровнить вершины к правому краю"));
+    alignHRightAct->setStatusTip(tr("Выровнять вершины по правому краю"));
     connect(alignHRightAct, SIGNAL(triggered()), this, SLOT(alignHRight()));
 
     alignHCenterAct = new QAction(QIcon(":/images/shape_align_center.png"), tr("Выровнить к центру по горизонтали"), this);
-    alignHCenterAct->setStatusTip(tr("Выровнить вершины к центру по горизонтали"));
+    alignHCenterAct->setStatusTip(tr("Выровнять вершины к центру по горизонтали"));
     connect(alignHCenterAct, SIGNAL(triggered()), this, SLOT(alignHCenter()));
 
     alignVTopAct = new QAction(QIcon(":/images/shape_align_top.png"), tr("Выровнить к верхнему краю"), this);
-    alignVTopAct->setStatusTip(tr("Выровнить вершины к верхнему краю"));
+    alignVTopAct->setStatusTip(tr("Выровнять вершины по верхнему краю"));
     connect(alignVTopAct, SIGNAL(triggered()), this, SLOT(alignVTop()));
 
     alignVBottomAct = new QAction(QIcon(":/images/shape_align_bottom.png"), tr("Выровнить к нижнему краю"), this);
-    alignVBottomAct->setStatusTip(tr("Выровнить вершины к нижнему краю"));
+    alignVBottomAct->setStatusTip(tr("Выровнять вершины по нижнему краю"));
     connect(alignVBottomAct, SIGNAL(triggered()), this, SLOT(alignVBottom()));
 
     alignVCenterAct = new QAction(QIcon(":/images/shape_align_middle.png"), tr("Выровнить к центру по вертикали"), this);
-    alignVCenterAct->setStatusTip(tr("Выровнить вершины к центру по вертикали"));
+    alignVCenterAct->setStatusTip(tr("Выровнять вершины к центру по вертикали"));
     connect(alignVCenterAct, SIGNAL(triggered()), this, SLOT(alignVCenter()));
 
     distribVerticallyAct = new QAction(QIcon(":/images/shape_distrib_vertically.png"), tr("Распределить по вертикали"), this);
@@ -680,4 +681,20 @@ void TMyWindow::closeEvent(QCloseEvent *event)
 void TMyWindow::grafMenuAboutToShow()
 {
 
+}
+
+void TMyWindow::CMCompile()
+{
+//    if (!globalDBManager->get_GSP_Shab_List(myShabList))
+//            QMessageBox::critical(NULL,
+//                          QObject::tr("Ошибка"),
+//                          QObject::tr("Не удалось прочитать из БД шаблон "
+//                                      "для генерации исходного файла (GSP_SHAB).\n")
+//                                    + globalDBManager->lastError().databaseText(),
+//                          QMessageBox::Ok);
+    // Compi();
+    // Определение размера структуры описания графа
+    // (кол-во строк в GRAPH для данного агрегата)
+    int temp_var;
+    globalDBManager->Compi_get_root_top(activeDrawWindow()->myGraphName, &temp_var);
 }
