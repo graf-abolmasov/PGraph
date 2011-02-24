@@ -23,7 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Справочник объектов</string>
+   <string>Редактор объектов</string>
   </property>
   <property name="windowIcon">
    <iconset resource="resources.qrc">
