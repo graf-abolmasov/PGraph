@@ -15,8 +15,9 @@ CREATE  TABLE IF NOT EXISTS `graph4`.`project` (
   `PROJECT_ID` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT ,
   `PROJECT_NAME` VARCHAR(200) NOT NULL ,
   PRIMARY KEY (`PROJECT_ID`) )
-ENGINE = InnoDB
-AUTO_INCREMENT = 3;
+ENGINE = InnoDB;
+
+INSERT INTO `graph4`.`project` (`PROJECT_NAME`) VALUES ('Project1');
 
 
 -- -----------------------------------------------------
@@ -282,6 +283,8 @@ DEFAULT CHARACTER SET = cp1251;
 
 CREATE INDEX `fk_typsys_project1` ON `graph4`.`typsys` (`PROJECT_ID` ASC) ;
 
+INSERT INTO `typsys` VALUES (1,'byte',''),(1,'char',''),(1,'double',''),(1,'float',''),(1,'int','');
+
 
 -- -----------------------------------------------------
 -- Table `graph4`.`toppic`
@@ -365,6 +368,6 @@ SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 -- -----------------------------------------------------
 SET AUTOCOMMIT=0;
 USE `graph4`;
-INSERT INTO `graph4`.`project` (`PROJECT_ID`, `PROJECT_NAME`) VALUES ('1', 'Project1');
+
 
 COMMIT;
