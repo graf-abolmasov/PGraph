@@ -105,10 +105,9 @@ void QActorEditor::prepareForm(Actor *actor)
         ui->inlineModuleTxtEdt->setFocus();
         break;
     }
-    QRegExp regExp("[A-Za-z1-9 ]{1,255}");
+    QRegExp regExp("[A-Za-z1-9А-Яа-я ]{1,255}");
     ui->actorNameEdt->setValidator(new QRegExpValidator(regExp, this));
     enableOkButton();
-
 }
 
 Actor* QActorEditor::getResult()
