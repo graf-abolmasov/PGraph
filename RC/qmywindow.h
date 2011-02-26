@@ -125,10 +125,10 @@ private slots:
     void CMBuildOpt(){}		// Настройки->Построение...
     void CMFont(){}		// Настройки->Шрифт
     void CMSaveSetup(){}  	// Настройки->Сохранить
-    void CMDoUserDialog(){}	// +Запуск->Режим ручного ввода данных
-    void CMSaveStruct();        // +Запуск->Запись структуры
-    void CMCompile();           // +Запуск->Компиляция
-    void CMRun(){}              // +Запуск->Построение и запуск
+    void CMDoUserDialog(){}	//+ Запуск->Режим ручного ввода данных
+    void CMSaveStruct();        //+ Запуск->Запись структуры
+    void CMCompile();           //+ Запуск->Компиляция
+    void CMRun(){}              //+ Запуск->Построение и запуск
     void CMHelpContents(){}	// Помощь->Содержание
     void CMHelpAbout(); 	//+ Помощь->О программе
 
