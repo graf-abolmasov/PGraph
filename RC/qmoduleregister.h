@@ -26,11 +26,10 @@ private:
     QComboBox* paramTypeCmbBox;
     QTextEdit* paramCommentEdt;
 
-    void on_fileList_activated(QModelIndex index);
-    void on_buttonBox_clicked(QAbstractButton* button);
+private slots:
+    void on_fileList_currentRowChanged(int currentRow);
     void on_buttonBox_accepted();
     void on_parametersTable_currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn);
-    void on_fileList_currentRowChanged(int currentRow);
 };
 
 #endif // QMODULEREGISTER_H
