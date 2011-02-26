@@ -70,29 +70,7 @@ void QModuleRegister::prepareForm()
     }
 }
 
-void QModuleRegister::on_fileList_currentRowChanged(int currentRow)
-{
-    ui->parametersTable->clearContents();
-    ui->parametersTable->setRowCount(0);
-    QFile file(fileList.at(currentRow).absoluteFilePath());
-    file.open(QFile::ReadOnly);
-    QString buff(file.readAll());
-    int start = buff.indexOf(fileList.at(currentRow).baseName() + "(", 0, Qt::CaseSensitive) + fileList.at(currentRow).baseName().length() + 1;
-    int end   = buff.indexOf(")", start, Qt::CaseSensitive);
-    QString signature(buff.mid(start, end-start));
-    if (signature.isEmpty()) return;
-    QStringList paramsList = signature.split(QRegExp(",{1,}\\s*"));
-    for (int i = 0; i < paramsList.count(); i++){
-        ui->parametersTable->insertRow(i);
-        QString paramName = paramsList.at(i).split(QRegExp("\\*?\\s{1,}\\*?")).at(1);
-        QString paramType = paramsList.at(i).split(QRegExp("\\*?\\s{1,}\\*?")).at(0);
-        ui->parametersTable->setItem(i, 0, new QTableWidgetItem(paramName));
-        ui->parametersTable->setItem(i, 1, new QTableWidgetItem(paramType));
-        ui->parametersTable->setItem(i, 2, new QTableWidgetItem(""));
-        ui->parametersTable->setItem(i, 3, new QTableWidgetItem(""));
-    }
-    file.close();
-}
+
 
 void QModuleRegister::on_parametersTable_currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn)
 {
@@ -205,23 +183,26 @@ void QModuleRegister::on_buttonBox_accepted()
     input.close();
 }
 
-void QModuleRegister::on_buttonBox_clicked(QAbstractButton* button)
+void QModuleRegister::on_fileList_currentRowChanged(int currentRow)
 {
-    ui->parametersTable->setCurrentCell(-1, -1);
-    bool readyToSave = (ui->parametersTable->rowCount() > 0);
-    for (int i = 0; i < ui->parametersTable->rowCount(); i++){
-        if ((ui->parametersTable->item(i, 0)->text().isEmpty()) ||
-            (ui->parametersTable->item(i, 1)->text().isEmpty()) ||
-            (ui->parametersTable->item(i, 2)->text().isEmpty())){
-            readyToSave = false;
-            break;
-        }
+    ui->parametersTable->clearContents();
+    ui->parametersTable->setRowCount(0);
+    QFile file(fileList.at(currentRow).absoluteFilePath());
+    file.open(QFile::ReadOnly);
+    QString buff(file.readAll());
+    int start = buff.indexOf(fileList.at(currentRow).baseName() + "(", 0, Qt::CaseSensitive) + fileList.at(currentRow).baseName().length() + 1;
+    int end   = buff.indexOf(")", start, Qt::CaseSensitive);
+    QString signature(buff.mid(start, end-start));
+    if (signature.isEmpty()) return;
+    QStringList paramsList = signature.split(QRegExp(",{1,}\\s*"));
+    for (int i = 0; i < paramsList.count(); i++){
+        ui->parametersTable->insertRow(i);
+        QString paramName = paramsList.at(i).split(QRegExp("\\*?\\s{1,}\\*?")).at(1);
+        QString paramType = paramsList.at(i).split(QRegExp("\\*?\\s{1,}\\*?")).at(0);
+        ui->parametersTable->setItem(i, 0, new QTableWidgetItem(paramName));
+        ui->parametersTable->setItem(i, 1, new QTableWidgetItem(paramType));
+        ui->parametersTable->setItem(i, 2, new QTableWidgetItem(""));
+        ui->parametersTable->setItem(i, 3, new QTableWidgetItem(""));
     }
-
-    if (readyToSave) accept();
-}
-
-void QModuleRegister::on_fileList_activated(QModelIndex index)
-{
-
+    file.close();
 }
