@@ -3,7 +3,7 @@ SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
 
 DROP SCHEMA IF EXISTS `graph4` ;
-CREATE SCHEMA IF NOT EXISTS `graph4` ;
+CREATE SCHEMA IF NOT EXISTS `graph4` DEFAULT CHARACTER SET utf8 ;
 USE `graph4` ;
 
 -- -----------------------------------------------------
@@ -15,7 +15,10 @@ CREATE  TABLE IF NOT EXISTS `graph4`.`project` (
   `PROJECT_ID` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT ,
   `PROJECT_NAME` VARCHAR(200) NOT NULL ,
   PRIMARY KEY (`PROJECT_ID`) )
-ENGINE = InnoDB;
+ENGINE = InnoDB
+AUTO_INCREMENT = 3
+DEFAULT CHARACTER SET = utf8;
+
 
 INSERT INTO `graph4`.`project` (`PROJECT_NAME`) VALUES ('Project1');
 
@@ -36,16 +39,40 @@ CREATE  TABLE IF NOT EXISTS `graph4`.`actor` (
   `PROTOTIP` VARCHAR(9) NULL DEFAULT NULL ,
   `BAZIS` VARCHAR(8) NULL DEFAULT NULL ,
   PRIMARY KEY (`PROJECT_ID`, `NAMEPR`) ,
+  INDEX `NAMEPR` USING BTREE (`NAMEPR` ASC) ,
+  INDEX `PROJECT_ID` USING BTREE (`PROJECT_ID` ASC) ,
   CONSTRAINT `Actor_Project_fk`
     FOREIGN KEY (`PROJECT_ID` )
     REFERENCES `graph4`.`project` (`PROJECT_ID` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
-ENGINE = InnoDB;
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
 
-CREATE INDEX `NAMEPR` USING BTREE ON `graph4`.`actor` (`NAMEPR` ASC) ;
 
-CREATE INDEX `PROJECT_ID` USING BTREE ON `graph4`.`actor` (`PROJECT_ID` ASC) ;
+-- -----------------------------------------------------
+-- Table `graph4`.`arcpic`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `graph4`.`arcpic` ;
+
+CREATE  TABLE IF NOT EXISTS `graph4`.`arcpic` (
+  `PROJECT_ID` INT(11) UNSIGNED NOT NULL ,
+  `NAMEPR` VARCHAR(9) NOT NULL ,
+  `Priority` INT(11) NOT NULL ,
+  `FromTop` INT(11) NOT NULL ,
+  `ToTop` INT(11) NOT NULL ,
+  `Nodes` VARCHAR(300) NOT NULL ,
+  `Type` VARCHAR(1) NOT NULL ,
+  `Predicate` VARCHAR(9) NOT NULL ,
+  PRIMARY KEY (`NAMEPR`, `PROJECT_ID`, `Priority`, `FromTop`, `ToTop`) ,
+  INDEX `fk_arcpic_graphpic1` (`PROJECT_ID` ASC, `NAMEPR` ASC) ,
+  CONSTRAINT `fk_arcpic_graphpic1`
+    FOREIGN KEY (`PROJECT_ID` , `NAMEPR` )
+    REFERENCES `graph4`.`actor` (`PROJECT_ID` , `NAMEPR` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
@@ -77,6 +104,8 @@ CREATE  TABLE IF NOT EXISTS `graph4`.`bazmod` (
   `COMMENT` VARCHAR(254) NULL DEFAULT NULL ,
   `STATUS` FLOAT NULL DEFAULT NULL ,
   PRIMARY KEY (`PROJECT_ID`, `PROTOTIP`) ,
+  INDEX `bazmod_FK1` USING BTREE (`NAMEPR` ASC) ,
+  INDEX `fk_bazmod_project1` (`PROJECT_ID` ASC) ,
   CONSTRAINT `fk_bazmod_project1`
     FOREIGN KEY (`PROJECT_ID` )
     REFERENCES `graph4`.`project` (`PROJECT_ID` )
@@ -85,9 +114,28 @@ CREATE  TABLE IF NOT EXISTS `graph4`.`bazmod` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = cp1251;
 
-CREATE INDEX `bazmod_FK1` USING BTREE ON `graph4`.`bazmod` (`NAMEPR` ASC) ;
 
-CREATE INDEX `fk_bazmod_project1` ON `graph4`.`bazmod` (`PROJECT_ID` ASC) ;
+-- -----------------------------------------------------
+-- Table `graph4`.`commentpic`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `graph4`.`commentpic` ;
+
+CREATE  TABLE IF NOT EXISTS `graph4`.`commentpic` (
+  `PROJECT_ID` INT(11) UNSIGNED NOT NULL ,
+  `NAMEPR` VARCHAR(9) NOT NULL ,
+  `TEXT` VARCHAR(100) NULL DEFAULT NULL ,
+  `FONT` VARCHAR(100) NULL ,
+  `X` FLOAT NULL ,
+  `Y` FLOAT NULL ,
+  PRIMARY KEY (`PROJECT_ID`, `NAMEPR`) ,
+  INDEX `fk_commentpic_actor1` (`PROJECT_ID` ASC, `NAMEPR` ASC) ,
+  CONSTRAINT `fk_commentpic_actor1`
+    FOREIGN KEY (`PROJECT_ID` , `NAMEPR` )
+    REFERENCES `graph4`.`actor` (`PROJECT_ID` , `NAMEPR` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
@@ -102,6 +150,8 @@ CREATE  TABLE IF NOT EXISTS `graph4`.`data` (
   `INIT` VARCHAR(256) NULL DEFAULT NULL ,
   `COMMENT` VARCHAR(256) NULL DEFAULT NULL ,
   PRIMARY KEY (`PROJECT_ID`, `data`) ,
+  INDEX `data_FK1` USING BTREE (`TYPE` ASC) ,
+  INDEX `fk_data_project1` (`PROJECT_ID` ASC) ,
   CONSTRAINT `fk_data_project1`
     FOREIGN KEY (`PROJECT_ID` )
     REFERENCES `graph4`.`project` (`PROJECT_ID` )
@@ -109,10 +159,6 @@ CREATE  TABLE IF NOT EXISTS `graph4`.`data` (
     ON UPDATE CASCADE)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = cp1251;
-
-CREATE INDEX `data_FK1` USING BTREE ON `graph4`.`data` (`TYPE` ASC) ;
-
-CREATE INDEX `fk_data_project1` ON `graph4`.`data` (`PROJECT_ID` ASC) ;
 
 
 -- -----------------------------------------------------
@@ -128,6 +174,7 @@ CREATE  TABLE IF NOT EXISTS `graph4`.`databaz` (
   `MODE` VARCHAR(1) NOT NULL ,
   `COMMENT` VARCHAR(254) NULL DEFAULT NULL ,
   PRIMARY KEY (`PROJECT_ID`, `PROTOTIP`, `DATA`, `TYPE`, `MODE`) ,
+  INDEX `fk_databaz_bazmod1` (`PROJECT_ID` ASC, `PROTOTIP` ASC) ,
   CONSTRAINT `fk_databaz_bazmod1`
     FOREIGN KEY (`PROJECT_ID` , `PROTOTIP` )
     REFERENCES `graph4`.`bazmod` (`PROJECT_ID` , `PROTOTIP` )
@@ -135,8 +182,6 @@ CREATE  TABLE IF NOT EXISTS `graph4`.`databaz` (
     ON UPDATE CASCADE)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = cp1251;
-
-CREATE INDEX `fk_databaz_bazmod1` ON `graph4`.`databaz` (`PROJECT_ID` ASC, `PROTOTIP` ASC) ;
 
 
 -- -----------------------------------------------------
@@ -154,6 +199,7 @@ CREATE  TABLE IF NOT EXISTS `graph4`.`graph` (
   `EXCL` VARCHAR(8) NULL DEFAULT NULL ,
   `ARCTYPE` INT(11) UNSIGNED NOT NULL ,
   PRIMARY KEY (`PROJECT_ID`, `NAMEPR`, `NFROM`, `NTO`, `NPRED`, `PRIOR`, `ARCTYPE`) ,
+  INDEX `fk_graph_project1` (`PROJECT_ID` ASC) ,
   CONSTRAINT `fk_graph_project1`
     FOREIGN KEY (`PROJECT_ID` )
     REFERENCES `graph4`.`project` (`PROJECT_ID` )
@@ -161,8 +207,6 @@ CREATE  TABLE IF NOT EXISTS `graph4`.`graph` (
     ON UPDATE CASCADE)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = cp1251;
-
-CREATE INDEX `fk_graph_project1` ON `graph4`.`graph` (`PROJECT_ID` ASC) ;
 
 
 -- -----------------------------------------------------
@@ -176,6 +220,7 @@ CREATE  TABLE IF NOT EXISTS `graph4`.`graphpre` (
   `NPRED` VARCHAR(3) NOT NULL ,
   `NAME` VARCHAR(9) NOT NULL ,
   PRIMARY KEY (`PROJECT_ID`, `NPRED`, `NAMEPR`, `NAME`) ,
+  INDEX `fk_graphpre_project1` (`PROJECT_ID` ASC) ,
   CONSTRAINT `fk_graphpre_project1`
     FOREIGN KEY (`PROJECT_ID` )
     REFERENCES `graph4`.`project` (`PROJECT_ID` )
@@ -183,8 +228,6 @@ CREATE  TABLE IF NOT EXISTS `graph4`.`graphpre` (
     ON UPDATE CASCADE)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = cp1251;
-
-CREATE INDEX `fk_graphpre_project1` ON `graph4`.`graphpre` (`PROJECT_ID` ASC) ;
 
 
 -- -----------------------------------------------------
@@ -199,6 +242,7 @@ CREATE  TABLE IF NOT EXISTS `graph4`.`graphtop` (
   `NAME` VARCHAR(9) NOT NULL ,
   `EXCL` FLOAT NULL DEFAULT NULL ,
   PRIMARY KEY (`PROJECT_ID`, `NAMEPR`, `NTOP`, `NAME`) ,
+  INDEX `fk_graphtop_project1` (`PROJECT_ID` ASC) ,
   CONSTRAINT `fk_graphtop_project1`
     FOREIGN KEY (`PROJECT_ID` )
     REFERENCES `graph4`.`project` (`PROJECT_ID` )
@@ -206,8 +250,6 @@ CREATE  TABLE IF NOT EXISTS `graph4`.`graphtop` (
     ON UPDATE CASCADE)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = cp1251;
-
-CREATE INDEX `fk_graphtop_project1` ON `graph4`.`graphtop` (`PROJECT_ID` ASC) ;
 
 
 -- -----------------------------------------------------
@@ -253,37 +295,14 @@ CREATE  TABLE IF NOT EXISTS `graph4`.`pasport` (
   `MODE` VARCHAR(1) NOT NULL ,
   `TYPE` VARCHAR(32) NULL DEFAULT NULL ,
   PRIMARY KEY (`NEV`, `DATA`, `PROJECT_ID`, `NAMEPR`, `MODE`) ,
+  INDEX `fk_pasport_actor1` (`PROJECT_ID` ASC, `NAMEPR` ASC) ,
   CONSTRAINT `fk_pasport_actor1`
     FOREIGN KEY (`PROJECT_ID` , `NAMEPR` )
     REFERENCES `graph4`.`actor` (`PROJECT_ID` , `NAMEPR` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
-ENGINE = InnoDB;
-
-CREATE INDEX `fk_pasport_actor1` ON `graph4`.`pasport` (`PROJECT_ID` ASC, `NAMEPR` ASC) ;
-
-
--- -----------------------------------------------------
--- Table `graph4`.`typsys`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `graph4`.`typsys` ;
-
-CREATE  TABLE IF NOT EXISTS `graph4`.`typsys` (
-  `PROJECT_ID` INT(11) UNSIGNED NOT NULL ,
-  `TYPE` VARCHAR(8) NOT NULL ,
-  `TYPEDEF` VARCHAR(254) NULL DEFAULT NULL ,
-  PRIMARY KEY (`TYPE`, `PROJECT_ID`) ,
-  CONSTRAINT `fk_typsys_project1`
-    FOREIGN KEY (`PROJECT_ID` )
-    REFERENCES `graph4`.`project` (`PROJECT_ID` )
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = cp1251;
-
-CREATE INDEX `fk_typsys_project1` ON `graph4`.`typsys` (`PROJECT_ID` ASC) ;
-
-INSERT INTO `typsys` VALUES (1,'byte',''),(1,'char',''),(1,'double',''),(1,'float',''),(1,'int','');
+DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
@@ -303,71 +322,38 @@ CREATE  TABLE IF NOT EXISTS `graph4`.`toppic` (
   `Actor` VARCHAR(9) NOT NULL ,
   `Type` VARCHAR(1) NOT NULL ,
   PRIMARY KEY (`NAMEPR`, `PROJECT_ID`, `ntop`) ,
+  INDEX `fk_toppic_graphpic1` (`PROJECT_ID` ASC, `NAMEPR` ASC) ,
   CONSTRAINT `fk_toppic_graphpic1`
     FOREIGN KEY (`PROJECT_ID` , `NAMEPR` )
     REFERENCES `graph4`.`actor` (`PROJECT_ID` , `NAMEPR` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
-ENGINE = InnoDB;
-
-CREATE INDEX `fk_toppic_graphpic1` ON `graph4`.`toppic` (`PROJECT_ID` ASC, `NAMEPR` ASC) ;
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
--- Table `graph4`.`arcpic`
+-- Table `graph4`.`typsys`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `graph4`.`arcpic` ;
+DROP TABLE IF EXISTS `graph4`.`typsys` ;
 
-CREATE  TABLE IF NOT EXISTS `graph4`.`arcpic` (
+CREATE  TABLE IF NOT EXISTS `graph4`.`typsys` (
   `PROJECT_ID` INT(11) UNSIGNED NOT NULL ,
-  `NAMEPR` VARCHAR(9) NOT NULL ,
-  `Priority` INT(11) NOT NULL ,
-  `FromTop` INT(11) NOT NULL ,
-  `ToTop` INT(11) NOT NULL ,
-  `Nodes` VARCHAR(300) NOT NULL ,
-  `Type` VARCHAR(1) NOT NULL ,
-  `Predicate` VARCHAR(9) NOT NULL ,
-  PRIMARY KEY (`NAMEPR`, `PROJECT_ID`, `Priority`, `FromTop`, `ToTop`) ,
-  CONSTRAINT `fk_arcpic_graphpic1`
-    FOREIGN KEY (`PROJECT_ID` , `NAMEPR` )
-    REFERENCES `graph4`.`actor` (`PROJECT_ID` , `NAMEPR` )
+  `TYPE` VARCHAR(8) NOT NULL ,
+  `TYPEDEF` VARCHAR(254) NULL DEFAULT NULL ,
+  PRIMARY KEY (`TYPE`, `PROJECT_ID`) ,
+  INDEX `fk_typsys_project1` (`PROJECT_ID` ASC) ,
+  CONSTRAINT `fk_typsys_project1`
+    FOREIGN KEY (`PROJECT_ID` )
+    REFERENCES `graph4`.`project` (`PROJECT_ID` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
-ENGINE = InnoDB;
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = cp1251;
 
-CREATE INDEX `fk_arcpic_graphpic1` ON `graph4`.`arcpic` (`PROJECT_ID` ASC, `NAMEPR` ASC) ;
-
-
--- -----------------------------------------------------
--- Table `graph4`.`commentpic`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `graph4`.`commentpic` ;
-
-CREATE  TABLE IF NOT EXISTS `graph4`.`commentpic` (
-  `PROJECT_ID` INT(11) UNSIGNED NOT NULL ,
-  `NAMEPR` VARCHAR(9) NOT NULL ,
-  `TEXT` VARCHAR(100) NULL ,
-  PRIMARY KEY (`PROJECT_ID`, `NAMEPR`) ,
-  CONSTRAINT `fk_commentpic_actor1`
-    FOREIGN KEY (`PROJECT_ID` , `NAMEPR` )
-    REFERENCES `graph4`.`actor` (`PROJECT_ID` , `NAMEPR` )
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
-ENGINE = InnoDB;
-
-CREATE INDEX `fk_commentpic_actor1` ON `graph4`.`commentpic` (`PROJECT_ID` ASC, `NAMEPR` ASC) ;
-
+INSERT INTO `typsys` VALUES (1,'byte',''),(1,'char',''),(1,'double',''),(1,'float',''),(1,'int','');
 
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
-
--- -----------------------------------------------------
--- Data for table `graph4`.`project`
--- -----------------------------------------------------
-SET AUTOCOMMIT=0;
-USE `graph4`;
-
-
-COMMIT;
