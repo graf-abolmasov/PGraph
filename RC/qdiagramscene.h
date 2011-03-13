@@ -8,6 +8,7 @@
 #include "qsyncarc.h"
 #include "qmultiproctop.h"
 #include "qnormaltop.h"
+#include "qdataitem.h"
 
 QT_BEGIN_NAMESPACE
 class QGraphicsSceneMouseEvent;
@@ -28,7 +29,7 @@ class QDiagramScene : public QGraphicsScene
     Q_OBJECT
 
 public:
-    enum Mode { InsertNormalTop, InsertLine, InsertText, InsertSync, InsertMultiProcTop, MoveItem, ReadOnly, SelectTop};
+    enum Mode { InsertNormalTop, InsertLine, InsertText, InsertSync, InsertMultiProcTop, InsertDataItem, MoveItem, ReadOnly};
 
     QDiagramScene(QObject *parent = 0);
     void setArcMenu(QMenu *menu);

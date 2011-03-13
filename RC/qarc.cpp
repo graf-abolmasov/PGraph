@@ -541,7 +541,34 @@ QArcLine* QArc::newLine(QPointF p1, QPointF p2)
         currentLine = new QArcLine(QLineF(p1, p2), this, scene());
     else {
         addLine(currentLine);
-        currentLine = new QArcLine(QLineF(prevLine()->line().p2(), p2), this, scene());
+
+        //выщитываем направление линии
+        QLineF vector(prevLine()->line().p2(), p2);
+        float dx = vector.dx();
+        float dy = vector.dy();
+        int sector = int(vector.angle() / 45.0);
+        QLineF nLine;
+        switch (sector) {
+        case 0:;
+        case 7:;
+        case 3:;
+        case 4:
+            nLine.setP1(vector.p1());
+            nLine.setP2(QPointF(vector.p1().x() + dx, vector.p1().y()));
+            break;
+        case 1:;
+        case 2:;
+        case 5:;
+        case 6:
+            nLine.setP1(vector.p1());
+            nLine.setP2(QPointF(vector.p1().x(), vector.p1().y() + dy));
+            break;
+        default:
+            ;
+        }
+
+        //добавляем отрезок дуги
+        currentLine = new QArcLine(QLineF(nLine), this, scene());
     }
     currentLine->setPen(pen());
     currentLine->setFlag(QGraphicsItem::ItemIsMovable, true);
