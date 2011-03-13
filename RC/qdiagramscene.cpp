@@ -77,7 +77,9 @@ void QDiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
         break;
     case ReadOnly:
         break;
-    case SelectTop:
+    case InsertDataItem:
+        QDataItem *item = new QDataItem(NULL, NULL, this);
+        item->setPos(mouseEvent->scenePos());
         break;
     }
     QGraphicsScene::mousePressEvent(mouseEvent);
@@ -183,11 +185,16 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
         QLineF newLine(line->line().p1(), mouseEvent->scenePos());
         line->setLine(newLine);
     }
+    //режим перетаскивания коментария
     else if ((myMode == MoveItem) &&
              (mouseEvent->buttons() == Qt::LeftButton) &&
              (mySelectedItems.count() == 1) &&
-             (mySelectedItems.first()->type() == QComment::Type))
+             (mySelectedItems.first()->type() == QComment::Type)) {
         emit itemMoved(mySelectedItems.first(), QLineF(mouseEvent->lastScenePos(), mouseEvent->scenePos()));
+    //просто перемещения мыши, без выделения, без добавления, обычное перемещение.
+    } else {
+        QGraphicsScene::mouseMoveEvent(mouseEvent);
+    }
 }
 
 void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
