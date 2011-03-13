@@ -152,6 +152,30 @@ void QNormalTop::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
         top = dlg.getResult();
 }
 
+void QNormalTop::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
+{
+    QPen myPen = pen();
+    myPen.setColor(Qt::red);
+    setPen(myPen);
+    event->accept();
+}
+
+void QNormalTop::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
+{
+    QPen myPen = pen();
+    myPen.setColor(Qt::black);
+    setPen(myPen);
+    event->accept();
+}
+
+void QNormalTop::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
+{
+    QPen myPen = pen();
+    myPen.setColor(Qt::red);
+    setPen(myPen);
+    event->accept();
+}
+
 Top* QNormalTop::toTop() const
 {
     QPointF pos = scenePos();
