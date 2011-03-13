@@ -17,6 +17,8 @@ QTop::QTop(QMenu *contextMenu,
 
     setFlag(QGraphicsItem::ItemIsMovable, true);
     setFlag(QGraphicsItem::ItemIsSelectable, true);
+    setFlag(QGraphicsItem::ItemSendsGeometryChanges, true);
+    setAcceptHoverEvents(true);
 
     isRoot  = false;
     number = -1;
