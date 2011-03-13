@@ -41,7 +41,8 @@ SOURCES += main.cpp \
     multiproctoppropertydialog.cpp \
     graph.cpp \
     logger.cpp \
-    undocommand.cpp
+    undocommand.cpp \
+    qdataitem.cpp
 HEADERS += qmywindow.h \
     qdrawwindow.h \
     qtop.h \
@@ -79,7 +80,8 @@ HEADERS += qmywindow.h \
     graph.h \
     logger.h \
     globalvariables.h \
-    undocommand.h
+    undocommand.h \
+    qdataitem.h
 RESOURCES += resources.qrc
 FORMS += toppropertydialog.ui \
     qobjecteditor.ui \
