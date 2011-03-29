@@ -87,6 +87,25 @@ void TMyWindow::createActions()
     saveAsGraphAct->setStatusTip(tr("Сохранить граф с новым именем"));
     connect(saveAsGraphAct, SIGNAL(triggered()), this, SLOT(CMGSaveAs()));
 
+    cutAct = new QAction(QIcon(":/images/cut.png"), tr("Вырезать"), this);
+    cutAct->setShortcut(QKeySequence::Cut);
+    cutAct->setStatusTip(tr("Скопировать в буфер и очистить выделенную область"));
+    connect(cutAct, SIGNAL(triggered()), this, SLOT(CMECut()));
+
+    copyAct = new QAction(QIcon(":/images/copy.png"), tr("Копировать"), this);
+    copyAct->setShortcut(QKeySequence::Copy);
+    copyAct->setStatusTip(tr("Скопировать в буфер выделенную область"));
+    connect(copyAct, SIGNAL(triggered()), this, SLOT(CMECopy()));
+
+    pasteAct = new QAction(QIcon(":/images/paste.png"), tr("Вставить"), this);
+    pasteAct->setShortcut(QKeySequence::Copy);
+    pasteAct->setStatusTip(tr("Вставить из буфера"));
+    connect(pasteAct, SIGNAL(triggered()), this, SLOT(CMEPaste()));
+
+    cutAct->setEnabled(false);
+    copyAct->setEnabled(false);
+    pasteAct->setEnabled(false);
+
     saveAsImageGraphAct = new QAction(tr("Cохранить как картинку"), this);
     saveAsImageGraphAct->setStatusTip(tr("Cохраняет как картинку"));
     connect(saveAsImageGraphAct, SIGNAL(triggered()), this, SLOT(CMGSaveAsImage()));
@@ -215,6 +234,10 @@ void TMyWindow::createActions()
     scaleSlider->setMaximumWidth(100);
     connect(scaleSlider, SIGNAL(sliderMoved(int)), this, SLOT(setFloatScale(int)));
 
+    showDataLayer = new QToolButton();
+    showDataLayer->setText(tr("Данные"));
+    showDataLayer ->setCheckable(true);
+    connect(showDataLayer, SIGNAL(clicked(bool)), this, SLOT(showDataLayerClicked(bool)));
 }
 
 TDrawWindow* TMyWindow::createDrawWindow()
@@ -228,7 +251,7 @@ TDrawWindow* TMyWindow::createDrawWindow()
     connect(newDrawWindow, SIGNAL(itemChanged(QGraphicsItem*)),
             this, SLOT(getInfo(QGraphicsItem*)));
     connect(newDrawWindow, SIGNAL(selectionChanged(QList<QGraphicsItem*>)),
-            this, SLOT(updateAlignToolBar(QList<QGraphicsItem*>)));
+            this, SLOT(updateToolBar(QList<QGraphicsItem*>)));
     connect(newDrawWindow, SIGNAL(graphLoaded(QString,QString)), this,
             SLOT(graphLoaded(QString,QString)));
 
@@ -254,6 +277,10 @@ void TMyWindow::createToolBar()
     mainToolBar->addAction(newGraphAct);
     mainToolBar->addAction(openGraphAct);
     mainToolBar->addAction(saveGraphAct);
+    mainToolBar->addSeparator();
+    mainToolBar->addAction(cutAct);
+    mainToolBar->addAction(copyAct);
+    mainToolBar->addAction(pasteAct);
     mainToolBar->addSeparator();
     mainToolBar->addAction(openObjectEditorAct);
     mainToolBar->addSeparator();
@@ -296,6 +323,9 @@ void TMyWindow::createToolBar()
     scaleToolBar = addToolBar(tr("Масштаб"));
     scaleToolBar->addWidget(new QLabel(tr("Масштаб: ")));
     scaleToolBar->addWidget(sceneScaleCombo);
+
+    layerToolBar = addToolBar(tr("Слои"));
+    layerToolBar->addWidget(showDataLayer);
     //Если нужен ползунковый регулятор масштаба
     //scaleToolBar->addSeparator();
     //scaleToolBar->addWidget(scaleSlider);
@@ -583,7 +613,7 @@ void TMyWindow::getInfo(QGraphicsItem *item)
     globalInfoLabel->setText(info);
 }
 
-void TMyWindow::updateAlignToolBar(QList<QGraphicsItem *> items)
+void TMyWindow::updateToolBar(QList<QGraphicsItem *> items)
 {
     alignHLeftAct->setEnabled(false);
     alignHCenterAct->setEnabled(false);
@@ -593,6 +623,10 @@ void TMyWindow::updateAlignToolBar(QList<QGraphicsItem *> items)
     alignVBottomAct->setEnabled(false);
     distribVerticallyAct->setEnabled(false);
     distribHorizontallyAct->setEnabled(false);
+
+    cutAct->setEnabled(false);
+    copyAct->setEnabled(false);
+    pasteAct->setEnabled(false);
 
     QList<QGraphicsItem* > arcList;
     QList<QGraphicsItem* > topList;
@@ -610,8 +644,11 @@ void TMyWindow::updateAlignToolBar(QList<QGraphicsItem *> items)
             arcList.append(item);
             break;
         }
-    if (arcList.count() > 0) return;
+    if (arcList.count() > 0) return;  
     if (topList.count() == 1 ) {
+        cutAct->setEnabled(true);
+        copyAct->setEnabled(true);
+        pasteAct->setEnabled(true);
         QTop* top = qgraphicsitem_cast<QTop* >(topList.first());
         if (top->allArcs().count() > 0) {
             distribVerticallyAct->setEnabled(true);
@@ -626,6 +663,9 @@ void TMyWindow::updateAlignToolBar(QList<QGraphicsItem *> items)
         alignVBottomAct->setEnabled(true);
         distribVerticallyAct->setEnabled(true);
         distribHorizontallyAct->setEnabled(true);
+        cutAct->setEnabled(true);
+        copyAct->setEnabled(true);
+        pasteAct->setEnabled(true);
     }
 }
 
@@ -644,16 +684,14 @@ void TMyWindow::setFloatScale(const int scale)
 void TMyWindow::readSettings()
 {
     QSettings settings("graph.ini", QSettings::IniFormat);
-    recentGraphs = settings.value("IDE\recents", "").toMap();
+    recentGraphs = settings.value("IDE/recents", "").toMap();
 }
 
 void TMyWindow::writeSettings()
 {
-    /*
-      Сохраняем список недавних файлов
+    //Сохраняем список недавних файлов
     QSettings settings("graph.ini", QSettings::IniFormat);
     settings.setValue("IDE/Recents", recentGraphs);
-    */
 }
 
 void TMyWindow::graphLoaded(QString name, QString extName)
@@ -697,4 +735,24 @@ void TMyWindow::CMCompile()
     // (кол-во строк в GRAPH для данного агрегата)
     int temp_var;
     globalDBManager->Compi_get_root_top(activeDrawWindow()->myGraphName, &temp_var);
+}
+
+void TMyWindow::showDataLayerClicked(bool clicked)
+{
+    activeDrawWindow()->showDataLayer(clicked);
+}
+
+void TMyWindow::CMECopy()
+{
+    //TODO: реализовать копирование
+}
+
+void TMyWindow::CMECut()
+{
+    //TODO: реализовать вырезание
+}
+
+void TMyWindow::CMEPaste()
+{
+    //TODO: реализовать вставку
 }
