@@ -25,6 +25,8 @@ private:
     QList<DataType*> typeList;
 
 private slots:
+    void on_pushButton_5_clicked();
+    void on_pushButton_4_clicked();
     void on_tableWidget_doubleClicked(QModelIndex index);
     void on_buttonBox_accepted();
     void on_pushButton_3_clicked();
