@@ -121,7 +121,8 @@ bool DataBaseManager::getGraph(Graph &graph)
         QSqlRecord record = query.record();
         Comment* comment = new Comment(record.value("X").toFloat(),
                                        record.value("Y").toFloat(),
-                                       record.value("TEXT").toString());
+                                       record.value("TEXT").toString(),
+                                       QFont(record.value("FONT").toString()));
         graph.commentList.append(comment);
     }
 
@@ -179,13 +180,14 @@ bool DataBaseManager::saveGraph(Graph *graph)
     }
 
     foreach(Comment* comment, graph->commentList){
-        query.prepare("INSERT INTO commentpic (PROJECT_ID, NAMEPR, TEXT, X, Y) "
-                      "VALUES (:PROJECT_ID, :NAMEPR, :TEXT, :X, :Y)");
+        query.prepare("INSERT INTO commentpic (PROJECT_ID, NAMEPR, TEXT, FONT, X, Y) "
+                      "VALUES (:PROJECT_ID, :NAMEPR, :TEXT, :FONT, :X, :Y)");
         query.bindValue(":PROJECT_ID", myProjectId);
         query.bindValue(":NAMEPR",     graph->name);
         query.bindValue(":X",          comment->x);
         query.bindValue(":Y",          comment->y);
         query.bindValue(":TEXT",       comment->text);
+        query.bindValue(":FONT",       comment->font.toString());
         query.exec();
         globalLogger->writeLog(query.executedQuery().toUtf8());
     }

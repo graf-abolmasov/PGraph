@@ -63,6 +63,7 @@ public:
     TDrawWindow(ShowRole role = NormalEditor, QWidget *parent = 0);
     void saveAsImage(QString filename);
     void setMode(QDiagramScene::Mode mode);
+    void showDataLayer(bool show);
     QDiagramScene::Mode mode() const
         { return scene->mode(); }
     Graph* getGraph();

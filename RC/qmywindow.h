@@ -1,4 +1,4 @@
-#ifndef QMYWINDOW_H
+﻿#ifndef QMYWINDOW_H
 #define QMYWINDOW_H
 
 #include <QMainWindow>
@@ -71,10 +71,19 @@ private:
     QComboBox *sceneScaleCombo;
     QSlider *scaleSlider;
 
+    //LayerToolBar
+    QToolButton *showDataLayer;
+
+    //EditToolBar
+    QAction *cutAct;
+    QAction *copyAct;
+    QAction *pasteAct;
+
     QToolBar *mainToolBar;
     QToolBar *leftToolBar;
     QToolBar *layoutToolBar;
     QToolBar *scaleToolBar;
+    QToolBar *layerToolBar;
 
     QUndoView *undoView;
 
@@ -132,6 +141,10 @@ private slots:
     void CMHelpContents(){}	// Помощь->Содержание
     void CMHelpAbout(); 	//+ Помощь->О программе
 
+    void CMECut();              // Правка->Вырезать
+    void CMECopy();             // Правка->Скопировать
+    void CMEPaste();            // Правка->Вставить
+
     void grafMenuAboutToShow(); // Вызывается перед показом меню Граф
 
     void sceneChanged();        // Действие при изменении сцены
@@ -148,10 +161,12 @@ private slots:
     void setFixedScale(const QString &scale);
     void setFloatScale(const int scale);
 
-    void updateAlignToolBar(QList<QGraphicsItem *> items);
+    void updateToolBar(QList<QGraphicsItem *> items);
     void getInfo(QGraphicsItem *item);
 
     void pointerGroupClicked(int id);  //Действие при выборе инструмента
+
+    void showDataLayerClicked(bool clicked);
 
     void graphLoaded(QString name, QString extName);
 };
