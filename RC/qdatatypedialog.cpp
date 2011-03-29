@@ -116,3 +116,35 @@ void QDataTypeDialog::on_tableWidget_doubleClicked(QModelIndex index)
 {
     on_pushButton_2_clicked();
 }
+
+void QDataTypeDialog::on_pushButton_4_clicked()
+{
+    QDataTypeEditor *editor = new QDataTypeEditor(QDataTypeEditor::Array);
+    editor->prepareForm(NULL);
+    if (editor->exec()){
+        DataType* newDataType = editor->getResult();
+        if (newDataType != NULL) {
+            typeList.append(newDataType);
+            ui->tableWidget->insertRow(ui->tableWidget->rowCount());
+            ui->tableWidget->setItem(ui->tableWidget->rowCount()-1,0,new QTableWidgetItem(newDataType->name,QTableWidgetItem::Type));
+            ui->tableWidget->setItem(ui->tableWidget->rowCount()-1,1,new QTableWidgetItem(newDataType->typedefStr,0));
+        }
+    }
+    delete editor;
+}
+
+void QDataTypeDialog::on_pushButton_5_clicked()
+{
+    QDataTypeEditor *editor = new QDataTypeEditor(QDataTypeEditor::Struct);
+    editor->prepareForm(NULL);
+    if (editor->exec()){
+        DataType* newDataType = editor->getResult();
+        if (newDataType != NULL) {
+            typeList.append(newDataType);
+            ui->tableWidget->insertRow(ui->tableWidget->rowCount());
+            ui->tableWidget->setItem(ui->tableWidget->rowCount()-1,0,new QTableWidgetItem(newDataType->name,QTableWidgetItem::Type));
+            ui->tableWidget->setItem(ui->tableWidget->rowCount()-1,1,new QTableWidgetItem(newDataType->typedefStr,0));
+        }
+    }
+    delete editor;
+}

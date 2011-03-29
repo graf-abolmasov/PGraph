@@ -742,6 +742,11 @@ void TDrawWindow::showFontDialog()
         comment->setFont(dlg.selectedFont());
 }
 
+void TDrawWindow::showDataLayer(bool show)
+{
+
+}
+
 bool arcPriorLessThan(const QArc* arc1, const QArc* arc2)
 {
     return (arc1->priority() < arc2->priority());

@@ -12,7 +12,6 @@ public:
     QString type;
     QVariant initValue;
     QString comment;
-
 };
 
 #endif // VARIABLE_H

@@ -3,21 +3,24 @@
 
 #include <QGraphicsItem>
 #include <QPen>
+#include <QFont>
 
 QT_BEGIN_NAMESPACE
 class QFocusEvent;
 class QGraphicsItem;
 class QGraphicsScene;
 class QGraphicsSceneMouseEvent;
+class QFont;
 QT_END_NAMESPACE
 
 class Comment
 {
 public:
-    Comment(float x, float y, QString text);
+    Comment(float x, float y, QString text, QFont font);
     float x;
     float y;
     QString text;
+    QFont font;
 };
 
 class QComment : public QGraphicsTextItem

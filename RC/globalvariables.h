@@ -7,5 +7,6 @@ extern DataBaseManager* globalDBManager;
 extern Logger *globalLogger;
 extern QLabel* globalInfoLabel;
 extern QStringList globalPredicateList;
+extern Graph *globalClipboard;
 
 #endif // GLOBALVARIABLES_H
