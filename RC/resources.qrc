@@ -24,5 +24,8 @@
         <file>images/shape_distrib_horizontally.png</file>
         <file>images/shape_distrib_vertically.png</file>
         <file>images/shape_align_bottom.png</file>
+        <file>images/copy.png</file>
+        <file>images/cut.png</file>
+        <file>images/paste.png</file>
     </qresource>
 </RCC>
