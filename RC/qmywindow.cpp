@@ -723,18 +723,7 @@ void TMyWindow::grafMenuAboutToShow()
 
 void TMyWindow::CMCompile()
 {
-//    if (!globalDBManager->get_GSP_Shab_List(myShabList))
-//            QMessageBox::critical(NULL,
-//                          QObject::tr("Ошибка"),
-//                          QObject::tr("Не удалось прочитать из БД шаблон "
-//                                      "для генерации исходного файла (GSP_SHAB).\n")
-//                                    + globalDBManager->lastError().databaseText(),
-//                          QMessageBox::Ok);
-    // Compi();
-    // Определение размера структуры описания графа
-    // (кол-во строк в GRAPH для данного агрегата)
-    int temp_var;
-    globalDBManager->Compi_get_root_top(activeDrawWindow()->myGraphName, &temp_var);
+
 }
 
 void TMyWindow::showDataLayerClicked(bool clicked)

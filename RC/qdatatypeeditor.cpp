@@ -43,15 +43,19 @@ void QDataTypeEditor::prepareForm(DataType *type)
     ui->StructType->setVisible(false);
     ui->SimpleType->setVisible(false);
 
+    //Подготавливаем справочник типов
+    if (!globalDBManager->getDataTypeList(typeList))
+        QMessageBox::critical(NULL,
+                              QObject::tr("Ошибка"),
+                              QObject::tr("Не удалось получить список типов данных.\n") + globalDBManager->lastError().databaseText(),
+                              QMessageBox::Ok);
+    foreach (DataType* type, typeList)
+        ui->arrItemTypeCmbBox->addItem(type->name, type->typedefStr);
+
+    ui->structFieldsTable->blockSignals(true);
     if (type != NULL) {
         if (type->typedefStr.contains("struct")) {
             myMode = Struct;
-
-            if (!globalDBManager->getDataTypeList(typeList))
-                QMessageBox::critical(NULL,
-                                      QObject::tr("Ошибка"),
-                                      QObject::tr("Не удалось получить список типов данных.\n") + globalDBManager->lastError().databaseText(),
-                                      QMessageBox::Ok);
 
             QRegExp r("(\\n(\\b.+\\b)\\s+(\\b.+\\b);)");
             r.setMinimal(true);
@@ -84,13 +88,6 @@ void QDataTypeEditor::prepareForm(DataType *type)
             ui->arrDimensionSpnBox->setValue(ui->arrItemsCountTable->rowCount());
 
             //Парсим тип элемента
-            if (!globalDBManager->getDataTypeList(typeList))
-                QMessageBox::critical(NULL,
-                                      QObject::tr("Ошибка"),
-                                      QObject::tr("Не удалось получить список типов данных.\n") + globalDBManager->lastError().databaseText(),
-                                      QMessageBox::Ok);
-            foreach (DataType* type, typeList)
-                ui->arrItemTypeCmbBox->addItem(type->name, type->typedefStr);
             r.setPattern("(typedef\\s+(\\b.+\\b))");
             if (r.indexIn(type->typedefStr) != -1) {
                 int idx = -1;
@@ -123,6 +120,15 @@ void QDataTypeEditor::prepareForm(DataType *type)
         ui->StructType->setVisible(myMode==Struct);
         ui->SimpleType->setVisible(myMode==Simple);
     }
+
+
+    //Вставляем последнюю пустую строку в таблицу структуры
+    ui->structFieldsTable->insertRow(ui->structFieldsTable->rowCount());
+    ui->structFieldsTable->setItem(ui->structFieldsTable->rowCount()-1, 0, new QTableWidgetItem(""));
+    ui->structFieldsTable->setItem(ui->structFieldsTable->rowCount()-1, 1, new QTableWidgetItem(""));
+    //Включаем сигналы
+    ui->structFieldsTable->blockSignals(false);
+
     myDataType = type;
 }
 
@@ -180,10 +186,13 @@ void QDataTypeEditor::on_buttonBox_accepted()
 
             QString typedefStr(tr("struct {\n"));
             for (int i = 0; i < ui->structFieldsTable->rowCount(); i++){
-                typedefStr.append(ui->structFieldsTable->item(i, 0)->text());
-                typedefStr.append(" ");
-                typedefStr.append(ui->structFieldsTable->item(i, 1)->text());
-                typedefStr.append(";\n");
+                if (!ui->structFieldsTable->item(i, 0)->text().isEmpty() &&
+                        !ui->structFieldsTable->item(i, 1)->text().isEmpty()) {
+                    typedefStr.append(ui->structFieldsTable->item(i, 0)->text());
+                    typedefStr.append(" ");
+                    typedefStr.append(ui->structFieldsTable->item(i, 1)->text());
+                    typedefStr.append(";\n");
+                }
             }
             typedefStr.append("} ");
             typedefStr.append(ui->structTypeNameEdt->text());
@@ -243,6 +252,11 @@ void QDataTypeEditor::on_structFieldsTable_currentCellChanged(int currentRow, in
             ui->structFieldsTable->item(previousRow, 0)->setText(varTypeCmbBox->currentText());
             delete varTypeCmbBox;
         }
+        if (previousColumn == 1){
+            ui->structFieldsTable->setCellWidget(previousRow, 1, NULL);
+            ui->structFieldsTable->item(previousRow, 1)->setText(varNameEdt->text());
+            delete varNameEdt;
+        }
     }
 
     if (currentColumn == 0){
@@ -254,5 +268,25 @@ void QDataTypeEditor::on_structFieldsTable_currentCellChanged(int currentRow, in
         varTypeCmbBox->setCurrentIndex(idx);
 
         ui->structFieldsTable->setCellWidget(currentRow, 0, varTypeCmbBox);
+    }
+
+    if (currentColumn == 1){
+        varNameEdt = new QLineEdit(ui->structFieldsTable);
+        varNameEdt->setText(ui->structFieldsTable->item(currentRow, 1)->text());
+
+        QRegExp regExp("[A-Za-z][A-Za-z1-9]{0,31}");
+        varNameEdt->setValidator(new QRegExpValidator(regExp, this));
+        ui->structFieldsTable->setCellWidget(currentRow, 1, varNameEdt);
+    }
+}
+
+void QDataTypeEditor::on_structFieldsTable_cellChanged(int row, int column)
+{
+    if ((ui->structFieldsTable->item(ui->structFieldsTable->rowCount()-1, 0)->text() != "") &&
+        (ui->structFieldsTable->item(ui->structFieldsTable->rowCount()-1, 1)->text() != "")) {
+        //Вставляем последнюю пустую строку
+        ui->structFieldsTable->insertRow(ui->structFieldsTable->rowCount());
+        ui->structFieldsTable->setItem(ui->structFieldsTable->rowCount()-1, 0, new QTableWidgetItem(""));
+        ui->structFieldsTable->setItem(ui->structFieldsTable->rowCount()-1, 1, new QTableWidgetItem(""));
     }
 }
