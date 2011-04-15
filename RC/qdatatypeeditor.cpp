@@ -126,6 +126,11 @@ void QDataTypeEditor::prepareForm(DataType *type)
     ui->structFieldsTable->insertRow(ui->structFieldsTable->rowCount());
     ui->structFieldsTable->setItem(ui->structFieldsTable->rowCount()-1, 0, new QTableWidgetItem(""));
     ui->structFieldsTable->setItem(ui->structFieldsTable->rowCount()-1, 1, new QTableWidgetItem(""));
+
+    //Вставляем строку в таблицу размерност массива
+    if (ui->arrItemsCountTable->rowCount() == 0) {
+        ui->arrDimensionSpnBox->setValue(1);
+    }
     //Включаем сигналы
     ui->structFieldsTable->blockSignals(false);
 

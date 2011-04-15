@@ -147,40 +147,34 @@ void QModuleRegister::on_buttonBox_accepted()
                               QObject::tr("Не удалось зарегистрировать модуль.\n") + globalDBManager->lastError().databaseText(),
                               QMessageBox::Ok);
 
-    QFile output(uniqName + ".CPP");
-    output.open(QFile::WriteOnly);
+    // Читаем файл
     QFile input(fileList.at(ui->fileList->currentRow()).absoluteFilePath());
     input.open(QFile::ReadOnly);
     QString buff(input.readAll());
+    input.close();
+
+    // Ищим заголовок (без регэкспа способ ужасен :((
     int start = buff.indexOf(fileList.at(ui->fileList->currentRow()).baseName() + "(", 0, Qt::CaseSensitive) + fileList.at(ui->fileList->currentRow()).baseName().length() + 1;
     int end   = buff.indexOf(")", start, Qt::CaseSensitive);
     QString signature(buff.mid(start, end-start));
     QByteArray outputData;
     outputData.append("#include \"graph.h\"\r\nextern int ");
     outputData.append(fileList.at(ui->fileList->currentRow()).baseName() + "(" + signature + ");\r\n");
-    outputData.append("int " + uniqName + "(TPOData *D)\r\n{\r\n");
+    outputData.append("int " + uniqName + "(" + signature + ")\r\n{\r\n");
 
+    outputData.append("\treturn " + fileList.at(ui->fileList->currentRow()).baseName() + "(");
     for (int i = 0; i < ui->parametersTable->rowCount(); i++){
         QString paramName = ui->parametersTable->item(i, 0)->text();
-        QString paramType = ui->parametersTable->item(i, 1)->text();
-        outputData.append("  " + paramType + " " + paramName + " = (D->" + paramName + ");\r\n");
+        outputData.append(paramName + ", ");
     }
-    outputData.append("\r\n  int result = " + fileList.at(ui->fileList->currentRow()).baseName() + "(");
-    for (int i = 0; i < ui->parametersTable->rowCount(); i++){
-        QString paramName = ui->parametersTable->item(i, 0)->text();
-        outputData.append("&" + paramName + ", ");
-    }
-    if (ui->parametersTable->rowCount() != 0)
+    if (ui->parametersTable->rowCount() > 0)
         outputData.remove(outputData.size()-2, 2);
-    outputData.append(");\r\n\r\n");
-    for (int i = 0; i < ui->parametersTable->rowCount(); i++){
-        QString paramName = ui->parametersTable->item(i, 0)->text();
-        outputData.append("  D->" + paramName + " = " + paramName + ";\r\n");
-    }
-    outputData.append("  return result;\r\n}\r\n");
+    outputData.append(");\r\n");
+    outputData.append("}\r\n");
+    QFile output(uniqName + ".CPP");
+    output.open(QFile::WriteOnly);
     output.write(outputData);
     output.close();
-    input.close();
 }
 
 void QModuleRegister::on_fileList_currentRowChanged(int currentRow)
@@ -190,6 +184,7 @@ void QModuleRegister::on_fileList_currentRowChanged(int currentRow)
     QFile file(fileList.at(currentRow).absoluteFilePath());
     file.open(QFile::ReadOnly);
     QString buff(file.readAll());
+    file.close();
     int start = buff.indexOf(fileList.at(currentRow).baseName() + "(", 0, Qt::CaseSensitive) + fileList.at(currentRow).baseName().length() + 1;
     int end   = buff.indexOf(")", start, Qt::CaseSensitive);
     QString signature(buff.mid(start, end-start));
@@ -204,5 +199,4 @@ void QModuleRegister::on_fileList_currentRowChanged(int currentRow)
         ui->parametersTable->setItem(i, 2, new QTableWidgetItem(""));
         ui->parametersTable->setItem(i, 3, new QTableWidgetItem(""));
     }
-    file.close();
 }

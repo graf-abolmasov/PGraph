@@ -157,18 +157,60 @@ void QPredicateEditor::on_buttonBox_accepted()
                               QObject::tr("Ошибка"),
                               QObject::tr("Введие название предиката.\n") + globalDBManager->lastError().databaseText(),
                               QMessageBox::Ok);
+
+    QSettings myLocSettings("graph.ini", QSettings::IniFormat);
+    QDir currentDir;
+    currentDir.setCurrent(myLocSettings.value("Location/BaseDir", QApplication::applicationDirPath() + "\\BaseDir\\").toString());
+
+    QByteArray outputData;
+    QFile output;
+
     switch(myMode){
     case Normal:
         myPredicate->extName = ui->predicateNameEdt->text();
         myPredicate->baseModule = myModuleList.at(ui->baseModuleList->currentRow())->unicName;
         myPredicate->name = "P" + getCRC(myPredicate->extName.toUtf8());
+
+        // Генерируем актор
+        outputData.append("#include \"stype.h\"\r\n");
+        outputData.append("int ");
+        outputData.append(myPredicate->name.toUtf8());
+        outputData.append("(TPOData *D)\r\n");
+        outputData.append("{\r\n");
+        // Инициализуем данные
+        for(int i = 0; i < myPredicate->variableList.count(); i++) {
+            QStringList parameter = myModuleList[ui->baseModuleList->currentRow()]->parameterList[i].split(";;");
+            outputData.append(QString(tr("\t%1 %2 = D->%3;\r\n")).arg(parameter[0]).arg(parameter[1]).arg(myPredicate->variableList[i]->name).toUtf8());
+        }
+        // Вызываем прототип
+        outputData.append("\r\n\tint result = ");
+        outputData.append(myPredicate->baseModule);
+        outputData.append("(");
+        for(int i = 0; i < myPredicate->variableList.count(); i++) {
+            QStringList parameter = myModuleList[ui->baseModuleList->currentRow()]->parameterList[i].split(";;");
+            outputData.append(QString(tr("&%1, ")).arg(parameter[1]).toUtf8());
+        }
+        if (myPredicate->variableList.count() > 0)
+            outputData.remove(outputData.length()-2,2);
+        outputData.append(");\r\n\r\n");
+        // сохраняем данные
+        for(int i = 0; i < myPredicate->variableList.count(); i++) {
+            QStringList parameter = myModuleList[ui->baseModuleList->currentRow()]->parameterList[i].split(";;");
+            outputData.append(QString(tr("\tD->%1 = %2;\n")).arg(myPredicate->variableList[i]->name).arg(parameter[1]).toUtf8());
+        }
+        // выход
+        outputData.append("\r\n\r\n\treturn result;\r\n}");
+
+        output.setFileName(currentDir.canonicalPath() + "/" + myPredicate->name + ".cpp");
+        output.open(QFile::WriteOnly);
+        output.write(outputData);
+        output.close();
+
         break;
     case Inline:
         myPredicate->extName = ui->inlineModuleTxtEdt->document()->toPlainText();
         myPredicate->name = "P" + getCRC(myPredicate->extName.toUtf8());
         //генерируем с++ файл
-        QFile output(QApplication::applicationDirPath() + "\\C\\" + myPredicate->name + ".cpp");
-        output.open(QFile::WriteOnly);
         QByteArray outputData;
         outputData.append("#include \"stype.h\"\r\n");
         outputData.append("int " + myPredicate->name + "(TPOData *D)\r\n");
@@ -180,6 +222,9 @@ void QPredicateEditor::on_buttonBox_accepted()
         //code.replace(QRegExp("\\n"), "\n  ");
         outputData.append("  return (" + code + ")\r\n");
         outputData.append("}\r\n");
+
+        output.setFileName(currentDir.canonicalPath() + "/" + myPredicate->name + ".cpp");
+        output.open(QFile::WriteOnly);
         output.write(outputData);
         output.close();
         break;
