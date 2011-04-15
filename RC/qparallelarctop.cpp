@@ -40,7 +40,7 @@ QVariant QParallelArcTop::itemChange(GraphicsItemChange change, const QVariant &
     return value;
 }
 
-void QParallelArcTop::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+void QParallelArcTop::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *)
 {
     ArcPropertyDialog dlg;
     QArc* arc = qgraphicsitem_cast<QArc *>(parentItem());

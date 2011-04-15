@@ -620,13 +620,14 @@ bool DataBaseManager::registerModule(const QString &uniqName, const QString &fil
 
     for (int i = 0; i < paramList.count(); i++){
         query.clear();
-        query.prepare("INSERT INTO databaz (PROJECT_ID, PROTOTIP, DATA, TYPE, MODE, COMMENT)"
-                      "VALUES (:PROJECT_ID, :PROTOTIP, :DATA, :TYPE, :MODE, :COMMENT);");
+        query.prepare("INSERT INTO databaz (PROJECT_ID, PROTOTIP, DATA, TYPE, MODE, NEV, COMMENT)"
+                      "VALUES (:PROJECT_ID, :PROTOTIP, :DATA, :TYPE, :MODE, :NEV, :COMMENT);");
         QStringList parameter = paramList.at(i).split(";;");
         query.bindValue(":PROJECT_ID",  myProjectId);
         query.bindValue(":PROTOTIP",    uniqName);
         query.bindValue(":DATA",        parameter.at(0));
         query.bindValue(":TYPE",        parameter.at(1));
+        query.bindValue(":NEV",         i);
         QString vaMode;
         if (parameter.at(2) == QObject::tr("Исходный"))
             vaMode = "I";
@@ -655,7 +656,7 @@ bool DataBaseManager::getRegisteredModules(QList<BaseModule*> &moduleList)
     query1.exec();
     globalLogger->writeLog(query1.executedQuery().toUtf8());
     while (query1.next()){
-        query2.prepare("SELECT TYPE, DATA, MODE, COMMENT FROM databaz WHERE PROTOTIP = :PROTOTIP AND PROJECT_ID = :PROJECT_ID;");
+        query2.prepare("SELECT TYPE, DATA, MODE, COMMENT FROM databaz WHERE PROTOTIP = :PROTOTIP AND PROJECT_ID = :PROJECT_ID order by NEV;");
         query2.bindValue(":PROTOTIP", query1.value(0).toString());
         query2.bindValue(":PROJECT_ID", myProjectId);
         query2.exec();

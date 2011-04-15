@@ -9,7 +9,7 @@ QMultiProcTop::QMultiProcTop(QMenu *contextMenu,
     procCount = 2;
 }
 
-void QMultiProcTop::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void QMultiProcTop::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *)
 {
     //Рисуем вокруг пунктир
     if (option->state & QStyle::State_Selected) {

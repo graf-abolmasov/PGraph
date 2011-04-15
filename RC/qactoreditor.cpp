@@ -105,7 +105,7 @@ void QActorEditor::prepareForm(Actor *actor)
         ui->inlineModuleTxtEdt->setFocus();
         break;
     }
-    QRegExp regExp("[A-Za-z1-9А-Яа-я ]{1,255}");
+    QRegExp regExp(tr("[A-Za-z1-9А-Яа-я ]{1,255}"));
     ui->actorNameEdt->setValidator(new QRegExpValidator(regExp, this));
     enableOkButton();
 }
@@ -176,23 +176,61 @@ void QActorEditor::on_varEditBtn_clicked()
 
 void QActorEditor::on_buttonBox_accepted()
 {
+    QSettings myLocSettings("graph.ini", QSettings::IniFormat);
+    QDir currentDir;
+    currentDir.setCurrent(myLocSettings.value("Location/BaseDir", QApplication::applicationDirPath() + "\\BaseDir\\").toString());
+
+    QByteArray outputData;
+    QFile output;
+
     switch(myMode){
     case Normal:
         myActor->extName = ui->actorNameEdt->text();
         myActor->baseModule = myModuleList.at(ui->baseModuleList->currentRow())->unicName;
         myActor->name = "A" + getCRC(myActor->extName.toUtf8());
+
+        // Генерируем актор
+        outputData.append("#include \"stype.h\"\r\n");
+        outputData.append("int ");
+        outputData.append(myActor->name.toUtf8());
+        outputData.append("(TPOData *D)\r\n");
+        outputData.append("{\r\n");
+        // Инициализуем данные
+        for(int i = 0; i < myActor->variableList.count(); i++) {
+            QStringList parameter = myModuleList[ui->baseModuleList->currentRow()]->parameterList[i].split(";;");
+            outputData.append(QString(tr("\t%1 %2 = D->%3;\r\n")).arg(parameter[0]).arg(parameter[1]).arg(myActor->variableList[i]->name).toUtf8());
+        }
+        // Вызываем прототип
+        outputData.append("\r\n\tint result = ");
+        outputData.append(myActor->baseModule);
+        outputData.append("(");
+        for(int i = 0; i < myActor->variableList.count(); i++) {
+            QStringList parameter = myModuleList[ui->baseModuleList->currentRow()]->parameterList[i].split(";;");
+            outputData.append(QString(tr("&%1, ")).arg(parameter[1]).toUtf8());
+        }
+        if (myActor->variableList.count() > 0)
+            outputData.remove(outputData.length()-2,2);
+        outputData.append(");\r\n\r\n");
+        // сохраняем данные
+        for(int i = 0; i < myActor->variableList.count(); i++) {
+            QStringList parameter = myModuleList[ui->baseModuleList->currentRow()]->parameterList[i].split(";;");
+            outputData.append(QString(tr("\tD->%1 = %2;\n")).arg(myActor->variableList[i]->name).arg(parameter[1]).toUtf8());
+        }
+        // выход
+        outputData.append("\r\n\r\n\treturn result;\r\n}");
+
+        output.setFileName(currentDir.canonicalPath() + "/" + myActor->name + ".cpp");
+        output.open(QFile::WriteOnly);
+        output.write(outputData);
+        output.close();
+
         break;
     case Inline:
         myActor->extName = ui->inlineModuleTxtEdt->document()->toPlainText();
         ui->paramsInlineTable->setCurrentCell(-1, -1);
         myActor->name = "A" + getCRC(myActor->extName.toUtf8());
         //генерируем с++ файл
-        QSettings myLocSettings("graph.ini", QSettings::IniFormat);
-        QDir currentDir;
-        currentDir.setCurrent(myLocSettings.value("Location/BaseDir", QApplication::applicationDirPath() + "\\BaseDir\\").toString());
-        QFile output(currentDir.canonicalPath() + "/" + myActor->name + ".cpp");
-        output.open(QFile::WriteOnly);
-        QByteArray outputData;
+
         outputData.append("#include \"stype.h\"\r\n");
         outputData.append("int " + myActor->name + "(TPOData *D)\r\n");
         outputData.append("{\r\n");
@@ -200,10 +238,12 @@ void QActorEditor::on_buttonBox_accepted()
         for (int i = 0; i < myActor->variableList.count(); i++){
             code.replace(QRegExp("(\\b)" + myActor->variableList.at(i)->name + "(\\b)", Qt::CaseSensitive), "(D->" + myActor->variableList.at(i)->name + ")");
         }
-        //code.replace(QRegExp("\\n"), "\n  ");
         outputData.append("  " + code + "\r\n");
         outputData.append("  return 1;\r\n");
         outputData.append("}\r\n");
+
+        output.setFileName(currentDir.canonicalPath() + "/" + myActor->name + ".cpp");
+        output.open(QFile::WriteOnly);
         output.write(outputData);
         output.close();
         break;

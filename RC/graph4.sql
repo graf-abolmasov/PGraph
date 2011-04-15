@@ -17,10 +17,7 @@ CREATE  TABLE IF NOT EXISTS `graph4`.`project` (
   PRIMARY KEY (`PROJECT_ID`) )
 ENGINE = InnoDB
 AUTO_INCREMENT = 1
-DEFAULT CHARACTER SET = utf8;
-
-
-INSERT INTO `graph4`.`project` (`PROJECT_NAME`) VALUES ('Project1');
+PACK_KEYS = DEFAULT;
 
 
 -- -----------------------------------------------------
@@ -46,8 +43,7 @@ CREATE  TABLE IF NOT EXISTS `graph4`.`actor` (
     REFERENCES `graph4`.`project` (`PROJECT_ID` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8;
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -71,8 +67,7 @@ CREATE  TABLE IF NOT EXISTS `graph4`.`arcpic` (
     REFERENCES `graph4`.`actor` (`PROJECT_ID` , `NAMEPR` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8;
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -111,8 +106,7 @@ CREATE  TABLE IF NOT EXISTS `graph4`.`bazmod` (
     REFERENCES `graph4`.`project` (`PROJECT_ID` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = cp1251;
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -123,19 +117,18 @@ DROP TABLE IF EXISTS `graph4`.`commentpic` ;
 CREATE  TABLE IF NOT EXISTS `graph4`.`commentpic` (
   `PROJECT_ID` INT(11) UNSIGNED NOT NULL ,
   `NAMEPR` VARCHAR(9) NOT NULL ,
-  `TEXT` VARCHAR(100) NULL DEFAULT NULL ,
+  `TEXT` VARCHAR(100) NOT NULL ,
   `FONT` VARCHAR(100) NULL ,
-  `X` FLOAT NULL ,
-  `Y` FLOAT NULL ,
-  PRIMARY KEY (`PROJECT_ID`, `NAMEPR`) ,
+  `X` FLOAT NOT NULL ,
+  `Y` FLOAT NOT NULL ,
+  PRIMARY KEY (`PROJECT_ID`, `NAMEPR`, `TEXT`, `X`, `Y`) ,
   INDEX `fk_commentpic_actor1` (`PROJECT_ID` ASC, `NAMEPR` ASC) ,
   CONSTRAINT `fk_commentpic_actor1`
     FOREIGN KEY (`PROJECT_ID` , `NAMEPR` )
     REFERENCES `graph4`.`actor` (`PROJECT_ID` , `NAMEPR` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8;
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -157,8 +150,7 @@ CREATE  TABLE IF NOT EXISTS `graph4`.`data` (
     REFERENCES `graph4`.`project` (`PROJECT_ID` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = cp1251;
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -180,8 +172,7 @@ CREATE  TABLE IF NOT EXISTS `graph4`.`databaz` (
     REFERENCES `graph4`.`bazmod` (`PROJECT_ID` , `PROTOTIP` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = cp1251;
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -205,8 +196,7 @@ CREATE  TABLE IF NOT EXISTS `graph4`.`graph` (
     REFERENCES `graph4`.`project` (`PROJECT_ID` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = cp1251;
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -226,8 +216,7 @@ CREATE  TABLE IF NOT EXISTS `graph4`.`graphpre` (
     REFERENCES `graph4`.`project` (`PROJECT_ID` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = cp1251;
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -248,8 +237,7 @@ CREATE  TABLE IF NOT EXISTS `graph4`.`graphtop` (
     REFERENCES `graph4`.`project` (`PROJECT_ID` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = cp1251;
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -301,8 +289,7 @@ CREATE  TABLE IF NOT EXISTS `graph4`.`pasport` (
     REFERENCES `graph4`.`actor` (`PROJECT_ID` , `NAMEPR` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8;
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -328,8 +315,7 @@ CREATE  TABLE IF NOT EXISTS `graph4`.`toppic` (
     REFERENCES `graph4`.`actor` (`PROJECT_ID` , `NAMEPR` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8;
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -348,12 +334,55 @@ CREATE  TABLE IF NOT EXISTS `graph4`.`typsys` (
     REFERENCES `graph4`.`project` (`PROJECT_ID` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = cp1251;
+ENGINE = InnoDB;
 
-INSERT INTO `typsys` VALUES (1,'byte',''),(1,'char',''),(1,'double',''),(1,'float',''),(1,'int','');
+
+-- -----------------------------------------------------
+-- Table `graph4`.`syncpic`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `graph4`.`syncpic` ;
+
+CREATE  TABLE IF NOT EXISTS `graph4`.`syncpic` (
+  `PROJECT_ID` INT(11) UNSIGNED NOT NULL ,
+  `NAMEPR` VARCHAR(9) NOT NULL ,
+  `FromTop` INT(11) NOT NULL ,
+  `FromGraph` VARCHAR(9) NOT NULL ,
+  `ToTop` INT(11) NOT NULL ,
+  `ToGraph` VARCHAR(9) NOT NULL ,
+  PRIMARY KEY (`PROJECT_ID`, `NAMEPR`, `FromTop`, `FromGraph`, `ToGraph`, `ToTop`) ,
+  INDEX `fk_syncpic_actor1` (`PROJECT_ID` ASC, `NAMEPR` ASC) ,
+  CONSTRAINT `fk_syncpic_actor1`
+    FOREIGN KEY (`PROJECT_ID` , `NAMEPR` )
+    REFERENCES `graph4`.`actor` (`PROJECT_ID` , `NAMEPR` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
 
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
+-- -----------------------------------------------------
+-- Data for table `graph4`.`project`
+-- -----------------------------------------------------
+START TRANSACTION;
+USE `graph4`;
+INSERT INTO `graph4`.`project` (`PROJECT_ID`, `PROJECT_NAME`) VALUES (1, 'Project1');
+
+COMMIT;
+
+-- -----------------------------------------------------
+-- Data for table `graph4`.`typsys`
+-- -----------------------------------------------------
+START TRANSACTION;
+USE `graph4`;
+INSERT INTO `graph4`.`typsys` (`PROJECT_ID`, `TYPE`, `TYPEDEF`) VALUES (1, 'byte', NULL);
+INSERT INTO `graph4`.`typsys` (`PROJECT_ID`, `TYPE`, `TYPEDEF`) VALUES (1, 'long', NULL);
+INSERT INTO `graph4`.`typsys` (`PROJECT_ID`, `TYPE`, `TYPEDEF`) VALUES (1, 'char', NULL);
+INSERT INTO `graph4`.`typsys` (`PROJECT_ID`, `TYPE`, `TYPEDEF`) VALUES (1, 'int', NULL);
+INSERT INTO `graph4`.`typsys` (`PROJECT_ID`, `TYPE`, `TYPEDEF`) VALUES (1, 'float', NULL);
+INSERT INTO `graph4`.`typsys` (`PROJECT_ID`, `TYPE`, `TYPEDEF`) VALUES (1, 'double', NULL);
+
+COMMIT;

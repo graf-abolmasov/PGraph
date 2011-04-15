@@ -47,7 +47,7 @@ QVariant QTerminateArcTop::itemChange(GraphicsItemChange change, const QVariant 
     return value;
 }
 
-void QTerminateArcTop::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+void QTerminateArcTop::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *)
 {
     ArcPropertyDialog dlg;
     QArc* arc = qgraphicsitem_cast<QArc *>(parentItem());

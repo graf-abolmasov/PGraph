@@ -12,14 +12,14 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>535</width>
-    <height>505</height>
+    <width>400</width>
+    <height>300</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>535</width>
-    <height>505</height>
+    <width>800</width>
+    <height>600</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -29,140 +29,112 @@
    <iconset resource="resources.qrc">
     <normaloff>:/images/G.png</normaloff>:/images/G.png</iconset>
   </property>
-  <widget class="QTabWidget" name="tab">
-   <property name="geometry">
-    <rect>
-     <x>9</x>
-     <y>9</y>
-     <width>521</width>
-     <height>451</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true"/>
-   </property>
-   <property name="tabPosition">
-    <enum>QTabWidget::North</enum>
-   </property>
-   <property name="tabShape">
-    <enum>QTabWidget::Rounded</enum>
-   </property>
-   <property name="currentIndex">
-    <number>0</number>
-   </property>
-   <property name="elideMode">
-    <enum>Qt::ElideNone</enum>
-   </property>
-   <property name="documentMode">
-    <bool>false</bool>
-   </property>
-   <property name="tabsClosable">
-    <bool>false</bool>
-   </property>
-   <widget class="QWidget" name="actorsTab">
-    <attribute name="title">
-     <string>Акторы</string>
-    </attribute>
-    <widget class="QListWidget" name="actorList">
-     <property name="enabled">
-      <bool>true</bool>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QTabWidget" name="tab">
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="geometry">
-      <rect>
-       <x>9</x>
-       <y>9</y>
-       <width>501</width>
-       <height>411</height>
-      </rect>
+     <property name="tabPosition">
+      <enum>QTabWidget::North</enum>
      </property>
-     <property name="editTriggers">
-      <set>QAbstractItemView::NoEditTriggers</set>
+     <property name="tabShape">
+      <enum>QTabWidget::Rounded</enum>
      </property>
-     <property name="tabKeyNavigation">
-      <bool>true</bool>
+     <property name="currentIndex">
+      <number>0</number>
      </property>
-     <property name="showDropIndicator" stdset="0">
+     <property name="elideMode">
+      <enum>Qt::ElideNone</enum>
+     </property>
+     <property name="documentMode">
       <bool>false</bool>
      </property>
-     <property name="selectionBehavior">
-      <enum>QAbstractItemView::SelectItems</enum>
+     <property name="tabsClosable">
+      <bool>false</bool>
      </property>
+     <widget class="QWidget" name="actorsTab">
+      <attribute name="title">
+       <string>Акторы</string>
+      </attribute>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QListWidget" name="actorList">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="editTriggers">
+          <set>QAbstractItemView::NoEditTriggers</set>
+         </property>
+         <property name="tabKeyNavigation">
+          <bool>true</bool>
+         </property>
+         <property name="showDropIndicator" stdset="0">
+          <bool>false</bool>
+         </property>
+         <property name="selectionBehavior">
+          <enum>QAbstractItemView::SelectItems</enum>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="predicatesTab">
+      <attribute name="title">
+       <string>Предикаты</string>
+      </attribute>
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="QListWidget" name="predicateList"/>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="iactorsTab">
+      <attribute name="title">
+       <string>I-Акторы</string>
+      </attribute>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="QListWidget" name="inlineActorList">
+         <property name="editTriggers">
+          <set>QAbstractItemView::NoEditTriggers</set>
+         </property>
+         <property name="tabKeyNavigation">
+          <bool>true</bool>
+         </property>
+         <property name="showDropIndicator" stdset="0">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="ipredicatesTab">
+      <attribute name="title">
+       <string>I-Предикаты</string>
+      </attribute>
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <item>
+        <widget class="QListWidget" name="inlinePredicateList"/>
+       </item>
+      </layout>
+     </widget>
     </widget>
-   </widget>
-   <widget class="QWidget" name="predicatesTab">
-    <attribute name="title">
-     <string>Предикаты</string>
-    </attribute>
-    <widget class="QListWidget" name="predicateList">
-     <property name="geometry">
-      <rect>
-       <x>9</x>
-       <y>9</y>
-       <width>501</width>
-       <height>411</height>
-      </rect>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
-    </widget>
-   </widget>
-   <widget class="QWidget" name="iactorsTab">
-    <attribute name="title">
-     <string>I-Акторы</string>
-    </attribute>
-    <widget class="QListWidget" name="inlineActorList">
-     <property name="geometry">
-      <rect>
-       <x>9</x>
-       <y>9</y>
-       <width>501</width>
-       <height>411</height>
-      </rect>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
      </property>
-     <property name="editTriggers">
-      <set>QAbstractItemView::NoEditTriggers</set>
-     </property>
-     <property name="tabKeyNavigation">
-      <bool>true</bool>
-     </property>
-     <property name="showDropIndicator" stdset="0">
+     <property name="centerButtons">
       <bool>false</bool>
      </property>
     </widget>
-   </widget>
-   <widget class="QWidget" name="ipredicatesTab">
-    <attribute name="title">
-     <string>I-Предикаты</string>
-    </attribute>
-    <widget class="QListWidget" name="inlinePredicateList">
-     <property name="geometry">
-      <rect>
-       <x>9</x>
-       <y>9</y>
-       <width>501</width>
-       <height>411</height>
-      </rect>
-     </property>
-    </widget>
-   </widget>
-  </widget>
-  <widget class="QDialogButtonBox" name="buttonBox">
-   <property name="geometry">
-    <rect>
-     <x>15</x>
-     <y>470</y>
-     <width>511</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="orientation">
-    <enum>Qt::Horizontal</enum>
-   </property>
-   <property name="standardButtons">
-    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-   </property>
-   <property name="centerButtons">
-    <bool>false</bool>
-   </property>
-  </widget>
+   </item>
+  </layout>
  </widget>
  <tabstops>
   <tabstop>tab</tabstop>
