@@ -144,7 +144,8 @@ void QActorEditor::on_paramsNormalTable_currentCellChanged(int currentRow, int c
         ui->paramsNormalTable->setCellWidget(previousRow, 2, NULL);
         delete varWidget;
     }
-    if (currentRow == -1) return;
+    if (currentRow == -1)
+        return;
     varWidget = new QWidget(ui->paramsNormalTable);
     varLayout = new QHBoxLayout(varWidget);
     varEditBtn = new QToolButton(varWidget);

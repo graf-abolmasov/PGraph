@@ -22,7 +22,7 @@ QTerminateArcTop::QTerminateArcTop(QMenu *contextMenu, QGraphicsItem *parent, QG
 }
 
 QRectF QTerminateArcTop::boundingRect() const {
-    return QGraphicsLineItem::boundingRect().adjusted(-1, -1, 1, 1);
+    return QGraphicsLineItem::boundingRect().adjusted(-2, -2, 2, 2);
 }
 
 QPainterPath QTerminateArcTop::shape() const{

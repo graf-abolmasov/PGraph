@@ -110,7 +110,7 @@ void TopPropertyDialog::on_actorsListWidget_currentRowChanged(int currentRow)
     ui->descriptionLbl->setText(info);
 }
 
-void TopPropertyDialog::on_actorsListWidget_itemDoubleClicked(QListWidgetItem* item)
+void TopPropertyDialog::on_actorsListWidget_itemDoubleClicked(QListWidgetItem *)
 {
     accept();
 }

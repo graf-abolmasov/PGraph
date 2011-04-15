@@ -13,6 +13,7 @@ public:
     enum { Type = ARC_LINE_TYPE };
     QArcLine(QLineF line, QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
     QPainterPath shape() const;
+    QRectF boundingRect() const;
 protected:
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
