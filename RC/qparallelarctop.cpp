@@ -23,7 +23,7 @@ QParallelArcTop::QParallelArcTop(QMenu *contextMenu, QGraphicsItem *parent, QGra
 }
 
 QRectF QParallelArcTop::boundingRect() const {
-    return QGraphicsEllipseItem::boundingRect().adjusted(-1, -1, 1, 1);
+    return QGraphicsEllipseItem::boundingRect().adjusted(-2, -2, 2, 2);
 }
 
 QVariant QParallelArcTop::itemChange(GraphicsItemChange change, const QVariant &value){

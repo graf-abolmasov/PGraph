@@ -53,11 +53,11 @@ bool QArc::autoBuild(QTop* top, float dx, float dy){
     QPointF P1, P2;
     //vertical border start
     if ((polyLineStart.angle() == 90) ||
-        (polyLineStart.angle() == 270)) {
+            (polyLineStart.angle() == 270)) {
 
         //parallel border end
         if ((polyLineEnd.angleTo(polyLineStart) == 0) ||
-            (polyLineEnd.angleTo(polyLineStart) == 180)) {
+                (polyLineEnd.angleTo(polyLineStart) == 180)) {
             P1.setX(startPoint.x() + deltaX/2);
             P1.setY(startPoint.y());
             P2.setX(P1.x());
@@ -68,7 +68,7 @@ bool QArc::autoBuild(QTop* top, float dx, float dy){
         }
         //perpendicular border end
         if ((polyLineEnd.angleTo(polyLineStart) == 90) ||
-            (polyLineEnd.angleTo(polyLineStart) == 270)) {
+                (polyLineEnd.angleTo(polyLineStart) == 270)) {
             P1.setX(endPoint.x());
             P1.setY(startPoint.y());
             newLine(startPoint, P1);
@@ -77,10 +77,10 @@ bool QArc::autoBuild(QTop* top, float dx, float dy){
     }
     //horizontal border start
     if ((polyLineStart.angle() == 0) ||
-        (polyLineStart.angle() == 180)) {
+            (polyLineStart.angle() == 180)) {
         //perpendicular border end
         if ((polyLineEnd.angleTo(polyLineStart) == 90) ||
-            (polyLineEnd.angleTo(polyLineStart) == 270)) {
+                (polyLineEnd.angleTo(polyLineStart) == 270)) {
             P1.setX(startPoint.x());
             P1.setY(endPoint.y());
             newLine(startPoint, P1);
@@ -88,7 +88,7 @@ bool QArc::autoBuild(QTop* top, float dx, float dy){
         }
         //parallel border end
         if ((polyLineEnd.angleTo(polyLineStart) == 0) ||
-            (polyLineEnd.angleTo(polyLineStart) == 180)) {
+                (polyLineEnd.angleTo(polyLineStart) == 180)) {
             P1.setX(startPoint.x());
             P1.setY(startPoint.y() + deltaY/2);
             P2.setX(endPoint.x());
@@ -122,12 +122,14 @@ bool QArc::remake(QTop* aMovedTop, float dx, float dy){
     if (freezed) {
         foreach (QArcLine* line, lines)
             line->setLine(line->line().translated(dx/2, dy/2));
+        updateBounds();
         return true;
     }
 
     if ((myStartTop == aMovedTop) && (myEndTop == aMovedTop)){
         foreach (QArcLine* line, lines)
             line->setLine(line->line().translated(dx, dy));
+        updateBounds();
         return true;
     }
 
@@ -176,7 +178,7 @@ bool QArc::remake(QTop* aMovedTop, float dx, float dy){
             lgdir    = dvec2log(pnts[1].x() + dx - pnts[0].x(), pnts[1].y() + dy - pnts[0].y());
             if (lgolddir & lgdir){
                 if ((!(pnts[1].x() - pnts[0].x()) && !dx) ||
-                    (!(pnts[1].y() - pnts[0].y()) && !dy)){
+                        (!(pnts[1].y() - pnts[0].y()) && !dy)){
                     pnts[1] += QPointF(dx, dy);
                 } else {
                     pnts[3] = pnts[1] + QPointF(dx, dy);
@@ -204,7 +206,7 @@ bool QArc::remake(QTop* aMovedTop, float dx, float dy){
             }
             else flag = false;*/
             break;
-            case 3:
+        case 3:
             lgolddir = dvec2log(pnts[3].x() - pnts[2].x(), pnts[3].y() - pnts[2].y());
             lgdir    = dvec2log(pnts[3].x() + dx - pnts[1].x(), pnts[3].y() + dy - pnts[1].y());
             if (lgolddir & lgdir){
@@ -234,17 +236,17 @@ bool QArc::remake(QTop* aMovedTop, float dx, float dy){
 
         //теперь в pts новые точки =) якобы. проверим это.
         //if (old_otr != otr) {
-            qDeleteAll(lines);
-            lines.clear();
-            currentLine = NULL;
+        qDeleteAll(lines);
+        lines.clear();
+        currentLine = NULL;
 
-            newLine(pts[0] + deltaStartPoint, pts[1]);
-            for (j = 1; j < otr - 1; j++){
-                newLine(pts[j], pts[j+1]);
-            }
-            newLine(pts[otr-1], pts[otr] + deltaEndPoint);
-            addLine(currentLine);
-            currentLine = NULL;
+        newLine(pts[0] + deltaStartPoint, pts[1]);
+        for (j = 1; j < otr - 1; j++){
+            newLine(pts[j], pts[j+1]);
+        }
+        newLine(pts[otr-1], pts[otr] + deltaEndPoint);
+        addLine(currentLine);
+        currentLine = NULL;
         /*} else {
             if (otr == 1)
                 lines.first()->setLine(QLineF(pts[0] + deltaStartPoint, pts[1] + deltaEndPoint));
@@ -256,7 +258,8 @@ bool QArc::remake(QTop* aMovedTop, float dx, float dy){
                 lines.last()->setLine(QLineF(pts[otr-1], pts[otr] + deltaEndPoint));
             }
         }*/
-
+        if (result)
+            updateBounds();
         return result;
     }
     
@@ -281,10 +284,10 @@ bool QArc::remake(QTop* aMovedTop, float dx, float dy){
                                             lines.at(1)->line().p2()
                                             )
                                      );
-            //если дуга соединяет вершины напрямую, то ограничим перемещение шириной конечной вершины
+                //если дуга соединяет вершины напрямую, то ограничим перемещение шириной конечной вершины
             } else {
                 if ((lines.first()->line().p2().x() < myEndTop->sceneBoundingRect().bottomLeft().x()) ||
-                    (lines.first()->line().p2().x() > myEndTop->sceneBoundingRect().bottomRight().x())){
+                        (lines.first()->line().p2().x() > myEndTop->sceneBoundingRect().bottomRight().x())){
                     lines.first()->setLine(QLineF(QPointF(lines.first()->line().p1().x() - dx,
                                                           lines.first()->line().p1().y() - dy),
                                                   QPointF(lines.first()->line().p2().x() - dx,
@@ -295,6 +298,7 @@ bool QArc::remake(QTop* aMovedTop, float dx, float dy){
                 }
             }
 
+            updateBounds();
             return true;
         }
         //горизонтальную линию можем двигать только вверх/вниз или удлиннять/укорачивать
@@ -316,10 +320,10 @@ bool QArc::remake(QTop* aMovedTop, float dx, float dy){
                                             lines.at(1)->line().p2()
                                             )
                                      );
-            //если дуга соединяет вершины напрямую, то ограничим перемещение шириной конечной вершины
+                //если дуга соединяет вершины напрямую, то ограничим перемещение шириной конечной вершины
             } else {
                 if ((lines.first()->line().p2().y() > myEndTop->sceneBoundingRect().bottomLeft().y()) ||
-                    (lines.first()->line().p2().y() < myEndTop->sceneBoundingRect().topLeft().y())){
+                        (lines.first()->line().p2().y() < myEndTop->sceneBoundingRect().topLeft().y())){
                     lines.first()->setLine(QLineF(QPointF(lines.first()->line().p1().x() - dx,
                                                           lines.first()->line().p1().y() - dy),
                                                   QPointF(lines.first()->line().p2().x(),
@@ -329,6 +333,7 @@ bool QArc::remake(QTop* aMovedTop, float dx, float dy){
                     return false;
                 }
             }
+            updateBounds();
             return true;
         }
     }
@@ -353,10 +358,10 @@ bool QArc::remake(QTop* aMovedTop, float dx, float dy){
                                                                   lines.at(lines.count()-2)->line().p2().y())
                                                           )
                                                    );
-            //если дуга соединяет вершины напрямую, то ограничим перемещение шириной начальной вершины
+                //если дуга соединяет вершины напрямую, то ограничим перемещение шириной начальной вершины
             } else {
                 if ((lines.last()->line().p2().x() < myStartTop->sceneBoundingRect().bottomLeft().x()) ||
-                    (lines.last()->line().p2().x() > myStartTop->sceneBoundingRect().bottomRight().x())){
+                        (lines.last()->line().p2().x() > myStartTop->sceneBoundingRect().bottomRight().x())){
                     lines.last()->setLine(QLineF(QPointF(lines.last()->line().p1().x() - dx,
                                                          lines.last()->line().p1().y()),
                                                  QPointF(lines.last()->line().p2().x() - dx,
@@ -366,6 +371,7 @@ bool QArc::remake(QTop* aMovedTop, float dx, float dy){
                     return false;
                 }
             }
+            updateBounds();
             return true;
         }
         //горизонтальную линию можем двигать только вверх/вниз или удлиннять/укорачивать
@@ -387,10 +393,10 @@ bool QArc::remake(QTop* aMovedTop, float dx, float dy){
                                                                   lines.at(lines.count()-2)->line().p2().y() + dy)
                                                           )
                                                    );
-            //если дуга соединяет вершины напрямую, то ограничим перемещение шириной начальной вершины
+                //если дуга соединяет вершины напрямую, то ограничим перемещение шириной начальной вершины
             } else {
                 if ((lines.last()->line().p2().y() > myStartTop->sceneBoundingRect().bottomLeft().y()) ||
-                    (lines.last()->line().p2().y() < myStartTop->sceneBoundingRect().topLeft().y())){
+                        (lines.last()->line().p2().y() < myStartTop->sceneBoundingRect().topLeft().y())){
                     lines.last()->setLine(QLineF(QPointF(lines.last()->line().p1().x(),
                                                          lines.last()->line().p1().y() - dy),
                                                  QPointF(lines.last()->line().p2().x() - dx,
@@ -400,6 +406,7 @@ bool QArc::remake(QTop* aMovedTop, float dx, float dy){
                     return false;
                 }
             }
+            updateBounds();
             return true;
         }
     }
@@ -416,7 +423,7 @@ bool QArc::remake(QTop* aMovedTop, float dx, float dy){
   @param scene - указатель на контейнер (сцену)
 */
 QArc::QArc(QTop *startItem, QTop *endItem, QMenu *contextMenu,
-         QGraphicsItem *parent, QGraphicsScene *scene)
+           QGraphicsItem *parent, QGraphicsScene *scene)
     : QGraphicsLineItem(parent, scene){
     //инициализация указателей
     arcTop          = NULL;
@@ -442,7 +449,7 @@ QArc::~QArc()
     if (myEndTop != NULL)
         myEndTop->removeArc(this);
 
-   qDeleteAll(lines);
+    qDeleteAll(lines);
 }
 
 /*!
@@ -467,7 +474,7 @@ QPainterPath QArc::shape() const
     QPainterPath path;
     path.addPolygon(arcHead);
     foreach (QArcLine *line, lines)
-       path.addPath(line->shape());
+        path.addPath(line->shape());
     path.addPath(arcTop->shape());
 
     return path;
@@ -516,10 +523,10 @@ void QArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 bool QArc::addLine(QArcLine *line)
 {
     if ((prevLine() != NULL) &&
-        (prevLine()->line().p2() == line->line().p1()) &&
-        (prevLine() != line) &&
-        ((prevLine()->line().angleTo(line->line()) == 0) ||
-        (prevLine()->line().angleTo(line->line()) == 180))) {
+            (prevLine()->line().p2() == line->line().p1()) &&
+            (prevLine() != line) &&
+            ((prevLine()->line().angleTo(line->line()) == 0) ||
+             (prevLine()->line().angleTo(line->line()) == 180))) {
         line->setLine(QLineF(prevLine()->line().p1(), line->line().p2()));
         delete prevLine();
         lines.removeLast();
@@ -629,8 +636,8 @@ Arc* QArc::toArc()
 {
     QStringList nodes;
     foreach(QArcLine* line, lines){
-         nodes.append(QString::number(line->line().x1()) + " " + QString::number(line->line().y1()) + " " +
-                      QString::number(line->line().x2()) + " " + QString::number(line->line().y2()));
+        nodes.append(QString::number(line->line().x1()) + " " + QString::number(line->line().y1()) + " " +
+                     QString::number(line->line().x2()) + " " + QString::number(line->line().y2()));
     }
     return new Arc(Arc::ArcType(arcType()),
                    priority(),
@@ -667,7 +674,7 @@ bool QArc::moveLine(QArcLine *line, float dx, float dy)
         prevLine = NULL;
         nextLine = NULL;
         if (!(myEndTop->sceneBoundingRect().adjusted(8, 8, -8, -8).contains(line->line().p2() + QPointF(dx, dy)) &&
-            myStartTop->sceneBoundingRect().adjusted(8, 8, -8, -8).contains(line->line().p1() + QPointF(dx, dy))))
+              myStartTop->sceneBoundingRect().adjusted(8, 8, -8, -8).contains(line->line().p1() + QPointF(dx, dy))))
             return false;
     } else {
         if (selectedLine == lines.first()){

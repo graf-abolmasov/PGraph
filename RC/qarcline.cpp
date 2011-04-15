@@ -15,6 +15,11 @@ QPainterPath QArcLine::shape() const {
     return path;
 }
 
+QRectF QArcLine::boundingRect() const
+{
+    return QRectF(line().p1(), line().p2()).normalized().adjusted(-10, -10, 10, 10);
+}
+
 void QArcLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     QPen myPen = pen();
