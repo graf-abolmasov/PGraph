@@ -78,8 +78,8 @@ void QDiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
     case ReadOnly:
         break;
     case InsertDataItem:
-        QDataItem *item = new QDataItem(NULL, NULL, this);
-        item->setPos(mouseEvent->scenePos());
+        //QDataItem *item = new QDataItem(NULL, NULL, this);
+        //item->setPos(mouseEvent->scenePos());
         break;
     }
     QGraphicsScene::mousePressEvent(mouseEvent);
