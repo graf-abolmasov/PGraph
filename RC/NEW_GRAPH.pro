@@ -42,7 +42,8 @@ SOURCES += main.cpp \
     graph.cpp \
     logger.cpp \
     undocommand.cpp \
-    qdataitem.cpp
+    shab.cpp \
+    compi.cpp
 HEADERS += qmywindow.h \
     qdrawwindow.h \
     qtop.h \
@@ -81,7 +82,8 @@ HEADERS += qmywindow.h \
     logger.h \
     globalvariables.h \
     undocommand.h \
-    qdataitem.h
+    shab.h \
+    compi.h
 RESOURCES += resources.qrc
 FORMS += toppropertydialog.ui \
     qobjecteditor.ui \
