@@ -16,6 +16,8 @@
 #include "actor.h"
 #include "predicate.h"
 #include "basemodule.h"
+#include "shab.h"
+#include "compi.h"
 #include <QList>
 
 class DataBaseManager
@@ -25,6 +27,7 @@ private:
     QList<Variable*> varListProxy;
     QList<Actor*> actorListProxy;
     QList<Predicate*> predListProxy;
+    //QList<Shab*> myShabList;
     int myProjectId;
 public:
     DataBaseManager();
@@ -32,7 +35,7 @@ public:
 
     void setProjectId(int pid)
         { myProjectId = pid; }
-    int projectId()
+    int getProjectId()
         { return myProjectId; }
 
     bool getGraphList(QList<Graph* > &graphList);
@@ -59,7 +62,18 @@ public:
 
     bool saveStruct(Graph *graph);
 
+    bool Compi_get_GSP_Shab_List();
+    int Compi_count_MaxGH(QString myGraphName, int* MaxGH);
+    int Compi_count_MaxLT(QString myGraphName, int* MaxLT);
+    int Compi_count_MaxLP(QString myGraphName, int* MaxLP);
+    int Compi_get_root_top(QString myGraphName, int* root_top);
+    int Compi_fill_Graph_struct(QString myGraphName, int MaxGH, COMPHs *Graph);
+    int Compi_fill_ListT_struct(QString myGraphName, int MaxLT, COMPTOPs *ListTop);
+    int Compi_fill_ListP_struct(QString myGraphName, int MaxLP, COMPREs *ListP);
+
     QSqlError lastError();
+
+    QList<Shab*> myShabList;
 };
 
 #endif // DATABASEMANAGER_H
