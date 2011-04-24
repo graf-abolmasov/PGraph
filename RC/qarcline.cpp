@@ -1,3 +1,6 @@
+#include <QtCore>
+#include <QtGui>
+
 #include "qarcline.h"
 #include "qarc.h"
 
@@ -8,7 +11,6 @@ QArcLine::QArcLine(QLineF line, QGraphicsItem *parent, QGraphicsScene *scene)
 };
 
 QPainterPath QArcLine::shape() const {
-    //return QGraphicsLineItem::shape();
     QPainterPath path;
     int width = pen().width() + 2;
     path.addRect(QRectF(line().p1(), line().p2()).normalized().adjusted(-width, -width, width, width));
@@ -20,7 +22,7 @@ QRectF QArcLine::boundingRect() const
     return QRectF(line().p1(), line().p2()).normalized().adjusted(-10, -10, 10, 10);
 }
 
-void QArcLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void QArcLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
     QPen myPen = pen();
     painter->setPen(myPen);

@@ -18,6 +18,8 @@
 #include "commonutils.h"
 #include "logger.h"
 #include "globalvariables.h"
+#include "qarc.h"
+#include "qcomment.h"
 
 DataBaseManager* globalDBManager;
 

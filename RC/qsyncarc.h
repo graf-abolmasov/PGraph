@@ -1,8 +1,10 @@
 #ifndef QSYNCARC_H
 #define QSYNCARC_H
 
-#include <QGraphicsLineItem>
-#include "qtop.h"
+#include <QtGui/QGraphicsLineItem>
+
+#define SYNC_ARC_TYPE      UserType+7
+
 QT_BEGIN_NAMESPACE
 class QGraphicsPolygonItem;
 class QGraphicsLineItem;
@@ -11,8 +13,6 @@ class QRectF;
 class QGraphicsSceneMouseEvent;
 class QPainterPath;
 QT_END_NAMESPACE
-
-#define SYNC_ARC_TYPE      UserType+7
 
 class QTop;
 
@@ -47,8 +47,8 @@ protected:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 
 private:
-    QTop* myStartTop;
-    QTop* myEndTop;
+    QTop *myStartTop;
+    QTop *myEndTop;
     QPolygonF arcHead;
     QMenu *myContextMenu;
 };

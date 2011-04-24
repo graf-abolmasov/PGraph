@@ -1,4 +1,5 @@
-#include <QtCore>
+#include <QtCore/QString>
+#include <QtCore/QByteArray>
 #include <stdio.h>
 
 #ifdef __alpha  

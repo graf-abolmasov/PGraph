@@ -1,8 +1,8 @@
 #ifndef VARIABLE_H
 #define VARIABLE_H
-#include "datatype.h"
-#include <qstring.h>
-#include "qvariant.h"
+
+#include <QtCore/QVariant>
+#include <QtCore/QString>
 
 class Variable
 {

@@ -1,7 +1,7 @@
 #ifndef QSERIALARCTOP_H
 #define QSERIALARCTOP_H
 
-#include <QtGui>
+#include <QtGui/QGraphicsRectItem>
 
 #define ARC_TOP_TYPE  UserType+5
 

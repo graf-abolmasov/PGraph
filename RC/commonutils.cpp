@@ -1,5 +1,9 @@
 #include "commonutils.h"
 #include "md5.h"
+#include "qarcline.h"
+#include "qsyncarc.h"
+#include "qarc.h"
+#include "qcomment.h"
 
 
 QString getCRC(QByteArray in)

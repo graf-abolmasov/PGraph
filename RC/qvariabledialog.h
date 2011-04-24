@@ -1,14 +1,20 @@
 #ifndef QVARIABLEDIALOG_H
 #define QVARIABLEDIALOG_H
 
-#include <QDialog>
-#include "variable.h"
-#include <QtCore>
-#include <QtGui>
+#include <QtGui/QDialog>
+#include <QtCore/QList>
 
 namespace Ui {
     class QVariableDialog;
 }
+
+QT_BEGIN_NAMESPACE
+class QComboBox;
+class QEvent;
+QT_END_NAMESPACE
+
+class Variable;
+class DataType;
 
 class QVariableDialog : public QDialog {
     Q_OBJECT
@@ -23,10 +29,10 @@ protected:
 
 private:
     Ui::QVariableDialog *ui;
-    QList<Variable* > myVariableList;
-    QComboBox* varTypeCmbBox;
-    QList<DataType*> myTypeList;
-    Variable* myVar;
+    QList<Variable *> myVariableList;
+    QComboBox *varTypeCmbBox;
+    QList<DataType *> myTypeList;
+    Variable *myVar;
 
 private slots:
     void on_variablesTable_currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn);

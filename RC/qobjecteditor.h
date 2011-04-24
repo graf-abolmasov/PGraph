@@ -1,14 +1,18 @@
 #ifndef QOBJECTEDITOR_H
 #define QOBJECTEDITOR_H
 
-#include <QDialog>
-#include <QToolButton>
-#include <actor.h>
-#include <predicate.h>
+#include <QtGui/QDialog>
 
 namespace Ui {
     class QObjectEditor;
 }
+
+QT_BEGIN_NAMESPACE
+class QButtonGroup;
+QT_END_NAMESPACE
+
+class Actor;
+class Predicate;
 
 class QObjectEditor : public QDialog {
     Q_OBJECT

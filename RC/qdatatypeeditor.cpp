@@ -1,5 +1,10 @@
+#include <QtGui>
+#include <QtCore>
+
 #include "qdatatypeeditor.h"
 #include "ui_qdatatypeeditor.h"
+#include "datatype.h"
+#include "globalvariables.h"
 
 QDataTypeEditor::QDataTypeEditor(QWidget *parent) :
     QDialog(parent),
@@ -285,7 +290,7 @@ void QDataTypeEditor::on_structFieldsTable_currentCellChanged(int currentRow, in
     }
 }
 
-void QDataTypeEditor::on_structFieldsTable_cellChanged(int row, int column)
+void QDataTypeEditor::on_structFieldsTable_cellChanged(int, int)
 {
     if ((ui->structFieldsTable->item(ui->structFieldsTable->rowCount()-1, 0)->text() != "") &&
         (ui->structFieldsTable->item(ui->structFieldsTable->rowCount()-1, 1)->text() != "")) {

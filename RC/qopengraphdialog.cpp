@@ -1,7 +1,10 @@
+#include <QtGui>
+
 #include "qopengraphdialog.h"
 #include "ui_qopengraphdialog.h"
 #include "databasemanager.h"
 #include "globalvariables.h"
+#include "graph.h"
 
 QOpenGraphDialog::QOpenGraphDialog(QWidget *parent) :
     QDialog(parent),
@@ -43,7 +46,7 @@ void QOpenGraphDialog::prepareForm()
         ui->listWidget->addItem(new QListWidgetItem(myGraphList.at(i)->extName));
 }
 
-void QOpenGraphDialog::on_listWidget_itemDoubleClicked(QListWidgetItem* item)
+void QOpenGraphDialog::on_listWidget_itemDoubleClicked(QListWidgetItem *)
 {
     accept();
 }

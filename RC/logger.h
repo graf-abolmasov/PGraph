@@ -1,7 +1,8 @@
 #ifndef LOGGER_H
 #define LOGGER_H
-#include <QtCore>
-#include <QtGui>
+
+#include <QtCore/QString>
+#include <QtCore/QFile>
 
 class Logger
 {

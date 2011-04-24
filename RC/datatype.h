@@ -1,6 +1,7 @@
 #ifndef DATATYPE_H
 #define DATATYPE_H
-#include <QString>
+
+#include <QtCore/QString>
 
 class DataType
 {

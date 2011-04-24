@@ -1,6 +1,5 @@
 #include <QtGui>
-#include <QCoreApplication>
-#include <QPointF>
+#include <QtCore>
 #include "qdrawwindow.h"
 #include "qtop.h"
 #include "qsyncarc.h"
@@ -13,6 +12,15 @@
 #include "globalvariables.h"
 #include "undocommand.h"
 #include "commonutils.h"
+#include "qarcline.h"
+#include "qmultiproctop.h"
+#include "qdiagramscene.h"
+#include "qtop.h"
+#include "qcomment.h"
+#include "toppropertydialog.h"
+#include "graph.h"
+#include "databasemanager.h"
+#include "qarc.h"
 
 QStringList globalPredicateList;
 
@@ -36,11 +44,11 @@ TDrawWindow::TDrawWindow(ShowRole role, QWidget *parent)
     scene->setSceneRect(-800, -600, 1600, 1200);
     //обработчик добавления объекта
     connect(scene, SIGNAL(itemInserted(QGraphicsItem*)),
-            this, SLOT(itemInserted(QGraphicsItem *)));
+            this, SLOT(itemInserted(QGraphicsItem*)));
     //обработчик перемещения объекта
-    connect(scene, SIGNAL(itemMoved(QGraphicsItem*, QLineF)),
-        this, SLOT(itemMoved(QGraphicsItem*, QLineF)));
-    connect(scene, SIGNAL(itemsMoved(QList<QGraphicsItem*>, QLineF)),
+    connect(scene, SIGNAL(itemMoved(QGraphicsItem*,QLineF)),
+        this, SLOT(itemMoved(QGraphicsItem*,QLineF)));
+    connect(scene, SIGNAL(itemsMoved(QList<QGraphicsItem*>,QLineF)),
             this, SLOT(itemsMoved(QList<QGraphicsItem*>,QLineF)));
     //выбор объекта - тоже изменение сцены
     connect(scene, SIGNAL(selectionChanged()),
@@ -369,7 +377,7 @@ Graph* TDrawWindow::getGraph()
   Загружает граф в редактор
 */
 
-void TDrawWindow::loadGraph(const QString &name, DataBaseManager* dbManager)
+void TDrawWindow::loadGraph(const QString &name)
 {
     globalLogger->writeLog("TDrawWindow::loadGraph start", Logger::All);
     scene->clear();
@@ -382,9 +390,9 @@ void TDrawWindow::loadGraph(const QString &name, DataBaseManager* dbManager)
     QList<Actor* > actorList;
     QList<Predicate* > predicateList;
     Graph graph(name, "", topList, arcList, commentList, syncArcList, multiProcTopList);
-    dbManager->getGraph(graph);
-    dbManager->getActorList(actorList);
-    dbManager->getPredicateList(predicateList);
+    globalDBManager->getGraph(graph);
+    globalDBManager->getActorList(actorList);
+    globalDBManager->getPredicateList(predicateList);
     foreach (Top* top, graph.topList) {
         if (top->type == "T") {
             QNormalTop *qtop = new QNormalTop(topMenu, NULL, scene);
@@ -471,7 +479,7 @@ void TDrawWindow::loadGraph(const QString &name, DataBaseManager* dbManager)
     emit graphLoaded(myGraphName, myGraphExtName);
 }
 
-bool TDrawWindow::saveGraph(QString name, QString extName, DataBaseManager *dbManager)
+bool TDrawWindow::saveGraph(QString name, QString extName)
 {
     if (name.isEmpty() || extName.isEmpty()) {
         QMessageBox::critical(this, tr("Ошибка"), tr("Нельзя сохранить граф без имени."), QMessageBox::Ok);
@@ -480,25 +488,25 @@ bool TDrawWindow::saveGraph(QString name, QString extName, DataBaseManager *dbMa
     myGraphExtName = extName;
     myGraphName = name;
     Graph* graph = getGraph();
-    bool result = dbManager->saveGraph(graph);
+    bool result = globalDBManager->saveGraph(graph);
     if (result)
         emit graphLoaded(graph->name, graph->extName);
     return result;
 }
 
-bool TDrawWindow::updateGraph(DataBaseManager *dbManager)
+bool TDrawWindow::updateGraph()
 {
     Graph* graph = getGraph();
     if (graph->extName != "")
-        return dbManager->updateGraph(graph);
+        return globalDBManager->updateGraph(graph);
     return false;
 }
 
-bool TDrawWindow::saveStruct(DataBaseManager *dbManager)
+bool TDrawWindow::saveStruct()
 {
     Graph* graph = getGraph();
     if (graph->name != "")
-        return dbManager->saveStruct(graph);
+        return globalDBManager->saveStruct(graph);
     return false;
 }
 
@@ -1069,7 +1077,7 @@ void TDrawWindow::viewSubGraph()
         QTop *top = qgraphicsitem_cast<QTop *>(item);
         if (top->actor != NULL && top->actor->type == Actor::GraphType) {
             TDrawWindow *drawWindow = new TDrawWindow(TDrawWindow::ReadOnly, this);
-            drawWindow->loadGraph(top->actor->name, globalDBManager);
+            drawWindow->loadGraph(top->actor->name);
             connect(drawWindow, SIGNAL(itemChanged(QGraphicsItem*)), this, SIGNAL(itemChanged(QGraphicsItem*)));
             drawWindow->show();
         }
@@ -1083,7 +1091,7 @@ void TDrawWindow::editSubGraph()
         QTop *top = qgraphicsitem_cast<QTop *>(item);
         if (top->actor != NULL && top->actor->type == Actor::GraphType) {
             QString name = top->actor->name;
-            loadGraph(name, globalDBManager);
+            loadGraph(name);
         }
     }
 }

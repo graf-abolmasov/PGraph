@@ -1,14 +1,12 @@
 #ifndef QTOP_H
 #define QTOP_H
 
-#include <QtGui>
-#include <QList>
-#include "qsyncarc.h"
-#include "qarc.h"
-#include "actor.h"
+#include <QtGui/QGraphicsRectItem>
 
 class QArc;
+class Actor;
 class QSyncArc;
+class QDiagramScene;
 
 #define TOP_TYPE UserType+15
 

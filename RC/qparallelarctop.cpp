@@ -1,5 +1,6 @@
-#include "qparallelarctop.h"
 #include <QtGui>
+
+#include "qparallelarctop.h"
 #include "qarc.h"
 #include "arcpropertydialog.h"
 #include "globalvariables.h"

@@ -4,6 +4,9 @@
 #include "qvariabledialog.h"
 #include "commonutils.h"
 #include "globalvariables.h"
+#include "actor.h"
+#include "basemodule.h"
+#include <QtGui>
 
 QActorEditor::QActorEditor(QWidget *parent) :
     QDialog(parent),
@@ -138,7 +141,7 @@ void QActorEditor::on_baseModuleList_currentRowChanged(int currentRow)
     }
 }
 
-void QActorEditor::on_paramsNormalTable_currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn)
+void QActorEditor::on_paramsNormalTable_currentCellChanged(int currentRow, int, int previousRow, int)
 {
     if (previousRow != -1) {
         ui->paramsNormalTable->setCellWidget(previousRow, 2, NULL);
@@ -271,7 +274,7 @@ void QActorEditor::on_inlineModuleTxtEdt_textChanged()
     }
 }
 
-void QActorEditor::on_paramsInlineTable_currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn)
+void QActorEditor::on_paramsInlineTable_currentCellChanged(int currentRow, int, int previousRow, int)
 {
     if (previousRow != -1){
         ui->paramsInlineTable->setCellWidget(previousRow, 2, NULL);

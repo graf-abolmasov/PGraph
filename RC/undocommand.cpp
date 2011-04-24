@@ -1,4 +1,11 @@
+#include <QtCore>
+#include <QtGui>
+
 #include "undocommand.h"
+#include "commonutils.h"
+#include "qarc.h"
+#include "qsyncarc.h"
+#include "qcomment.h"
 
 AddCommand::AddCommand(QGraphicsItem *item, QGraphicsScene *scene, QUndoCommand *parent)
     : QUndoCommand(parent)

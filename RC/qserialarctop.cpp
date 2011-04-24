@@ -47,7 +47,7 @@ QPainterPath QSerialArcTop::shape() const
     return result;
 }
 
-void QSerialArcTop::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+void QSerialArcTop::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *)
 {
     ArcPropertyDialog dlg;
     QArc* arc = qgraphicsitem_cast<QArc *>(parentItem());
