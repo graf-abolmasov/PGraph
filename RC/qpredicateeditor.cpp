@@ -1,9 +1,14 @@
+#include <QtGui>
+
 #include "qpredicateeditor.h"
 #include "ui_qpredicateeditor.h"
 #include "databasemanager.h"
 #include "qvariabledialog.h"
 #include "commonutils.h"
 #include "globalvariables.h"
+#include "predicate.h"
+#include "basemodule.h"
+#include "variable.h"
 
 QPredicateEditor::QPredicateEditor(QWidget *parent) :
     QDialog(parent),

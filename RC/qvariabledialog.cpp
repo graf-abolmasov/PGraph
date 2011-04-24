@@ -1,8 +1,14 @@
+#include <QtCore>
+#include <QtGui>
+
 #include "qvariabledialog.h"
 #include "ui_qvariabledialog.h"
+
 #include "qvariableeditor.h"
 #include "databasemanager.h"
 #include "globalvariables.h"
+#include "variable.h"
+#include "datatype.h"
 
 QVariableDialog::QVariableDialog(QWidget *parent) :
     QDialog(parent),

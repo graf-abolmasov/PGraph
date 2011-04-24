@@ -1,11 +1,14 @@
 #ifndef GRAPH_H
 #define GRAPH_H
 
-#include <QList>
-#include "qtop.h"
-#include "qarc.h"
-#include "qcomment.h"
-#include "qmultiproctop.h"
+#include <QtCore/QList>
+#include <QtCore/QString>
+
+class Top;
+class Arc;
+class Comment;
+class QSyncArc;
+class QMultiProcTop;
 
 class Graph
 {

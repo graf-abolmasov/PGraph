@@ -11,6 +11,8 @@
 #include "qpredicateeditor.h"
 #include "databasemanager.h"
 #include "globalvariables.h"
+#include "actor.h"
+#include "predicate.h"
 
 QObjectEditor::QObjectEditor(QWidget *parent) :
     QDialog(parent),

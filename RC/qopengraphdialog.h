@@ -1,12 +1,17 @@
 #ifndef QOPENGRAPHDIALOG_H
 #define QOPENGRAPHDIALOG_H
 
-#include <QDialog>
-#include "graph.h"
+#include <QtGui/QDialog>
 
 namespace Ui {
     class QOpenGraphDialog;
 }
+
+QT_BEGIN_NAMESPACE
+class QListWidgetItem;
+QT_END_NAMESPACE
+
+class Graph;
 
 class QOpenGraphDialog : public QDialog {
     Q_OBJECT
@@ -21,7 +26,7 @@ protected:
 
 private:
     Ui::QOpenGraphDialog *ui;
-    QList<Graph* > myGraphList;
+    QList<Graph *> myGraphList;
 
 private slots:
     void on_listWidget_itemDoubleClicked(QListWidgetItem* item);

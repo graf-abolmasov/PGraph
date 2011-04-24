@@ -1,11 +1,19 @@
-﻿#ifndef QMYWINDOW_H
+#ifndef QMYWINDOW_H
 #define QMYWINDOW_H
 
-#include <QMainWindow>
-#include <QToolBar>
-#include <QtGui>
-#include "qdrawwindow.h"
-#include "databasemanager.h"
+#include <QtGui/QMainWindow>
+#include <QtCore/QMap>
+
+QT_BEGIN_NAMESPACE
+class QToolButton;
+class QComboBox;
+class QUndoView;
+class QButtonGroup;
+class QSlider;
+class QGraphicsItem;
+QT_END_NAMESPACE
+
+class TDrawWindow;
 
 class TMyWindow : public QMainWindow
 {

@@ -1,7 +1,7 @@
 #ifndef QTERMINATEARCTOP_H
 #define QTERMINATEARCTOP_H
 
-#include <QtGui>
+#include <QtGui/QGraphicsLineItem>
 
 #define ARC_TOP_TYPE  UserType+5
 

@@ -3,6 +3,8 @@
 #include "qarc.h"
 #include "databasemanager.h"
 #include "globalvariables.h"
+#include "predicate.h"
+#include "qtop.h"
 
 ArcPropertyDialog::ArcPropertyDialog(QWidget *parent) :
     QDialog(parent),
@@ -107,7 +109,7 @@ void ArcPropertyDialog::on_buttonBox_accepted()
 
 }
 
-void ArcPropertyDialog::on_predicateList_itemDoubleClicked(QListWidgetItem* item)
+void ArcPropertyDialog::on_predicateList_itemDoubleClicked(QListWidgetItem *)
 {
     accept();
 }

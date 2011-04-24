@@ -1,17 +1,13 @@
 #ifndef QARC_H
 #define QARC_H
 
-#include <QtGui>
-#include <QtCore>
-#include "qtop.h"
-#include "qarcline.h"
-#include "qserialarctop.h"
-#include "predicate.h"
+#include <QtGui/QGraphicsLineItem>
 
 #define ARC_TYPE      UserType+4
 
 class QTop;
 class QArcLine;
+class Predicate;
 class QSerialArcTop;
 
 class Arc

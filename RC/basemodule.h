@@ -1,7 +1,8 @@
 #ifndef BASEMODULE_H
 #define BASEMODULE_H
-#include <QString>
-#include <QStringList>
+
+#include <QtCore/QString>
+#include <QtCore/QStringList>
 
 class BaseModule
 {

@@ -1,16 +1,15 @@
 #ifndef QCOMMENT_H
 #define QCOMMENT_H
 
-#include <QGraphicsItem>
-#include <QPen>
-#include <QFont>
+#include <QtGui/QGraphicsTextItem>
+#include <QtGui/QFont>
 
 QT_BEGIN_NAMESPACE
 class QFocusEvent;
+class QGraphicsSceneMouseEvent;
 class QGraphicsItem;
 class QGraphicsScene;
-class QGraphicsSceneMouseEvent;
-class QFont;
+class QPen;
 QT_END_NAMESPACE
 
 class Comment

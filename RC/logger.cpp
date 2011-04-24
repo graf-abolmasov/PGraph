@@ -1,5 +1,8 @@
+#include <QtCore/QSettings>
+#include <QtCore/QDebug>
+#include <QtCore/QDateTime>
+
 #include "logger.h"
-#include "qdebug.h"
 
 Logger *globalLogger;
 

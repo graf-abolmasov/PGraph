@@ -1,7 +1,7 @@
 #ifndef QPARALLELARCTOP_H
 #define QPARALLELARCTOP_H
 
-#include <QtGui>
+#include <QtGui/QGraphicsEllipseItem>
 
 #define ARC_TOP_TYPE  UserType+5
 

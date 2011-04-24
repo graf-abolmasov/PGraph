@@ -112,7 +112,7 @@ void MultiProcTopPropertyDialog::on_actorsListWidget_currentRowChanged(int curre
     ui->descriptionLbl->setText(info);
 }
 
-void MultiProcTopPropertyDialog::on_actorsListWidget_itemDoubleClicked(QListWidgetItem* item)
+void MultiProcTopPropertyDialog::on_actorsListWidget_itemDoubleClicked(QListWidgetItem *)
 {
     accept();
 }

@@ -1,16 +1,22 @@
 #ifndef QMODULEREGISTER_H
 #define QMODULEREGISTER_H
 
-#include <QDialog>
-#include <QtCore>
-#include <QtGui>
+#include <QtGui/QDialog>
+#include <QtCore/QDir>
+#include <QtCore/QFileInfoList>
 
 namespace Ui {
     class QModuleRegister;
 }
 
+QT_BEGIN_NAMESPACE
+class QComboBox;
+class QTextEdit;
+QT_END_NAMESPACE
+
 class QModuleRegister : public QDialog {
     Q_OBJECT
+
 public:
     QModuleRegister(QWidget *parent = 0);
     ~QModuleRegister();
@@ -23,8 +29,8 @@ private:
     Ui::QModuleRegister *ui;
     QDir workingDir;
     QFileInfoList fileList;
-    QComboBox* paramTypeCmbBox;
-    QTextEdit* paramCommentEdt;
+    QComboBox *paramTypeCmbBox;
+    QTextEdit *paramCommentEdt;
 
 private slots:
     void on_fileList_currentRowChanged(int currentRow);

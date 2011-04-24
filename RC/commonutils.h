@@ -5,8 +5,6 @@
 #include <stdint.h>
 #include <QGraphicsItem>
 #include "qtop.h"
-#include "qarc.h"
-#include "qcomment.h"
 
 #define UP	0x80
 #define LEFT	0x20

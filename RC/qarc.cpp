@@ -6,6 +6,10 @@
 #include "qserialarctop.h"
 #include "qterminatearctop.h"
 #include "commonutils.h"
+#include "qtop.h"
+#include "qarcline.h"
+#include "qserialarctop.h"
+#include "predicate.h"
 
 const qreal Pi = M_PI;
 const int MINDELTA = 40;

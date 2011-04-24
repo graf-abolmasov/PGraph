@@ -1,14 +1,14 @@
 #ifndef QVARIABLEEDITOR_H
 #define QVARIABLEEDITOR_H
-#include "variable.h"
 
-#include <QDialog>
-#include <QtCore>
-#include <QtGui>
+#include <QtGui/QDialog>
 
 namespace Ui {
     class QVariableEditor;
 }
+
+class Variable;
+class DataType;
 
 class QVariableEditor : public QDialog {
     Q_OBJECT
@@ -18,7 +18,7 @@ public:
     ~QVariableEditor();
 
     void prepareForm(Variable *var);
-    Variable* getResult();
+    Variable *getResult();
 
 protected:
     void changeEvent(QEvent *e);
@@ -26,8 +26,8 @@ protected:
 private:
     Ui::QVariableEditor *ui;
 
-    Variable* myVariable;
-    QList<DataType*> typeList;
+    Variable *myVariable;
+    QList<DataType *> typeList;
 
 private slots:
     void on_pushButton_clicked();

@@ -1,14 +1,7 @@
 #ifndef QDIAGRAMSCENE_H
 #define QDIAGRAMSCENE_H
 
-#include <QGraphicsScene>
-#include "qtop.h"
-#include "qcomment.h"
-#include "qarc.h"
-#include "qsyncarc.h"
-#include "qmultiproctop.h"
-#include "qnormaltop.h"
-#include "qdataitem.h"
+#include <QtGui/QGraphicsScene>
 
 QT_BEGIN_NAMESPACE
 class QGraphicsSceneMouseEvent;
@@ -23,6 +16,8 @@ QT_END_NAMESPACE
 class QTop;
 class QArc;
 class QSyncArc;
+class QNormalTop;
+class QComment;
 
 class QDiagramScene : public QGraphicsScene
 {

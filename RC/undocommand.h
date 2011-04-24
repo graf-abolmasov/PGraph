@@ -1,10 +1,18 @@
 #ifndef UNDOCOMMAND_H
 #define UNDOCOMMAND_H
-#include <QtCore>
-#include <QtGui>
-#include "commonutils.h"
+
+#include <QtGui/QUndoCommand>
+#include <QtCore/QLineF>
 
 #define MOVE_COMMAND_ID 1
+
+QT_BEGIN_NAMESPACE
+class QGraphicsItem;
+class QGraphicsScene;
+QT_END_NAMESPACE
+
+class QArc;
+class QSyncArc;
 
 class AddCommand : public QUndoCommand
 {

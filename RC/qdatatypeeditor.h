@@ -1,15 +1,18 @@
 #ifndef QDATATYPEEDITOR_H
 #define QDATATYPEEDITOR_H
 
-#include <QDialog>
-#include <QtGui>
-#include <QtCore>
-#include "datatype.h"
-#include "globalvariables.h"
+#include <QtGui/QDialog>
 
 namespace Ui {
     class QDataTypeEditor;
 }
+
+QT_BEGIN_NAMESPACE
+class QComboBox;
+class QLineEdit;
+QT_END_NAMESPACE
+
+class DataType;
 
 class QDataTypeEditor : public QDialog {
     Q_OBJECT
@@ -30,7 +33,7 @@ private:
     DataType* myDataType;
     Mode myMode;
     QStringList indexes;
-    QList<DataType*> typeList;
+    QList<DataType *> typeList;
     QComboBox* varTypeCmbBox;
     QLineEdit* varNameEdt;
 

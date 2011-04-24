@@ -2,6 +2,10 @@
 #include <QtGui>
 
 #include "qtop.h"
+#include "qarcline.h"
+#include "qsyncarc.h"
+#include "qarc.h"
+#include "actor.h"
 
 QTop::QTop(QMenu *contextMenu,
              QGraphicsItem *parent, QGraphicsScene *scene)

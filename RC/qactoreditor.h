@@ -1,14 +1,21 @@
 #ifndef QActorEditor_H
 #define QActorEditor_H
 
-#include <QDialog>
-#include "actor.h"
-#include "basemodule.h"
-#include <QtGui>
+#include <QtGui/QDialog>
 
 namespace Ui {
     class QActorEditor;
 }
+
+QT_BEGIN_NAMESPACE
+class QToolButton;
+class QHBoxLayout;
+class QComboBox;
+QT_END_NAMESPACE
+
+class Actor;
+class BaseModule;
+class Variable;
 
 class QActorEditor : public QDialog {
     Q_OBJECT
@@ -26,13 +33,13 @@ protected:
 private:
     Ui::QActorEditor *ui;
     void updateInterface();
-    Actor* myActor;
+    Actor *myActor;
     Mode myMode;
-    QList<BaseModule*> myModuleList;
-    QList<Variable* > myVariableList;
-    QToolButton* varEditBtn;
-    QWidget* varWidget;
-    QHBoxLayout* varLayout;
+    QList<BaseModule *> myModuleList;
+    QList<Variable *> myVariableList;
+    QToolButton *varEditBtn;
+    QWidget *varWidget;
+    QHBoxLayout *varLayout;
     QComboBox* paramTypeCmbBox;
 
 

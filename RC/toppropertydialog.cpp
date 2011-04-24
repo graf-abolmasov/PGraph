@@ -1,7 +1,11 @@
+#include <QtCore>
+#include <QtGui>
+
 #include "toppropertydialog.h"
 #include "ui_toppropertydialog.h"
 #include "databasemanager.h"
 #include "globalvariables.h"
+#include "qnormaltop.h"
 
 TopPropertyDialog::TopPropertyDialog(QWidget *parent) :
     QDialog(parent),

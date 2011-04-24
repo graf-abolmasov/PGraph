@@ -1,4 +1,7 @@
+#include <QtGui>
+
 #include "qmywindow.h"
+#include "qdrawwindow.h"
 #include "qobjecteditor.h"
 #include "qvariabledialog.h"
 #include "qdatatypedialog.h"
@@ -8,6 +11,11 @@
 #include "commonutils.h"
 #include "globalvariables.h"
 #include "compi.h"
+#include "qarcline.h"
+#include "qserialarctop.h"
+#include "qsyncarc.h"
+#include "qarc.h"
+#include "qcomment.h"
 
 QLabel *globalInfoLabel;
 
@@ -371,7 +379,7 @@ void TMyWindow::CMGSaveAs()
         if (dialog.getResult() != ""){
             QString extName = dialog.getResult();
             QString name = "G" + getCRC(dialog.getResult().toUtf8());
-            if (activeDrawWindow()->saveGraph(name, extName, globalDBManager)) {
+            if (activeDrawWindow()->saveGraph(name, extName)) {
                 setWindowTitle(activeDrawWindow()->myGraphExtName + tr(" - Граф-редактор"));
                 saveGraphAct->setEnabled(false);
                 statusBar()->showMessage(tr("Сохранено как ") + activeDrawWindow()->myGraphName, 3000);
@@ -412,7 +420,7 @@ void TMyWindow::CMGOpen()
     dialog.prepareForm();
     if (dialog.exec()){
         CMGNew();
-        activeDrawWindow()->loadGraph(dialog.getResult()->name, globalDBManager);
+        activeDrawWindow()->loadGraph(dialog.getResult()->name);
         recentGraphs[dialog.getResult()->name] = dialog.getResult()->extName;
     }
 }
@@ -433,13 +441,13 @@ void TMyWindow::CMExit()
 
 void TMyWindow::CMSaveStruct()
 {
-    if (activeDrawWindow()->saveStruct(globalDBManager))
+    if (activeDrawWindow()->saveStruct())
         statusBar()->showMessage(tr("Структура записана"), 2000);
 }
 
 void TMyWindow::CMGSave()
 {
-    if (activeDrawWindow()->updateGraph(globalDBManager)) {
+    if (activeDrawWindow()->updateGraph()) {
         setWindowTitle(activeDrawWindow()->myGraphExtName + tr(" - Граф-редактор"));
         saveGraphAct->setEnabled(false);
         statusBar()->showMessage(tr("Сохранено как ") + activeDrawWindow()->myGraphName, 3000);

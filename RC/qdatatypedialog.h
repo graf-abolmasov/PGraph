@@ -1,13 +1,14 @@
 #ifndef QDATATYPEDIALOG_H
 #define QDATATYPEDIALOG_H
 
-#include <QDialog>
-#include <QtCore>
-#include "datatype.h"
+#include <QtGui/QDialog>
+#include <QtCore/QModelIndex>
 
 namespace Ui {
     class QDataTypeDialog;
 }
+
+class DataType;
 
 class QDataTypeDialog : public QDialog {
     Q_OBJECT
@@ -16,13 +17,12 @@ public:
     ~QDataTypeDialog();
     void prepareForm();
 
-
 protected:
     void changeEvent(QEvent *e);
 
 private:
     Ui::QDataTypeDialog *ui;
-    QList<DataType*> typeList;
+    QList<DataType *> typeList;
 
 private slots:
     void on_pushButton_5_clicked();

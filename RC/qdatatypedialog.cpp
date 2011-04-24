@@ -1,9 +1,11 @@
+#include <QtCore>
+
 #include "qdatatypedialog.h"
 #include "ui_qdatatypedialog.h"
 #include "qdatatypeeditor.h"
 #include "databasemanager.h"
 #include "globalvariables.h"
-#include <QtCore>
+#include "datatype.h"
 
 QDataTypeDialog::QDataTypeDialog(QWidget *parent) :
     QDialog(parent),
@@ -112,7 +114,7 @@ void QDataTypeDialog::on_buttonBox_accepted()
                               QMessageBox::Ok);;
 }
 
-void QDataTypeDialog::on_tableWidget_doubleClicked(QModelIndex index)
+void QDataTypeDialog::on_tableWidget_doubleClicked(QModelIndex)
 {
     on_pushButton_2_clicked();
 }

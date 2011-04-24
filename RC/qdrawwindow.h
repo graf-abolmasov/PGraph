@@ -1,17 +1,22 @@
 #ifndef QDRAWWINDOW_H
 #define QDRAWWINDOW_H
 
-#include <QMainWindow>
-#include <QGraphicsView>
-#include <QDebug>
-#include <QGraphicsScene>
-#include <QWheelEvent>
+#include <QtGui/QMainWindow>
+
 #include "qdiagramscene.h"
-#include "qtop.h"
-#include "qcomment.h"
-#include "toppropertydialog.h"
-#include "graph.h"
-#include "databasemanager.h"
+
+QT_BEGIN_NAMESPACE
+class QGraphicsView;
+class QUndoStack;
+QT_END_NAMESPACE
+
+class QTop;
+class QArc;
+class QSyncArc;
+class QNormalTop;
+class QComment;
+class QMultiProcTop;
+class Graph;
 
 class TDrawWindow : public QMainWindow
 {
@@ -66,11 +71,11 @@ public:
     void showDataLayer(bool show);
     QDiagramScene::Mode mode() const
         { return scene->mode(); }
-    Graph* getGraph();
-    void loadGraph(const QString &name, DataBaseManager* dbManager);
-    bool saveGraph(QString name, QString extName, DataBaseManager* dbManager);
-    bool updateGraph(DataBaseManager *dbManager);
-    bool saveStruct(DataBaseManager* dbManager);
+    Graph *getGraph();
+    void loadGraph(const QString &name);
+    bool saveGraph(QString name, QString extName);
+    bool updateGraph();
+    bool saveStruct();
 
     void alignHLeft();
     void alignHCenter();
@@ -105,7 +110,7 @@ private slots:
     void itemInserted(QGraphicsItem *item);
     void itemMoved(QGraphicsItem *item, QLineF vector);
     void itemDeleted(QGraphicsItem *item);
-    void itemsMoved(QList<QGraphicsItem*> items, QLineF vector);
+    void itemsMoved(QList<QGraphicsItem *> items, QLineF vector);
 
     void selectionChanged();
 };

@@ -1,9 +1,13 @@
+#include <QtCore>
+#include <QtGui>
+
+#include "variable.h"
+#include "datatype.h"
 #include "qvariableeditor.h"
 #include "ui_qvariableeditor.h"
 #include "qdatatypeeditor.h"
 #include "datatype.h"
 #include "databasemanager.h"
-#include <QList>
 #include "globalvariables.h"
 
 

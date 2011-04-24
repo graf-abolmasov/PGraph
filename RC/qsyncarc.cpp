@@ -1,6 +1,7 @@
 #include <QtGui>
 #include <math.h>
 #include "qsyncarc.h"
+#include "qtop.h"
 
 const qreal Pi = 3.14;
 
@@ -44,7 +45,7 @@ QRectF QSyncArc::boundingRect() const {
         .adjusted(-extra, -extra, extra, extra);
 }
 
-void QSyncArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *options, QWidget *widget){
+void QSyncArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *){
 
     if (myStartTop->collidesWithItem(myEndTop))
         return;

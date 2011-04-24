@@ -1,10 +1,12 @@
 #ifndef ACTOR_H
 #define ACTOR_H
 
-#include <QtCore>
-#include <QtGui>
-#include "variable.h"
-#include "basemodule.h"
+#include <QtGui/QImage>
+#include <QtCore/QList>
+#include <QtCore/QString>
+#include <QtCore/QStringList>
+
+class Variable;
 
 class Actor
 {
@@ -14,7 +16,7 @@ public:
     QString extName;
     QString name;
     Type type;
-    QList<Variable*> variableList;
+    QList<Variable* > variableList;
     QStringList varAccModeList;
     QString baseModule;
     QImage icon;

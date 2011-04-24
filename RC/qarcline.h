@@ -1,9 +1,7 @@
 #ifndef QARCLINE_H
 #define QARCLINE_H
 
-#include <QGraphicsLineItem>
-#include <QtCore>
-#include <QtGui>
+#include <QtGui/QGraphicsLineItem>
 
 #define ARC_LINE_TYPE UserType+6
 

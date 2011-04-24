@@ -1,10 +1,12 @@
+#include <QtCore>
+#include <QtGui>
+
 #include "qmoduleregister.h"
 #include "ui_qmoduleregister.h"
 #include "databasemanager.h"
 #include "commonutils.h"
 #include "basemodule.h"
 #include "globalvariables.h"
-
 
 QModuleRegister::QModuleRegister(QWidget *parent) :
     QDialog(parent),

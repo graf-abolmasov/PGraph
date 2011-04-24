@@ -5,6 +5,14 @@
 #include "qterminatearctop.h"
 #include "globalvariables.h"
 #include "undocommand.h"
+#include "qarcline.h"
+#include "qtop.h"
+#include "qcomment.h"
+#include "qarc.h"
+#include "qsyncarc.h"
+#include "qmultiproctop.h"
+#include "qnormaltop.h"
+#include "qdataitem.h"
 
 QDiagramScene::QDiagramScene(QObject *parent)
     : QGraphicsScene(parent)
@@ -36,6 +44,9 @@ void QDiagramScene::editorLostFocus(QComment *item)
 void QDiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
     if (mouseEvent->button() != Qt::LeftButton)
+        return;
+
+    if (myMode == ReadOnly)
         return;
 
     bool allowAddTop = true;
@@ -87,6 +98,9 @@ void QDiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
 void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
+    if (myMode == ReadOnly)
+        return;
+
     QList<QGraphicsItem* > mySelectedItems = selectedItems();
 
     //режим выделения области
@@ -199,6 +213,9 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
 void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
+    if (myMode == ReadOnly)
+        return;
+
     if (myMode == MoveItem && selectionRect != NULL) {
         QPainterPath selectedPath;
         selectedPath.addPolygon(selectionRect->mapToScene(selectionRect->rect()));
@@ -324,26 +341,36 @@ void QDiagramScene::keyReleaseEvent (QKeyEvent *keyEvent){
 
 void QDiagramScene::setTopMenu(QMenu *menu)
 {
+    if (myMode == ReadOnly)
+        return;
     myTopMenu = menu;
 }
 
 void QDiagramScene::setArcMenu(QMenu *menu)
 {
+    if (myMode == ReadOnly)
+        return;
     myArcMenu = menu;
 }
 
 void QDiagramScene::setCommentMenu(QMenu *menu)
 {
+    if (myMode == ReadOnly)
+        return;
     myCommentMenu = menu;
 }
 
 void QDiagramScene::setSyncArcMenu(QMenu *menu)
 {
+    if (myMode == ReadOnly)
+        return;
     mySyncArcMenu = menu;
 }
 
 void QDiagramScene::setMultiProcTopMenu(QMenu *menu)
 {
+    if (myMode == ReadOnly)
+        return;
     myMultiProcTopMenu = menu;
 }
 

@@ -1,12 +1,18 @@
 #ifndef TOPPROPERTYDIALOG_H
 #define TOPPROPERTYDIALOG_H
 
-#include <QDialog>
-#include "qnormaltop.h"
+#include <QtGui/QDialog>
 
 namespace Ui {
     class TopPropertyDialog;
 }
+
+QT_BEGIN_NAMESPACE
+class QListWidgetItem;
+QT_END_NAMESPACE
+
+class Actor;
+class QNormalTop;
 
 class TopPropertyDialog : public QDialog {
     Q_OBJECT
@@ -21,8 +27,8 @@ protected:
 
 private:
     Ui::TopPropertyDialog *ui;
-    QNormalTop* myTop;
-    QList<Actor*> myActorList;
+    QNormalTop *myTop;
+    QList<Actor *> myActorList;
 
 private slots:
     void on_actorsListWidget_itemDoubleClicked(QListWidgetItem* item);

@@ -1,13 +1,18 @@
 #ifndef ARCPROPERTYDIALOG_H
 #define ARCPROPERTYDIALOG_H
 
-#include <QDialog>
-#include "qarc.h"
-#include "predicate.h"
+#include <QtGui/QDialog>
 
 namespace Ui {
     class ArcPropertyDialog;
 }
+
+QT_BEGIN_NAMESPACE
+class QListWidgetItem;
+QT_END_NAMESPACE
+
+class QArc;
+class Predicate;
 
 class ArcPropertyDialog : public QDialog {
     Q_OBJECT
@@ -22,8 +27,8 @@ protected:
 
 private:
     Ui::ArcPropertyDialog *ui;
-    QArc* myArc;
-    QList<Predicate*> myPredicateList;
+    QArc *myArc;
+    QList<Predicate *> myPredicateList;
 
 private slots:
     void on_predicateList_itemDoubleClicked(QListWidgetItem* item);
