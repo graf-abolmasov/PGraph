@@ -342,7 +342,7 @@ void TMyWindow::createToolBar()
 
 TDrawWindow *TMyWindow::activeDrawWindow()
 {
-   return qobject_cast<TDrawWindow *>(centralWidget());
+    return qobject_cast<TDrawWindow *>(centralWidget());
 }
 
 void TMyWindow::pointerGroupClicked(int)
@@ -459,7 +459,7 @@ void TMyWindow::CMHelpAbout()
     QMessageBox::about(this, tr("O Граф-редакторе"),
                        tr("<h2>Граф-редатор 2.0</h2>"
                           "<p>Внутренняя версия ") + QApplication::applicationVersion() +
-                          tr("<p>Copyright &copy; 2010 FuzzyLogic Team. All rights reserved.</p>"
+                       tr("<p>Copyright &copy; 2010 FuzzyLogic Team. All rights reserved.</p>"
                           "<p>The program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.</p>"));
 
 }
@@ -537,85 +537,85 @@ void TMyWindow::getInfo(QGraphicsItem *item)
             arc = qgraphicsitem_cast<QArc*>(item);
         case QArcLine::Type:
         case QSerialArcTop::Type: {
-                if (!arc)
-                    arc = qgraphicsitem_cast<QArc*>(item->parentItem());
-                switch (arc->arcType()) {
-                case QArc::SerialArc:
-                    arcTypeStr = tr("последовательная");
-                    break;
-                case QArc::ParallelArc:
-                    arcTypeStr = tr("параллелная");
-                    break;
-                case QArc::TerminateArc:
-                    arcTypeStr = tr("терминирующая");
-                    break;
-                }
-                info.append(tr("Дуга\nТип: ") + arcTypeStr + "\n");
-                if (arc->startItem() != NULL) {
-                    info.append(tr("Начальная вершина: ") + QString::number(arc->startItem()->number) + "\n");
-                }
-                if (arc->endItem() != NULL) {
-                    info.append(tr("Конечная вершина: ") + QString::number(arc->endItem()->number) + "\n");
-                }
-                info.append(tr("Приоритет: ") + QString::number(arc->priority()) + "\n" +
-                            tr("Ширина пера ") + QString::number(arc->pen().width()) + "\n");
-                info.append(tr("Число изломов: ") + QString::number(arc->lines.count()) + "\n");
-                if (arc->predicate != NULL) {
-                    info.append(tr("\nО предикате\n"));
-                    QString predType = tr("");
-                    switch(arc->predicate->type) {
-                    case Predicate::inlineType:
-                        predType = tr("inline");
-                        break;
-                    case Predicate::normalType:
-                        predType = tr("Обычный");
-                        break;
-                    }
-                    info.append(tr("Тип: ") + predType + "\n");
-                    info.append(tr("Название: ") + arc->predicate->extName + "\n");
-                    info.append(tr("Внутреннее имя: ") + arc->predicate->name + "\n");
-                    if (arc->predicate->type == Predicate::normalType)
-                        info.append(tr("Базовый модуль: ") + arc->predicate->baseModule + "\n");
-                }
+            if (!arc)
+                arc = qgraphicsitem_cast<QArc*>(item->parentItem());
+            switch (arc->arcType()) {
+            case QArc::SerialArc:
+                arcTypeStr = tr("последовательная");
+                break;
+            case QArc::ParallelArc:
+                arcTypeStr = tr("параллелная");
+                break;
+            case QArc::TerminateArc:
+                arcTypeStr = tr("терминирующая");
+                break;
             }
-            break;
+            info.append(tr("Дуга\nТип: ") + arcTypeStr + "\n");
+            if (arc->startItem() != NULL) {
+                info.append(tr("Начальная вершина: ") + QString::number(arc->startItem()->number) + "\n");
+            }
+            if (arc->endItem() != NULL) {
+                info.append(tr("Конечная вершина: ") + QString::number(arc->endItem()->number) + "\n");
+            }
+            info.append(tr("Приоритет: ") + QString::number(arc->priority()) + "\n" +
+                        tr("Ширина пера ") + QString::number(arc->pen().width()) + "\n");
+            info.append(tr("Число изломов: ") + QString::number(arc->lines.count()) + "\n");
+            if (arc->predicate != NULL) {
+                info.append(tr("\nО предикате\n"));
+                QString predType = tr("");
+                switch(arc->predicate->type) {
+                case Predicate::inlineType:
+                    predType = tr("inline");
+                    break;
+                case Predicate::normalType:
+                    predType = tr("Обычный");
+                    break;
+                }
+                info.append(tr("Тип: ") + predType + "\n");
+                info.append(tr("Название: ") + arc->predicate->extName + "\n");
+                info.append(tr("Внутреннее имя: ") + arc->predicate->name + "\n");
+                if (arc->predicate->type == Predicate::normalType)
+                    info.append(tr("Базовый модуль: ") + arc->predicate->baseModule + "\n");
+            }
+        }
+        break;
 
         case QTop::Type: {
-                top = qgraphicsitem_cast<QTop* >(item);
-                info.append(tr("Номер вершины ") + QString::number(top->number) + "\n");
-                info.append(tr("Число дуг: ") + QString::number(top->allArcs().count()) + "\n");
-                info.append(tr("Число исход. дуг: ") + QString::number(top->outArcs().count()) + "\n");
-                info.append(tr("Число вход. дуг: ") + QString::number(top->inArcs().count()) + "\n");
-                info.append(tr("Left: ") + QString::number(top->mapRectToScene(top->rect()).left()) + "\n");
-                info.append(tr("Top: ") + QString::number(top->mapRectToScene(top->rect()).top()) + "\n");
-                info.append(tr("Right: ") + QString::number(top->mapRectToScene(top->rect()).right()) + "\n");
-                info.append(tr("Bottom: ") + QString::number(top->mapRectToScene(top->rect()).bottom()) + "\n");
-                if (top->actor != NULL) {
-                    info.append(tr("\nОб акторе\n"));
-                    QString actType = tr("");
-                    switch(top->actor->type) {
-                    case Actor::InlineType:
-                        actType = tr("inline");
-                        break;
-                    case Actor::NormalType:
-                        actType = tr("Обычный");
-                        break;
-                    case Actor::GraphType:
-                        actType = tr("Агрегат");
-                        break;
-                    }
-                    info.append(tr("Тип: ") + actType + "\n");
-                    info.append(tr("Название: ") + top->actor->extName + "\n");
-                    info.append(tr("Внутреннее имя: ") + top->actor->name+ "\n");
-                    if (top->actor->type == Actor::NormalType)
-                        info.append(tr("Базовый модуль: ") + top->actor->baseModule + "\n");
+            top = qgraphicsitem_cast<QTop* >(item);
+            info.append(tr("Номер вершины ") + QString::number(top->number) + "\n");
+            info.append(tr("Число дуг: ") + QString::number(top->allArcs().count()) + "\n");
+            info.append(tr("Число исход. дуг: ") + QString::number(top->outArcs().count()) + "\n");
+            info.append(tr("Число вход. дуг: ") + QString::number(top->inArcs().count()) + "\n");
+            info.append(tr("Left: ") + QString::number(top->mapRectToScene(top->rect()).left()) + "\n");
+            info.append(tr("Top: ") + QString::number(top->mapRectToScene(top->rect()).top()) + "\n");
+            info.append(tr("Right: ") + QString::number(top->mapRectToScene(top->rect()).right()) + "\n");
+            info.append(tr("Bottom: ") + QString::number(top->mapRectToScene(top->rect()).bottom()) + "\n");
+            if (top->actor != NULL) {
+                info.append(tr("\nОб акторе\n"));
+                QString actType = tr("");
+                switch(top->actor->type) {
+                case Actor::InlineType:
+                    actType = tr("inline");
+                    break;
+                case Actor::NormalType:
+                    actType = tr("Обычный");
+                    break;
+                case Actor::GraphType:
+                    actType = tr("Агрегат");
+                    break;
                 }
+                info.append(tr("Тип: ") + actType + "\n");
+                info.append(tr("Название: ") + top->actor->extName + "\n");
+                info.append(tr("Внутреннее имя: ") + top->actor->name+ "\n");
+                if (top->actor->type == Actor::NormalType)
+                    info.append(tr("Базовый модуль: ") + top->actor->baseModule + "\n");
             }
-            break;
-        case QSyncArc::Type:
-        syncArc = qgraphicsitem_cast<QSyncArc* >(item);
+        }
         break;
-    }
+        case QSyncArc::Type:
+            syncArc = qgraphicsitem_cast<QSyncArc* >(item);
+            break;
+        }
     }
 
     globalInfoLabel->setText(info);
@@ -731,13 +731,13 @@ void TMyWindow::grafMenuAboutToShow()
 
 void TMyWindow::CMCompile()
 {
-//    if (!globalDBManager->Compi_get_GSP_Shab_List())
-//            QMessageBox::critical(NULL,
-//                          QObject::tr("Ошибка"),
-//                          QObject::tr("Не удалось прочитать из БД шаблон "
-//                                      "для генерации исходного файла (GSP_SHAB).\n")
-//                                    + globalDBManager->lastError().databaseText(),
-//                          QMessageBox::Ok);
+    //    if (!globalDBManager->Compi_get_GSP_Shab_List())
+    //            QMessageBox::critical(NULL,
+    //                          QObject::tr("Ошибка"),
+    //                          QObject::tr("Не удалось прочитать из БД шаблон "
+    //                                      "для генерации исходного файла (GSP_SHAB).\n")
+    //                                    + globalDBManager->lastError().databaseText(),
+    //                          QMessageBox::Ok);
 
     Compi(activeDrawWindow()->myGraphName);
     // Определение размера структуры описания графа

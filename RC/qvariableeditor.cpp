@@ -57,7 +57,7 @@ void QVariableEditor::prepareForm(Variable *var)
     if (var != NULL) {
         ui->nameEdt->setText(var->name);
         ui->commentTxtEdt->setPlainText(var->comment);
-        ui->initValueEdt->setText(var->initValue.toString());
+        ui->initValueEdt->setText(var->initValue);
         int idx = -1;
         for (int i = 0; i < typeList.count(); i++){
             if (var->type == typeList.at(i)->name){
