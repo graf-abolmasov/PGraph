@@ -312,7 +312,7 @@ bool DataBaseManager::saveVariableList(QList<Variable*>& varList)
         query.bindValue(":PROJECT_ID", myProjectId);
         query.bindValue(":DATA", varList.at(i)->name);
         query.bindValue(":TYPE", varList.at(i)->type);
-        query.bindValue(":INIT", varList.at(i)->initValue.toString());
+        query.bindValue(":INIT", varList.at(i)->initValue);
         query.bindValue(":COMMENT", varList.at(i)->comment);
         query.exec();
         query.clear();

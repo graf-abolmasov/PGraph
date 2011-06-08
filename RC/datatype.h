@@ -9,6 +9,8 @@ public:
     DataType(QString name, QString typedefStr);
     QString name;
     QString typedefStr;
+
+    bool operator ==(const DataType& value) const;
 };
 
 #endif // DATATYPE_H

@@ -7,11 +7,13 @@
 class Variable
 {
 public:
-    Variable(QString name, QString type, QVariant initValue, QString comment);
+    Variable(QString name, QString type, QString initValue, QString comment);
     QString name;
     QString type;
-    QVariant initValue;
+    QString initValue;
     QString comment;
+
+    //bool operator ==(const Variable& other) const;
 };
 
 #endif // VARIABLE_H

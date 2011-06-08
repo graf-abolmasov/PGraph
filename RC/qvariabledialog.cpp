@@ -61,7 +61,7 @@ void QVariableDialog::prepareForm(QString filter)
         ui->variablesTable->insertRow(ui->variablesTable->rowCount());
         ui->variablesTable->setItem(ui->variablesTable->rowCount()-1,0,new QTableWidgetItem(var->name));
         ui->variablesTable->setItem(ui->variablesTable->rowCount()-1,1,new QTableWidgetItem(var->type));
-        ui->variablesTable->setItem(ui->variablesTable->rowCount()-1,2,new QTableWidgetItem(var->initValue.toString()));
+        ui->variablesTable->setItem(ui->variablesTable->rowCount()-1,2,new QTableWidgetItem(var->initValue));
         ui->variablesTable->setItem(ui->variablesTable->rowCount()-1,3,new QTableWidgetItem(var->comment));
     }
     ui->variablesTable->blockSignals(false);
@@ -79,7 +79,7 @@ void QVariableDialog::on_newButton_clicked()
             ui->variablesTable->insertRow(ui->variablesTable->rowCount());
             ui->variablesTable->setItem(ui->variablesTable->rowCount()-1,0,new QTableWidgetItem(newVar->name));
             ui->variablesTable->setItem(ui->variablesTable->rowCount()-1,1,new QTableWidgetItem(newVar->type));
-            ui->variablesTable->setItem(ui->variablesTable->rowCount()-1,2,new QTableWidgetItem(newVar->initValue.toString()));
+            ui->variablesTable->setItem(ui->variablesTable->rowCount()-1,2,new QTableWidgetItem(newVar->initValue));
             ui->variablesTable->setItem(ui->variablesTable->rowCount()-1,3,new QTableWidgetItem(newVar->comment));
             ui->variablesTable->blockSignals(false);
         }
@@ -102,7 +102,7 @@ void QVariableDialog::on_editButton_clicked()
                 ui->variablesTable->blockSignals(true);
                 ui->variablesTable->setItem(idx,0,new QTableWidgetItem(newVar->name));
                 ui->variablesTable->setItem(idx,1,new QTableWidgetItem(newVar->type));
-                ui->variablesTable->setItem(idx,2,new QTableWidgetItem(newVar->initValue.toString()));
+                ui->variablesTable->setItem(idx,2,new QTableWidgetItem(newVar->initValue));
                 ui->variablesTable->setItem(idx,3,new QTableWidgetItem(newVar->comment));
                 ui->variablesTable->blockSignals(false);
             }
