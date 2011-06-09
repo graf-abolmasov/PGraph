@@ -8,12 +8,21 @@
 Compiler::Compiler()
 {
     QSettings settings("graph.ini", QSettings::IniFormat);
-    myOutputDirectory = settings.value("Compi/outDir", QApplication::applicationDirPath() + "\\BaseDir\\").toString();
+    myOutputDirectory = settings.value("Location/OutputDir", QApplication::applicationDirPath() + "\\BaseDir\\").toString();
 }
 
 QString Compiler::getTemplate(const QString &type) const
 {
-    return QString();
+    QSettings settings("graph.ini", QSettings::IniFormat);
+    QString baseDir = settings.value("Location/TemplateDir", QApplication::applicationDirPath() + "\\BaseDir\\").toString();
+    QString name = baseDir + "/" + type;
+    QFile f(name);
+    f.open(QIODevice::ReadOnly);
+    QTextStream ts(&f);
+    ts.setCodec("UTF-8");
+    QString result = ts.readAll();
+    f.close();
+    return result;
 }
 
 void Compiler::compileData() const
@@ -38,28 +47,31 @@ void Compiler::compileData() const
     //Создаем файл utype.h
     {
         QString utypeText = getTemplate(QString(USER_TYPES_FILE_NAME) + ".h.template");
+        Q_ASSERT(!utypeText.isEmpty());
 
         //Создаем типы
         QString userTypesBlock;
 
         foreach (DataType *type, typeList) {
-            userTypesBlock.append(type->typedefStr + "\n");
+            if (!type->typedefStr.isEmpty()) {
+                userTypesBlock.append(type->typedefStr + "\n");
 
-            //Если встертился массив
-            if (type->typedefStr.contains("[")) {
+                //Если встертился массив
+                if (type->typedefStr.contains("[")) {
 
-                //Парсим количество элементов
-                QRegExp r("(\\[(\\d+)\\])");
-                r.setMinimal(true);
-                Q_ASSERT(r.indexIn(type->typedefStr) != -1);
-                userTypesBlock.append("#define " + type->name + "_LENGTH " + r.cap(2) + "\n");
+                    //Парсим количество элементов
+                    QRegExp r("(\\[(\\d+)\\])");
+                    r.setMinimal(true);
+                    Q_ASSERT(r.indexIn(type->typedefStr) != -1);
+                    userTypesBlock.append("#define " + type->name + "_LENGTH " + r.cap(2) + "\n");
 
-                //Парсим тип элемента
-                r.setPattern("(typedef\\s+(\\b.+\\b))");
-                Q_ASSERT(r.indexIn(type->typedefStr) != -1);
-                userTypesBlock.append("typedef " + type->name + "* ptr" + r.cap(2) + ";\n");
+                    //Парсим тип элемента
+                    r.setPattern("(typedef\\s+(\\b.+\\b))");
+                    Q_ASSERT(r.indexIn(type->typedefStr) != -1);
+                    userTypesBlock.append("typedef " + r.cap(2) + "* ptr" + type->name  + ";\n");
+                }
+                userTypesBlock.append("\n");
             }
-            userTypesBlock.append("\n");
         }
 
         utypeText.replace("<#userTypes>", userTypesBlock);
@@ -67,15 +79,19 @@ void Compiler::compileData() const
         //Создаем типы MPI
         QString mpiTypesBlock;
         foreach (DataType *type, typeList) {
-            QRegExp r("(typedef\\s+(\\b.+\\b))");
-            Q_ASSERT(r.indexIn(type->typedefStr) != -1);
-            mpiTypesBlock.append("#define MPI_USER_TYPE_" + type->name.toUpper() + " " + (mpiTypes.contains(r.cap(2)) ? mpiTypes[r.cap(2)] : "MPI_USER_TYPE_" + r.cap(2).toUpper()) + "\n");
+            if (!type->typedefStr.isEmpty()) {
+                QRegExp r("(typedef\\s+(\\b.+\\b))");
+                r.setMinimal(true);
+                Q_ASSERT(r.indexIn(type->typedefStr) != -1);
+                QString intType = r.cap(2);
+                mpiTypesBlock.append("#define MPI_USER_TYPE_" + type->name.toUpper() + " " + (mpiTypes.contains(intType) ? mpiTypes[r.cap(2)] : "MPI_USER_TYPE_" + r.cap(2).toUpper()) + "\n");
+            }
         }
 
         utypeText.replace("<#mpiTypes>", mpiTypesBlock);
 
         //Сохраняем файл
-        QFile userTypes(myOutputDirectory + "\\" + USER_TYPES_FILE_NAME + ".h");
+        QFile userTypes(myOutputDirectory + "/" + USER_TYPES_FILE_NAME + ".h");
         userTypes.open(QFile::WriteOnly);
         userTypes.write(utypeText.toUtf8());
         userTypes.close();
@@ -85,6 +101,7 @@ void Compiler::compileData() const
     {
         //Создаем файл podata.h
         QString poDataText = getTemplate(QString(PODATA_FILE_NAME) + ".h.template");
+        Q_ASSERT(!poDataText.isEmpty());
 
         //Заполняем блок Id
         QString varIdBlock;
@@ -95,26 +112,22 @@ void Compiler::compileData() const
         //Заполняем блок указателей на данные
         QString varPtrBlock;
         foreach (Variable *var, varList)
-            varPtrBlock.append(var->type + " *_" + var->name);
+            varPtrBlock.append(var->type + " *_" + var->name + ";\n");
         poDataText.replace("<#varPtr>", varPtrBlock);
 
-        //Заполняем блое свойств
+        //Заполняем блок свойств
         QString varPropertyBlock;
-        foreach (Variable *var, varList)
-            varPropertyBlock.append("__property_rw<" + var->type + ", POData> " + var->name);
-        poDataText.replace("<#varProperty>", varPropertyBlock);
 
         //Заполняем блок setter/getter
         QString setGetBlock;
         foreach (Variable *var, varList) {
-            int idx = typeList.indexOf(new DataType(var->type, ""));
-            Q_ASSERT(idx != -1);
-            DataType* type = typeList[idx];
+            DataType* type = var->getDataType();
+            Q_ASSERT(type != NULL);
             //Если встертился массив
             if (type->typedefStr.contains("[")) {
-
                 //Парсим тип элемента
                 QRegExp r("(typedef\\s+(\\b.+\\b))");
+                r.setMinimal(true);
                 Q_ASSERT(r.indexIn(type->typedefStr) != -1);
                 QString intType = r.cap(2);
 
@@ -122,56 +135,63 @@ void Compiler::compileData() const
                 setGetBlock.append("ptr" + var->type + " set_" + var->name + "(const ptr" + var->type + "& value);\n");
                 setGetBlock.append(intType + " get_" + var->name + "(const int& index);\n");
                 setGetBlock.append(intType + " set_" + var->name + "(const int& index, const " + intType + "& value);\n");
+                varPropertyBlock.append("__property_rw_indexed<" + intType + ", int, POData> " + var->name + ";\n");
             } else {
                 setGetBlock.append(var->type + " get_" + var->name + "();\n");
-                setGetBlock.append(var->type + " set_" + var->name + "(const ptr" + var->type + "& value);\n");
+                setGetBlock.append(var->type + " set_" + var->name + "(const " + var->type + "& value);\n");
+                varPropertyBlock.append("__property_rw<" + var->type + ", POData> " + var->name + ";\n");
             }
         }
         poDataText.replace("<#setGet>", setGetBlock);
+        poDataText.replace("<#varProperty>", varPropertyBlock);
 
         //Сохраняем файл
-        QFile userTypes(myOutputDirectory + "\\" + PODATA_FILE_NAME + ".h");
-        userTypes.open(QFile::WriteOnly);
-        userTypes.write(poDataText.toUtf8());
-        userTypes.close();
+        QFile poDataH(myOutputDirectory + "/" + PODATA_FILE_NAME + ".h");
+        poDataH.open(QFile::WriteOnly);
+        poDataH.write(poDataText.toUtf8());
+        poDataH.close();
 
         //Создаем файл podata.cpp
         poDataText = getTemplate(QString(PODATA_FILE_NAME) + ".cpp.template");
 
+        //Шаблон <#assignSetterGetter> В конструкторе присваевает методы доступа к свойствам
         QString assignSetterGetterBlock;
-
+        //Шаблон <#delete> В деструкторе очищает память
         QString deleteBlock;
-
+        //Шаблон <#initMemory> В функции initMemory() выделяет память для rank = 0, для остальных = NULL
         QString initMemoryBlock;
         initMemoryBlock.append("if (myRank == 0) {\n");
-
+        //Шаблон <#initId> В функции initId() присваевает всем порядковый номер
         QString initIdBlock;
-
+        //Шаблон <#getDataAddr> В функции getDataAddr() возвращает указатель на память в зависимостиот id
         QString getDataAddrBlock;
         getDataAddrBlock.append("void* result = NULL;\n"
                                 "switch (id) {\n");
-
+        //Шаблон <#getDataSize> В функции getDataSize() возвращает размер ОДНОГО!! элемента
         QString getDataSizeBlock;
         getDataSizeBlock.append("int result = 0;\n"
                                 "switch (id) {\n");
-
+        //Шаблон <#getMpiType> В функции getMpiType() возвращает тип ОДНОГО!! элемента
         QString getMpiTypeBlock;
         getMpiTypeBlock.append("MPI_Datatype result = MPI_INT;\n"
-                                "switch (id) {\n");
-
+                               "switch (id) {\n");
+        //Шаблон <#setGet> Функции доступа для свойств. Для массива 4 функции, для простого типа 2.
         setGetBlock.clear();
 
         int i = 0;
         foreach (Variable* var, varList) {
-            int idx = typeList.indexOf(new DataType(var->type, ""));
-            Q_ASSERT(idx != -1);
-            DataType* type = typeList[idx];
-            //Парсим тип элемента
-            QRegExp r("(typedef\\s+(\\b.+\\b))");
-            Q_ASSERT(r.indexIn(type->typedefStr) != -1);
-            QString intType = r.cap(2);
+            DataType* type = var->getDataType();
+            Q_ASSERT(type != NULL);
+            QString intType = var->type;
+            if (!type->typedefStr.isEmpty()) {
+                //Парсим тип элемента
+                QRegExp r("(typedef\\s+(\\b.+\\b))");
+                r.setMinimal(true);
+                Q_ASSERT(r.indexIn(type->typedefStr) != -1);
+                intType = r.cap(2);
+            }
             //Общее для всех типов
-            initIdBlock.append("_" + var->name + " = " + QString::number(i) + ";\n");
+            initIdBlock.append(var->name + "_id = " + QString::number(i) + ";\n");
             getDataAddrBlock.append("case " + QString::number(i) + ":\n"
                                     "\tresult = _" + var->name + ";\n"
                                     "\tbreak;\n");
@@ -181,30 +201,34 @@ void Compiler::compileData() const
             //Если встертился массив
             if (type->typedefStr.contains("[")) {
                 assignSetterGetterBlock.append(var->name + ".Assign(this, &POData::set_" + var->name + ", &POData::get_" + var->name + ", &POData::set_" + var->name + ", &POData::get_" + var->name + ");\n");
-                deleteBlock.append("delete[] " + var->name + ";\n");
+                deleteBlock.append("delete[] _" + var->name + ";\n");
                 initMemoryBlock.append("_" + var->name + " = (" + var->type + "*)" + "(new " + var->type + ");\n");
-                getDataSizeBlock.append("case " + QString::number(i) + ":\n"
+                getDataSizeBlock.append("case " + QString::number(i++) + ":\n"
                                         "\tresult = sizeof(" + var->type + ") / " + var->type + "_LENGTH;\n"
                                         "\tbreak;\n");
+                //getter by index
                 setGetBlock.append(intType + " POData::get_" + var->name + "(const int& index)\n{\n"
                                    "\tif (_" + var->name + " == NULL) _" + var->name + " = (" + var->type + "*)" + "(new " + var->type + ");\n" +
                                    "\tgetData(" + var->name + "_id, index, 1, &(*_" + var->name + ")[index]);\n"
-                                   "\treturn *_" + var->name + ";\n}\n\n");
-                setGetBlock.append(intType + " POData::set_" + var->name + "(const int& index, const" + intType + " &value)\n{\n"
+                                   "\treturn (*_" + var->name + ")[index];\n}\n\n");
+                //setter by index
+                setGetBlock.append(intType + " POData::set_" + var->name + "(const int& index, const " + intType + " &value)\n{\n"
                                    "\tsetData(" + var->name + "_id, index, 1, &value);\n"
                                    "\treturn value;\n}\n\n");
+                //getter all array
                 setGetBlock.append("ptr" + var->type + " POData::get_" + var->name + "()\n{\n"
                                    "\tif (_" + var->name + " == NULL) _" + var->name + " = (" + var->type + "*)" + "(new " + var->type + ");\n" +
                                    "\tgetData(" + var->name + "_id, 0, " + var->type + "_LENGTH" + ", _" + var->name +");\n"
                                    "\treturn *_" + var->name + ";\n}\n\n");
+                //setter all array
                 setGetBlock.append("ptr" + var->type + " POData::set_" + var->name + "(const " + "ptr" + var->type + " &value)\n{\n"
                                    "\tsetData(" + var->name + "_id, 0, " + var->type + "_LENGTH" ", *(&value));\n"
                                    "\treturn (" + intType + " *)value;\n}\n\n");
             } else {
                 assignSetterGetterBlock.append(var->name + ".Assign(this, &POData::set_" + var->name + ", &POData::get_" + var->name + ");\n");
-                deleteBlock.append("delete " + var->name + ";\n");
+                deleteBlock.append("delete _" + var->name + ";\n");
                 initMemoryBlock.append("*(_" + var->name + " = new " + var->type + ")" + (var->initValue.isEmpty() ? ";\n" : " = " + var->initValue + ";\n"));
-                getDataSizeBlock.append("case " + QString::number(i) + ":\n"
+                getDataSizeBlock.append("case " + QString::number(i++) + ":\n"
                                         "\tresult = sizeof(" + var->type + ");\n"
                                         "\tbreak;\n");
                 setGetBlock.append(var->type + " POData::get_" + var->name + "()\n{\n"
@@ -219,7 +243,7 @@ void Compiler::compileData() const
         poDataText.replace("<#assignSetterGetter>", assignSetterGetterBlock);
         poDataText.replace("<#delete>", deleteBlock);
         poDataText.replace("<#initId>", initIdBlock);
-        poDataText.replace("<#setGetBlock>", setGetBlock);
+        poDataText.replace("<#setGet>", setGetBlock);
 
         initMemoryBlock.append("} else {\n");
         getDataAddrBlock.append("}\nreturn result;\n");
@@ -234,7 +258,10 @@ void Compiler::compileData() const
         initMemoryBlock.append("}\n");
         poDataText.replace("<#initMemory>", initMemoryBlock);
 
+        //Сохраняем файл
+        QFile poDataCpp(myOutputDirectory + "/" + PODATA_FILE_NAME + ".cpp");
+        poDataCpp.open(QFile::WriteOnly);
+        poDataCpp.write(poDataText.toUtf8());
+        poDataCpp.close();
     }
-
-
 }

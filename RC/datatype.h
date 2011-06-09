@@ -10,7 +10,7 @@ public:
     QString name;
     QString typedefStr;
 
-    bool operator ==(const DataType& value) const;
+    ~DataType();
 };
 
 #endif // DATATYPE_H

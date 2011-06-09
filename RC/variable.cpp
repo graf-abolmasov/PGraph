@@ -1,4 +1,5 @@
 #include "variable.h"
+#include "globalvariables.h"
 
 Variable::Variable(QString name, QString type, QString initValue, QString comment)
 {
@@ -6,9 +7,24 @@ Variable::Variable(QString name, QString type, QString initValue, QString commen
     this->type = type;
     this->initValue = initValue;
     this->comment = comment;
+
+    this->myType = NULL;
 }
 
-//bool Variable::operator ==(const Variable& other) const
+DataType *Variable::getDataType()
+{
+    if (this->myType == NULL)
+        myType = globalDBManager->getDataType(this->type);
+    return myType;
+}
+
+//void Variable::setType(const QString &value)
 //{
-//    return other.name == this->name;
+//    this->type = value;
+//    this->myType = NULL;
+//}
+
+//QString Variable::getType() const
+//{
+//    return this->type;
 //}

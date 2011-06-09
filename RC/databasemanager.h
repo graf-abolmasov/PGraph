@@ -43,14 +43,16 @@ public:
     bool saveGraph(Graph* graph);
     bool updateGraph(Graph* graph);
 
-    bool saveVariableList(QList<Variable*>& varList);
-    bool getVariableList(QList<Variable*>& varList);
+    bool saveVariableList(QList<Variable*> &varList);
+    bool getVariableList(QList<Variable*> &varList);
 
-    bool saveDataTypeList(QList<DataType*>& typeList);
-    bool getDataTypeList(QList<DataType*>& typeList);
+    bool saveDataTypeList(QList<DataType*> &typeList);
+    bool getDataTypeList(QList<DataType*> &typeList);
+    DataType *getDataType(const QString &value);
+    //QList<DataType> getDataTypeList();
 
-    bool saveActorList(QList<Actor*>& actorList);
-    bool getActorList(QList<Actor*>& actorList);
+    bool saveActorList(QList<Actor*> &actorList);
+    bool getActorList(QList<Actor*> &actorList);
     Actor* getActor(QString namepr);
 
     bool savePredicateList(QList<Predicate*>& predList);
