@@ -26,6 +26,7 @@ public:
 private:
     QMenu *grafMenu;
     QMenu *objectMenu;
+    QMenu *dataMenu;
     QMenu *buildMenu;
     QMenu *helpMenu;
 
@@ -52,6 +53,7 @@ private:
     //Данные
     QAction *variablesAct;
     QAction *dataTypeAct;
+    QAction *compileDataAct;
 
     //О программе
     QAction *aboutEditorAct;
@@ -129,6 +131,7 @@ private slots:
     void CMObjList();		//+ Объект->Редактор объектов
     void CMEdtVar();		//+ Данные->Словарь данных
     void CMEdtType();		//+ Данные->Список типов
+    void CMCompileData();       //+ Данные->Компиляция данных
     void CMGspUser(){}		// Данные->Gspuser.h
     void CMLibraries(){}	// Данные->Библиотеки
     void CMThickArcs(){}	// Настройки->Приоритеты дуг

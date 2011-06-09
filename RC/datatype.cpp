@@ -1,12 +1,13 @@
 #include "datatype.h"
+#include <QDebug>
 
 DataType::DataType(QString name, QString typedefStr)
 {
     this->name = name;
     this->typedefStr = typedefStr;
 }
-
-bool DataType::operator ==(const DataType& other) const
+DataType::~DataType()
 {
-    return other.name == this->name;
+    qDebug() << "DataType::~DataType()";
 }
+

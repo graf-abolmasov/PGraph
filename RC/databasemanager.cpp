@@ -286,7 +286,7 @@ bool DataBaseManager::getDataTypeList(QList<DataType*>& typeList){
         return false;
     QSqlQuery query;
     typeList.clear();
-    query.prepare("SELECT PROJECT_ID, TYPE, TYPEDEF FROM typsys WHERE PROJECT_ID = :PROJECT_ID ORDER BY TYPE;");
+    query.prepare("SELECT PROJECT_ID, TYPE, TYPEDEF FROM typsys WHERE PROJECT_ID = :PROJECT_ID;");
     query.bindValue(":PROJECT_ID", myProjectId);
     query.exec();
     globalLogger->writeLog(query.executedQuery().toUtf8());
@@ -295,6 +295,38 @@ bool DataBaseManager::getDataTypeList(QList<DataType*>& typeList){
     }
     db.close();
     return (db.lastError().type() == QSqlError::NoError);
+}
+
+//QList<DataType> DataBaseManager::getDataTypeList() throw QString
+//{
+//    QList<DataType> result;
+//    if (!db.open())
+//        throw QObject::tr("Не удалось получить список типов.\nОшибка: ") + db.lastError().text();
+//    QSqlQuery query;
+//    query.prepare("SELECT PROJECT_ID, TYPE, TYPEDEF FROM typsys WHERE PROJECT_ID = :PROJECT_ID;");
+//    query.bindValue(":PROJECT_ID", myProjectId);
+//    query.exec();
+//    globalLogger->writeLog(query.executedQuery().toUtf8());
+//    while (query.next())
+//        result.append(DataType(query.value(1).toString(), query.value(2).toString()));
+//    db.close();
+//    return result;
+//}
+
+DataType* DataBaseManager::getDataType(const QString &type)
+{
+    if (!db.open())
+        return false;
+    QSqlQuery query;
+    query.prepare("SELECT PROJECT_ID, TYPE, TYPEDEF FROM typsys WHERE PROJECT_ID = :PROJECT_ID AND TYPE = :TYPE;");
+    query.bindValue(":PROJECT_ID", myProjectId);
+    query.bindValue(":TYPE", type);
+    query.exec();
+    globalLogger->writeLog(query.executedQuery().toUtf8());
+    DataType *result;
+    result = query.next() ? new DataType(query.value(1).toString(), query.value(2).toString()) : NULL;
+    db.close();
+    return result;
 }
 
 bool DataBaseManager::saveVariableList(QList<Variable*>& varList)

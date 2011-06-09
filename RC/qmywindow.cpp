@@ -16,6 +16,7 @@
 #include "qsyncarc.h"
 #include "qarc.h"
 #include "qcomment.h"
+#include "compiler.h"
 
 QLabel *globalInfoLabel;
 
@@ -58,9 +59,11 @@ void TMyWindow::createMenus()
     objectMenu->addAction(viewContentAct);
     objectMenu->addAction(viewGarbageAct);
 
-    objectMenu = menuBar()->addMenu(tr("Данные"));
-    objectMenu->addAction(variablesAct);
-    objectMenu->addAction(dataTypeAct);
+    dataMenu = menuBar()->addMenu(tr("Данные"));
+    dataMenu->addAction(variablesAct);
+    dataMenu->addAction(dataTypeAct);
+    dataMenu->addSeparator();
+    dataMenu->addAction(compileDataAct);
 
     buildMenu = menuBar()->addMenu(tr("Запуск"));
     buildMenu->addAction(runAct);
@@ -146,6 +149,9 @@ void TMyWindow::createActions()
 
     dataTypeAct = new QAction(tr("Список типов"), this);
     connect(dataTypeAct, SIGNAL(triggered()), this, SLOT(CMEdtType()));
+
+    compileDataAct = new QAction(tr("Компиляция данных"), this);
+    connect(compileDataAct, SIGNAL(triggered()), this, SLOT(CMCompileData()));
 
     runAct = new QAction(QIcon(":/images/build.png"), tr("Запуск"), this);
     runAct->setStatusTip(tr("Компиляция и запуск"));
@@ -764,4 +770,10 @@ void TMyWindow::CMECut()
 void TMyWindow::CMEPaste()
 {
     //TODO: реализовать вставку
+}
+
+void TMyWindow::CMCompileData()
+{
+    Compiler c;
+    c.compileData();
 }

@@ -8,6 +8,7 @@
 #include "md5.h"
 #include "logger.h"
 #include "globalvariables.h"
+#include "compiler.h"
 
 int main(int argc, char *argv[])
 {  	
@@ -30,10 +31,8 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-
     TMyWindow w;
     w.show();
-    //w.showMaximized();
 
     int result = a.exec();
 
