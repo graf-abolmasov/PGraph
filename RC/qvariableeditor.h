@@ -14,24 +14,29 @@ class QVariableEditor : public QDialog {
     Q_OBJECT
 public:
 
-    explicit QVariableEditor(QWidget *parent = 0);
+    static QVariableEditor *getCreator();
+    static QVariableEditor *getEditor(const Variable *var);
+
     ~QVariableEditor();
 
-    void prepareForm(Variable *var);
-    Variable *getResult();
+    const Variable *getResult() const;
 
 protected:
     void changeEvent(QEvent *e);
 
 private:
     Ui::QVariableEditor *ui;
+    const Variable *myVariable;
+    Variable *result;
+    QList<const DataType *> myTypeList;
 
-    Variable *myVariable;
-    QList<DataType *> typeList;
+    void makeResult();
 
+    explicit QVariableEditor(QWidget *parent = 0);
+    QVariableEditor(const Variable *var, QWidget *parent = 0);
 private slots:
-    void on_pushButton_clicked();
     void enableOkButton();
+    void on_buttonBox_accepted();
 };
 
 #endif // QVARIABLEEDITOR_H

@@ -16,7 +16,7 @@ public:
         { return Type; }
     QRectF boundingRect() const;
     QPainterPath shape() const;
-    Variable *variable;
+    const Variable *variable;
 protected:
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);

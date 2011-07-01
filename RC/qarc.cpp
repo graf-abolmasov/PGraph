@@ -432,7 +432,7 @@ QArc::QArc(QTop *startItem, QTop *endItem, QMenu *contextMenu,
     //инициализация указателей
     arcTop          = NULL;
     currentLine     = NULL;
-    predicate       = NULL;
+    myPredicate       = NULL;
     myStartTop      = startItem;
     myEndTop        = endItem;
     myContextMenu   = contextMenu;
@@ -636,22 +636,22 @@ void QArc::setArcType(ArcType type)
 /*!
   Преобразует в простой формат дуги для сохранения в базу данных.
 */
-Arc* QArc::toArc()
+Arc QArc::toArc()
 {
     QStringList nodes;
     foreach(QArcLine* line, lines){
         nodes.append(QString::number(line->line().x1()) + " " + QString::number(line->line().y1()) + " " +
                      QString::number(line->line().x2()) + " " + QString::number(line->line().y2()));
     }
-    return new Arc(Arc::ArcType(arcType()),
-                   priority(),
-                   myStartTop->number,
-                   myEndTop->number,
-                   predicate == NULL ? "" : predicate->name,
-                   nodes);
+    return Arc(Arc::ArcType(arcType()),
+               priority(),
+               myStartTop->number,
+               myEndTop->number,
+               myPredicate,
+               nodes);
 }
 
-Arc::Arc(ArcType type, int priority, int startTop, int endTop, QString predicate, QStringList &lines)
+Arc::Arc(ArcType type, int priority, int startTop, int endTop, const Predicate *predicate, QStringList &lines)
 {
     this->type = type;
     this->priority = priority;
@@ -760,4 +760,14 @@ void QArc::freeze()
 void QArc::unfreeze()
 {
     freezed = false;
+}
+
+void QArc::setPredicate(const Predicate *predicate)
+{
+    myPredicate = predicate;
+}
+
+const Predicate *QArc::getPredicate() const
+{
+    return myPredicate;
 }

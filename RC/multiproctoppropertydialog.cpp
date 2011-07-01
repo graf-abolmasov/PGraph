@@ -17,6 +17,13 @@ MultiProcTopPropertyDialog::MultiProcTopPropertyDialog(QWidget *parent) :
     ui->setupUi(this);
 }
 
+MultiProcTopPropertyDialog *MultiProcTopPropertyDialog::getDialog(QMultiProcTop *top)
+{
+    MultiProcTopPropertyDialog *result = new MultiProcTopPropertyDialog();
+    result->prepareForm(top);
+    return result;
+}
+
 MultiProcTopPropertyDialog::~MultiProcTopPropertyDialog()
 {
     delete ui;
@@ -36,63 +43,47 @@ void MultiProcTopPropertyDialog::changeEvent(QEvent *e)
 
 void MultiProcTopPropertyDialog::prepareForm(QMultiProcTop *top)
 {
-    myTop = top;
-    ui->procCountSpnBox->setValue(myTop->procCount);
+    ui->procCountSpnBox->setValue(top->procCount);
 
     //Добавляем пустой актор
-    myActorList.insert(0, NULL);
     ui->actorsListWidget->addItem(tr("Нет"));
 
     //Добавляем агрегаты
-    QList<Graph* > myGraphList;
-    if (globalDBManager->getGraphList(myGraphList))
-        foreach(Graph* graph, myGraphList){
-            QList<Variable* > varList;
-            QStringList varAMList;
-            myActorList.append(new Actor(graph->name, graph->extName, Actor::GraphType, "", varList, varAMList, QImage()));
-        }
-    else QMessageBox::critical(NULL,
-                               QObject::tr("Ошибка"),
-                               QObject::tr("Не удалось получить список агрегатов.\n") + globalDBManager->lastError().databaseText(),
-                               QMessageBox::Ok);
+    QList<Graph *> myGraphList;
+    myGraphList = globalDBManager->getGraphList();
+    foreach(Graph *graph, myGraphList)
+        myActorList.append(graph);
 
     //Добавляем акторы
     //Наверно это не нужно, т.к. в параллельных ветвях можно использовать только агрегаты
-    if (globalDBManager->getActorList(myActorList))
-        for (int i = 1 ; i < myActorList.count(); i++)
-            ui->actorsListWidget->addItem(myActorList.at(i)->extName);
-    else QMessageBox::critical(NULL,
-                               QObject::tr("Ошибка"),
-                               QObject::tr("Не удалось получить список акторов.\n") + globalDBManager->lastError().databaseText(),
-                               QMessageBox::Ok);
+    myActorList.append(globalDBManager->getActorList());
+    for (int i = 0 ; i < myActorList.count(); i++)
+        ui->actorsListWidget->addItem(myActorList[i]->extName);
 
     //Выделяем актор в списке
-    if (top->actor != NULL){
-        int idx = -1;
-        for (int i = 1; i < myActorList.count(); i++)
-            if (top->actor->name == myActorList.at(i)->name &&
-                top->actor->extName == myActorList.at(i)->extName) {
-                idx = i;
-                break;
-        }
+    if (top->actor != NULL) {
+        int idx = myActorList.indexOf(top->actor);
         if (idx != -1) ui->actorsListWidget->setCurrentRow(idx);
         else {
             QMessageBox(QMessageBox::Critical, tr("Ошибка"), tr("Вершина использует несуществующий объект"), QMessageBox::Ok).exec();
             top->actor = NULL;
+            //TODO: Сзедать констрэйт на удаление актора у который используется в вершине
         }
     } else ui->actorsListWidget->setCurrentRow(0);
+
+    theirTop = top;
 }
 
 QMultiProcTop* MultiProcTopPropertyDialog::getResult()
 {
-    return myTop;
+    return theirTop;
 }
 
 void MultiProcTopPropertyDialog::on_actorsListWidget_currentRowChanged(int currentRow)
 {
     QString info("");
     if (currentRow > 0){
-        Actor* actor = myActorList.at(currentRow);
+        Actor *actor = myActorList[currentRow];
         info.append(tr("Name: ") + actor->name + "\r\n");
         QString type;
         switch (actor->type){
@@ -119,39 +110,34 @@ void MultiProcTopPropertyDialog::on_actorsListWidget_itemDoubleClicked(QListWidg
 
 void MultiProcTopPropertyDialog::on_buttonBox_accepted()
 {
-    QList<Top* > topList;
-    QList<Arc* > arcList;
-    QList<Comment* > commentList;
-    QList<QSyncArc* > syncArcList;
-    QList<QMultiProcTop* > multiProcTopList;
-    myTop->actor = myActorList.at(ui->actorsListWidget->currentRow());
-    myTop->procCount = ui->procCountSpnBox->value();
-    if (myTop->actor == NULL) return;
-    QString extName = myTop->actor->extName + " " + QString::number(myTop->procCount) + tr(" процессов");
+    theirTop->actor = myActorList[ui->actorsListWidget->currentRow()];
+    theirTop->procCount = ui->procCountSpnBox->value();
+    if (theirTop->actor == NULL) return;
+    QString extName = theirTop->actor->extName + " " + QString::number(theirTop->procCount) + tr(" процессов");
     QString name = getCRC(extName.toUtf8());
-    Graph* newGraph = new Graph(name, extName, topList, arcList, commentList, syncArcList, multiProcTopList);
-    Top* headTop = new Top(0, -85, myTop->procCount*50 - 10, 30, 0, -1, true, "", "T");
-    newGraph->topList.append(headTop);
-    for (int i = 0; i < myTop->procCount; i++) {
-        Top* newTop = new Top(-(myTop->procCount-1)*25+i*50, 0, 40, 30, i+1, -1, false, myTop->actor->name, "T");
-        newGraph->topList.append(newTop);
+    Graph newGraph(name, extName, QList<Top>(),  QList<Arc>(), QList<Comment>(), QList<SyncArc>());
+    Top headTop(0, -85, theirTop->procCount*50 - 10, 30, 0, -1, true, "", "T");
+    newGraph.topList.append(headTop);
+    for (int i = 0; i < theirTop->procCount; i++) {
+        Top newTop(-(theirTop->procCount-1)*25+i*50, 0, 40, 30, i+1, -1, false, theirTop->actor->name, "T");
+        newGraph.topList.append(newTop);
         QStringList nodes;
-        nodes.append(QString::number(-(myTop->procCount-1)*25+i*50) + " " +
+        nodes.append(QString::number(-(theirTop->procCount-1)*25+i*50) + " " +
                      QString::number(-85) + " " +
-                     QString::number(-(myTop->procCount-1)*25+i*50) + " " +
+                     QString::number(-(theirTop->procCount-1)*25+i*50) + " " +
                      QString::number(-1));
-        Arc* newArc = new Arc(Arc::ParallelArc, i+1, 0, i+1, "", nodes);
-        newGraph->arcList.append(newArc);
+        Arc newArc(Arc::ParallelArc, i+1, 0, i+1, NULL, nodes);
+        newGraph.arcList.append(newArc);
         nodes.clear();
-        nodes.append(QString::number(-(myTop->procCount-1)*25+i*50) + " " +
+        nodes.append(QString::number(-(theirTop->procCount-1)*25+i*50) + " " +
                      QString::number(1) + " " +
-                     QString::number(-(myTop->procCount-1)*25+i*50) + " " +
+                     QString::number(-(theirTop->procCount-1)*25+i*50) + " " +
                      QString::number(85));
-        newArc = new Arc(Arc::TerminateArc, 1, i+1, myTop->procCount + 1, "", nodes);
-        newGraph->arcList.append(newArc);
+        newArc = Arc(Arc::TerminateArc, 1, i+1, theirTop->procCount + 1, NULL, nodes);
+        newGraph.arcList.append(newArc);
     }
-    Top* endTop = new Top(0, 85, myTop->procCount*50 - 10, 30, myTop->procCount + 1, -1, true, "", "T");
-    newGraph->topList.append(endTop);
-    if (globalDBManager->saveGraph(newGraph))
-        myTop->actor = globalDBManager->getActor(name);
+    Top endTop(0, 85, theirTop->procCount*50 - 10, 30, theirTop->procCount + 1, -1, true, "", "T");
+    newGraph.topList.append(endTop);
+    globalDBManager->saveGraphDB(newGraph);
+    theirTop->actor = globalDBManager->getActor(name);
 }

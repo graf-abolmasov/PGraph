@@ -2,6 +2,8 @@
 #define QDATATYPEEDITOR_H
 
 #include <QtGui/QDialog>
+#include "datatype.h"
+#include <QPointer>
 
 namespace Ui {
     class QDataTypeEditor;
@@ -12,31 +14,36 @@ class QComboBox;
 class QLineEdit;
 QT_END_NAMESPACE
 
-class DataType;
-
 class QDataTypeEditor : public QDialog {
     Q_OBJECT
 
 public:
     enum Mode {Simple, Array, Struct};
+
+    static QDataTypeEditor *getCreator(Mode mode);
+    static QDataTypeEditor *getEditor(const DataType *type);
+
     explicit QDataTypeEditor(QWidget *parent = 0);
-    QDataTypeEditor(Mode mode, QWidget *parent = 0);
     ~QDataTypeEditor();
-    DataType* getResult();
-    void prepareForm(DataType *type);
+    const DataType *getResult() const;
 
 protected:
     void changeEvent(QEvent *e);
 
 private:
     Ui::QDataTypeEditor *ui;
-    DataType* myDataType;
     Mode myMode;
     QStringList indexes;
-    QList<DataType *> typeList;
-    QComboBox* varTypeCmbBox;
-    QLineEdit* varNameEdt;
+    QList<const DataType *> myTypeList;
+    const DataType *myDataType;
+    DataType *result;
+    QPointer<QComboBox> varTypeCmbBox;
+    QPointer<QLineEdit> varNameEdt;
 
+    void makeResult();
+
+    QDataTypeEditor(Mode mode, QWidget *parent = 0);
+    QDataTypeEditor(const DataType *type, QWidget *parent = 0);
 private slots:
     void on_structFieldsTable_currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn);
     void on_arrDimensionSpnBox_valueChanged(int );

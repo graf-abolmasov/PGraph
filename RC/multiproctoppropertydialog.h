@@ -17,17 +17,19 @@ namespace Ui {
 class MultiProcTopPropertyDialog : public QDialog {
     Q_OBJECT
 public:
-    MultiProcTopPropertyDialog(QWidget *parent = 0);
+    static MultiProcTopPropertyDialog *getDialog(QMultiProcTop *top);
     ~MultiProcTopPropertyDialog();
-    void prepareForm(QMultiProcTop *top);
     QMultiProcTop *getResult();
 
 protected:
     void changeEvent(QEvent *e);
 
 private:
+    MultiProcTopPropertyDialog(QWidget *parent = 0);
+    void prepareForm(QMultiProcTop *top);
+
     Ui::MultiProcTopPropertyDialog *ui;
-    QMultiProcTop *myTop;
+    QMultiProcTop *theirTop;
     QList<Actor *> myActorList;
 
 private slots:

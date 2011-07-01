@@ -37,13 +37,9 @@ Graph* QOpenGraphDialog::getResult()
 
 void QOpenGraphDialog::prepareForm()
 {
-    if (!globalDBManager->getGraphList(myGraphList))
-        QMessageBox::critical(NULL,
-                              QObject::tr("Ошибка"),
-                              QObject::tr("Не удалось получить список агрегатов.\n") + globalDBManager->lastError().databaseText(),
-                              QMessageBox::Ok);
+    myGraphList = globalDBManager->getGraphList();
     for (int i = 0; i < myGraphList.count(); i++)
-        ui->listWidget->addItem(new QListWidgetItem(myGraphList.at(i)->extName));
+        ui->listWidget->addItem(new QListWidgetItem(myGraphList[i]->extName));
 }
 
 void QOpenGraphDialog::on_listWidget_itemDoubleClicked(QListWidgetItem *)

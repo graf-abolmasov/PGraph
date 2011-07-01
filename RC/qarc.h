@@ -2,6 +2,7 @@
 #define QARC_H
 
 #include <QtGui/QGraphicsLineItem>
+#include "graph.h"
 
 #define ARC_TYPE      UserType+4
 
@@ -10,19 +11,6 @@ class QArcLine;
 class Predicate;
 class QSerialArcTop;
 
-class Arc
-{
-public:
-    enum ArcType { SerialArc, ParallelArc, TerminateArc };
-    Arc(ArcType type, int priority, int startTop, int endTop, QString predicate, QStringList &lines);
-    ArcType type;
-    int priority;
-    int startTop;
-    int endTop;
-    QStringList lines;
-    QString predicate;
-};
-
 class QArc : public QGraphicsLineItem
 {
 public:
@@ -30,12 +18,12 @@ public:
     enum ArcType { SerialArc, ParallelArc, TerminateArc };
 
     QList<QArcLine *> lines;
-    QArcLine* currentLine;
+    QArcLine *currentLine;
     QArc(QTop *startItem, QTop *endItem, QMenu *contextMenu,
       QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
     ~QArc();
     bool addLine(QArcLine *line);
-    QArcLine* newLine(QPointF p1, QPointF p2);
+    QArcLine *newLine(QPointF p1, QPointF p2);
     QRectF boundingRect() const;
     QPainterPath shape() const;
     void setPriority(int w);
@@ -54,14 +42,16 @@ public:
     ArcType arcType() const
         { return myArcType; }
     void setArcType(ArcType type);
-    QArcLine* prevLine(){
+    QArcLine *prevLine(){
         if (lines.count() > 0)
             return lines.last();
          else return NULL;
     }
     void setPen(const QPen &pen);
-    Predicate* predicate;
-    Arc* toArc();
+    void setPredicate(const Predicate *predicate);
+    const Predicate *getPredicate() const;
+
+    Arc toArc();
     bool autoBuild(QTop* top, float dx, float dy);
     bool remake(QTop *, float dx, float dy);
     bool moveLine(QArcLine* line, float dx, float dy);
@@ -73,6 +63,7 @@ protected:
                QWidget *widget = 0);
 
 private:
+    const Predicate *myPredicate;
     bool freezed;
     ArcType myArcType;
     QTop *myStartTop;

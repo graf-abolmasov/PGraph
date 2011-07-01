@@ -277,11 +277,10 @@ void TDrawWindow::saveAsImage(QString filename)
 */
 void TDrawWindow::showArcPropDialog()
 {
-    ArcPropertyDialog dlg;
     QArc* arc = qgraphicsitem_cast<QArc *>(scene->selectedItems().first()->parentItem());
-    dlg.prepareForm(arc);
-    if (dlg.exec()) {
-        arc = dlg.getResult();
+    ArcPropertyDialog *dlg = ArcPropertyDialog::getDialog(arc);
+    if (dlg->exec()) {
+        arc = dlg->getResult();
         emit itemChanged(arc);
         emit sceneChanged();
     }
@@ -300,7 +299,8 @@ void TDrawWindow::makeAsRoot()
 /*!
   Возвращает список всех вершиен лежащих на сцене
 */
-QList<QTop* > TDrawWindow::allTops(){
+QList<QTop* > TDrawWindow::allTops() const
+{
     QList<QTop* > topList;
     for (int i = 0; i < scene->items().count(); i++)
         if (scene->items().at(i)->type() == QTop::Type)
@@ -311,7 +311,8 @@ QList<QTop* > TDrawWindow::allTops(){
 /*!
   Возвращает список всех дуг лежащих на сцене
 */
-QList<QArc* > TDrawWindow::allArcs(){
+QList<QArc* > TDrawWindow::allArcs() const
+{
     QList<QArc* > arcList;
     for (int i = 0; i < scene->items().count(); i++)
         if (scene->items().at(i)->type() == QArc::Type)
@@ -322,7 +323,8 @@ QList<QArc* > TDrawWindow::allArcs(){
 /*!
   Возвращает список всех многопоточных вершин лежащих на сцене
 */
-QList<QMultiProcTop* > TDrawWindow::allMultiProcTop(){
+QList<QMultiProcTop* > TDrawWindow::allMultiProcTop() const
+{
     QList<QMultiProcTop* > topList;
     for (int i = 0; i < scene->items().count(); i++)
         if (scene->items().at(i)->type() == QMultiProcTop::Type)
@@ -333,7 +335,8 @@ QList<QMultiProcTop* > TDrawWindow::allMultiProcTop(){
 /*!
   Возвращает список всех комментариев лежащих на сцене
 */
-QList<QComment* > TDrawWindow::allComments(){
+QList<QComment* > TDrawWindow::allComments() const
+{
     QList<QComment* > commentList;
     for (int i = 0; i < scene->items().count(); i++)
         if (scene->items().at(i)->type() == QComment::Type)
@@ -344,7 +347,8 @@ QList<QComment* > TDrawWindow::allComments(){
 /*!
   Возвращает список всех дуг синхронизации лежащих на сцене
 */
-QList<QSyncArc* > TDrawWindow::allSyncArcs(){
+QList<QSyncArc* > TDrawWindow::allSyncArcs() const
+{
     QList<QSyncArc* > arcList;
     for (int i = 0; i < scene->items().count(); i++)
         if (scene->items().at(i)->type() == QSyncArc::Type)
@@ -355,22 +359,20 @@ QList<QSyncArc* > TDrawWindow::allSyncArcs(){
 /*!
   Возвращает граф
 */
-Graph* TDrawWindow::getGraph()
+Graph TDrawWindow::getGraph() const
 {
-    QList<Top* > topList;
+    QList<Top> topList;
     foreach (QTop* top, allTops())
         topList.append(top->toTop());
-    QList<Arc* > arcList;
+    QList<Arc> arcList;
     foreach (QArc* arc, allArcs())
         arcList.append(arc->toArc());
-    QList<Comment* > commentList;
+    QList<Comment> commentList;
     foreach (QComment* comment, allComments())
         commentList.append(comment->toComment());
 
-    QList<QSyncArc* > syncArcList = allSyncArcs();
-    QList<QMultiProcTop* > multiProcTopList = allMultiProcTop();
-    Graph* result = new Graph(myGraphName, myGraphExtName, topList, arcList, commentList, syncArcList, multiProcTopList);
-    return result;
+    QList<SyncArc> syncArcList;// = allSyncArcs();
+    return Graph(myGraphName, myGraphExtName, topList, arcList, commentList, syncArcList);
 }
 
 /*!
@@ -381,82 +383,55 @@ void TDrawWindow::loadGraph(const QString &name)
 {
     globalLogger->writeLog("TDrawWindow::loadGraph start", Logger::All);
     scene->clear();
-    QList<Top* > topList;
-    QList<Arc* > arcList;
-    QList<Comment* > commentList;
-    QList<QSyncArc* > syncArcList;
-    QList<QMultiProcTop* > multiProcTopList;
-
-    QList<Actor* > actorList;
-    QList<Predicate* > predicateList;
-    Graph graph(name, "", topList, arcList, commentList, syncArcList, multiProcTopList);
-    globalDBManager->getGraph(graph);
-    globalDBManager->getActorList(actorList);
-    globalDBManager->getPredicateList(predicateList);
-    foreach (Top* top, graph.topList) {
-        if (top->type == "T") {
+    Graph graph = globalDBManager->getGraphDB(name);
+    foreach (Top top, graph.topList) {
+        QTop *qtop = NULL;
+        if (top.type == "T") {
             QNormalTop *qtop = new QNormalTop(topMenu, NULL, scene);
-            qtop->number = top->number;
-            if (top->isRoot)
+            if (top.isRoot)
                 scene->setRootTop(qtop);
-            double w = top->sizeX;
-            double h = top->sizeY;
+            double w = top.sizeX;
+            double h = top.sizeY;
             qtop->setRect(-w/2, -h/2, w, h);
-            qtop->setPos(top->x, top->y);
-            foreach (Actor* actor, actorList) {
-                if (actor->name == top->actor) {
-                    qtop->actor = actor;
-                    break;
-                }
-            }
-        } else if (top->type == "M") {
+        } else if (top.type == "M") {
             QMultiProcTop *qtop = new QMultiProcTop(multiProcMenu, NULL, scene);
-            qtop->number = top->number;
-            qtop->setPos(top->x, top->y);
-            qtop->procCount = top->procCount;
-            foreach (Actor* actor, actorList) {
-                if (actor->name == top->actor) {
-                    qtop->actor = actor;
-                    break;
-                }
-            }
+            qtop->procCount = top.procCount;
         }
+        qtop->number = top.number;
+        qtop->setPos(top.x, top.y);
+        Actor *actor = globalDBManager->getActor(top.actor);
+        qtop->actor = actor;
     }
 
-    QList<QPair<QArc*, int> > qarcList;
-    foreach (Arc* arc, graph.arcList) {
+    QList<QPair<QArc *, int> > qarcList;
+    foreach (Arc arc, graph.arcList) {
         QTop *startTop = NULL;
         QTop *endTop = NULL;
         QList<QTop* > topList = allTops();
         for (int i = 0; i < topList.count(); i++){
-            if (topList.at(i)->number == arc->startTop)
-                startTop = topList.at(i);
-            if (topList.at(i)->number == arc->endTop)
-                endTop = topList.at(i);
+            if (topList[i]->number == arc.startTop)
+                startTop = topList[i];
+            if (topList[i]->number == arc.endTop)
+                endTop = topList[i];
         }
 
         QArc *qarc = new QArc(startTop, endTop, arcMenu, NULL, scene);
-        for (int i = 0; i < arc->lines.count(); i++){
-            QStringList nodes = arc->lines.at(i).split(" ");
+        for (int i = 0; i < arc.lines.count(); i++){
+            QStringList nodes = arc.lines.at(i).split(" ");
             QPointF startPoint = QPointF(nodes.at(0).toFloat(), nodes.at(1).toFloat());
             QPointF endPoint = QPointF(nodes.at(2).toFloat(), nodes.at(3).toFloat());
             qarc->newLine(startPoint, endPoint);
         }
         qarc->addLine(qarc->currentLine);
         qarc->currentLine = NULL;
-        qarc->setArcType(QArc::ArcType(arc->type));
-        foreach (Predicate* predicate, predicateList) {
-            if (predicate->name == arc->predicate) {
-                qarc->predicate = predicate;
-                break;
-            }
-        }
+        qarc->setArcType(QArc::ArcType(arc.type));
+        qarc->setPredicate(arc.predicate);
 
-        if (qarc->predicate != NULL && !globalPredicateList.contains(qarc->predicate->extName))
-            globalPredicateList.append(qarc->predicate->extName);
+        if (qarc->getPredicate() != NULL && !globalPredicateList.contains(qarc->getPredicate()->name))
+            globalPredicateList.append(qarc->getPredicate()->name);
         startTop->addArc(qarc);
         endTop->addArc(qarc);
-        qarcList.append(qMakePair(qarc, arc->priority));
+        qarcList.append(qMakePair(qarc, arc.priority));
     }
 
     //расставляем приоритеты дуг
@@ -464,10 +439,10 @@ void TDrawWindow::loadGraph(const QString &name)
         qarcList.at(i).first->setPriority(qarcList.at(i).second);
     }
 
-    foreach (Comment* comment, graph.commentList) {
+    foreach (Comment comment, graph.commentList) {
         QComment *qcomment = new QComment(commentMenu, NULL, scene);
-        qcomment->setPos(comment->x, comment->y);
-        qcomment->setPlainText(comment->text);
+        qcomment->setPos(comment.x, comment.y);
+        qcomment->setPlainText(comment.text);
     }
 
     myGraphName = graph.name;
@@ -487,36 +462,51 @@ bool TDrawWindow::saveGraph(QString name, QString extName)
     }
     myGraphExtName = extName;
     myGraphName = name;
-    Graph* graph = getGraph();
-    bool result = globalDBManager->saveGraph(graph);
-    if (result)
-        emit graphLoaded(graph->name, graph->extName);
-    return result;
+    Graph graph = getGraph();
+    try {
+        globalDBManager->saveGraphDB(graph);
+        emit graphLoaded(graph.name, graph.extName);
+    } catch (QString s) {
+        QMessageBox::critical(this, tr("Ошибка"), s, QMessageBox::Ok);
+        return false;
+    }
+    return true;
 }
 
 bool TDrawWindow::updateGraph()
 {
-    Graph* graph = getGraph();
-    if (graph->extName != "")
-        return globalDBManager->updateGraph(graph);
-    return false;
+    Graph graph = getGraph();
+    if (graph.extName != "") {
+        try {
+            globalDBManager->updateGraphDB(graph);
+        } catch (QString s) {
+            return false;
+            QMessageBox::critical(this, tr("Ошибка"), s, QMessageBox::Ok);
+        }
+        return true;
+    } else return false;
 }
 
 bool TDrawWindow::saveStruct()
 {
-    Graph* graph = getGraph();
-    if (graph->name != "")
-        return globalDBManager->saveStruct(graph);
-    return false;
+    Graph graph = getGraph();
+    if (graph.extName != "") {
+        try {
+            globalDBManager->saveStruct(graph);
+        } catch (QString s) {
+            return false;
+            QMessageBox::critical(this, tr("Ошибка"), s, QMessageBox::Ok);
+        }
+        return true;
+    } else return false;
 }
 
 void TDrawWindow::showMultiProcTopDialog()
 {
-    MultiProcTopPropertyDialog dlg;
     QMultiProcTop* top = qgraphicsitem_cast<QMultiProcTop *>(scene->selectedItems().first());
-    dlg.prepareForm(top);
-    if (dlg.exec()) {
-        top = dlg.getResult();
+    MultiProcTopPropertyDialog *dlg = MultiProcTopPropertyDialog::getDialog(top);
+    if (dlg->exec()) {
+        top = dlg->getResult();
         emit sceneChanged();
     }
 }

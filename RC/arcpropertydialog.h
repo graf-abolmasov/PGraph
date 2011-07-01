@@ -17,19 +17,20 @@ class Predicate;
 class ArcPropertyDialog : public QDialog {
     Q_OBJECT
 public:
-    ArcPropertyDialog(QWidget *parent = 0);
+    static ArcPropertyDialog *getDialog(QArc *arc);
     ~ArcPropertyDialog();
-    void prepareForm(QArc* arc);
-    QArc* getResult();
+    QArc *getResult();
 
 protected:
     void changeEvent(QEvent *e);
 
 private:
+    ArcPropertyDialog(QWidget *parent = 0);
     Ui::ArcPropertyDialog *ui;
-    QArc *myArc;
-    QList<Predicate *> myPredicateList;
+    QArc *theirArc;
+    QList<const Predicate *> myPredicateList;
 
+    void prepareForm(QArc *arc);
 private slots:
     void on_predicateList_itemDoubleClicked(QListWidgetItem* item);
     void on_buttonBox_accepted();

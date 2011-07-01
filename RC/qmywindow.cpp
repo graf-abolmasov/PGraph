@@ -405,7 +405,6 @@ void TMyWindow::CMObjList()
 void TMyWindow::CMEdtVar()
 {
     QVariableDialog editor;
-    editor.prepareForm();
     if (editor.exec()){
 
     }
@@ -413,9 +412,8 @@ void TMyWindow::CMEdtVar()
 
 void TMyWindow::CMEdtType()
 {
-    QDataTypeDialog editor;
-    editor.prepareForm();
-    if (editor.exec()){
+    QDataTypeDialog *editor = QDataTypeDialog::getDialog();
+    if (editor->exec()){
 
     }
 }
@@ -566,22 +564,22 @@ void TMyWindow::getInfo(QGraphicsItem *item)
             info.append(tr("Приоритет: ") + QString::number(arc->priority()) + "\n" +
                         tr("Ширина пера ") + QString::number(arc->pen().width()) + "\n");
             info.append(tr("Число изломов: ") + QString::number(arc->lines.count()) + "\n");
-            if (arc->predicate != NULL) {
+            if (arc->getPredicate() != NULL) {
                 info.append(tr("\nО предикате\n"));
                 QString predType = tr("");
-                switch(arc->predicate->type) {
+                switch(arc->getPredicate()->type) {
                 case Predicate::inlineType:
                     predType = tr("inline");
                     break;
-                case Predicate::normalType:
+                case Predicate::NormalType:
                     predType = tr("Обычный");
                     break;
                 }
                 info.append(tr("Тип: ") + predType + "\n");
-                info.append(tr("Название: ") + arc->predicate->extName + "\n");
-                info.append(tr("Внутреннее имя: ") + arc->predicate->name + "\n");
-                if (arc->predicate->type == Predicate::normalType)
-                    info.append(tr("Базовый модуль: ") + arc->predicate->baseModule + "\n");
+                info.append(tr("Название: ") + arc->getPredicate()->extName + "\n");
+                info.append(tr("Внутреннее имя: ") + arc->getPredicate()->name + "\n");
+                if (arc->getPredicate()->type == Predicate::NormalType)
+                    info.append(tr("Базовый модуль: ") + arc->getPredicate()->baseModule->name + "\n");
             }
         }
         break;

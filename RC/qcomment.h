@@ -3,6 +3,7 @@
 
 #include <QtGui/QGraphicsTextItem>
 #include <QtGui/QFont>
+#include "graph.h"
 
 QT_BEGIN_NAMESPACE
 class QFocusEvent;
@@ -11,16 +12,6 @@ class QGraphicsItem;
 class QGraphicsScene;
 class QPen;
 QT_END_NAMESPACE
-
-class Comment
-{
-public:
-    Comment(float x, float y, QString text, QFont font);
-    float x;
-    float y;
-    QString text;
-    QFont font;
-};
 
 class QComment : public QGraphicsTextItem
 {
@@ -31,7 +22,7 @@ public:
     QComment(QMenu *menu, QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
     int type() const
         { return Type; }
-    Comment* toComment();
+    Comment toComment();
 
 signals:
     void lostFocus(QComment *item);

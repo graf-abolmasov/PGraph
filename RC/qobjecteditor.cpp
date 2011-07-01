@@ -52,6 +52,10 @@ QObjectEditor::QObjectEditor(QWidget *parent) :
 QObjectEditor::~QObjectEditor()
 {
     delete ui;
+    delete newButton;
+    delete editButton;
+    delete deleteButton;
+    delete editButtonGroup;
 }
 
 void QObjectEditor::changeEvent(QEvent *e)
@@ -72,35 +76,29 @@ void QObjectEditor::changeEvent(QEvent *e)
 */
 void QObjectEditor::prepareForm()
 {
-    QList<Actor *> fullActorList;
-    if (!globalDBManager->getActorList(fullActorList))
-        QMessageBox::critical(NULL,
-                              QObject::tr("Ошибка"),
-                              QObject::tr("Не удалось получить список акторов.\n") + globalDBManager->lastError().databaseText(),
-                              QMessageBox::Ok);
-    foreach (Actor* actor, fullActorList){
-        if (actor->type == Actor::NormalType) {
-            ui->actorList->addItem(QString(actor->extName).replace(QRegExp("(\r+|\n+)"), " "));
-            actorsList.append(actor);
-        } else if (actor->type == Actor::InlineType) {
-            ui->inlineActorList->addItem(QString(actor->extName).replace(QRegExp("(\r+|\n+)"), " "));
-            iActorsList.append(actor);
+    try {
+        QList<Actor *> fullActorList = globalDBManager->getActorList();
+        foreach (Actor *actor, fullActorList){
+            if (actor->type == Actor::NormalType) {
+                ui->actorList->addItem(QString(actor->extName).replace(QRegExp("(\r+|\n+)"), " "));
+                myActorsList.append(actor);
+            } else if (actor->type == Actor::InlineType) {
+                ui->inlineActorList->addItem(QString(actor->extName).replace(QRegExp("(\r+|\n+)"), " "));
+                myInlineActorsList.append(actor);
+            }
         }
-    }
-    QList<Predicate *> fullPredicateList;
-    if (!globalDBManager->getPredicateList(fullPredicateList))
-        QMessageBox::critical(NULL,
-                                      QObject::tr("Ошибка"),
-                                      QObject::tr("Не удалось получить список предикатов.\n") + globalDBManager->lastError().databaseText(),
-                                      QMessageBox::Ok);
-    foreach (Predicate* pred, fullPredicateList){
-        if (pred->type == Predicate::normalType) {
-            ui->predicateList->addItem(QString(pred->extName).replace(QRegExp("(\r+|\n+)"), " "));
-            predicatesList.append(pred);
-        } else if (pred->type == Predicate::inlineType) {
-            ui->inlinePredicateList->addItem(QString(pred->extName).replace(QRegExp("(\r+|\n+)"), " "));
-            iPredicateList.append(pred);
+        QList<const Predicate *> fullPredicateList = globalDBManager->getPredicateList();
+        foreach (const Predicate *pred, fullPredicateList){
+            if (pred->type == Predicate::NormalType) {
+                ui->predicateList->addItem(QString(pred->extName).replace(QRegExp("(\r+|\n+)"), " "));
+                myPredicatesList.append(pred);
+            } else if (pred->type == Predicate::inlineType) {
+                ui->inlinePredicateList->addItem(QString(pred->extName).replace(QRegExp("(\r+|\n+)"), " "));
+                myInlinePredicateList.append(pred);
+            }
         }
+    } catch (QString s) {
+        QMessageBox::critical(this, tr("Ошибка"), s, QMessageBox::Ok);
     }
 }
 
@@ -115,41 +113,37 @@ void QObjectEditor::newButtonClicked()
 
     switch (ui->tab->currentIndex()){
     case 0: //Акторы
-        actorEditor = new QActorEditor(QActorEditor::Normal);
-        actorEditor->prepareForm(NULL);
+        actorEditor = QActorEditor::getCreator(Actor::NormalType);
         if (actorEditor->exec()){
             Actor *actor = actorEditor->getResult();
-            actorsList.append(actor);
+            myActorsList.append(actor);
             ui->actorList->addItem(QString(actor->extName).replace(QRegExp("(\r+|\n+)"), " "));
         }
         delete actorEditor;
         break;
     case 1: //Предикаты
-        predEditor = new QPredicateEditor(QPredicateEditor::Normal);
-        predEditor->prepareForm(NULL);
+        predEditor = QPredicateEditor::getCreator(Predicate::NormalType);
         if (predEditor->exec()){
-            Predicate *pred = predEditor->getResult();
-            predicatesList.append(pred);
+            const Predicate *pred = predEditor->getResult();
+            myPredicatesList.append(pred);
             ui->predicateList->addItem(QString(pred->extName).replace(QRegExp("(\r+|\n+)"), " "));
         }
         delete predEditor;
         break;
     case 2: //I-акторы
-        actorEditor = new QActorEditor(QActorEditor::Inline);
-        actorEditor->prepareForm(NULL);
+        actorEditor = QActorEditor::getCreator(Actor::InlineType);
         if (actorEditor->exec()){
             Actor *actor = actorEditor->getResult();
-            iActorsList.append(actor);
+            myInlineActorsList.append(actor);
             ui->inlineActorList->addItem(QString(actor->extName).replace(QRegExp("(\r+|\n+)"), " "));
         }
         delete actorEditor;
         break;
     case 3: //I-предикаты
-        predEditor = new QPredicateEditor(QPredicateEditor::Inline);
-        predEditor->prepareForm(NULL);
+        predEditor = QPredicateEditor::getCreator(Predicate::inlineType);
         if (predEditor->exec()){
-            Predicate *pred = predEditor->getResult();
-            iPredicateList.append(pred);
+            const Predicate *pred = predEditor->getResult();
+            myInlinePredicateList.append(pred);
             ui->inlinePredicateList->addItem(QString(pred->extName).replace(QRegExp("(\r+|\n+)"), " "));
         }
         delete predEditor;
@@ -160,68 +154,64 @@ void QObjectEditor::newButtonClicked()
 void QObjectEditor::editButtonClicked()
 {
     QActorEditor *actorEditor;
-    QPredicateEditor * predEditor;
+    QPredicateEditor *predEditor;
 
     int idx = -1;
-    Actor* actor;
-    Predicate* pred;
+    //Actor *actor;
+    //Predicate *pred;
     switch (ui->tab->currentIndex()){
     case 0: //Акторы
-        actorEditor = new QActorEditor(QActorEditor::Normal);
         idx = ui->actorList->currentRow();
         if (idx != -1){
-            actor = actorsList.at(idx);
-            actorEditor->prepareForm(actor);
+            Actor *actor = myActorsList[idx];
+            actorEditor = QActorEditor::getEditor(actor);
             if (actorEditor->exec()){
-                actor = actorEditor->getResult();
-                actorsList.replace(idx, actor);
+                Actor *newActor = actorEditor->getResult();
+                myActorsList.replace(idx, newActor);
                 delete ui->actorList->item(idx);
-                ui->actorList->insertItem(idx, QString(actor->extName).replace(QRegExp("(\r+|\n+)"), " "));
+                ui->actorList->insertItem(idx, QString(newActor->extName).replace(QRegExp("(\r+|\n+)"), " "));
             }
+            delete actorEditor;
         }
-        delete actorEditor;
         break;
     case 1: //Предикаты
-        predEditor = new QPredicateEditor(QPredicateEditor::Normal);
         idx = ui->predicateList->currentRow();
         if (idx != -1){
-            pred = predicatesList.at(idx);
-            predEditor->prepareForm(pred);
+            const Predicate *predicate = myPredicatesList[idx];
+            predEditor = QPredicateEditor::getEditor(predicate);
             if (predEditor->exec()){
-                pred = predEditor->getResult();
-                predicatesList.replace(idx, pred);
+                const Predicate *newPred = predEditor->getResult();
+                myPredicatesList.replace(idx, newPred);
                 delete ui->predicateList->item(idx);
-                ui->predicateList->insertItem(idx, QString(pred->extName).replace(QRegExp("(\r+|\n+)"), " "));
+                ui->predicateList->insertItem(idx, QString(newPred->extName).replace(QRegExp("(\r+|\n+)"), " "));
             }
         }
         delete predEditor;
         break;
     case 2: //I-акторы
-        actorEditor = new QActorEditor(QActorEditor::Inline);
         idx = ui->inlineActorList->currentIndex().row();
         if (idx != -1){
-            actor = iActorsList.at(idx);
-            actorEditor->prepareForm(actor);
+            Actor *actor = myInlineActorsList[idx];
+            actorEditor = QActorEditor::getEditor(actor);
             if (actorEditor->exec()){
-                actor = actorEditor->getResult();
-                iActorsList.replace(idx, actor);
+                Actor *newActor = actorEditor->getResult();
+                myInlineActorsList.replace(idx, newActor);
                 delete ui->inlineActorList->item(idx);
-                ui->inlineActorList->insertItem(idx, QString(actor->extName).replace(QRegExp("(\r+|\n+)"), " "));
+                ui->inlineActorList->insertItem(idx, QString(newActor->extName).replace(QRegExp("(\r+|\n+)"), " "));
             }
         }
         delete actorEditor;
         break;
     case 3: //I-предикаты
-        predEditor = new QPredicateEditor(QPredicateEditor::Inline);
         idx = ui->inlinePredicateList->currentRow();
         if (idx != -1){
-            pred = iPredicateList.at(idx);
-            predEditor->prepareForm(pred);
+            const Predicate *pred = myInlinePredicateList[idx];
+            predEditor = QPredicateEditor::getEditor(pred);
             if (predEditor->exec()){
-                pred = predEditor->getResult();
-                iPredicateList.replace(idx, pred);
+                const Predicate *newPred = predEditor->getResult();
+                myInlinePredicateList.replace(idx, newPred);
                 delete ui->inlinePredicateList->item(idx);
-                ui->inlinePredicateList->insertItem(idx, QString(pred->extName).replace(QRegExp("(\r+|\n+)"), " "));
+                ui->inlinePredicateList->insertItem(idx, QString(newPred->extName).replace(QRegExp("(\r+|\n+)"), " "));
             }
         }
         delete predEditor;
@@ -238,8 +228,8 @@ void QObjectEditor::deleteButtonClicked()
         if (idx != -1){
             //TODO: Удалять только неиспользуемые акторы
             delete ui->actorList->item(idx);
-            //delete actorsList.at(idx);
-            actorsList.removeAt(idx);
+            delete myActorsList[idx];
+            myActorsList.removeAt(idx);
         }
         break;
     case 1: //Предикаты
@@ -247,22 +237,24 @@ void QObjectEditor::deleteButtonClicked()
         if (idx != -1){
             //TODO: Удалять только неиспользуемые предикаты
             delete ui->predicateList->item(idx);
-            predicatesList.removeAt(idx);
+            delete myPredicatesList[idx];
+            myPredicatesList.removeAt(idx);
         }
         break;
     case 2: //I-акторы
         idx = ui->inlineActorList->currentRow();
         if (idx != -1){
             delete ui->inlineActorList->item(idx);
-            //delete iActorsList.at(idx);
-            iActorsList.removeAt(idx);
+            delete myInlineActorsList[idx];
+            myInlineActorsList.removeAt(idx);
         }
         break;
     case 3: //I-предикаты
         idx = ui->inlinePredicateList->currentRow();
         if (idx != -1){
             delete ui->inlinePredicateList->item(idx);
-            iPredicateList.removeAt(idx);
+            delete myInlinePredicateList[idx];
+            myInlinePredicateList.removeAt(idx);
         }
         break;
     }
@@ -272,20 +264,12 @@ void QObjectEditor::deleteButtonClicked()
 
 void QObjectEditor::on_buttonBox_accepted()
 {
-    QList<Actor*> fullActorList;
-    fullActorList.append(actorsList);
-    fullActorList.append(iActorsList);
-    if (!globalDBManager->saveActorList(fullActorList))
-        QMessageBox::critical(NULL,
-                              QObject::tr("Ошибка"),
-                              QObject::tr("Не удалось сохранить список акторов.\n") + globalDBManager->lastError().databaseText(),
-                              QMessageBox::Ok);
-    QList<Predicate*> fullPredicateList;
-    fullPredicateList.append(predicatesList);
-    fullPredicateList.append(iPredicateList);
-    if (!globalDBManager->savePredicateList(fullPredicateList))
-        QMessageBox::critical(NULL,
-                              QObject::tr("Ошибка"),
-                              QObject::tr("Не удалось сохранить список предикаторв.\n") + globalDBManager->lastError().databaseText(),
-                              QMessageBox::Ok);
+    QList<Actor *> fullActorList;
+    fullActorList.append(myActorsList);
+    fullActorList.append(myInlineActorsList);
+    QList<const Predicate *> fullPredicateList;
+    fullPredicateList.append(myPredicatesList);
+    fullPredicateList.append(myInlinePredicateList);
+    globalDBManager->setActorList(fullActorList);
+    globalDBManager->setPredicateList(fullPredicateList);
 }

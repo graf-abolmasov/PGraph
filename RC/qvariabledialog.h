@@ -21,18 +21,17 @@ class QVariableDialog : public QDialog {
 public:
     explicit QVariableDialog(QWidget *parent = 0);
     ~QVariableDialog();
-    void prepareForm(QString filter = "");
-    Variable* getVariable();
+    const Variable *getVariable() const;
 
 protected:
     void changeEvent(QEvent *e);
 
 private:
     Ui::QVariableDialog *ui;
-    QList<Variable *> myVariableList;
+    QList<const Variable *> myVariableList;
+    QList<const DataType *> myTypeList;
     QComboBox *varTypeCmbBox;
-    QList<DataType *> myTypeList;
-    Variable *myVar;
+    const Variable *myVariable;
 
 private slots:
     void on_variablesTable_currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn);

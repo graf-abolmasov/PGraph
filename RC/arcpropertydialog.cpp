@@ -18,6 +18,13 @@ ArcPropertyDialog::~ArcPropertyDialog()
     delete ui;
 }
 
+ArcPropertyDialog *ArcPropertyDialog::getDialog(QArc *arc)
+{
+    ArcPropertyDialog *result = new ArcPropertyDialog();
+    result->prepareForm(arc);
+    return result;
+}
+
 void ArcPropertyDialog::changeEvent(QEvent *e)
 {
     QDialog::changeEvent(e);
@@ -32,8 +39,6 @@ void ArcPropertyDialog::changeEvent(QEvent *e)
 
 void ArcPropertyDialog::prepareForm(QArc *arc)
 {
-    if (arc == NULL) return;
-    myArc = arc;
     switch (arc->arcType()) {
     case QArc::SerialArc:
         ui->serialRadioBtn->setChecked(true);
@@ -47,69 +52,61 @@ void ArcPropertyDialog::prepareForm(QArc *arc)
     }
 
     ui->prioritySpnBox->setValue(arc->priority());
-    ui->prioritySpnBox->setMaximum(myArc->startItem()->outArcs().count());
+    ui->prioritySpnBox->setMaximum(arc->startItem()->outArcs().count());
 
     //Загружаем предикаты из базы данных
-    if (!globalDBManager->getPredicateList(myPredicateList))
-        QMessageBox::critical(NULL,
-                              QObject::tr("Ошибка"),
-                              QObject::tr("Не удалось получить список предикатов.\n") + globalDBManager->lastError().databaseText(),
-                              QMessageBox::Ok);
-
-    myPredicateList.insert(0, NULL);
+    myPredicateList  = globalDBManager->getPredicateList();
     ui->predicateList->addItem(tr("Нет"));
-    for (int i = 1; i < myPredicateList.count(); i++)
-        ui->predicateList->addItem(QString(myPredicateList.at(i)->extName).replace(QRegExp("(\r+|\n+)"), " "));
+    for (int i = 0; i < myPredicateList.count(); i++)
+        ui->predicateList->addItem(QString(myPredicateList[i]->extName).replace(QRegExp("(\r+|\n+)"), " "));
 
-    if (arc->predicate != NULL) {
-        int idx = -1;
-        for (int i = 1; i < myPredicateList.count(); i++)
-            if (arc->predicate->name == myPredicateList.at(i)->name &&
-                arc->predicate->extName == myPredicateList.at(i)->extName) {
-                idx = i;
-                break;
-        }
-        if (idx != -1) ui->predicateList->setCurrentRow(idx);
+    if (arc->getPredicate() != NULL) {
+        const Predicate *arcPredicate = arc->getPredicate();
+        int idx = myPredicateList.indexOf(arcPredicate);
+        if (idx != -1)
+            ui->predicateList->setCurrentRow(idx);
         else {
             QMessageBox(QMessageBox::Critical, tr("Ошибка"), tr("Дуга использует несуществующий предикат"), QMessageBox::Ok).exec();
-            arc->predicate = NULL;
+            arc->setPredicate(NULL);
+            //TODO: Зделать констрэйт в базе на удаление предикатов к которым есть привязка.
         }
     } else ui->predicateList->setCurrentRow(0);
     ui->predicateList->setFocus(Qt::MouseFocusReason);
+
+    theirArc = arc;
 }
 
-QArc* ArcPropertyDialog::getResult()
+QArc *ArcPropertyDialog::getResult()
 {
-    if (ui->serialRadioBtn->isChecked()) myArc->setArcType(QArc::SerialArc);
-    if (ui->parallelRadioBtn->isChecked()) myArc->setArcType(QArc::ParallelArc);
-    if (ui->terminateRadioBtn->isChecked()) myArc->setArcType(QArc::TerminateArc);
-    QList<QArc* > arcList = myArc->startItem()->outArcs();
-    if (myArc->priority() < ui->prioritySpnBox->value()) {
-        for (int i = 0; i < arcList.count(); i++)
-            if (arcList.at(i)->priority()>myArc->priority() && arcList.at(i)->priority() <= ui->prioritySpnBox->value())
-                arcList.at(i)->setPriority(arcList.at(i)->priority() - 1);
-    } else {
-        for (int i = 0; i < arcList.count(); i++)
-            if (arcList.at(i)->priority() < myArc->priority() && arcList.at(i)->priority() >= ui->prioritySpnBox->value())
-                arcList.at(i)->setPriority(arcList.at(i)->priority() + 1);
-    }
-    myArc->setPriority(ui->prioritySpnBox->value());
-    if (ui->predicateList->currentRow() > -1) {
-        myArc->predicate = myPredicateList.at(ui->predicateList->currentRow());
-        if (myArc->predicate != NULL && !globalPredicateList.contains(myArc->predicate->extName))
-            globalPredicateList.append(myArc->predicate->extName);
-
-    } else
-        myArc->predicate = NULL;
-    return myArc;
-}
-
-void ArcPropertyDialog::on_buttonBox_accepted()
-{
-
+    return theirArc;
 }
 
 void ArcPropertyDialog::on_predicateList_itemDoubleClicked(QListWidgetItem *)
 {
     accept();
+}
+void ArcPropertyDialog::on_buttonBox_accepted()
+{
+    if (ui->serialRadioBtn->isChecked()) theirArc->setArcType(QArc::SerialArc);
+    else if (ui->parallelRadioBtn->isChecked()) theirArc->setArcType(QArc::ParallelArc);
+    else if (ui->terminateRadioBtn->isChecked()) theirArc->setArcType(QArc::TerminateArc);
+
+    QList<QArc* > arcList = theirArc->startItem()->outArcs();
+    if (theirArc->priority() < ui->prioritySpnBox->value()) {
+        for (int i = 0; i < arcList.count(); i++)
+            if (arcList[i]->priority()>theirArc->priority() && arcList[i]->priority() <= ui->prioritySpnBox->value())
+                arcList[i]->setPriority(arcList[i]->priority() - 1);
+    } else {
+        for (int i = 0; i < arcList.count(); i++)
+            if (arcList[i]->priority() < theirArc->priority() && arcList[i]->priority() >= ui->prioritySpnBox->value())
+                arcList[i]->setPriority(arcList[i]->priority() + 1);
+    }
+    theirArc->setPriority(ui->prioritySpnBox->value());
+    if (ui->predicateList->currentRow() > 0) {
+        theirArc->setPredicate(myPredicateList[ui->predicateList->currentRow()]);
+        if (!globalPredicateList.contains(theirArc->getPredicate()->name))
+            globalPredicateList.append(theirArc->getPredicate()->name);
+        //TODO: сигнал о добавлении нового предиката
+    } else
+        theirArc->setPredicate(NULL);
 }

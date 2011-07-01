@@ -35,43 +35,28 @@ void TopPropertyDialog::changeEvent(QEvent *e)
 void TopPropertyDialog::prepareForm(QNormalTop* top){
     myTop = top;
 
-    if (!globalDBManager->getActorList(myActorList))
-        QMessageBox::critical(NULL,
-                              QObject::tr("Ошибка"),
-                              QObject::tr("Не удалось получить список акторов.\n") + globalDBManager->lastError().databaseText(),
-                              QMessageBox::Ok);
+    try {
+        myActorList = globalDBManager->getActorList();
+        //myActorList.insert(0, Actor("Нет", "", Actor::InlineType, "", QList<Variable>(),QStringList(), QImage()));
+        QList<Graph*> graphList = globalDBManager->getGraphList();
+        foreach (Graph *graph, graphList)
+            myActorList.append(graph);
+        foreach (Actor *actor, myActorList)
+            ui->actorsListWidget->addItem(QString(actor->extName).replace(QRegExp("(\r+|\n+)"), " "));
 
-    myActorList.insert(0, NULL);
-    QList<Graph* > myGraphList;
-    if (!globalDBManager->getGraphList(myGraphList))
-        QMessageBox::critical(NULL,
-                              QObject::tr("Ошибка"),
-                              QObject::tr("Не удалось получить список агрегатов.\n") + globalDBManager->lastError().databaseText(),
-                              QMessageBox::Ok);;
-    foreach(Graph* graph, myGraphList){
-        QList<Variable* > varList;
-        QStringList varAMList;
-        myActorList.append(new Actor(graph->name, graph->extName, Actor::GraphType, "", varList, varAMList, QImage()));
+        if (top->actor != NULL) {
+            Actor *actor = top->actor;
+            int idx = myActorList.indexOf(actor);
+            if (idx != -1)
+                ui->actorsListWidget->setCurrentRow(idx + 1);
+            else {
+                QMessageBox(QMessageBox::Critical, tr("Ошибка"), tr("Вершина использует несуществующий объект"), QMessageBox::Ok).exec();
+                top->actor = NULL;
+            }
+        } else ui->actorsListWidget->setCurrentRow(0);
+    } catch (QString s) {
+        QMessageBox::critical(this, tr("Ошибка"), s, QMessageBox::Ok);
     }
-    ui->actorsListWidget->addItem(tr("Нет"));
-    for (int i = 1 ; i < myActorList.count(); i++){
-        ui->actorsListWidget->addItem(QString(myActorList.at(i)->extName).replace(QRegExp("(\r+|\n+)"), " "));
-    }
-
-    if (top->actor != NULL){
-        int idx = -1;
-        for (int i = 1; i < myActorList.count(); i++)
-            if (top->actor->name == myActorList.at(i)->name &&
-                top->actor->extName == myActorList.at(i)->extName) {
-                idx = i;
-                break;
-        }
-        if (idx != -1) ui->actorsListWidget->setCurrentRow(idx);
-        else {
-            QMessageBox(QMessageBox::Critical, tr("Ошибка"), tr("Вершина использует несуществующий объект"), QMessageBox::Ok).exec();
-            top->actor = NULL;
-        }
-    } else ui->actorsListWidget->setCurrentRow(0);
 
     ui->spnBoxHeight->setProperty("value", top->rect().height());
     ui->spnBoxWidth->setProperty("value", top->rect().width());
@@ -87,7 +72,7 @@ QNormalTop* TopPropertyDialog::getResult(){
     int w = ui->spnBoxWidth->value();
     int h = ui->spnBoxHeight->value();
     myTop->setRect(-w/2, -h/2, w, h);
-    myTop->actor = myActorList.at(ui->actorsListWidget->currentRow());
+    myTop->actor = myActorList[ui->actorsListWidget->currentRow()-1];
     return myTop;
 }
 
@@ -95,7 +80,7 @@ void TopPropertyDialog::on_actorsListWidget_currentRowChanged(int currentRow)
 {
     QString info("");
     if (currentRow > 0){
-        Actor* actor = myActorList.at(currentRow);
+        Actor *actor = myActorList[currentRow];
         info.append(tr("Name: ") + actor->name + "\r\n");
         QString type;
         switch (actor->type){
