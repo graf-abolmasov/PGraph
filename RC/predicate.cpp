@@ -1,6 +1,6 @@
 #include "predicate.h"
 
-Predicate::Predicate(QString name, QString extName, Type type, QString baseModule, QList<Variable *>variableList)
+Predicate::Predicate(QString name, QString extName, Type type, const BaseModule *baseModule, QList<const Variable *> variableList)
 {
     this->extName = extName;
     this->name = name;

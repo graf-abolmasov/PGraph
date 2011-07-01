@@ -13,16 +13,17 @@ class DataType;
 class QDataTypeDialog : public QDialog {
     Q_OBJECT
 public:
-    explicit QDataTypeDialog(QWidget *parent = 0);
+    static QDataTypeDialog *getDialog();
     ~QDataTypeDialog();
-    void prepareForm();
 
 protected:
     void changeEvent(QEvent *e);
 
 private:
+    explicit QDataTypeDialog(QWidget *parent = 0);
     Ui::QDataTypeDialog *ui;
-    QList<DataType *> typeList;
+    QList<const DataType *> myTypeList;
+    void prepareForm();
 
 private slots:
     void on_pushButton_5_clicked();

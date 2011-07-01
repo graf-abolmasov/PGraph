@@ -16,7 +16,7 @@ public:
     float getMinWidth() const;
     float getMinHeight() const;
     void setIcon(QImage &icon);
-    Top* toTop() const;
+    Top toTop() const;
 protected:
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);

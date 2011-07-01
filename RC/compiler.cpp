@@ -28,12 +28,12 @@ QString Compiler::getTemplate(const QString &type) const
 void Compiler::compileData() const
 {
     //Получаем (пока) все типы ПО
-    QList<DataType *> typeList;
-    globalDBManager->getDataTypeList(typeList);
+    QList<const DataType *> typeList;
+    typeList = globalDBManager->getDataTypeList();
 
     //Получаем (пока) все переменные ПО
-    QList<Variable *> varList;
-    globalDBManager->getVariableList(varList);
+    QList<const Variable *> varList;
+    varList = globalDBManager->getVariableList();
 
     //Предопределенные типы MPI
     QMap<QString, QString> mpiTypes;
@@ -52,7 +52,7 @@ void Compiler::compileData() const
         //Создаем типы
         QString userTypesBlock;
 
-        foreach (DataType *type, typeList) {
+        foreach (const DataType *type, typeList) {
             if (!type->typedefStr.isEmpty()) {
                 userTypesBlock.append(type->typedefStr + "\n");
 
@@ -78,7 +78,7 @@ void Compiler::compileData() const
 
         //Создаем типы MPI
         QString mpiTypesBlock;
-        foreach (DataType *type, typeList) {
+        foreach (const DataType *type, typeList) {
             if (!type->typedefStr.isEmpty()) {
                 QRegExp r("(typedef\\s+(\\b.+\\b))");
                 r.setMinimal(true);
@@ -111,8 +111,8 @@ void Compiler::compileData() const
 
         //Заполняем блок указателей на данные
         QString varPtrBlock;
-        foreach (Variable *var, varList)
-            varPtrBlock.append(var->type + " *_" + var->name + ";\n");
+        foreach (const Variable *var, varList)
+            varPtrBlock.append(var->type->name + " *_" + var->name + ";\n");
         poDataText.replace("<#varPtr>", varPtrBlock);
 
         //Заполняем блок свойств
@@ -120,8 +120,8 @@ void Compiler::compileData() const
 
         //Заполняем блок setter/getter
         QString setGetBlock;
-        foreach (Variable *var, varList) {
-            DataType* type = var->getDataType();
+        foreach (const Variable *var, varList) {
+            const DataType* type = var->type;
             Q_ASSERT(type != NULL);
             //Если встертился массив
             if (type->typedefStr.contains("[")) {
@@ -131,15 +131,15 @@ void Compiler::compileData() const
                 Q_ASSERT(r.indexIn(type->typedefStr) != -1);
                 QString intType = r.cap(2);
 
-                setGetBlock.append("ptr" + var->type + " get_" + var->name + "();\n");
-                setGetBlock.append("ptr" + var->type + " set_" + var->name + "(const ptr" + var->type + "& value);\n");
+                setGetBlock.append("ptr" + var->type->name + " get_" + var->name + "();\n");
+                setGetBlock.append("ptr" + var->type->name + " set_" + var->name + "(const ptr" + var->type->name + "& value);\n");
                 setGetBlock.append(intType + " get_" + var->name + "(const int& index);\n");
                 setGetBlock.append(intType + " set_" + var->name + "(const int& index, const " + intType + "& value);\n");
                 varPropertyBlock.append("__property_rw_indexed<" + intType + ", int, POData> " + var->name + ";\n");
             } else {
-                setGetBlock.append(var->type + " get_" + var->name + "();\n");
-                setGetBlock.append(var->type + " set_" + var->name + "(const " + var->type + "& value);\n");
-                varPropertyBlock.append("__property_rw<" + var->type + ", POData> " + var->name + ";\n");
+                setGetBlock.append(var->type->name + " get_" + var->name + "();\n");
+                setGetBlock.append(var->type->name + " set_" + var->name + "(const " + var->type->name + "& value);\n");
+                varPropertyBlock.append("__property_rw<" + var->type->name + ", POData> " + var->name + ";\n");
             }
         }
         poDataText.replace("<#setGet>", setGetBlock);
@@ -179,10 +179,10 @@ void Compiler::compileData() const
         setGetBlock.clear();
 
         int i = 0;
-        foreach (Variable* var, varList) {
-            DataType* type = var->getDataType();
+        foreach (const Variable* var, varList) {
+            const DataType* type = var->type;
             Q_ASSERT(type != NULL);
-            QString intType = var->type;
+            QString intType = var->type->name;
             if (!type->typedefStr.isEmpty()) {
                 //Парсим тип элемента
                 QRegExp r("(typedef\\s+(\\b.+\\b))");
@@ -196,19 +196,19 @@ void Compiler::compileData() const
                                     "\tresult = _" + var->name + ";\n"
                                     "\tbreak;\n");
             getMpiTypeBlock.append("case " + QString::number(i) + ":\n"
-                                    "\tresult = " + (mpiTypes.contains(var->type) ? mpiTypes[var->type] : "MPI_USER_TYPE_" + var->type.toUpper()) + ";\n"
+                                    "\tresult = " + (mpiTypes.contains(var->type->name) ? mpiTypes[var->type->name] : "MPI_USER_TYPE_" + var->type->name.toUpper()) + ";\n"
                                     "\tbreak;\n");
             //Если встертился массив
             if (type->typedefStr.contains("[")) {
                 assignSetterGetterBlock.append(var->name + ".Assign(this, &POData::set_" + var->name + ", &POData::get_" + var->name + ", &POData::set_" + var->name + ", &POData::get_" + var->name + ");\n");
                 deleteBlock.append("delete[] _" + var->name + ";\n");
-                initMemoryBlock.append("_" + var->name + " = (" + var->type + "*)" + "(new " + var->type + ");\n");
+                initMemoryBlock.append("_" + var->name + " = (" + var->type->name + "*)" + "(new " + var->type->name + ");\n");
                 getDataSizeBlock.append("case " + QString::number(i++) + ":\n"
-                                        "\tresult = sizeof(" + var->type + ") / " + var->type + "_LENGTH;\n"
+                                        "\tresult = sizeof(" + var->type->name + ") / " + var->type->name + "_LENGTH;\n"
                                         "\tbreak;\n");
                 //getter by index
                 setGetBlock.append(intType + " POData::get_" + var->name + "(const int& index)\n{\n"
-                                   "\tif (_" + var->name + " == NULL) _" + var->name + " = (" + var->type + "*)" + "(new " + var->type + ");\n" +
+                                   "\tif (_" + var->name + " == NULL) _" + var->name + " = (" + var->type->name + "*)" + "(new " + var->type->name + ");\n" +
                                    "\tgetData(" + var->name + "_id, index, 1, &(*_" + var->name + ")[index]);\n"
                                    "\treturn (*_" + var->name + ")[index];\n}\n\n");
                 //setter by index
@@ -216,26 +216,26 @@ void Compiler::compileData() const
                                    "\tsetData(" + var->name + "_id, index, 1, &value);\n"
                                    "\treturn value;\n}\n\n");
                 //getter all array
-                setGetBlock.append("ptr" + var->type + " POData::get_" + var->name + "()\n{\n"
-                                   "\tif (_" + var->name + " == NULL) _" + var->name + " = (" + var->type + "*)" + "(new " + var->type + ");\n" +
-                                   "\tgetData(" + var->name + "_id, 0, " + var->type + "_LENGTH" + ", _" + var->name +");\n"
+                setGetBlock.append("ptr" + var->type->name + " POData::get_" + var->name + "()\n{\n"
+                                   "\tif (_" + var->name + " == NULL) _" + var->name + " = (" + var->type->name + "*)" + "(new " + var->type->name + ");\n" +
+                                   "\tgetData(" + var->name + "_id, 0, " + var->type->name + "_LENGTH" + ", _" + var->name +");\n"
                                    "\treturn *_" + var->name + ";\n}\n\n");
                 //setter all array
-                setGetBlock.append("ptr" + var->type + " POData::set_" + var->name + "(const " + "ptr" + var->type + " &value)\n{\n"
-                                   "\tsetData(" + var->name + "_id, 0, " + var->type + "_LENGTH" ", *(&value));\n"
+                setGetBlock.append("ptr" + var->type->name + " POData::set_" + var->name + "(const " + "ptr" + var->type->name + " &value)\n{\n"
+                                   "\tsetData(" + var->name + "_id, 0, " + var->type->name + "_LENGTH" ", *(&value));\n"
                                    "\treturn (" + intType + " *)value;\n}\n\n");
             } else {
                 assignSetterGetterBlock.append(var->name + ".Assign(this, &POData::set_" + var->name + ", &POData::get_" + var->name + ");\n");
                 deleteBlock.append("delete _" + var->name + ";\n");
-                initMemoryBlock.append("*(_" + var->name + " = new " + var->type + ")" + (var->initValue.isEmpty() ? ";\n" : " = " + var->initValue + ";\n"));
+                initMemoryBlock.append("*(_" + var->name + " = new " + var->type->name + ")" + (var->initValue.isEmpty() ? ";\n" : " = " + var->initValue + ";\n"));
                 getDataSizeBlock.append("case " + QString::number(i++) + ":\n"
-                                        "\tresult = sizeof(" + var->type + ");\n"
+                                        "\tresult = sizeof(" + var->type->name + ");\n"
                                         "\tbreak;\n");
-                setGetBlock.append(var->type + " POData::get_" + var->name + "()\n{\n"
-                                   "\tif (_" + var->name + " == NULL) *(_" + var->name + " = new " + var->type + ")" + (var->initValue.isEmpty() ? ";\n" : " = " + var->initValue + ";\n") +
+                setGetBlock.append(var->type->name + " POData::get_" + var->name + "()\n{\n"
+                                   "\tif (_" + var->name + " == NULL) *(_" + var->name + " = new " + var->type->name + ")" + (var->initValue.isEmpty() ? ";\n" : " = " + var->initValue + ";\n") +
                                    "\tgetData(" + var->name + "_id, 0, 1, _" + var->name +");\n"
                                    "\treturn *_" + var->name + ";\n}\n\n");
-                setGetBlock.append(var->type + " POData::set_" + var->name + "(const " + var->type + " &value)\n{\n"
+                setGetBlock.append(var->type->name + " POData::set_" + var->name + "(const " + var->type->name + " &value)\n{\n"
                                    "\tsetData(" + var->name + "_id, 0, 1, &value);\n"
                                    "\treturn value;\n}\n\n");
             }
@@ -253,7 +253,7 @@ void Compiler::compileData() const
         poDataText.replace("<#getSizeAddr>", getDataSizeBlock);
         poDataText.replace("<#getMpiType>", getMpiTypeBlock);
 
-        foreach (Variable* var, varList)
+        foreach (const Variable* var, varList)
             initMemoryBlock.append("_" + var->name + " = NULL;\n");
         initMemoryBlock.append("}\n");
         poDataText.replace("<#initMemory>", initMemoryBlock);

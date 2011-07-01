@@ -37,10 +37,10 @@ private:
     QPushButton *deleteButton;
     QButtonGroup *editButtonGroup;
 
-    QList<Actor *> actorsList;
-    QList<Predicate *> predicatesList;
-    QList<Actor *> iActorsList;
-    QList<Predicate *> iPredicateList;
+    QList<Actor *> myActorsList;
+    QList<const Predicate *> myPredicatesList;
+    QList<Actor *> myInlineActorsList;
+    QList<const Predicate *> myInlinePredicateList;
 };
 
 #endif // QOBJECTEDITOR_H

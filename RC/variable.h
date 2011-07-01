@@ -7,18 +7,12 @@
 
 class Variable
 {
-private:
-    DataType *myType;
 public:
-    Variable(QString name, QString type, QString initValue, QString comment);
+    Variable(const QString &name, const QString &initValue, const QString &comment, const DataType *type);
     QString name;
     QString initValue;
     QString comment;
-    QString type;
-
-    //QString getType() const;
-    //void setType(const QString &value);
-    DataType *getDataType();
+    const DataType *type;
 };
 
 #endif // VARIABLE_H

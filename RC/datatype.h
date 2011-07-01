@@ -9,7 +9,6 @@ public:
     DataType(QString name, QString typedefStr);
     QString name;
     QString typedefStr;
-
     ~DataType();
 };
 

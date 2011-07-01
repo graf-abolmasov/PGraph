@@ -182,10 +182,10 @@ void QNormalTop::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
     event->accept();
 }
 
-Top* QNormalTop::toTop() const
+Top QNormalTop::toTop() const
 {
     QPointF pos = scenePos();
     float sizeX = rect().width();
     float sizeY = rect().height();
-    return new Top(pos.x(), pos.y(), sizeX, sizeY, number, -1, isRoot, actor == NULL ? "" : actor->name, "T");
+    return Top(pos.x(), pos.y(), sizeX, sizeY, number, -1, isRoot, actor == NULL ? "" : actor->name, "T");
 }

@@ -2,28 +2,14 @@
 #define QTOP_H
 
 #include <QtGui/QGraphicsRectItem>
+#include "actor.h"
+#include "graph.h"
 
 class QArc;
-class Actor;
 class QSyncArc;
 class QDiagramScene;
 
 #define TOP_TYPE UserType+15
-
-class Top
-{
-public:
-    Top(float x, float y, float sizeX, float sizeY, int number, int procCount, bool isRoot, QString actor, QString type);
-    float x;
-    float y;
-    float sizeX;
-    float sizeY;
-    int number;
-    int procCount;
-    bool isRoot;
-    QString actor;
-    QString type;
-};
 
 class QTop : public QGraphicsRectItem
 {
@@ -33,7 +19,7 @@ public:
     ~QTop();
     int number;
     bool isRoot;
-    Actor* actor;
+
     void removeArc(QArc *arc);
     void removeArcs();
     void removeSync(QSyncArc *arc);
@@ -51,9 +37,11 @@ public:
     QList<QArc *> outArcs() const;
     QRectF boundingRect() const;
     QPainterPath shape() const;
-    virtual Top* toTop() const = 0;
+    virtual Top toTop() const = 0;
     QList<QArc *> getArcsAtBound(int i) const;
     bool moveBy(qreal dx, qreal dy);
+
+    Actor *actor;
 protected:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 private:

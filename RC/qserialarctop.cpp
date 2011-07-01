@@ -49,18 +49,17 @@ QPainterPath QSerialArcTop::shape() const
 
 void QSerialArcTop::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *)
 {
-    ArcPropertyDialog dlg;
     QArc* arc = qgraphicsitem_cast<QArc *>(parentItem());
-    dlg.prepareForm(arc);
-    if (dlg.exec())
-        arc = dlg.getResult();
+    ArcPropertyDialog *dlg = ArcPropertyDialog::getDialog(arc);
+    if (dlg->exec())
+        arc = dlg->getResult();
 }
 
 void QSerialArcTop::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     QGraphicsRectItem::paint(painter, option, widget);
     QArc* myArc = qgraphicsitem_cast<QArc *>(parentItem());
-    if (myArc->predicate != NULL)
-        painter->drawText(rect().toRect(), Qt::AlignCenter, QString::number(globalPredicateList.indexOf(myArc->predicate->extName) + 1));
+    if (myArc->getPredicate() != NULL)
+        painter->drawText(rect().toRect(), Qt::AlignCenter, QString::number(globalPredicateList.indexOf(myArc->getPredicate()->name) + 1));
 }
 

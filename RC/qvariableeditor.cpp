@@ -10,12 +10,53 @@
 #include "databasemanager.h"
 #include "globalvariables.h"
 
+QVariableEditor *QVariableEditor::getCreator()
+{
+    return new QVariableEditor();
+}
+
+QVariableEditor *QVariableEditor::getEditor(const Variable *var)
+{
+    return new QVariableEditor(var);
+}
 
 QVariableEditor::QVariableEditor(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::QVariableEditor)
 {
     ui->setupUi(this);
+    myVariable = NULL;
+    QRegExp regExp("[_A-Za-z][_A-Za-z1-9]{0,31}");
+    ui->nameEdt->setValidator(new QRegExpValidator(regExp, this));
+    ui->nameEdt->setFocus();
+
+    //Подготавливаем справочники
+    myTypeList = globalDBManager->getDataTypeList();
+    foreach (const DataType *type, myTypeList)
+        ui->typeCmbBox->addItem(type->name, type->typedefStr);
+}
+
+QVariableEditor::QVariableEditor(const Variable *var, QWidget *parent) :
+    QDialog(parent),
+    ui(new Ui::QVariableEditor)
+{
+    ui->setupUi(this);
+    myVariable = var;
+    QRegExp regExp("[_A-Za-z][_A-Za-z1-9]{0,31}");
+    ui->nameEdt->setValidator(new QRegExpValidator(regExp, this));
+    ui->nameEdt->setFocus();
+
+    //Подготавливаем справочники
+    myTypeList = globalDBManager->getDataTypeList();
+    foreach (const DataType *type, myTypeList)
+        ui->typeCmbBox->addItem(type->name, type->typedefStr);
+
+    ui->nameEdt->setText(var->name);
+    ui->commentTxtEdt->setPlainText(var->comment);
+    ui->initValueEdt->setText(var->initValue);
+    int idx = myTypeList.indexOf(var->type);
+    ui->typeCmbBox->setCurrentIndex(idx);
+    enableOkButton();
 }
 
 QVariableEditor::~QVariableEditor()
@@ -35,66 +76,25 @@ void QVariableEditor::changeEvent(QEvent *e)
     }
 }
 
-void QVariableEditor::on_pushButton_clicked()
+void QVariableEditor::makeResult()
 {
-    QDataTypeEditor *editor = new QDataTypeEditor();
-    editor->prepareForm(NULL);
-    if (editor->exec()){
-        prepareForm(myVariable);
+    if (myVariable == NULL)
+        result = new Variable(ui->nameEdt->text(),
+                                  ui->initValueEdt->text(),
+                                  ui->commentTxtEdt->document()->toPlainText(),
+                                  myTypeList[ui->typeCmbBox->currentIndex()]);
+    else {
+        result = const_cast<Variable *>(myVariable);
+        result->name = ui->nameEdt->text();
+        result->initValue = ui->initValueEdt->text();
+        result->type = myTypeList[ui->typeCmbBox->currentIndex()];
+        result->comment = ui->commentTxtEdt->document()->toPlainText();
     }
 }
 
-void QVariableEditor::prepareForm(Variable *var)
+const Variable *QVariableEditor::getResult() const
 {
-    if (!globalDBManager->getDataTypeList(typeList))
-        QMessageBox::critical(NULL,
-                              QObject::tr("Ошибка"),
-                              QObject::tr("Не удалось получить список типов данных.\n") + globalDBManager->lastError().databaseText(),
-                              QMessageBox::Ok);
-    foreach (DataType* type, typeList)
-        ui->typeCmbBox->addItem(type->name, type->typedefStr);
-
-    if (var != NULL) {
-        ui->nameEdt->setText(var->name);
-        ui->commentTxtEdt->setPlainText(var->comment);
-        ui->initValueEdt->setText(var->initValue);
-        int idx = -1;
-        for (int i = 0; i < typeList.count(); i++){
-            if (var->type == typeList.at(i)->name){
-                idx = i;
-                break;
-            }
-        }
-        ui->typeCmbBox->setCurrentIndex(idx);
-    }
-    myVariable = var;
-    QRegExp regExp("[_A-Za-z][_A-Za-z1-9]{0,31}");
-    ui->nameEdt->setValidator(new QRegExpValidator(regExp, this));
-    enableOkButton();
-    ui->nameEdt->setFocus();
-}
-
-Variable* QVariableEditor::getResult()
-{
-    if (!ui->nameEdt->text().isEmpty() &&
-        ui->typeCmbBox->currentIndex() >= 0) {
-        if (myVariable == NULL) {
-            myVariable = new Variable(ui->nameEdt->text(),
-                                      typeList.at(ui->typeCmbBox->currentIndex())->name,
-                                      ui->initValueEdt->text(),
-                                      ui->commentTxtEdt->document()->toPlainText());
-        } else {
-            myVariable->name = ui->nameEdt->text();
-            myVariable->type = typeList.at(ui->typeCmbBox->currentIndex())->name;
-            myVariable->initValue = ui->initValueEdt->text();
-            myVariable->comment = ui->commentTxtEdt->document()->toPlainText();
-        }
-    } else
-        QMessageBox::critical(NULL,
-                              QObject::tr("Ошибка"),
-                              QObject::tr("Укажите имя и тип переменной.\n"),
-                              QMessageBox::Ok);
-    return myVariable;
+    return result;
 }
 
 void QVariableEditor::enableOkButton()
@@ -102,4 +102,9 @@ void QVariableEditor::enableOkButton()
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled((ui->nameEdt->hasAcceptableInput()) &&
                                                             (ui->typeCmbBox->currentIndex() >= 0));
 
+}
+
+void QVariableEditor::on_buttonBox_accepted()
+{
+    makeResult();
 }

@@ -44,9 +44,9 @@ void QComment::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
         painter->drawRect(boundingRect());
 }
 
-Comment* QComment::toComment()
+Comment QComment::toComment()
 {
-    return new Comment(scenePos().x(), scenePos().y(), document()->toPlainText(), font());
+    return Comment(scenePos().x(), scenePos().y(), document()->toPlainText(), font());
 }
 
 Comment::Comment(float x, float y, QString text, QFont font)

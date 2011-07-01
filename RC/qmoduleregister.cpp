@@ -46,18 +46,15 @@ void QModuleRegister::changeEvent(QEvent *e)
 void QModuleRegister::prepareForm()
 {
     QStringList moduleList;
-    QList<BaseModule*> tempList;
-    if (!globalDBManager->getRegisteredModules(tempList))
-        QMessageBox::critical(NULL,
-                              QObject::tr("Ошибка"),
-                              QObject::tr("Не удалось получить список базовых модулей.\n") + globalDBManager->lastError().databaseText(),
-                              QMessageBox::Ok);;
+    QList<const BaseModule *> tempList;
+    tempList = globalDBManager->getBaseModuleList();
+
     for (int i = 0; i < tempList.count(); i++)
-        moduleList.append(tempList.at(i)->name);
+        moduleList.append(tempList[i]->name);
     int i = 0;
     while (i < fileList.count()){
         //если уже зарегистрирован, то удаляем его из списка файлов
-        if (moduleList.contains(fileList.at(i).baseName())){
+        if (moduleList.contains(fileList[i].baseName())){
             fileList.removeAt(i);
             continue;
         }
@@ -66,13 +63,11 @@ void QModuleRegister::prepareForm()
         file.open(QFile::ReadOnly);
         QString buff(file.readAll());
         if (buff.contains(fileList.at(i).baseName(), Qt::CaseSensitive))
-            ui->fileList->addItem(fileList.at(i).fileName());
+            ui->fileList->addItem(fileList[i].fileName());
         file.close();
         i++;
     }
 }
-
-
 
 void QModuleRegister::on_parametersTable_currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn)
 {
@@ -141,14 +136,9 @@ void QModuleRegister::on_buttonBox_accepted()
         return;
 
     QString uniqName = "S" + getCRC(ui->fileList->currentItem()->text().toUtf8());
-    if (!globalDBManager->registerModule(uniqName,
+    globalDBManager->registerModuleDB(uniqName,
                                     fileList.at(ui->fileList->currentRow()).baseName(),
-                                    ui->commentTxtEdt->document()->toPlainText(), paramList))
-        QMessageBox::critical(NULL,
-                              QObject::tr("Ошибка"),
-                              QObject::tr("Не удалось зарегистрировать модуль.\n") + globalDBManager->lastError().databaseText(),
-                              QMessageBox::Ok);
-
+                                    ui->commentTxtEdt->document()->toPlainText(), paramList);
     // Читаем файл
     QFile input(fileList.at(ui->fileList->currentRow()).absoluteFilePath());
     input.open(QFile::ReadOnly);

@@ -89,14 +89,13 @@ void QMultiProcTop::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
 
 void QMultiProcTop::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *)
 {
-    MultiProcTopPropertyDialog dlg;
     QMultiProcTop* top = qgraphicsitem_cast<QMultiProcTop *>(scene()->selectedItems().first());
-    dlg.prepareForm(top);
-    if (dlg.exec())
-        top = dlg.getResult();
+    MultiProcTopPropertyDialog *dlg = MultiProcTopPropertyDialog::getDialog(top);
+    if (dlg->exec())
+        top = dlg->getResult();
 }
 
-Top* QMultiProcTop::toTop() const
+Top QMultiProcTop::toTop() const
 {
-    return new Top(scenePos().x(), scenePos().y(), rect().width(), rect().height(), number, procCount, false, actor == NULL ? "" : actor->name, "M");
+    return Top(scenePos().x(), scenePos().y(), rect().width(), rect().height(), number, procCount, false, actor == NULL ? "" : actor->name, "M");
 }

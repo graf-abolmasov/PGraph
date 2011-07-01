@@ -24,11 +24,30 @@ class DataBaseManager
 {
 private:
     QSqlDatabase db;
-    QList<Variable*> varListProxy;
-    QList<Actor*> actorListProxy;
-    QList<Predicate*> predListProxy;
-    //QList<Shab*> myShabList;
     int myProjectId;
+
+    QList<Graph *>      myGraphList;
+    QList<Actor *>      myActorList;
+    QList<const DataType *>   myDataTypeList;
+    QList<const Variable *>   myVariableList;
+    QList<const Predicate *>  myPredicateList;
+    QList<const BaseModule *> myBaseModuleList;
+
+    QList<Graph> getGraphListDB() throw (QString);
+
+    void saveVariableListDB(const QList<Variable> &varList) throw (QString);
+    QList<Variable> getVariableListDB() throw (QString);
+
+    void saveDataTypeListDB(const QList<DataType> &typeList) throw (QString);
+    QList<DataType> getDataTypeListDB() throw (QString);
+
+    void saveActorListDB(const QList<Actor> &actorList) throw (QString);
+    QList<Actor> getActorListDB() throw (QString);
+
+    void savePredicateListDB(const QList<Predicate> &predList) throw (QString);
+    QList<Predicate> getPredicateListDB() throw (QString);
+
+    QList<BaseModule> getBaseModuleListDB() throw (QString);
 public:
     DataBaseManager();
     ~DataBaseManager();
@@ -38,31 +57,29 @@ public:
     int getProjectId()
         { return myProjectId; }
 
-    bool getGraphList(QList<Graph* > &graphList);
-    bool getGraph(Graph &graph);
-    bool saveGraph(Graph* graph);
-    bool updateGraph(Graph* graph);
+    Actor *getActor(const QString &name);
+    const DataType *getDataType(const QString &type) const;
+    const Variable *getVariable(const QString &name) const;
+    const Predicate *getPredicate(const QString &name) const;
+    const BaseModule *getBaseModule(const QString &name) const;
 
-    bool saveVariableList(QList<Variable*> &varList);
-    bool getVariableList(QList<Variable*> &varList);
+    QList<const DataType *> getDataTypeList() const;
+    void setDatatypeList(const QList<const DataType *> &list);
+    QList<const Variable *> getVariableList() const;
+    void setVariableList(const QList<const Variable *> &list);
+    QList<Actor *> getActorList() const;
+    void setActorList(const QList<Actor *> &list);
+    QList<const Predicate *> getPredicateList() const;
+    void setPredicateList(const QList<const Predicate *> &list);
+    QList<const BaseModule *> getBaseModuleList() const;
+    QList<Graph *> getGraphList();
 
-    bool saveDataTypeList(QList<DataType*> &typeList);
-    bool getDataTypeList(QList<DataType*> &typeList);
-    DataType *getDataType(const QString &value);
-    //QList<DataType> getDataTypeList();
-
-    bool saveActorList(QList<Actor*> &actorList);
-    bool getActorList(QList<Actor*> &actorList);
-    Actor* getActor(QString namepr);
-
-    bool savePredicateList(QList<Predicate*>& predList);
-    bool getPredicateList(QList<Predicate*>& predList);
-    Predicate* getPredicate(QString namepr);
-
-    bool registerModule(const QString &uniqName, const QString &fileName, const QString &comment, QStringList &paramList);
-    bool getRegisteredModules(QList<BaseModule*> &moduleList);
-
-    bool saveStruct(Graph *graph);
+    void openProjectDB(int projectId);
+    Graph getGraphDB(const QString &namepr) throw (QString);
+    void saveStruct(const Graph &graph) throw (QString);
+    void saveGraphDB(const Graph &graph) throw (QString);
+    void updateGraphDB(const Graph &graph) throw (QString);
+    void registerModuleDB(const QString &uniqName, const QString &fileName, const QString &comment, const QStringList &paramList) throw (QString);
 
     bool Compi_get_GSP_Shab_List();
     int Compi_count_MaxGH(QString myGraphName, int* MaxGH);

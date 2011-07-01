@@ -50,11 +50,11 @@ private:
     QAction *setMultiProcTopAction;
     QAction *setFontAction;
 
-    QList<QTop* > allTops();
-    QList<QArc* > allArcs();
-    QList<QComment* > allComments();
-    QList<QSyncArc* > allSyncArcs();
-    QList<QMultiProcTop* > allMultiProcTop();
+    QList<QTop* > allTops() const;
+    QList<QArc* > allArcs() const;
+    QList<QComment* > allComments() const;
+    QList<QSyncArc* > allSyncArcs() const;
+    QList<QMultiProcTop* > allMultiProcTop() const;
 
 public:
     enum ShowRole {NormalEditor, ReadOnly, SelectTop};
@@ -71,7 +71,7 @@ public:
     void showDataLayer(bool show);
     QDiagramScene::Mode mode() const
         { return scene->mode(); }
-    Graph *getGraph();
+    Graph getGraph() const;
     void loadGraph(const QString &name);
     bool saveGraph(QString name, QString extName);
     bool updateGraph();

@@ -1,30 +1,10 @@
 #include "variable.h"
 #include "globalvariables.h"
 
-Variable::Variable(QString name, QString type, QString initValue, QString comment)
+Variable::Variable(const QString &name, const QString &initValue, const QString &comment, const DataType *type)
 {
     this->name = name;
-    this->type = type;
     this->initValue = initValue;
     this->comment = comment;
-
-    this->myType = NULL;
+    this->type = type;
 }
-
-DataType *Variable::getDataType()
-{
-    if (this->myType == NULL)
-        myType = globalDBManager->getDataType(this->type);
-    return myType;
-}
-
-//void Variable::setType(const QString &value)
-//{
-//    this->type = value;
-//    this->myType = NULL;
-//}
-
-//QString Variable::getType() const
-//{
-//    return this->type;
-//}

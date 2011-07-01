@@ -3,19 +3,19 @@
 
 #include <QtCore/QString>
 #include <QtCore/QList>
-
-class Variable;
+#include "variable.h"
+#include "basemodule.h"
 
 class Predicate
 {
 public:
-    enum Type {normalType, inlineType};
-    Predicate(QString name, QString extName, Type type, QString baseModule, QList<Variable *> variableList);
+    enum Type {NormalType, inlineType};
+    Predicate(QString name, QString extName, Type type, const BaseModule *baseModule, QList<const Variable *> variableList);
     QString extName;
     QString name;
     Type type;
-    QList<Variable *> variableList;
-    QString baseModule;
+    QList<const Variable *> variableList;
+    const BaseModule *baseModule;
 };
 
 #endif // PREDICATE_H
