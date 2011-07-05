@@ -1,5 +1,5 @@
-#include <QtGui/QApplication>
-#include <QTextCodec>
+#include <QtGui>
+#include <QtCore>
 #include <time.h>
 #include "qmywindow.h"
 #include "qdrawwindow.h"

@@ -77,6 +77,7 @@ void QPredicateEditor::prepareForm(const Predicate *predicate)
     case Predicate::NormalType:
         ui->inlineWidget->setVisible(false);
         ui->predicateNameEdt->setText(myPredicate->extName);
+        ui->predicateNameEdt->setValidator(new QRegExpValidator(QRegExp(tr("[A-Za-zА-Яа-я1-9]{0,255}")), this));
         foreach(const BaseModule* baseModule, myModuleList){
             ui->baseModuleList->insertItem(ui->baseModuleList->count(), baseModule->name);
             if (myPredicate != NULL && myPredicate->baseModule == baseModule){
@@ -100,6 +101,7 @@ void QPredicateEditor::prepareForm(const Predicate *predicate)
         ui->inlineModuleTxtEdt->blockSignals(false);
         break;
     }
+    enableOkButton();
 }
 
 const Predicate *QPredicateEditor::getResult() const
@@ -121,6 +123,7 @@ void QPredicateEditor::on_baseModuleList_currentRowChanged(int currentRow)
         ui->paramsNormalTable->setItem(i, 1, new QTableWidgetItem(parameter[0]));
         ui->paramsNormalTable->setItem(i, 2, new QTableWidgetItem("N/A"));
     }
+    enableOkButton();
 }
 
 void QPredicateEditor::on_paramsNormalTable_currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn)
@@ -138,7 +141,7 @@ void QPredicateEditor::on_paramsNormalTable_currentCellChanged(int currentRow, i
     varLayout->addWidget(varEditBtn);
     varEditBtn->setText("...");
 
-    connect(varEditBtn, SIGNAL(clicked()), this, SLOT(on_varEditBtn_clicked()));
+    connect(varEditBtn, SIGNAL(clicked()), this, SLOT(showVariableDialog()));
     ui->paramsNormalTable->setCellWidget(currentRow, 2, varWidget);
 
     ui->descriptionPOLbl_2->setText("");
@@ -146,9 +149,10 @@ void QPredicateEditor::on_paramsNormalTable_currentCellChanged(int currentRow, i
         ui->descriptionPOLbl_2->setText(myPredicate->variableList[currentRow]->comment);
     }
     ui->descriptionBMLbl_2->setText(myModuleList[ui->baseModuleList->currentRow()]->parameterList[currentRow].split(";;")[03]);
+    enableOkButton();
 }
 
-void QPredicateEditor::on_varEditBtn_clicked()
+void QPredicateEditor::showVariableDialog()
 {
     QVariableDialog dialog;
     if (dialog.exec()){
@@ -192,8 +196,8 @@ void QPredicateEditor::makeResult()
             return;
         }
 
-        tempPre->name = "P" + getCRC(tempPre->extName.toUtf8());
         tempPre->extName = ui->predicateNameEdt->text();
+        tempPre->name = "P" + getCRC(tempPre->extName.toUtf8());
         tempPre->baseModule = myModuleList[ui->baseModuleList->currentRow()];
 
         // Генерируем актор
@@ -227,8 +231,8 @@ void QPredicateEditor::makeResult()
         outputData.append("\r\n\r\n\treturn result;\r\n}");
         break;
     case Predicate::inlineType:
-        tempPre->name = "P" + getCRC(tempPre->extName.toUtf8());
         tempPre->extName = ui->inlineModuleTxtEdt->document()->toPlainText();
+        tempPre->name = "P" + getCRC(tempPre->extName.toUtf8());
         //генерируем с++ файл
         outputData.append("#include \"stype.h\"\r\n");
         outputData.append("int " + tempPre->name + "(TPOData *D)\r\n");
@@ -255,4 +259,9 @@ void QPredicateEditor::makeResult()
     result->baseModule = tempPre->baseModule;
     result->variableList = tempPre->variableList;
     delete tempPre;
+}
+
+void QPredicateEditor::enableOkButton()
+{
+
 }

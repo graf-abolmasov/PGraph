@@ -1,4 +1,5 @@
 #include <dir.h>
+#include <QMessageBox>
 #include "shab.h"
 #include "compi.h"
 #include "globalvariables.h"

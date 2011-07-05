@@ -1,6 +1,6 @@
 #include "actor.h"
 
-Actor::Actor(QString name, QString extName, Type type, QString baseModule, QList<const Variable *> variableList, QStringList varAccModeList, QImage icon)
+Actor::Actor(const QString &name, const QString &extName, const Type &type, const BaseModule *baseModule, const QList<const Variable *> &variableList, const QStringList &varAccModeList, const QImage &icon)
 {
     this->extName = extName;
     this->name = name;
@@ -22,7 +22,7 @@ Actor::Actor(const Actor &actor)
     this->variableList = variableList;
 }
 
-Actor::Actor(QString name, QString extName, Type type)
+Actor::Actor(const QString &name, const QString &extName, const Type &type)
 {
     this->name = name;
     this->extName = extName;

@@ -1,24 +1,12 @@
 #ifndef DATABASEMANAGER_H
 #define DATABASEMANAGER_H
 
-#include <QtCore>
 #include <QSqlDatabase>
-#include <QSqlQuery>
-#include <QDebug>
-#include <QMessageBox>
 #include <QSqlError>
-#include <QSqlTableModel>
-#include <QString>
+
 #include "graph.h"
-#include "qdiagramscene.h"
-#include "datatype.h"
-#include "variable.h"
-#include "actor.h"
-#include "predicate.h"
-#include "basemodule.h"
-#include "shab.h"
 #include "compi.h"
-#include <QList>
+#include "shab.h"
 
 class DataBaseManager
 {
@@ -27,7 +15,7 @@ private:
     int myProjectId;
 
     QList<Graph *>      myGraphList;
-    QList<Actor *>      myActorList;
+    QList<const Actor *>      myActorList;
     QList<const DataType *>   myDataTypeList;
     QList<const Variable *>   myVariableList;
     QList<const Predicate *>  myPredicateList;
@@ -57,7 +45,7 @@ public:
     int getProjectId()
         { return myProjectId; }
 
-    Actor *getActor(const QString &name);
+    const Actor *getActor(const QString &name) const;
     const DataType *getDataType(const QString &type) const;
     const Variable *getVariable(const QString &name) const;
     const Predicate *getPredicate(const QString &name) const;
@@ -67,8 +55,8 @@ public:
     void setDatatypeList(const QList<const DataType *> &list);
     QList<const Variable *> getVariableList() const;
     void setVariableList(const QList<const Variable *> &list);
-    QList<Actor *> getActorList() const;
-    void setActorList(const QList<Actor *> &list);
+    QList<const Actor *> getActorList() const;
+    void setActorList(const QList<const Actor *> &list);
     QList<const Predicate *> getPredicateList() const;
     void setPredicateList(const QList<const Predicate *> &list);
     QList<const BaseModule *> getBaseModuleList() const;

@@ -1,3 +1,5 @@
+#include <QtGui>
+
 #include "multiproctoppropertydialog.h"
 #include "ui_multiproctoppropertydialog.h"
 #include "qmultiproctop.h"
@@ -83,7 +85,7 @@ void MultiProcTopPropertyDialog::on_actorsListWidget_currentRowChanged(int curre
 {
     QString info("");
     if (currentRow > 0){
-        Actor *actor = myActorList[currentRow];
+        const Actor *actor = myActorList[currentRow];
         info.append(tr("Name: ") + actor->name + "\r\n");
         QString type;
         switch (actor->type){
@@ -98,7 +100,7 @@ void MultiProcTopPropertyDialog::on_actorsListWidget_currentRowChanged(int curre
             break;
         }
         info.append(tr("Type: ") + type + "\r\n");
-        info.append(tr("Base module: ") + actor->baseModule + "\r\n");
+        info.append(tr("Base module: ") + actor->baseModule->name + "\r\n");
     }
     ui->descriptionLbl->setText(info);
 }

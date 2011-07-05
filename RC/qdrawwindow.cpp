@@ -399,7 +399,7 @@ void TDrawWindow::loadGraph(const QString &name)
         }
         qtop->number = top.number;
         qtop->setPos(top.x, top.y);
-        Actor *actor = globalDBManager->getActor(top.actor);
+        const Actor *actor = globalDBManager->getActor(top.actor);
         qtop->actor = actor;
     }
 
