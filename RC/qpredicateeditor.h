@@ -47,12 +47,13 @@ private:
 
     void prepareForm(const Predicate *predicate);
     void makeResult();
+    void enableOkButton();
 private slots:
     void on_inlineModuleTxtEdt_textChanged();
     void on_buttonBox_accepted();
     void on_paramsNormalTable_currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn);
     void on_baseModuleList_currentRowChanged(int currentRow);
-    void on_varEditBtn_clicked();
+    void showVariableDialog();
 };
 
 #endif // QPREDICATEEDITOR_H

@@ -2,6 +2,7 @@
 #define QOBJECTEDITOR_H
 
 #include <QtGui/QDialog>
+#include <QPointer>
 
 namespace Ui {
     class QObjectEditor;
@@ -32,14 +33,14 @@ private slots:
 
 private:
     Ui::QObjectEditor *ui;
-    QPushButton *newButton;
-    QPushButton *editButton;
-    QPushButton *deleteButton;
-    QButtonGroup *editButtonGroup;
+    QPointer<QPushButton>  newButton;
+    QPointer<QPushButton>  editButton;
+    QPointer<QPushButton>  deleteButton;
+    QPointer<QButtonGroup> editButtonGroup;
 
-    QList<Actor *> myActorsList;
+    QList<const Actor *> myActorsList;
+    QList<const Actor *> myInlineActorsList;
     QList<const Predicate *> myPredicatesList;
-    QList<Actor *> myInlineActorsList;
     QList<const Predicate *> myInlinePredicateList;
 };
 

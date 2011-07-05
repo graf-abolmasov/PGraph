@@ -21,10 +21,10 @@ class QActorEditor : public QDialog {
     Q_OBJECT
 public:
     static QActorEditor *getCreator(const Actor::Type &mode);
-    static QActorEditor *getEditor(Actor *actor);
+    static QActorEditor *getEditor(const Actor *actor);
 
     ~QActorEditor();
-    Actor *getResult();
+    const Actor *getResult();
 
 protected:
     void changeEvent(QEvent *e);
@@ -32,9 +32,11 @@ protected:
 private:
     QActorEditor(QWidget *parent = 0);
     QActorEditor(const Actor::Type &mode, QWidget *parent = 0);
-    QActorEditor(Actor *actor, QWidget *parent = 0);
+    QActorEditor(const Actor *actor, QWidget *parent = 0);
     Ui::QActorEditor *ui;
-    Actor *myActor;
+    const Actor *myActor;
+    Actor *result;
+    Actor *tempActor;
     Actor::Type myMode;
     QList<const BaseModule *> myModuleList;
     QList<const Variable *> myVariableList;
@@ -43,18 +45,16 @@ private:
     QPointer<QHBoxLayout> varLayout;
     QPointer<QComboBox> paramTypeCmbBox;
 
-    void prepareForm(Actor *actor);
+    void prepareForm(const Actor *actor);
     bool validate();
-
-
+    void makeResult();
 private slots:
     void on_paramsInlineTable_currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn);
     void on_inlineModuleTxtEdt_textChanged();
     void on_paramsNormalTable_currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn);
     void on_baseModuleList_currentRowChanged(int currentRow);
-    void on_varEditBtn_clicked();
-    void on_okButton_clicked();
-    void on_QActorEditor_accepted();
+    void showVariableEditor();
+    void on_buttonBox_accepted();
 };
 
 #endif // QActorEditor_H

@@ -30,7 +30,7 @@ private:
 
     Ui::MultiProcTopPropertyDialog *ui;
     QMultiProcTop *theirTop;
-    QList<Actor *> myActorList;
+    QList<const Actor *> myActorList;
 
 private slots:
     void on_buttonBox_accepted();

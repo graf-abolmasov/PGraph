@@ -489,35 +489,11 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_11">
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="okButton">
-       <property name="text">
-        <string>OK</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="cancelButton">
-       <property name="text">
-        <string>Отмена</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>
@@ -531,40 +507,7 @@
  <resources>
   <include location="resources.qrc"/>
  </resources>
- <connections>
-  <connection>
-   <sender>actorNameEdt</sender>
-   <signal>textChanged(QString)</signal>
-   <receiver>QActorEditor</receiver>
-   <slot>enableOkButton()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>331</x>
-     <y>31</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>276</x>
-     <y>270</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>inlineModuleTxtEdt</sender>
-   <signal>textChanged()</signal>
-   <receiver>QActorEditor</receiver>
-   <slot>enableOkButton()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>275</x>
-     <y>165</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>276</x>
-     <y>270</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
  <designerdata>
   <property name="gridDeltaX">
    <number>10</number>

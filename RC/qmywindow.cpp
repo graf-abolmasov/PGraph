@@ -425,7 +425,7 @@ void TMyWindow::CMGOpen()
     if (dialog.exec()){
         CMGNew();
         activeDrawWindow()->loadGraph(dialog.getResult()->name);
-        recentGraphs[dialog.getResult()->name] = dialog.getResult()->extName;
+//        recentGraphs[dialog.getResult()->name] = dialog.getResult()->extName;
     }
 }
 
@@ -612,7 +612,7 @@ void TMyWindow::getInfo(QGraphicsItem *item)
                 info.append(tr("Название: ") + top->actor->extName + "\n");
                 info.append(tr("Внутреннее имя: ") + top->actor->name+ "\n");
                 if (top->actor->type == Actor::NormalType)
-                    info.append(tr("Базовый модуль: ") + top->actor->baseModule + "\n");
+                    info.append(tr("Базовый модуль: ") + top->actor->baseModule->name + "\n");
             }
         }
         break;
@@ -696,14 +696,14 @@ void TMyWindow::setFloatScale(const int scale)
 void TMyWindow::readSettings()
 {
     QSettings settings("graph.ini", QSettings::IniFormat);
-    recentGraphs = settings.value("IDE/recents", "").toMap();
+//    recentGraphs = settings.value("IDE/recents", "").toMap();
 }
 
 void TMyWindow::writeSettings()
 {
     //Сохраняем список недавних файлов
     QSettings settings("graph.ini", QSettings::IniFormat);
-    settings.setValue("IDE/Recents", recentGraphs);
+//    settings.setValue("IDE/Recents", recentGraphs);
 }
 
 void TMyWindow::graphLoaded(QString name, QString extName)

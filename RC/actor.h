@@ -5,21 +5,22 @@
 #include <QtCore/QList>
 #include <QtCore/QString>
 #include <QtCore/QStringList>
-#include "variable.h"
 
+class Variable;
+class BaseModule;
 
 class Actor
 {
 public:
     enum Type {NormalType, InlineType, GraphType};
     Actor(const Actor &actor);
-    Actor(QString name, QString extName, Type type);
-    Actor(QString name, QString extName, Type type, QString baseModule, QList<const Variable *> variableList, QStringList varAccModeList, QImage icon);
+    Actor(const QString &name, const QString &extName, const Type &type);
+    Actor(const QString &name, const QString &extName, const Type &type, const BaseModule *baseModule, const QList<const Variable *> &variableList, const QStringList &varAccModeList, const QImage &icon);
     QString extName;
     QString name;
     Type type;
     QStringList varAccModeList;
-    QString baseModule;
+    const BaseModule *baseModule;
     QImage icon;
     QList<const Variable *> variableList;
 };

@@ -1,12 +1,10 @@
 #include "databasemanager.h"
 #include "qdiagramscene.h"
-#include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlResult>
 #include <QSqlRecord>
 #include <QDebug>
 #include <QMessageBox>
-#include <QSqlError>
 #include <QSqlTableModel>
 #include <QTableView>
 #include <QSqlQueryModel>
@@ -15,10 +13,17 @@
 #include <QList>
 #include <QtGui>
 #include <QSqlDriver>
+
 #include "commonutils.h"
 #include "logger.h"
 #include "globalvariables.h"
 #include "qarc.h"
+#include "qdiagramscene.h"
+#include "datatype.h"
+#include "variable.h"
+#include "actor.h"
+#include "predicate.h"
+#include "basemodule.h"
 #include "qcomment.h"
 
 DataBaseManager* globalDBManager;
@@ -461,16 +466,16 @@ const Variable *DataBaseManager::getVariable(const QString &name) const
     return result;
 }
 
-QList<Actor *> DataBaseManager::getActorList() const
+QList<const Actor *> DataBaseManager::getActorList() const
 {
     return myActorList;
 }
 
-void DataBaseManager::setActorList(const QList<Actor *> &list)
+void DataBaseManager::setActorList(const QList<const Actor *> &list)
 {
     myActorList = list;
     QList<Actor> dbActorList;
-    foreach (Actor *actor, myActorList)
+    foreach (const Actor *actor, myActorList)
         dbActorList.append(Actor(*actor));
     saveActorListDB(dbActorList);
 }
@@ -517,7 +522,7 @@ void DataBaseManager::saveActorListDB(const QList<Actor> &actorList) throw (QStr
         query1.bindValue(":CLASPR", "a");
         query1.bindValue(":EXTNAME", actor.extName);
         query1.bindValue(":ICON", NULL);
-        query1.bindValue(":PROTOTIP", actor.baseModule);
+        query1.bindValue(":PROTOTIP", actor.baseModule == NULL ? NULL : actor.baseModule);
         if (!query1.exec()) {
             globalLogger->writeLog(db.lastError().text(), Logger::Critical);
             db.close();
@@ -593,7 +598,7 @@ QList<Actor> DataBaseManager::getActorListDB() throw (QString)
         result.append(Actor(query1.value(0).toString(),
                             query1.value(2).toString(),
                             query1.value(6).toString().isEmpty() ? Actor::InlineType : Actor::NormalType,
-                            query1.value(6).toString(),
+                            getBaseModule(query1.value(6).toString()),
                             actorVariableList,
                             actorVarAccList,
                             QImage()));
@@ -603,10 +608,10 @@ QList<Actor> DataBaseManager::getActorListDB() throw (QString)
     return result;
 }
 
-Actor *DataBaseManager::getActor(const QString &name)
+const Actor *DataBaseManager::getActor(const QString &name) const
 {
-    Actor *result = NULL;
-    foreach (Actor *actor, myActorList) {
+    const Actor *result = NULL;
+    foreach (const Actor *actor, myActorList) {
         if (actor->name == name) {
             result = actor;
             break;
@@ -715,7 +720,7 @@ void DataBaseManager::savePredicateListDB(const QList<Predicate> &predList) thro
         query.bindValue(":NAMEPR", predicate.name);
         query.bindValue(":CLASPR", "p");
         query.bindValue(":EXTNAME", predicate.extName);
-        query.bindValue(":PROTOTIP", predicate.baseModule);
+        query.bindValue(":PROTOTIP", predicate.baseModule == NULL ? NULL : predicate.baseModule->name);
         if (!query.exec()) {
             globalLogger->writeLog(db.lastError().text(), Logger::Critical);
             db.close();
@@ -772,7 +777,7 @@ QList<Predicate> DataBaseManager::getPredicateListDB() throw (QString)
             variableList.append(getVariable(query2.value(1).toString()));
         result.append(Predicate(query1.value(0).toString(),
                                 query1.value(2).toString(),
-                                query1.value(6).toString().isEmpty() ? Predicate::inlineType : Predicate::NormalType,
+                                query1.value(6).toString().isNull() ? Predicate::inlineType : Predicate::NormalType,
                                 getBaseModule(query1.value(6).toString()),
                                 variableList));
     }
@@ -898,7 +903,7 @@ QList<BaseModule> DataBaseManager::getBaseModuleListDB() throw (QString)
         query2.prepare("SELECT TYPE, DATA, MODE, COMMENT FROM databaz WHERE PROTOTIP = :PROTOTIP AND PROJECT_ID = :PROJECT_ID order by NEV;");
         query2.bindValue(":PROTOTIP", query1.value(0).toString());
         query2.bindValue(":PROJECT_ID", myProjectId);
-        if (!query1.exec()) {
+        if (!query2.exec()) {
             globalLogger->writeLog(db.lastError().text(), Logger::Critical);
             db.close();
             throw QObject::tr("Не удалось параметры модулей.\n") + db.lastError().text();

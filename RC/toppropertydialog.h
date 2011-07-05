@@ -28,7 +28,7 @@ protected:
 private:
     Ui::TopPropertyDialog *ui;
     QNormalTop *myTop;
-    QList<Actor *> myActorList;
+    QList<const Actor *> myActorList;
 
 private slots:
     void on_actorsListWidget_itemDoubleClicked(QListWidgetItem* item);

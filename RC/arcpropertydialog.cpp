@@ -1,3 +1,5 @@
+#include <QtGui>
+
 #include "arcpropertydialog.h"
 #include "ui_arcpropertydialog.h"
 #include "qarc.h"

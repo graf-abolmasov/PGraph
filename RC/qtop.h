@@ -41,7 +41,7 @@ public:
     QList<QArc *> getArcsAtBound(int i) const;
     bool moveBy(qreal dx, qreal dy);
 
-    Actor *actor;
+    const Actor *actor;
 protected:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 private:

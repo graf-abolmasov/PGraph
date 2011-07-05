@@ -41,11 +41,11 @@ void TopPropertyDialog::prepareForm(QNormalTop* top){
         QList<Graph*> graphList = globalDBManager->getGraphList();
         foreach (Graph *graph, graphList)
             myActorList.append(graph);
-        foreach (Actor *actor, myActorList)
+        foreach (const Actor *actor, myActorList)
             ui->actorsListWidget->addItem(QString(actor->extName).replace(QRegExp("(\r+|\n+)"), " "));
 
         if (top->actor != NULL) {
-            Actor *actor = top->actor;
+            const Actor *actor = top->actor;
             int idx = myActorList.indexOf(actor);
             if (idx != -1)
                 ui->actorsListWidget->setCurrentRow(idx + 1);
@@ -80,7 +80,7 @@ void TopPropertyDialog::on_actorsListWidget_currentRowChanged(int currentRow)
 {
     QString info("");
     if (currentRow > 0){
-        Actor *actor = myActorList[currentRow];
+        const Actor *actor = myActorList[currentRow];
         info.append(tr("Name: ") + actor->name + "\r\n");
         QString type;
         switch (actor->type){
@@ -94,7 +94,7 @@ void TopPropertyDialog::on_actorsListWidget_currentRowChanged(int currentRow)
             type = tr("graph");
             break;
         }        info.append(tr("Type: ") + type + "\r\n");
-        info.append(tr("Base module: ") + actor->baseModule + "\r\n");
+        info.append(tr("Base module: ") + actor->baseModule->name + "\r\n");
     }
     ui->descriptionLbl->setText(info);
 }
