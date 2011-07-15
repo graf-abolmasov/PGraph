@@ -19,6 +19,7 @@ class ArcPropertyDialog : public QDialog {
 public:
     static ArcPropertyDialog *getDialog(QArc *arc);
     ~ArcPropertyDialog();
+    bool makeResult();
     QArc *getResult();
 
 protected:
@@ -27,13 +28,14 @@ protected:
 private:
     ArcPropertyDialog(QWidget *parent = 0);
     Ui::ArcPropertyDialog *ui;
-    QArc *theirArc;
+    QArc *myArc;
     QList<const Predicate *> myPredicateList;
 
     void prepareForm(QArc *arc);
 private slots:
     void on_predicateList_itemDoubleClicked(QListWidgetItem* item);
     void on_buttonBox_accepted();
+    void on_predicateList_currentRowChanged(int currentRow);
 };
 
 #endif // ARCPROPERTYDIALOG_H

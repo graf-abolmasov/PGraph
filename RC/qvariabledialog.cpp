@@ -10,7 +10,7 @@
 #include "variable.h"
 #include "datatype.h"
 
-QVariableDialog::QVariableDialog(QWidget *parent) :
+QVariableDialog::QVariableDialog(const bool &editOnDblClick, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::QVariableDialog)
 {
@@ -21,6 +21,12 @@ QVariableDialog::QVariableDialog(QWidget *parent) :
     ui->variablesTable->setColumnWidth(3, 145);
 
     myVariable = NULL;
+
+    ui->variablesTable->setEditTriggers(editOnDblClick ? QAbstractItemView::DoubleClicked : QAbstractItemView::NoEditTriggers);
+    if (editOnDblClick)
+        connect(ui->variablesTable, SIGNAL(currentCellChanged(int,int,int,int)), this, SLOT(variablesTableCurrentCellChanged(int,int,int,int)));
+    else
+        connect(ui->variablesTable, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(tableDblClick(int,int)));
 
     /*тут мы получаем данные из базы*/
     myVariableList = globalDBManager->getVariableList();
@@ -113,6 +119,7 @@ void QVariableDialog::on_buttonBox_accepted()
     if  (idx != -1)
         myVariable = myVariableList[idx];
     globalDBManager->setVariableList(myVariableList);
+    accept();
 }
 
 const Variable *QVariableDialog::getVariable() const
@@ -141,7 +148,7 @@ void QVariableDialog::on_variablesTable_cellChanged(int row, int column)
     myVariableList.replace(row, result);
 }
 
-void QVariableDialog::on_variablesTable_currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn)
+void QVariableDialog::variablesTableCurrentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn)
 {
     if (previousRow != -1) {
         if (previousColumn == 1){
@@ -161,4 +168,10 @@ void QVariableDialog::on_variablesTable_currentCellChanged(int currentRow, int c
 
         ui->variablesTable->setCellWidget(currentRow, 1, varTypeCmbBox);
     }
+}
+
+void QVariableDialog::tableDblClick(int row, int)
+{
+    myVariable = myVariableList[row];
+    on_buttonBox_accepted();
 }

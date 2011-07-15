@@ -404,10 +404,11 @@ void TMyWindow::CMObjList()
 
 void TMyWindow::CMEdtVar()
 {
-    QVariableDialog editor;
-    if (editor.exec()){
+    QVariableDialog(true).exec();
+//    QVariableDialog editor(true);
+//    if (editor.exec()){
 
-    }
+//    }
 }
 
 void TMyWindow::CMEdtType()
@@ -424,8 +425,7 @@ void TMyWindow::CMGOpen()
     dialog.prepareForm();
     if (dialog.exec()){
         CMGNew();
-        activeDrawWindow()->loadGraph(dialog.getResult()->name);
-//        recentGraphs[dialog.getResult()->name] = dialog.getResult()->extName;
+        activeDrawWindow()->loadGraph(dialog.getResult());
     }
 }
 
@@ -568,7 +568,7 @@ void TMyWindow::getInfo(QGraphicsItem *item)
                 info.append(tr("\nО предикате\n"));
                 QString predType = tr("");
                 switch(arc->getPredicate()->type) {
-                case Predicate::inlineType:
+                case Predicate::InlineType:
                     predType = tr("inline");
                     break;
                 case Predicate::NormalType:
@@ -695,15 +695,11 @@ void TMyWindow::setFloatScale(const int scale)
 
 void TMyWindow::readSettings()
 {
-    QSettings settings("graph.ini", QSettings::IniFormat);
-//    recentGraphs = settings.value("IDE/recents", "").toMap();
 }
 
 void TMyWindow::writeSettings()
 {
     //Сохраняем список недавних файлов
-    QSettings settings("graph.ini", QSettings::IniFormat);
-//    settings.setValue("IDE/Recents", recentGraphs);
 }
 
 void TMyWindow::graphLoaded(QString name, QString extName)
@@ -725,6 +721,9 @@ void TMyWindow::graphLoaded(QString name, QString extName)
 void TMyWindow::closeEvent(QCloseEvent *event)
 {
     writeSettings();
+    if (saveGraphAct->isEnabled())
+        if (QMessageBox::question(this, tr("Сохранить"), tr("Сохранить изменения в ") + activeDrawWindow()->myGraphExtName + tr("?"), QMessageBox::Yes, QMessageBox::No, QMessageBox::NoButton) == QMessageBox::Yes)
+            CMGSave();
     event->accept();
 }
 
@@ -735,13 +734,13 @@ void TMyWindow::grafMenuAboutToShow()
 
 void TMyWindow::CMCompile()
 {
-    //    if (!globalDBManager->Compi_get_GSP_Shab_List())
-    //            QMessageBox::critical(NULL,
-    //                          QObject::tr("Ошибка"),
-    //                          QObject::tr("Не удалось прочитать из БД шаблон "
-    //                                      "для генерации исходного файла (GSP_SHAB).\n")
-    //                                    + globalDBManager->lastError().databaseText(),
-    //                          QMessageBox::Ok);
+//        if (!globalDBManager->Compi_get_GSP_Shab_List())
+//                QMessageBox::critical(NULL,
+//                              QObject::tr("Ошибка"),
+//                              QObject::tr("Не удалось прочитать из БД шаблон "
+//                                          "для генерации исходного файла (GSP_SHAB).\n")
+//                                        + globalDBManager->lastError().databaseText(),
+//                              QMessageBox::Ok);
 
     Compi(activeDrawWindow()->myGraphName);
     // Определение размера структуры описания графа

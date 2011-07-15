@@ -74,7 +74,7 @@ int B_compL__compi(GRFNAVI *GrfNav,NAMAGR *NameFilePRG,COMPTOPs *ListTop,
 
 // strcpy(NameP,(*GrfNav).PathPO);
 // strcat(NameP,"GSP_SHAB.dbf");
-// printf("NamPRG %s NamSh %s\n",NameFilePRG,NameP);
+// qDebug("NamPRG %s NamSh %s\n",NameFilePRG,NameP);
 // if((d4use(NameP)) < 0)
 //  {
 //   ((*Gerror).TekErr) = 2;
@@ -243,7 +243,7 @@ int BERR2M__compi(GRFNAVI *GrfNav,GRHERR *Gerror)
 
  // strcpy(NameP,(*GrfNav).PathPO);
  // strcat(NameP,"GRH_ERR");
- // printf("ERR %s %d\n",NameP,(*Gerror).TekErr);
+ // qDebug("ERR %s %d\n",NameP,(*Gerror).TekErr);
 
 // if (!globalDBManager->get_GSP_Shab_List(myShabList))
 //     QMessageBox::critical(NULL,
@@ -314,7 +314,7 @@ if (*FirstDef >= 0)
 
 	 case 'W':
 	    (*((*ListTop)+(*HeadTop))).FirstDef = *FirstDef;
-//	printf("FirstDef  %d  \n",*FirstDef);
+//	qDebug("FirstDef  %d  \n",*FirstDef);
 	    break;
      }
     }
@@ -326,13 +326,13 @@ if (*LastDef >= 0)
 	    break;
 
 	 case 'W':
-  //	 printf("LastDef  %d  \n",*LastDef);
+  //	 qDebug("LastDef  %d  \n",*LastDef);
 	    (*((*ListTop)+(*HeadTop))).LastDef = *LastDef;
 	    break;
      }
     }
 
-//printf("TWR HeadT=%d WR=%c Top=%d Name=%s Fdef=%d LDef=%d\n",
+//qDebug("TWR HeadT=%d WR=%c Top=%d Name=%s Fdef=%d LDef=%d\n",
 //	   *HeadTop,*WR,*Top,Name,*FirstDef,*LastDef, *Top);getch();
  return(1);
 }
@@ -411,7 +411,7 @@ int BallocM__compi(GRFNAVI *GrfNav,COMPTOPs *ListTop,DEFGRAFs *LstGraf,COMPREs *
 // strcpy(NameAKT,(*GrfNav).PathPO);
 // strcat(NameAKT,"actor.dbf");
 
-//printf("Whrer:1, %s 2 %s 3 %s\n",WhereGH,WhereGH2, WhereGH3);
+//qDebug("Whrer:1, %s 2 %s 3 %s\n",WhereGH,WhereGH2, WhereGH3);
 
  /*ref_AKTOR = d4use(NameAKT);
  if(ref_AKTOR < 0)
@@ -623,7 +623,7 @@ globalDBManager->Compi_count_MaxLP((*GrfNav).NamePR, (MaxLP));
 *ListP   = (COMPRE  *)calloc((*MaxLP),sizeof(COMPRE ));
 *Graph   = (COMPH   *)calloc((*MaxGH),sizeof(COMPH  ));
 
-printf("MGH=%d MT=%d MP=%d\n",*MaxGH,*MaxLT,*MaxLP);
+qDebug("MGH=%d MT=%d MP=%d\n",*MaxGH,*MaxLT,*MaxLP);
  
     //  d4select(ref_GH);
     //  x4filter_pop();
@@ -649,7 +649,7 @@ globalDBManager->Compi_fill_Graph_struct((*GrfNav).NamePR, (*MaxGH), Graph);
     //   }
     //   else { (*(*Graph+i)).ArcType = 1; }
 
-    //printf("from %d to %d Pred %d, ArcType %d\n",(*(*Graph+i)).FromTop,(*(*Graph+i)).ToTop,(*(*Graph+i)).Pred,(*(*Graph+i)).ArcType);
+    //qDebug("from %d to %d Pred %d, ArcType %d\n",(*(*Graph+i)).FromTop,(*(*Graph+i)).ToTop,(*(*Graph+i)).Pred,(*(*Graph+i)).ArcType);
 
     //   x4skip(1L);
     //  }
@@ -696,7 +696,7 @@ globalDBManager->Compi_fill_ListT_struct((*GrfNav).NamePR, (*MaxLT), ListTop);
 //  d4select(ref_AKTOR);
 //  strncpy((*(*ListTop + i)).NameProt,f4str(f4ref("PROTOTIP")),8);
 //  d4select(ref_LT);
-//  printf("Name %s Top=%d  FistDef=%d LastDef=%d NameProt=%s\n",(*(*ListTop + i)).Name,
+//  qDebug("Name %s Top=%d  FistDef=%d LastDef=%d NameProt=%s\n",(*(*ListTop + i)).Name,
 //             (*(*ListTop+i)).Top,(*(*ListTop+i)).FirstDef,(*(*ListTop+i)).LastDef,(*(*ListTop + i)).NameProt);
 //  x4skip(1L);
 // }
@@ -734,7 +734,7 @@ globalDBManager->Compi_fill_ListP_struct((*GrfNav).NamePR, (*MaxLP), ListP);
 //  (*(*ListP+i)).Pred = f4int(f4ref("NPRED"));
 //  d4select(ref_AKTOR);
 //  strncpy((*(*ListP + i)).NameProt,f4str(f4ref("PROTOTIP")),8);
-//  printf("Name=%s  Pred=%d NameProt=%s\n",(*(*ListP + i)).Name,(*(*ListP+i)).Pred,(*(*ListP + i)).NameProt);
+//  qDebug("Name=%s  Pred=%d NameProt=%s\n",(*(*ListP + i)).Name,(*(*ListP+i)).Pred,(*(*ListP + i)).NameProt);
 //  d4select(ref_LP);
 //  x4skip(1L);
 // }
@@ -775,7 +775,7 @@ int B_PHRWP__compi(int *HeadGPH, COMPHs *ListGPH, char *WR,int *FromTop,int *ToT
 
 int i;
 //for (i=0; i < 6; i++)
-//printf("Graph: %d %d %d \n", (*(*ListGPH + i)).FromTop,(*(*ListGPH + i)).ToTop,(*(*ListGPH + i)).Pred);
+//qDebug("Graph: %d %d %d \n", (*(*ListGPH + i)).FromTop,(*(*ListGPH + i)).ToTop,(*(*ListGPH + i)).Pred);
 
 if (*FromTop >= 0)
    {switch (*WR)
@@ -825,7 +825,7 @@ if (*ArcType >= 0)
      }
     }
 
-//printf("FROM TO PRED : %d  %d  %d\n",*FromTop,*ToTop,*Pred);
+//qDebug("FROM TO PRED : %d  %d  %d\n",*FromTop,*ToTop,*Pred);
 //getch();
  return(1);
 }
@@ -864,7 +864,7 @@ if (*NambPred >= 0)
             *NambPred = (*((*LstGraf)+(*HeadGR))).NambPred;
             break;
          case 'W':
-// printf("HeadGR = %d NambPred %d\n", *HeadGR,*NambPred);
+// qDebug("HeadGR = %d NambPred %d\n", *HeadGR,*NambPred);
             (*((*LstGraf)+(*HeadGR))).NambPred = *NambPred;
             break;
      }
@@ -877,7 +877,7 @@ if (*NambTop >= 0)
             break;
 
          case 'W':
-//printf("HeadGR = %d NambTop %d\n", *HeadGR,*NambTop);
+//qDebug("HeadGR = %d NambTop %d\n", *HeadGR,*NambTop);
             (*((*LstGraf)+(*HeadGR))).NambTop = *NambTop;
             break;
      }
@@ -890,7 +890,7 @@ if (*NambTop >= 0)
             break;
 
          case 'W':
-//printf("HeadGR = %d NambTop %d\n", *HeadGR,*NambTop);
+//qDebug("HeadGR = %d NambTop %d\n", *HeadGR,*NambTop);
             (*((*LstGraf)+(*HeadGR))).ArcType = (*((*LstGraf)+(*HeadGR))).ArcType;
             break;
      }
@@ -1130,7 +1130,7 @@ int aaaaaaai__compi(void *p[])
 
 int paaaaaah__compi(void *p[])
  {
-//printf("Nobj=%d ToTop=%d\n",(*(int *)(p[0])),(*(int *)(p[1])));getch();
+//qDebug("Nobj=%d ToTop=%d\n",(*(int *)(p[0])),(*(int *)(p[1])));getch();
   return((*(int *)(p[0]))==(*(int *)(p[1])));
  }
 
@@ -1204,7 +1204,7 @@ int aaaaaaba__compi(void *p[])
  {
   int k1;
   for (k1=0;k1<(*(int *)(p[0]));k1++)
-  printf("Top=%d, Name=%s, FDef=%d, LDef=%d, NPr=%s\n",(*((*(COMPTOPs *)(p[1]))+k1)).Top,
+  qDebug("Top=%d, Name=%s, FDef=%d, LDef=%d, NPr=%s\n",(*((*(COMPTOPs *)(p[1]))+k1)).Top,
   (*((*(COMPTOPs *)(p[1]))+k1)).Name,(*((*(COMPTOPs *)(p[1]))+k1)).FirstDef,(*((*(COMPTOPs *)(p[1]))+k1)).LastDef,(*((*(COMPTOPs *)(p[1]))+k1)).NameProt);
 
   return 1;
@@ -1282,10 +1282,11 @@ int GraphMV__compi(void* P[],int jroot,int Ntop, DEFPRED *ListPred,DEFTOP *ListT
  int jfirst,jlast,j,jPred,jTop,Fpred;
  int (*Tp)(void*[]);
  /*Вызов корневой вершины*/
-printf("н ч ло-н ч л\n");
+
+ qDebug("н ч ло-н ч л\n");
  Tp =  ListTop[jroot].Top;
  (*Tp)((void **)(P[jroot]));
- printf("Вершин : %s \n",ListTop[jroot].NameTop);
+ qDebug("Вершин : %s \n",ListTop[jroot].NameTop);
 
  jfirst = ListTop[jroot].FirstDef;
  jlast  = ListTop[jroot].LastDef;
@@ -1295,13 +1296,13 @@ printf("н ч ло-н ч л\n");
 	jPred = ListGraf[j].NambPred;
 
         Tp =  ListPred[jPred].Predicate;   Fpred = (*Tp)((void **)(P[jPred+Ntop]));
-printf("Пред: %s\n",ListPred[jPred].NamePred);
+qDebug("Пред: %s\n",ListPred[jPred].NamePred);
 	if( Fpred==1 )
 
 	  { jTop = ListGraf[j].NambTop;
-	 printf("Тек вер: %s \n",ListTop[jTop].NameTop);
+         qDebug("Тек вер: %s \n",ListTop[jTop].NameTop);
                  Tp  =  ListTop[jTop].Top;    (*Tp)((void **)(P[jTop]));
-// printf("Вершин : %s \n",ListTop[jTop].NameTop);
+// qDebug("Вершин : %s \n",ListTop[jTop].NameTop);
 
 		 jfirst = ListTop[jTop].FirstDef;
 		 jlast  = ListTop[jTop].LastDef;
@@ -1310,7 +1311,7 @@ printf("Пред: %s\n",ListPred[jPred].NamePred);
 		 goto BEGIN;
 		}
 	}
- printf("Из вершины %s нет р зрешенного выход \n",ListTop[jTop].NameTop);
+ qDebug("Из вершины %s нет р зрешенного выход \n",ListTop[jTop].NameTop);
  ENDGRAF:
  return 1;
 }

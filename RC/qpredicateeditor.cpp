@@ -72,9 +72,9 @@ void QPredicateEditor::prepareForm(const Predicate *predicate)
     myPredicate = predicate;
     tempPre = new Predicate(myPredicate->name, myPredicate->extName, myPredicate->type, myPredicate->baseModule, myPredicate->variableList);
     //заполняем форму
-    myModuleList = globalDBManager->getBaseModuleList();
     switch(tempPre->type){
     case Predicate::NormalType:
+        myModuleList = globalDBManager->getBaseModuleList();
         ui->inlineWidget->setVisible(false);
         ui->predicateNameEdt->setText(myPredicate->extName);
         ui->predicateNameEdt->setValidator(new QRegExpValidator(QRegExp(tr("[A-Za-zА-Яа-я1-9]{0,255}")), this));
@@ -94,14 +94,13 @@ void QPredicateEditor::prepareForm(const Predicate *predicate)
              }
         }
         break;
-    case Predicate::inlineType:
+    case Predicate::InlineType:
         ui->normalWidget->setVisible(false);
         ui->inlineModuleTxtEdt->blockSignals(true);
         ui->inlineModuleTxtEdt->setPlainText(myPredicate->extName);
         ui->inlineModuleTxtEdt->blockSignals(false);
         break;
     }
-    enableOkButton();
 }
 
 const Predicate *QPredicateEditor::getResult() const
@@ -123,7 +122,7 @@ void QPredicateEditor::on_baseModuleList_currentRowChanged(int currentRow)
         ui->paramsNormalTable->setItem(i, 1, new QTableWidgetItem(parameter[0]));
         ui->paramsNormalTable->setItem(i, 2, new QTableWidgetItem("N/A"));
     }
-    enableOkButton();
+    tempPre->baseModule = myModuleList[currentRow];
 }
 
 void QPredicateEditor::on_paramsNormalTable_currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn)
@@ -146,10 +145,9 @@ void QPredicateEditor::on_paramsNormalTable_currentCellChanged(int currentRow, i
 
     ui->descriptionPOLbl_2->setText("");
     if (tempPre->variableList[currentRow] != NULL) {
-        ui->descriptionPOLbl_2->setText(myPredicate->variableList[currentRow]->comment);
+        ui->descriptionPOLbl_2->setText(tempPre->variableList[currentRow]->comment);
     }
     ui->descriptionBMLbl_2->setText(myModuleList[ui->baseModuleList->currentRow()]->parameterList[currentRow].split(";;")[03]);
-    enableOkButton();
 }
 
 void QPredicateEditor::showVariableDialog()
@@ -164,7 +162,8 @@ void QPredicateEditor::showVariableDialog()
 
 void QPredicateEditor::on_buttonBox_accepted()
 {
-    makeResult();
+    if (makeResult())
+        accept();
 }
 
 void QPredicateEditor::on_inlineModuleTxtEdt_textChanged()
@@ -177,8 +176,35 @@ void QPredicateEditor::on_inlineModuleTxtEdt_textChanged()
     }
 }
 
-void QPredicateEditor::makeResult()
+bool QPredicateEditor::makeResult()
 {
+    switch(tempPre->type){
+    case Predicate::NormalType:
+        tempPre->extName = ui->predicateNameEdt->text();
+        tempPre->name = "P" + getCRC(tempPre->extName.toUtf8());
+        break;
+    case Predicate::InlineType:
+        tempPre->extName = ui->inlineModuleTxtEdt->document()->toPlainText();
+        tempPre->name = "P" + getCRC(tempPre->extName.toUtf8());
+        break;
+    }
+
+    if (tempPre->extName.isEmpty()) {
+        QString mes = tempPre->type == Predicate::InlineType ? tr("Тело inline-предиката не может быть пустым") : tr("Название предиката не может быть пустым");
+        QMessageBox::critical(NULL, tr("Ошибка"), mes);
+        return false;
+    }
+
+    if (tempPre->type == Predicate::NormalType && tempPre->baseModule == NULL) {
+        QMessageBox::critical(NULL, tr("Ошибка"), tr("Не указан базовый модуль"));
+        return false;
+    }
+
+    if (tempPre->variableList.size() > 0 && tempPre->variableList.contains(NULL)) {
+        QMessageBox::critical(NULL, tr("Ошибка"), tr("Необходимо указать переменные для всех параметров базового модуля"));
+        return false;
+    }
+
     QSettings myLocSettings("graph.ini", QSettings::IniFormat);
     QDir currentDir;
     currentDir.setCurrent(myLocSettings.value("Location/BaseDir", QApplication::applicationDirPath() + "\\BaseDir\\").toString());
@@ -188,19 +214,7 @@ void QPredicateEditor::makeResult()
 
     switch(tempPre->type){
     case Predicate::NormalType:
-        if (ui->predicateNameEdt->text().isEmpty()) {
-            QMessageBox::critical(NULL,
-                                  QObject::tr("Ошибка"),
-                                  QObject::tr("Введие название предиката.\n") + globalDBManager->lastError().databaseText(),
-                                  QMessageBox::Ok);
-            return;
-        }
-
-        tempPre->extName = ui->predicateNameEdt->text();
-        tempPre->name = "P" + getCRC(tempPre->extName.toUtf8());
-        tempPre->baseModule = myModuleList[ui->baseModuleList->currentRow()];
-
-        // Генерируем актор
+        // Генерируем предикат
         outputData.append("#include \"stype.h\"\r\n");
         outputData.append("int ");
         outputData.append(tempPre->name.toUtf8());
@@ -230,15 +244,13 @@ void QPredicateEditor::makeResult()
         // выход
         outputData.append("\r\n\r\n\treturn result;\r\n}");
         break;
-    case Predicate::inlineType:
-        tempPre->extName = ui->inlineModuleTxtEdt->document()->toPlainText();
-        tempPre->name = "P" + getCRC(tempPre->extName.toUtf8());
+    case Predicate::InlineType:
         //генерируем с++ файл
         outputData.append("#include \"stype.h\"\r\n");
         outputData.append("int " + tempPre->name + "(TPOData *D)\r\n");
         outputData.append("{\r\n");
         QString code(tempPre->extName);
-        for (int i = 0; i < tempPre->variableList.count(); i++){
+        for (int i = 0; i < tempPre->variableList.count(); i++) {
             code.replace(QRegExp("(\\b)" + tempPre->variableList.at(i)->name + "(\\b)", Qt::CaseSensitive), "D->" + tempPre->variableList.at(i)->name);
         }
         //code.replace(QRegExp("\\n"), "\n  ");
@@ -259,9 +271,5 @@ void QPredicateEditor::makeResult()
     result->baseModule = tempPre->baseModule;
     result->variableList = tempPre->variableList;
     delete tempPre;
-}
-
-void QPredicateEditor::enableOkButton()
-{
-
+    return true;
 }

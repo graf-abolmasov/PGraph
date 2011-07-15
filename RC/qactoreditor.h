@@ -33,21 +33,21 @@ private:
     QActorEditor(QWidget *parent = 0);
     QActorEditor(const Actor::Type &mode, QWidget *parent = 0);
     QActorEditor(const Actor *actor, QWidget *parent = 0);
-    Ui::QActorEditor *ui;
-    const Actor *myActor;
+
     Actor *result;
     Actor *tempActor;
-    Actor::Type myMode;
+    const Actor *myActor;
+    Ui::QActorEditor *ui;
+    QList<const Variable *>   myVariableList;
     QList<const BaseModule *> myModuleList;
-    QList<const Variable *> myVariableList;
-    QPointer<QToolButton> varEditBtn;
-    QPointer<QWidget> varWidget;
+    QComboBox *paramTypeCmbBox;
+
+    QPointer<QWidget>     varWidget;
     QPointer<QHBoxLayout> varLayout;
-    QPointer<QComboBox> paramTypeCmbBox;
+    QPointer<QToolButton> varEditBtn;
 
     void prepareForm(const Actor *actor);
-    bool validate();
-    void makeResult();
+    bool makeResult();
 private slots:
     void on_paramsInlineTable_currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn);
     void on_inlineModuleTxtEdt_textChanged();
@@ -55,6 +55,7 @@ private slots:
     void on_baseModuleList_currentRowChanged(int currentRow);
     void showVariableEditor();
     void on_buttonBox_accepted();
+    void on_buttonBox_rejected();
 };
 
 #endif // QActorEditor_H

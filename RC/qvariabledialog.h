@@ -19,7 +19,7 @@ class DataType;
 class QVariableDialog : public QDialog {
     Q_OBJECT
 public:
-    explicit QVariableDialog(QWidget *parent = 0);
+    QVariableDialog(const bool &editOnDblClick = false, QWidget *parent = 0);
     ~QVariableDialog();
     const Variable *getVariable() const;
 
@@ -34,12 +34,13 @@ private:
     const Variable *myVariable;
 
 private slots:
-    void on_variablesTable_currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn);
+    void variablesTableCurrentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn);
     void on_variablesTable_cellChanged(int row, int column);
     void on_buttonBox_accepted();
     void on_deleteButton_clicked();
     void on_editButton_clicked();
     void on_newButton_clicked();
+    void tableDblClick(int row, int column);
 };
 
 #endif // QVARIABLEDIALOG_H

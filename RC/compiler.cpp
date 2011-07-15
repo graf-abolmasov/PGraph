@@ -37,12 +37,12 @@ void Compiler::compileData() const
 
     //Предопределенные типы MPI
     QMap<QString, QString> mpiTypes;
-    mpiTypes["int"] = "MPI_INT";
-    mpiTypes["long"] = "MPI_LONG";
-    mpiTypes["char"] = "MPI_CHAR";
-    mpiTypes["float"] = "MPI_FLOAT";
+    mpiTypes["int"]    = "MPI_INT";
+    mpiTypes["long"]   = "MPI_LONG";
+    mpiTypes["char"]   = "MPI_CHAR";
+    mpiTypes["byte"]   = "MPI_BYTE";
+    mpiTypes["float"]  = "MPI_FLOAT";
     mpiTypes["double"] = "MPI_DOUBLE";
-    mpiTypes["byte"] = "MPI_BYTE";
 
     //Создаем файл utype.h
     {
@@ -58,7 +58,6 @@ void Compiler::compileData() const
 
                 //Если встертился массив
                 if (type->typedefStr.contains("[")) {
-
                     //Парсим количество элементов
                     QRegExp r("(\\[(\\d+)\\])");
                     r.setMinimal(true);

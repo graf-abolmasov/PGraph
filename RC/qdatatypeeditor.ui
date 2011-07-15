@@ -388,6 +388,38 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>arrTypeNameEdt</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>QDataTypeEditor</receiver>
+   <slot>enableOkButton()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>373</x>
+     <y>383</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>340</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>structTypeNameEdt</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>QDataTypeEditor</receiver>
+   <slot>enableOkButton()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>373</x>
+     <y>206</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>340</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>enableOkButton()</slot>

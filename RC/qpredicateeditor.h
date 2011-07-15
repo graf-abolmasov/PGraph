@@ -46,8 +46,7 @@ private:
     QPointer<QToolButton> varEditBtn;
 
     void prepareForm(const Predicate *predicate);
-    void makeResult();
-    void enableOkButton();
+    bool makeResult();
 private slots:
     void on_inlineModuleTxtEdt_textChanged();
     void on_buttonBox_accepted();

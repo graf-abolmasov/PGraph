@@ -104,7 +104,6 @@ void QModuleRegister::on_parametersTable_currentCellChanged(int currentRow, int 
 
 void QModuleRegister::on_buttonBox_accepted()
 {
-
     ui->parametersTable->setCurrentCell(-1, -1);
     bool readyToSave = true;
     for (int i = 0; i < ui->parametersTable->rowCount(); i++){
@@ -132,8 +131,10 @@ void QModuleRegister::on_buttonBox_accepted()
                          ui->parametersTable->item(i, 3)->text());
     }
 
-    if (ui->fileList->count() == 0)
+    if (ui->fileList->count() == 0) {
+        accept();
         return;
+    }
 
     QString uniqName = "S" + getCRC(ui->fileList->currentItem()->text().toUtf8());
     globalDBManager->registerModuleDB(uniqName,
@@ -167,6 +168,8 @@ void QModuleRegister::on_buttonBox_accepted()
     output.open(QFile::WriteOnly);
     output.write(outputData);
     output.close();
+
+    accept();
 }
 
 void QModuleRegister::on_fileList_currentRowChanged(int currentRow)

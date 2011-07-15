@@ -27,7 +27,7 @@
   </property>
   <property name="font">
    <font>
-    <pointsize>10</pointsize>
+    <pointsize>8</pointsize>
    </font>
   </property>
   <property name="windowTitle">
@@ -61,6 +61,11 @@
         <layout class="QVBoxLayout" name="verticalLayout_6">
          <item>
           <widget class="QLabel" name="inlineModuleTxtLbl">
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
            <property name="text">
             <string>Исходный текст модуля</string>
            </property>
@@ -77,7 +82,7 @@
    </item>
    <item>
     <widget class="QWidget" name="normalWidget" native="true">
-     <layout class="QGridLayout" name="gridLayout_2">
+     <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,0,0">
       <item row="0" column="0">
        <widget class="QFrame" name="frame_6">
         <property name="sizePolicy">
@@ -156,6 +161,11 @@
             <layout class="QHBoxLayout" name="horizontalLayout_2">
              <item>
               <widget class="QLabel" name="baseModuleLbl">
+               <property name="font">
+                <font>
+                 <pointsize>10</pointsize>
+                </font>
+               </property>
                <property name="text">
                 <string>Базовый модуль</string>
                </property>
@@ -163,6 +173,11 @@
              </item>
              <item>
               <widget class="QLabel" name="descriptionLbl">
+               <property name="font">
+                <font>
+                 <pointsize>10</pointsize>
+                </font>
+               </property>
                <property name="text">
                 <string>Описание модуля</string>
                </property>
@@ -241,6 +256,11 @@
           <layout class="QVBoxLayout" name="verticalLayout_3">
            <item>
             <widget class="QLabel" name="paramsNormalLbl">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
              <property name="text">
               <string>Параметры</string>
              </property>
@@ -248,6 +268,19 @@
            </item>
            <item>
             <widget class="QTableWidget" name="paramsNormalTable">
+             <property name="font">
+              <font>
+               <family>MS Sans Serif</family>
+               <weight>50</weight>
+               <bold>false</bold>
+              </font>
+             </property>
+             <property name="editTriggers">
+              <set>QAbstractItemView::NoEditTriggers</set>
+             </property>
+             <property name="selectionMode">
+              <enum>QAbstractItemView::SingleSelection</enum>
+             </property>
              <attribute name="horizontalHeaderCascadingSectionResizes">
               <bool>true</bool>
              </attribute>
@@ -288,6 +321,11 @@
             <layout class="QHBoxLayout" name="horizontalLayout_3">
              <item>
               <widget class="QLabel" name="descriptionBMLbl">
+               <property name="font">
+                <font>
+                 <pointsize>10</pointsize>
+                </font>
+               </property>
                <property name="text">
                 <string>Описание параметра базового модуля</string>
                </property>
@@ -295,6 +333,11 @@
              </item>
              <item>
               <widget class="QLabel" name="descriptionPOLbl">
+               <property name="font">
+                <font>
+                 <pointsize>10</pointsize>
+                </font>
+               </property>
                <property name="text">
                 <string>Описание данного предметной области</string>
                </property>
@@ -366,6 +409,11 @@
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
@@ -380,22 +428,6 @@
   <include location="resources.qrc"/>
  </resources>
  <connections>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>accepted()</signal>
-   <receiver>QPredicateEditor</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>157</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>

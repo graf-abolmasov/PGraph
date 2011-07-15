@@ -72,6 +72,7 @@ public:
     QDiagramScene::Mode mode() const
         { return scene->mode(); }
     Graph getGraph() const;
+
     void loadGraph(const QString &name);
     bool saveGraph(QString name, QString extName);
     bool updateGraph();
