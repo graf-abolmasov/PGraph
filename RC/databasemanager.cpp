@@ -108,9 +108,9 @@ Graph DataBaseManager::getGraphDB(const QString &name) throw (QString)
         Arc::ArcType arcType;
         if (record.value("Type").toString() == QObject::tr("S"))
             arcType = Arc::SerialArc;
-        if (record.value("Type").toString() == QObject::tr("P"))
+        else if (record.value("Type").toString() == QObject::tr("P"))
             arcType = Arc::ParallelArc;
-        if (record.value("Type").toString() == QObject::tr("T"))
+        else if (record.value("Type").toString() == QObject::tr("T"))
             arcType = Arc::TerminateArc;
         QStringList lines = record.value("Nodes").toString().split(";;");
         Arc arc(arcType,
@@ -143,8 +143,8 @@ Graph DataBaseManager::getGraphDB(const QString &name) throw (QString)
     }
 
     //Получаем полное название агрегата
-    query.prepare("SELECT NAMEPR, EXTNAME FROM Actor a"
-                  "WHERE a.NAMEPR=:NAMEPR AND a.PROJECT_ID=:PROJECT_ID ");
+    query.prepare("SELECT NAMEPR, EXTNAME FROM Actor a "
+                  "WHERE a.NAMEPR=:NAMEPR AND a.PROJECT_ID=:PROJECT_ID");
     query.bindValue(":PROJECT_ID", myProjectId);
     query.bindValue(":NAMEPR", name);
     if (!query.exec()) {
@@ -161,10 +161,6 @@ Graph DataBaseManager::getGraphDB(const QString &name) throw (QString)
 
 QList<Graph *> DataBaseManager::getGraphList()
 {
-    myGraphList.clear();
-    QList<Graph> dbGraphList = getGraphListDB();
-    foreach (Graph graph, dbGraphList)
-        myGraphList.append(new Graph(graph));
     return myGraphList;
 }
 
@@ -276,7 +272,7 @@ void DataBaseManager::saveGraphDB(const Graph &graph) throw (QString)
         query.bindValue(":Priority",  arc.priority);
         query.bindValue(":FromTop",   arc.startTop);
         query.bindValue(":ToTop",     arc.endTop);
-        query.bindValue(":Predicate", arc.predicate);
+        query.bindValue(":Predicate", arc.predicate == NULL ? "" : arc.predicate->name);
         if (!query.exec()) {
             globalLogger->writeLog(db.lastError().text(), Logger::Critical);
             db.close();
@@ -284,6 +280,7 @@ void DataBaseManager::saveGraphDB(const Graph &graph) throw (QString)
         }
     }
     db.close();
+    myGraphList.append(new Graph(graph.name, graph.extName, graph.topList, graph.arcList, graph.commentList, graph.syncArcList));
 }
 
 /*!
@@ -387,7 +384,6 @@ QList<DataType> DataBaseManager::getDataTypeListDB() throw (QString)
 
 const DataType *DataBaseManager::getDataType(const QString &name) const
 {
-
     const DataType *result = NULL;
     foreach (const DataType *dataType, myDataTypeList) {
         if (dataType->name == name) {
@@ -522,7 +518,7 @@ void DataBaseManager::saveActorListDB(const QList<Actor> &actorList) throw (QStr
         query1.bindValue(":CLASPR", "a");
         query1.bindValue(":EXTNAME", actor.extName);
         query1.bindValue(":ICON", NULL);
-        query1.bindValue(":PROTOTIP", actor.baseModule == NULL ? NULL : actor.baseModule);
+        query1.bindValue(":PROTOTIP", actor.baseModule == NULL ? NULL : actor.baseModule->name);
         if (!query1.exec()) {
             globalLogger->writeLog(db.lastError().text(), Logger::Critical);
             db.close();
@@ -625,7 +621,7 @@ const Predicate *DataBaseManager::getPredicate(const QString &name) const
     const Predicate *result = NULL;
     foreach (const Predicate *predicate, myPredicateList) {
         if (predicate->name == name) {
-            result == predicate;
+            result = predicate;
             break;
         }
     }
@@ -777,7 +773,7 @@ QList<Predicate> DataBaseManager::getPredicateListDB() throw (QString)
             variableList.append(getVariable(query2.value(1).toString()));
         result.append(Predicate(query1.value(0).toString(),
                                 query1.value(2).toString(),
-                                query1.value(6).toString().isNull() ? Predicate::inlineType : Predicate::NormalType,
+                                query1.value(6).toString().isNull() ? Predicate::InlineType : Predicate::NormalType,
                                 getBaseModule(query1.value(6).toString()),
                                 variableList));
     }
@@ -1439,4 +1435,7 @@ void DataBaseManager::openProjectDB(int projectId)
     QList<Predicate> dbPredicateList = getPredicateListDB();
     foreach (Predicate predicate, dbPredicateList)
         myPredicateList.append(new Predicate(predicate));
+    QList<Graph> dbGraphList = getGraphListDB();
+    foreach (Graph graph, dbGraphList)
+        myGraphList.append(new Graph(graph));
 }

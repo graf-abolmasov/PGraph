@@ -63,7 +63,7 @@ void AddCommand::redo()
 
 AddCommand::~AddCommand()
 {
-
+    delete myItem;
 }
 
 DeleteCommand::DeleteCommand(QGraphicsItem *item, QGraphicsScene *scene, QUndoCommand *parent)

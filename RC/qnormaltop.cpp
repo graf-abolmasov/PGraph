@@ -128,7 +128,7 @@ float QNormalTop::getMinHeight() const
 */
 void QNormalTop::setIcon(QImage &icon){
     if (actor != NULL)
-        QMessageBox::critical(0, "Ошибка", "Функция пока нелостуна");
+        QMessageBox::critical(0, QObject::tr("Ошибка"), QObject::tr("Функция пока недостуна"));
 }
 
 /*!

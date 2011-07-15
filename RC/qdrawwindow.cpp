@@ -47,7 +47,7 @@ TDrawWindow::TDrawWindow(ShowRole role, QWidget *parent)
             this, SLOT(itemInserted(QGraphicsItem*)));
     //обработчик перемещения объекта
     connect(scene, SIGNAL(itemMoved(QGraphicsItem*,QLineF)),
-        this, SLOT(itemMoved(QGraphicsItem*,QLineF)));
+            this, SLOT(itemMoved(QGraphicsItem*,QLineF)));
     connect(scene, SIGNAL(itemsMoved(QList<QGraphicsItem*>,QLineF)),
             this, SLOT(itemsMoved(QList<QGraphicsItem*>,QLineF)));
     //выбор объекта - тоже изменение сцены
@@ -56,7 +56,7 @@ TDrawWindow::TDrawWindow(ShowRole role, QWidget *parent)
     connect(scene, SIGNAL(selectionChanged()), this, SLOT(selectionChanged()));
     //обработчик удаления объекта
     connect(scene, SIGNAL(itemDeleted(QGraphicsItem*)),
-        this, SLOT(itemDeleted(QGraphicsItem*)));
+            this, SLOT(itemDeleted(QGraphicsItem*)));
 
     view->setScene(scene);
     view->setAlignment(Qt::AlignCenter);
@@ -383,70 +383,76 @@ void TDrawWindow::loadGraph(const QString &name)
 {
     globalLogger->writeLog("TDrawWindow::loadGraph start", Logger::All);
     scene->clear();
-    Graph graph = globalDBManager->getGraphDB(name);
-    foreach (Top top, graph.topList) {
-        QTop *qtop = NULL;
-        if (top.type == "T") {
-            QNormalTop *qtop = new QNormalTop(topMenu, NULL, scene);
-            if (top.isRoot)
-                scene->setRootTop(qtop);
-            double w = top.sizeX;
-            double h = top.sizeY;
-            qtop->setRect(-w/2, -h/2, w, h);
-        } else if (top.type == "M") {
-            QMultiProcTop *qtop = new QMultiProcTop(multiProcMenu, NULL, scene);
-            qtop->procCount = top.procCount;
-        }
-        qtop->number = top.number;
-        qtop->setPos(top.x, top.y);
-        const Actor *actor = globalDBManager->getActor(top.actor);
-        qtop->actor = actor;
-    }
+    try {
+        Graph graph = globalDBManager->getGraphDB(name);
 
-    QList<QPair<QArc *, int> > qarcList;
-    foreach (Arc arc, graph.arcList) {
-        QTop *startTop = NULL;
-        QTop *endTop = NULL;
-        QList<QTop* > topList = allTops();
-        for (int i = 0; i < topList.count(); i++){
-            if (topList[i]->number == arc.startTop)
-                startTop = topList[i];
-            if (topList[i]->number == arc.endTop)
-                endTop = topList[i];
+        foreach (Top top, graph.topList) {
+            QTop *qtop = NULL;
+            if (top.type == "T") {
+                qtop = new QNormalTop(topMenu, NULL, scene);
+                if (top.isRoot)
+                    scene->setRootTop(qgraphicsitem_cast<QNormalTop *>(qtop));
+                double w = top.sizeX;
+                double h = top.sizeY;
+                qtop->setRect(-w/2, -h/2, w, h);
+            } else if (top.type == "M") {
+                QMultiProcTop *qtop1 = new QMultiProcTop(multiProcMenu, NULL, scene);
+                qtop1->procCount = top.procCount;
+                qtop = qtop1;
+            }
+            qtop->number = top.number;
+            qtop->setPos(top.x, top.y);
+            qtop->actor = globalDBManager->getActor(top.actor);
         }
 
-        QArc *qarc = new QArc(startTop, endTop, arcMenu, NULL, scene);
-        for (int i = 0; i < arc.lines.count(); i++){
-            QStringList nodes = arc.lines.at(i).split(" ");
-            QPointF startPoint = QPointF(nodes.at(0).toFloat(), nodes.at(1).toFloat());
-            QPointF endPoint = QPointF(nodes.at(2).toFloat(), nodes.at(3).toFloat());
-            qarc->newLine(startPoint, endPoint);
+        QList<QPair<QArc *, int> > qarcList;
+        foreach (Arc arc, graph.arcList) {
+            QTop *startTop = NULL;
+            QTop *endTop = NULL;
+            QList<QTop* > topList = allTops();
+            for (int i = 0; i < topList.count(); i++){
+                if (topList[i]->number == arc.startTop)
+                    startTop = topList[i];
+                if (topList[i]->number == arc.endTop)
+                    endTop = topList[i];
+            }
+
+            QArc *qarc = new QArc(startTop, endTop, arcMenu, NULL, scene);
+            for (int i = 0; i < arc.lines.count(); i++){
+                QStringList nodes = arc.lines.at(i).split(" ");
+                QPointF startPoint = QPointF(nodes.at(0).toFloat(), nodes.at(1).toFloat());
+                QPointF endPoint = QPointF(nodes.at(2).toFloat(), nodes.at(3).toFloat());
+                qarc->newLine(startPoint, endPoint);
+            }
+            qarc->addLine(qarc->currentLine);
+            qarc->currentLine = NULL;
+            qarc->setArcType(QArc::ArcType(arc.type));
+            qarc->setPredicate(arc.predicate);
+
+            if (qarc->getPredicate() != NULL && !globalPredicateList.contains(qarc->getPredicate()->name))
+                globalPredicateList.append(qarc->getPredicate()->name);
+            startTop->addArc(qarc);
+            endTop->addArc(qarc);
+            qarcList.append(qMakePair(qarc, arc.priority));
         }
-        qarc->addLine(qarc->currentLine);
-        qarc->currentLine = NULL;
-        qarc->setArcType(QArc::ArcType(arc.type));
-        qarc->setPredicate(arc.predicate);
 
-        if (qarc->getPredicate() != NULL && !globalPredicateList.contains(qarc->getPredicate()->name))
-            globalPredicateList.append(qarc->getPredicate()->name);
-        startTop->addArc(qarc);
-        endTop->addArc(qarc);
-        qarcList.append(qMakePair(qarc, arc.priority));
+        //расставляем приоритеты дуг
+        for (int i = 0; i < qarcList.count(); i++) {
+            qarcList.at(i).first->setPriority(qarcList.at(i).second);
+        }
+
+        foreach (Comment comment, graph.commentList) {
+            QComment *qcomment = new QComment(commentMenu, NULL, scene);
+            qcomment->setPos(comment.x, comment.y);
+            qcomment->setPlainText(comment.text);
+        }
+
+        myGraphName = graph.name;
+        myGraphExtName = graph.extName;
+    } catch (QString e) {
+        QMessageBox::critical(NULL, tr("Ошибка"), e);
     }
 
-    //расставляем приоритеты дуг
-    for (int i = 0; i < qarcList.count(); i++) {
-        qarcList.at(i).first->setPriority(qarcList.at(i).second);
-    }
-
-    foreach (Comment comment, graph.commentList) {
-        QComment *qcomment = new QComment(commentMenu, NULL, scene);
-        qcomment->setPos(comment.x, comment.y);
-        qcomment->setPlainText(comment.text);
-    }
-
-    myGraphName = graph.name;
-    myGraphExtName = graph.extName;
     if (myRole == ReadOnly)
         setWindowTitle(myGraphExtName + tr(" - Read-only"));
     else
@@ -516,7 +522,7 @@ void TDrawWindow::alignHLeft()
     QList<QTop *> topList;
     foreach (QGraphicsItem* item, scene->selectedItems())
         if (item->type() == QTop::Type)
-           topList.append(qgraphicsitem_cast<QTop* >(item));
+            topList.append(qgraphicsitem_cast<QTop* >(item));
     if (topList.count() == 0) return;
     float left = topList.first()->mapRectToScene(topList.first()->rect()).left();
     foreach (QTop* top, topList) {
@@ -553,7 +559,7 @@ void TDrawWindow::alignHRight()
     QList<QTop *> topList;
     foreach (QGraphicsItem* item, scene->selectedItems())
         if (item->type() == QTop::Type)
-           topList.append(qgraphicsitem_cast<QTop* >(item));
+            topList.append(qgraphicsitem_cast<QTop* >(item));
     if (topList.count() == 0) return;
     float right = topList.first()->mapRectToScene(topList.first()->rect()).right();
     foreach (QTop* top, topList) {
@@ -590,7 +596,7 @@ void TDrawWindow::alignHCenter()
     QList<QTop *> topList;
     foreach (QGraphicsItem* item, scene->selectedItems())
         if (item->type() == QTop::Type)
-           topList.append(qgraphicsitem_cast<QTop* >(item));
+            topList.append(qgraphicsitem_cast<QTop* >(item));
     if (topList.count() == 0) return;
     float center = 0;
     foreach (QTop* top, topList)
@@ -626,7 +632,7 @@ void TDrawWindow::alignVTop()
     QList<QTop *> topList;
     foreach (QGraphicsItem* item, scene->selectedItems())
         if (item->type() == QTop::Type)
-           topList.append(qgraphicsitem_cast<QTop* >(item));
+            topList.append(qgraphicsitem_cast<QTop* >(item));
     if (topList.count() == 0) return;
     float topEdge = topList.first()->mapRectToScene(topList.first()->rect()).top();
     foreach (QTop* top, topList) {
@@ -663,7 +669,7 @@ void TDrawWindow::alignVBottom()
     QList<QTop *> topList;
     foreach (QGraphicsItem* item, scene->selectedItems())
         if (item->type() == QTop::Type)
-           topList.append(qgraphicsitem_cast<QTop* >(item));
+            topList.append(qgraphicsitem_cast<QTop* >(item));
     if (topList.count() == 0) return;
     float bottom = topList.first()->mapRectToScene(topList.first()->rect()).bottom();
     foreach (QTop* top, topList) {
@@ -700,7 +706,7 @@ void TDrawWindow::alignVCenter()
     QList<QTop *> topList;
     foreach (QGraphicsItem* item, scene->selectedItems())
         if (item->type() == QTop::Type)
-           topList.append(qgraphicsitem_cast<QTop* >(item));
+            topList.append(qgraphicsitem_cast<QTop* >(item));
     if (topList.count() == 0) return;
     float center = 0;
     foreach (QTop* top, topList)
@@ -755,9 +761,9 @@ void TDrawWindow::distribHorizontally()
     QList<QTop *> topList;
     foreach (QGraphicsItem* item, scene->selectedItems())
         if (item->type() == QTop::Type)
-           topList.append(qgraphicsitem_cast<QTop* >(item));
-        //else if (item->type() == QArcLine::Type || item->type() == QSerialArcTop::Type)
-        //    arcList.append(qgraphicsitem_cast<QArc* >(item->parentItem()));
+            topList.append(qgraphicsitem_cast<QTop* >(item));
+    //else if (item->type() == QArcLine::Type || item->type() == QSerialArcTop::Type)
+    //    arcList.append(qgraphicsitem_cast<QArc* >(item->parentItem()));
 
     //Если выделено несколько вершин - распределяем вершины
     if (topList.count() > 1) {
@@ -876,7 +882,7 @@ void TDrawWindow::distribVertically()
     QList<QTop *> topList;
     foreach (QGraphicsItem* item, scene->selectedItems())
         if (item->type() == QTop::Type)
-           topList.append(qgraphicsitem_cast<QTop* >(item));
+            topList.append(qgraphicsitem_cast<QTop* >(item));
     if (topList.count() > 1) {
 
         qSort(topList.begin(), topList.end(), topUpperThan);

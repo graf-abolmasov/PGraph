@@ -21,7 +21,6 @@ private:
     QList<const Predicate *>  myPredicateList;
     QList<const BaseModule *> myBaseModuleList;
 
-    QList<Graph> getGraphListDB() throw (QString);
 
     void saveVariableListDB(const QList<Variable> &varList) throw (QString);
     QList<Variable> getVariableListDB() throw (QString);
@@ -64,6 +63,7 @@ public:
 
     void openProjectDB(int projectId);
     Graph getGraphDB(const QString &namepr) throw (QString);
+    QList<Graph> getGraphListDB() throw (QString);
     void saveStruct(const Graph &graph) throw (QString);
     void saveGraphDB(const Graph &graph) throw (QString);
     void updateGraphDB(const Graph &graph) throw (QString);

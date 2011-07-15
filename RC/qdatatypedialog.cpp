@@ -106,7 +106,6 @@ void QDataTypeDialog::on_pushButton_3_clicked()
 
 void QDataTypeDialog::on_buttonBox_accepted()
 {
-    //тут писать сохранение в базу
     try {
         globalDBManager->setDatatypeList(myTypeList);
     } catch (QString s) {

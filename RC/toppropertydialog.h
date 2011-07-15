@@ -33,6 +33,7 @@ private:
 private slots:
     void on_actorsListWidget_itemDoubleClicked(QListWidgetItem* item);
     void on_actorsListWidget_currentRowChanged(int currentRow);
+    void on_buttonBox_accepted();
 };
 
 #endif // TOPPROPERTYDIALOG_H

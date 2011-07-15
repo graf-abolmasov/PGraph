@@ -48,8 +48,8 @@ QActorEditor::~QActorEditor()
         delete varEditBtn;
     if (varWidget != NULL)
         delete varWidget;
-    delete varLayout;
-    delete paramTypeCmbBox;
+    if (varLayout != NULL)
+        delete varLayout;
 }
 
 void QActorEditor::changeEvent(QEvent *e)
@@ -66,16 +66,11 @@ void QActorEditor::changeEvent(QEvent *e)
 
 void QActorEditor::prepareForm(const Actor *actor)
 {
-    QList<const Variable *> newVariableList;
-    QStringList newAMList;
     myActor = actor;
-    myMode = actor->type;
-    result = NULL;
-
     tempActor = new Actor(myActor->name, myActor->extName, myActor->type, myActor->baseModule, myActor->variableList, myActor->varAccModeList, myActor->icon);
 
     //заполняем форму
-    switch(actor->type) {
+    switch(tempActor->type) {
     case Actor::NormalType:
         ui->actorNameEdt->setText(tempActor->extName);
         //Получаем список базовых модулей
@@ -164,15 +159,16 @@ void QActorEditor::on_paramsNormalTable_currentCellChanged(int currentRow, int, 
     ui->paramsNormalTable->setCellWidget(currentRow, 2, varWidget);
 
     ui->descriptionPOLbl_2->setText("");
-    ui->descriptionPOLbl_2->setText(tempActor->variableList[currentRow]->comment);
+    if (tempActor->variableList[currentRow] != NULL)
+        ui->descriptionPOLbl_2->setText(tempActor->variableList[currentRow]->comment);
     ui->descriptionBMLbl_2->setText(myModuleList[ui->baseModuleList->currentRow()]->parameterList.at(currentRow).split(";;").at(3));
 }
 
 void QActorEditor::showVariableEditor()
 {
     QVariableDialog dialog;
-    if (dialog.exec()){
-        const Variable *var = dialog.getVariable();
+    const Variable *var;
+    if (dialog.exec() && (var = dialog.getVariable())){
         tempActor->variableList[ui->paramsNormalTable->currentRow()] = var;
         ui->paramsNormalTable->item(ui->paramsNormalTable->currentRow(), 2)->setText(var->name);
         ui->descriptionPOLbl_2->setText(var->comment);
@@ -197,31 +193,30 @@ void QActorEditor::on_inlineModuleTxtEdt_textChanged()
             p++;
         }
     }
+    tempActor->extName = ui->inlineModuleTxtEdt->document()->toPlainText();
 }
 
-void QActorEditor::on_paramsInlineTable_currentCellChanged(int currentRow, int, int previousRow, int)
+void QActorEditor::on_paramsInlineTable_currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn)
 {
     if (previousRow != -1) {
-        ui->paramsInlineTable->setCellWidget(previousRow, 2, NULL);
-        ui->paramsInlineTable->item(previousRow, 2)->setText(paramTypeCmbBox->currentText());
-        tempActor->varAccModeList.replace(previousRow, paramTypeCmbBox->currentText());
-        delete paramTypeCmbBox;
-        paramTypeCmbBox = NULL;
+        if (previousColumn == 2){
+            ui->paramsInlineTable->setCellWidget(previousRow, 2, NULL);
+            ui->paramsInlineTable->item(previousRow, 2)->setText(paramTypeCmbBox->currentText());
+            tempActor->varAccModeList.replace(previousRow, paramTypeCmbBox->currentText());
+            delete paramTypeCmbBox;
+        }
     }
 
-    paramTypeCmbBox = new QComboBox(ui->paramsInlineTable);
-    paramTypeCmbBox->addItem(tr("Исходный"));
-    paramTypeCmbBox->addItem(tr("Модифицируемый"));
-    paramTypeCmbBox->addItem(tr("Вычисляемый"));
+    if (currentColumn == 2) {
+        paramTypeCmbBox = new QComboBox(ui->paramsInlineTable);
+        paramTypeCmbBox->addItem(tr("Исходный"));
+        paramTypeCmbBox->addItem(tr("Модифицируемый"));
+        paramTypeCmbBox->addItem(tr("Вычисляемый"));
 
-    if (ui->paramsInlineTable->item(currentRow, 2) != NULL)
-        paramTypeCmbBox->setCurrentIndex(paramTypeCmbBox->findText(ui->paramsInlineTable->item(currentRow, 2)->text()));
-    ui->paramsInlineTable->setCellWidget(currentRow, 2, paramTypeCmbBox);
-}
-
-bool QActorEditor::validate()
-{
-    return true;
+        int idx = paramTypeCmbBox->findText(ui->paramsInlineTable->item(currentRow, 2)->text());
+        paramTypeCmbBox->setCurrentIndex(idx);
+        ui->paramsInlineTable->setCellWidget(currentRow, 2, paramTypeCmbBox);
+    }
 }
 
 /*!
@@ -229,14 +224,48 @@ bool QActorEditor::validate()
 */
 void QActorEditor::on_buttonBox_accepted()
 {
-    makeResult();
+    ui->paramsInlineTable->setCurrentCell(-1, -1);
+    if (makeResult())
+        accept();
 }
 
 /*!
-  \brief Применяет сделанные изменения.
+  \brief Проверяет введенные данные и применяет сделанные изменения.
 */
-void QActorEditor::makeResult()
+bool QActorEditor::makeResult()
 {
+    switch(tempActor->type) {
+    case Actor::NormalType:
+        tempActor->extName = ui->actorNameEdt->text();
+        tempActor->baseModule = myModuleList[ui->baseModuleList->currentRow()];
+        break;
+    case Actor::InlineType:
+        tempActor->extName = ui->inlineModuleTxtEdt->document()->toPlainText();
+        break;
+    }
+    tempActor->name = "A" + getCRC(tempActor->extName.toUtf8());
+
+    if (tempActor->extName.isEmpty()) {
+        QString mes = tempActor->type == Actor::InlineType ? tr("Тело inline-актора не может быть пустым") : tr("Необходимо указать название актора");
+        QMessageBox::warning(NULL, tr("Ошибка"), mes);
+        return false;
+    }
+
+    if (tempActor->type == Actor::NormalType && tempActor->baseModule == NULL) {
+        QMessageBox::warning(NULL, tr("Ошибка"), tr("Необходимо указать базовый модуль"));
+        return false;
+    }
+
+    if (tempActor->varAccModeList.size() > 0 && tempActor->varAccModeList.contains(tr(""))) {
+        QMessageBox::warning(NULL, tr("Ошибка"), tr("Необходимо указать модификаторы доступа для всех переменных"));
+        return false;
+    }
+
+    if (tempActor->variableList.size() > 0 && tempActor->variableList.contains(NULL)) {
+        QMessageBox::warning(NULL, tr("Ошибка"), tr("Необходимо указать переменные для всех параметров базового модуля"));
+        return false;
+    }
+
     QSettings myLocSettings("graph.ini", QSettings::IniFormat);
     QDir currentDir;
     currentDir.setCurrent(myLocSettings.value("Location/BaseDir", QApplication::applicationDirPath() + "\\BaseDir\\").toString());
@@ -244,12 +273,9 @@ void QActorEditor::makeResult()
     QByteArray outputData;
     QFile output;
 
-    switch(myMode){
+    // Создаем сpp файл
+    switch(tempActor->type) {
     case Actor::NormalType:
-        tempActor->extName = ui->actorNameEdt->text();
-        tempActor->baseModule = myModuleList[ui->baseModuleList->currentRow()];
-        tempActor->name = "A" + getCRC(tempActor->extName.toUtf8());
-
         // Генерируем актор
         outputData.append("#include \"stype.h\"\r\n");
         outputData.append("int ");
@@ -281,17 +307,13 @@ void QActorEditor::makeResult()
         outputData.append("\r\n\r\n\treturn result;\r\n}");
         break;
     case Actor::InlineType:
-        tempActor->extName = ui->inlineModuleTxtEdt->document()->toPlainText();
-        ui->paramsInlineTable->setCurrentCell(-1, -1);
-        tempActor->name = "A" + getCRC(tempActor->extName.toUtf8());
         //генерируем с++ файл
         outputData.append("#include \"stype.h\"\r\n");
         outputData.append("int " + tempActor->name + "(TPOData *D)\r\n");
         outputData.append("{\r\n");
         QString code(tempActor->extName);
-        for (int i = 0; i < tempActor->variableList.count(); i++){
+        for (int i = 0; i < tempActor->variableList.count(); i++)
             code.replace(QRegExp("(\\b)" + tempActor->variableList[i]->name + "(\\b)", Qt::CaseSensitive), "(D->" + tempActor->variableList[i]->name + ")");
-        }
         outputData.append("  " + code + "\r\n");
         outputData.append("  return 1;\r\n");
         outputData.append("}\r\n");
@@ -312,4 +334,10 @@ void QActorEditor::makeResult()
     result->varAccModeList = tempActor->varAccModeList;
     result->variableList = tempActor->variableList;
     delete tempActor;
+    return true;
+}
+
+void QActorEditor::on_buttonBox_rejected()
+{
+    reject();
 }

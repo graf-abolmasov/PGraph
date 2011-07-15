@@ -19,7 +19,7 @@ Actor::Actor(const Actor &actor)
     this->baseModule = actor.baseModule;
     this->varAccModeList = actor.varAccModeList;
     this->icon = actor.icon;
-    this->variableList = variableList;
+    this->variableList = actor.variableList;
 }
 
 Actor::Actor(const QString &name, const QString &extName, const Type &type)
@@ -27,4 +27,5 @@ Actor::Actor(const QString &name, const QString &extName, const Type &type)
     this->name = name;
     this->extName = extName;
     this->type = type;
+    this->baseModule = NULL;
 }
