@@ -53,4 +53,5 @@ void QTerminateArcTop::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *)
     ArcPropertyDialog *dlg = ArcPropertyDialog::getDialog(arc);
     if (dlg->exec())
         arc = dlg->getResult();
+    delete dlg;
 }

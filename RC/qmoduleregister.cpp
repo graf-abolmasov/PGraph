@@ -24,6 +24,7 @@ QModuleRegister::QModuleRegister(QWidget *parent) :
     QSettings myLocSettings("graph.ini", QSettings::IniFormat);
     workingDir.setCurrent(myLocSettings.value("Location/BaseDir", QApplication::applicationDirPath() + "\\BaseDir\\").toString());
     fileList = workingDir.entryInfoList();
+    prepareForm();
 }
 
 QModuleRegister::~QModuleRegister()

@@ -11,6 +11,7 @@ QOpenGraphDialog::QOpenGraphDialog(QWidget *parent) :
     ui(new Ui::QOpenGraphDialog)
 {
     ui->setupUi(this);
+    prepareForm();
 }
 
 QOpenGraphDialog::~QOpenGraphDialog()

@@ -19,6 +19,7 @@ public:
 
     QList<QArcLine *> lines;
     QArcLine *currentLine;
+    const Predicate *predicate;
     QArc(QTop *startItem, QTop *endItem, QMenu *contextMenu,
       QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
     ~QArc();
@@ -48,8 +49,6 @@ public:
          else return NULL;
     }
     void setPen(const QPen &pen);
-    void setPredicate(const Predicate *predicate);
-    const Predicate *getPredicate() const;
 
     Arc toArc();
     bool autoBuild(QTop* top, float dx, float dy);
@@ -63,7 +62,6 @@ protected:
                QWidget *widget = 0);
 
 private:
-    const Predicate *myPredicate;
     bool freezed;
     ArcType myArcType;
     QTop *myStartTop;
