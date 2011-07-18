@@ -20,7 +20,6 @@ class QModuleRegister : public QDialog {
 public:
     QModuleRegister(QWidget *parent = 0);
     ~QModuleRegister();
-    void prepareForm();
 
 protected:
     void changeEvent(QEvent *e);
@@ -32,6 +31,7 @@ private:
     QComboBox *paramTypeCmbBox;
     QTextEdit *paramCommentEdt;
 
+    void prepareForm();
 private slots:
     void on_fileList_currentRowChanged(int currentRow);
     void on_buttonBox_accepted();

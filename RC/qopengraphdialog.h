@@ -19,7 +19,6 @@ public:
     QOpenGraphDialog(QWidget *parent = 0);
     ~QOpenGraphDialog();
     QString getResult();
-    void prepareForm();
 
 protected:
     void changeEvent(QEvent *e);
@@ -28,6 +27,7 @@ private:
     Ui::QOpenGraphDialog *ui;
     QList<Graph> myGraphList;
 
+    void prepareForm();
 private slots:
     void on_listWidget_itemDoubleClicked(QListWidgetItem* item);
 };

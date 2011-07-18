@@ -64,19 +64,19 @@ public:
     void openProjectDB(int projectId);
     Graph getGraphDB(const QString &namepr) throw (QString);
     QList<Graph> getGraphListDB() throw (QString);
-    void saveStruct(const Graph &graph) throw (QString);
+    void saveStructDB(const Graph &graph) throw (QString);
     void saveGraphDB(const Graph &graph) throw (QString);
     void updateGraphDB(const Graph &graph) throw (QString);
     void registerModuleDB(const QString &uniqName, const QString &fileName, const QString &comment, const QStringList &paramList) throw (QString);
 
     bool Compi_get_GSP_Shab_List();
-    int Compi_count_MaxGH(QString myGraphName, int* MaxGH);
-    int Compi_count_MaxLT(QString myGraphName, int* MaxLT);
-    int Compi_count_MaxLP(QString myGraphName, int* MaxLP);
-    int Compi_get_root_top(QString myGraphName, int* root_top);
-    int Compi_fill_Graph_struct(QString myGraphName, int MaxGH, COMPHs *Graph);
-    int Compi_fill_ListT_struct(QString myGraphName, int MaxLT, COMPTOPs *ListTop);
-    int Compi_fill_ListP_struct(QString myGraphName, int MaxLP, COMPREs *ListP);
+    int Compi_count_MaxGH(const QString &myGraphName);
+    int Compi_count_MaxLT(const QString &myGraphName);
+    int Compi_count_MaxLP(const QString &myGraphName);
+    int Compi_get_root_top(const QString &myGraphName);
+    int Compi_fill_Graph_struct(const QString &myGraphName, int MaxGH, COMPHs *Graph);
+    int Compi_fill_ListT_struct(const QString &myGraphName, int MaxLT, COMPTOPs *ListTop);
+    int Compi_fill_ListP_struct(const QString &myGraphName, int MaxLP, COMPREs *ListP);
 
     QSqlError lastError();
 

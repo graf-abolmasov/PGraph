@@ -47,12 +47,13 @@ void QParallelArcTop::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *)
     ArcPropertyDialog *dlg = ArcPropertyDialog::getDialog(arc);
     if (dlg->exec())
         arc = dlg->getResult();
+    delete dlg;
 }
 
 void QParallelArcTop::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     QGraphicsEllipseItem::paint(painter, option, widget);
     QArc* myArc = qgraphicsitem_cast<QArc *>(parentItem());
-    if (myArc->getPredicate() != NULL)
-        painter->drawText(rect().toRect(), Qt::AlignCenter, QString::number(globalPredicateList.indexOf(myArc->getPredicate()->name) + 1));
+    if (myArc->predicate != NULL)
+        painter->drawText(rect().toRect(), Qt::AlignCenter, QString::number(globalPredicateList.indexOf(myArc->predicate->name) + 1));
 }

@@ -24,9 +24,9 @@ QTop::QTop(QMenu *contextMenu,
     setFlag(QGraphicsItem::ItemSendsGeometryChanges, true);
     setAcceptHoverEvents(true);
 
+    actor   = NULL;
+    number  = -1;
     isRoot  = false;
-    number = -1;
-    actor = NULL;
 }
 
 QRectF QTop::boundingRect() const
@@ -84,14 +84,16 @@ void QTop::removeArc(QArc *arc){
 }
 
 /*!
-  Удаляет все дуги, входящие и выходящие из вершины
+  Удаляет все дуги, входящие и выходящие из вершины.
+  Но не удаляет объекты.
 */
 void QTop::removeArcs(){
     arcs.clear();
 }
 
 /*!
-  Удаляет все дуги синхронизации, входящие и выходящие из вершины
+  Удаляет все дуги синхронизации, входящие и выходящие из вершины.
+  Но не удаляет объекты.
 */
 void QTop::removeSyncs(){
     sync.clear();
@@ -170,9 +172,8 @@ bool QTop::moveBy(qreal dx, qreal dy)
         arc->autoBuild(this, dx, dy);
 
     //перерисовываем дуги синхронизации
-    foreach (QSyncArc *arc, allSync()) {
+    foreach (QSyncArc *arc, allSync())
         arc->remake(this, dx, dy);
-    }
 
     return true;
 }

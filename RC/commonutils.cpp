@@ -112,7 +112,7 @@ QString getCRC(QByteArray in)
     return QString::number(res, 16).toUpper();
 }
 
-QString itemTypeToString(QGraphicsItem *item)
+QString itemTypeToString(const QGraphicsItem *item)
 {
     switch (item->type()) {
     case QTop::Type:
@@ -146,4 +146,52 @@ int dvec2log(float dx, float dy){
     if (dy > 0) res |= DOWN;
     else if (dy < 0) res |= UP;
     return res;
+}
+
+QString predicateTypeToString(const Predicate *predicate)
+{
+    QString result;
+    switch(predicate->type) {
+    case Predicate::InlineType:
+        result = QObject::tr("inline");
+        break;
+    case Predicate::NormalType:
+        result = QObject::tr("Обычный");
+        break;
+    }
+    return result;
+}
+
+QString actorTypeToString(const Actor *actor)
+{
+    QString result;
+    switch(actor->type) {
+    case Actor::InlineType:
+        result = QObject::tr("inline");
+        break;
+    case Actor::NormalType:
+        result = QObject::tr("Обычный");
+        break;
+    case Actor::GraphType:
+        result = QObject::tr("Агрегат");
+        break;
+    }
+    return result;
+}
+
+QString arcTypeToString(const QArc *arc)
+{
+    QString result;
+    switch (arc->arcType()) {
+    case QArc::SerialArc:
+        result = QObject::tr("Последовательная");
+        break;
+    case QArc::ParallelArc:
+        result = QObject::tr("Параллельная");
+        break;
+    case QArc::TerminateArc:
+        result = QObject::tr("Терминирующая");
+        break;
+    }
+    return result;
 }

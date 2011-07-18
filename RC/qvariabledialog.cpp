@@ -80,41 +80,43 @@ void QVariableDialog::on_newButton_clicked()
 
 void QVariableDialog::on_editButton_clicked()
 {
-    if (ui->variablesTable->selectedRanges().count() > 0) {
-        int idx = ui->variablesTable->selectedRanges().first().topRow();
-        if (idx == -1) return;
-        const Variable *var = myVariableList[idx];
-        QVariableEditor *editor = QVariableEditor::getEditor(var);
-        if (editor->exec()){
-            const Variable *newVar = editor->getResult();
-            myVariableList.replace(idx, newVar);
-            ui->variablesTable->blockSignals(true);
-            ui->variablesTable->setItem(idx,0,new QTableWidgetItem(newVar->name));
-            ui->variablesTable->setItem(idx,1,new QTableWidgetItem(newVar->type->name));
-            ui->variablesTable->setItem(idx,2,new QTableWidgetItem(newVar->initValue));
-            ui->variablesTable->setItem(idx,3,new QTableWidgetItem(newVar->comment));
-            ui->variablesTable->blockSignals(false);
-        }
-        delete editor;
+    if (ui->variablesTable->selectedRanges().count() == 0)
+        return;
+    const int idx = ui->variablesTable->selectedRanges().first().topRow();
+    if (idx == -1)
+        return;
+    const Variable *var = myVariableList[idx];
+    QVariableEditor *editor = QVariableEditor::getEditor(var);
+    if (editor->exec()){
+        const Variable *newVar = editor->getResult();
+        myVariableList.replace(idx, newVar);
+        ui->variablesTable->blockSignals(true);
+        ui->variablesTable->setItem(idx,0,new QTableWidgetItem(newVar->name));
+        ui->variablesTable->setItem(idx,1,new QTableWidgetItem(newVar->type->name));
+        ui->variablesTable->setItem(idx,2,new QTableWidgetItem(newVar->initValue));
+        ui->variablesTable->setItem(idx,3,new QTableWidgetItem(newVar->comment));
+        ui->variablesTable->blockSignals(false);
     }
+    delete editor;
 }
 
 void QVariableDialog::on_deleteButton_clicked()
 {
-    if (ui->variablesTable->selectedRanges().count() > 0) {
-        int idx = ui->variablesTable->selectedRanges().first().topRow();
-        if (idx == -1) return;
-        delete myVariableList[idx];
-        myVariableList.removeAt(idx);
-        ui->variablesTable->blockSignals(true);
-        ui->variablesTable->removeRow(idx);
-        ui->variablesTable->blockSignals(false);
-    }
+    if (ui->variablesTable->selectedRanges().count() == 0)
+        return;
+    const int idx = ui->variablesTable->selectedRanges().first().topRow();
+    if (idx == -1)
+        return;
+    delete myVariableList[idx];
+    myVariableList.removeAt(idx);
+    ui->variablesTable->blockSignals(true);
+    ui->variablesTable->removeRow(idx);
+    ui->variablesTable->blockSignals(false);
 }
 
 void QVariableDialog::on_buttonBox_accepted()
 {
-    int idx = ui->variablesTable->currentRow();
+    const int idx = ui->variablesTable->currentRow();
     ui->variablesTable->setCurrentCell(-1, -1);
     if  (idx != -1)
         myVariable = myVariableList[idx];
@@ -129,7 +131,8 @@ const Variable *QVariableDialog::getVariable() const
 
 void QVariableDialog::on_variablesTable_cellChanged(int row, int column)
 {
-    if (row == -1) return;
+    if (row == -1)
+        return;
     Variable *result = const_cast<Variable *>(myVariableList[row]);
     switch (column) {
     case 0:

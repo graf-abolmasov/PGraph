@@ -16,7 +16,7 @@
 #include "qsyncarc.h"
 #include "qarc.h"
 #include "qcomment.h"
-#include "compiler.h"
+#include "datacompiler.h"
 
 QLabel *globalInfoLabel;
 
@@ -382,47 +382,38 @@ void TMyWindow::CMGSaveAs()
 {
     QSaveGraphDialog dialog;
     if (dialog.exec()){
-        if (dialog.getResult() != ""){
-            QString extName = dialog.getResult();
-            QString name = "G" + getCRC(dialog.getResult().toUtf8());
-            if (activeDrawWindow()->saveGraph(name, extName)) {
-                setWindowTitle(activeDrawWindow()->myGraphExtName + tr(" - Граф-редактор"));
-                saveGraphAct->setEnabled(false);
-                statusBar()->showMessage(tr("Сохранено как ") + activeDrawWindow()->myGraphName, 3000);
-            }
+        const QString extName = dialog.getResult();
+        if (extName.isEmpty())
+            return;
+        QString name = "G" + getCRC(extName.toUtf8());
+        if (activeDrawWindow()->saveGraph(name, extName)) {
+            setWindowTitle(activeDrawWindow()->myGraphExtName + tr(" - Граф-редактор"));
+            saveGraphAct->setEnabled(false);
+            statusBar()->showMessage(tr("Сохранено как ") + activeDrawWindow()->myGraphName, 3000);
         }
     }
 }
 
 void TMyWindow::CMObjList()
 {
-    QObjectEditor editor;
-    if (editor.exec()){
-
-    }
+    QObjectEditor().exec();
 }
 
 void TMyWindow::CMEdtVar()
 {
     QVariableDialog(true).exec();
-//    QVariableDialog editor(true);
-//    if (editor.exec()){
-
-//    }
 }
 
 void TMyWindow::CMEdtType()
 {
     QDataTypeDialog *editor = QDataTypeDialog::getDialog();
-    if (editor->exec()){
-
-    }
+    editor->exec();
+    delete editor;
 }
 
 void TMyWindow::CMGOpen()
 {
     QOpenGraphDialog dialog;
-    dialog.prepareForm();
     if (dialog.exec()){
         CMGNew();
         activeDrawWindow()->loadGraph(dialog.getResult());
@@ -431,11 +422,7 @@ void TMyWindow::CMGOpen()
 
 void TMyWindow::CMNewModule()
 {
-    QModuleRegister editor;
-    editor.prepareForm();
-    if (editor.exec()){
-
-    }
+    QModuleRegister().exec();
 }
 
 void TMyWindow::CMExit()
@@ -533,93 +520,58 @@ void TMyWindow::getInfo(QGraphicsItem *item)
     QArc *arc = NULL;
     QTop *top = NULL;
     QSyncArc *syncArc = NULL;
-    QString info = tr("");
-    QString arcTypeStr;
-    if (item != NULL) {
-        switch (item->type()) {
-        case QArc::Type:
-            arc = qgraphicsitem_cast<QArc*>(item);
-        case QArcLine::Type:
-        case QSerialArcTop::Type: {
-            if (!arc)
-                arc = qgraphicsitem_cast<QArc*>(item->parentItem());
-            switch (arc->arcType()) {
-            case QArc::SerialArc:
-                arcTypeStr = tr("последовательная");
-                break;
-            case QArc::ParallelArc:
-                arcTypeStr = tr("параллелная");
-                break;
-            case QArc::TerminateArc:
-                arcTypeStr = tr("терминирующая");
-                break;
-            }
-            info.append(tr("Дуга\nТип: ") + arcTypeStr + "\n");
-            if (arc->startItem() != NULL) {
-                info.append(tr("Начальная вершина: ") + QString::number(arc->startItem()->number) + "\n");
-            }
-            if (arc->endItem() != NULL) {
-                info.append(tr("Конечная вершина: ") + QString::number(arc->endItem()->number) + "\n");
-            }
-            info.append(tr("Приоритет: ") + QString::number(arc->priority()) + "\n" +
-                        tr("Ширина пера ") + QString::number(arc->pen().width()) + "\n");
-            info.append(tr("Число изломов: ") + QString::number(arc->lines.count()) + "\n");
-            if (arc->getPredicate() != NULL) {
-                info.append(tr("\nО предикате\n"));
-                QString predType = tr("");
-                switch(arc->getPredicate()->type) {
-                case Predicate::InlineType:
-                    predType = tr("inline");
-                    break;
-                case Predicate::NormalType:
-                    predType = tr("Обычный");
-                    break;
-                }
-                info.append(tr("Тип: ") + predType + "\n");
-                info.append(tr("Название: ") + arc->getPredicate()->extName + "\n");
-                info.append(tr("Внутреннее имя: ") + arc->getPredicate()->name + "\n");
-                if (arc->getPredicate()->type == Predicate::NormalType)
-                    info.append(tr("Базовый модуль: ") + arc->getPredicate()->baseModule->name + "\n");
-            }
-        }
-        break;
+    if (item == NULL) {
+        globalInfoLabel->setText("");
+        return;
+    }
 
-        case QTop::Type: {
-            top = qgraphicsitem_cast<QTop* >(item);
-            info.append(tr("Номер вершины ") + QString::number(top->number) + "\n");
-            info.append(tr("Число дуг: ") + QString::number(top->allArcs().count()) + "\n");
-            info.append(tr("Число исход. дуг: ") + QString::number(top->outArcs().count()) + "\n");
-            info.append(tr("Число вход. дуг: ") + QString::number(top->inArcs().count()) + "\n");
-            info.append(tr("Left: ") + QString::number(top->mapRectToScene(top->rect()).left()) + "\n");
-            info.append(tr("Top: ") + QString::number(top->mapRectToScene(top->rect()).top()) + "\n");
-            info.append(tr("Right: ") + QString::number(top->mapRectToScene(top->rect()).right()) + "\n");
-            info.append(tr("Bottom: ") + QString::number(top->mapRectToScene(top->rect()).bottom()) + "\n");
-            if (top->actor != NULL) {
-                info.append(tr("\nОб акторе\n"));
-                QString actType = tr("");
-                switch(top->actor->type) {
-                case Actor::InlineType:
-                    actType = tr("inline");
-                    break;
-                case Actor::NormalType:
-                    actType = tr("Обычный");
-                    break;
-                case Actor::GraphType:
-                    actType = tr("Агрегат");
-                    break;
-                }
-                info.append(tr("Тип: ") + actType + "\n");
-                info.append(tr("Название: ") + top->actor->extName + "\n");
-                info.append(tr("Внутреннее имя: ") + top->actor->name+ "\n");
-                if (top->actor->type == Actor::NormalType)
-                    info.append(tr("Базовый модуль: ") + top->actor->baseModule->name + "\n");
-            }
+    QString info;
+    switch (item->type()) {
+    case QArc::Type:
+        arc = qgraphicsitem_cast<QArc*>(item);
+    case QArcLine::Type:
+    case QSerialArcTop::Type:
+        if (!arc)
+            arc = qgraphicsitem_cast<QArc*>(item->parentItem());
+        info.append(tr("Дуга\nТип: ") + arcTypeToString(arc) + "\n");
+        if (arc->startItem() != NULL)
+            info.append(tr("Начальная вершина: ") + QString::number(arc->startItem()->number) + "\n");
+        if (arc->endItem() != NULL)
+            info.append(tr("Конечная вершина: ") + QString::number(arc->endItem()->number) + "\n");
+        info.append(tr("Приоритет: ") + QString::number(arc->priority()) + "\n" +
+                    tr("Ширина пера ") + QString::number(arc->pen().width()) + "\n");
+        info.append(tr("Число изломов: ") + QString::number(arc->lines.count()) + "\n");
+        if (arc->predicate != NULL) {
+            info.append(tr("\nО предикате\n"));
+            info.append(tr("Тип: ") + predicateTypeToString(arc->predicate) + "\n");
+            info.append(tr("Название: ") + arc->predicate->extName + "\n");
+            info.append(tr("Внутреннее имя: ") + arc->predicate->name + "\n");
+            if (arc->predicate->type == Predicate::NormalType)
+                info.append(tr("Базовый модуль: ") + arc->predicate->baseModule->name + "\n");
         }
         break;
-        case QSyncArc::Type:
-            syncArc = qgraphicsitem_cast<QSyncArc* >(item);
-            break;
+    case QTop::Type:
+        top = qgraphicsitem_cast<QTop* >(item);
+        info.append(tr("Номер вершины ") + QString::number(top->number) + "\n");
+        info.append(tr("Число дуг: ") + QString::number(top->allArcs().count()) + "\n");
+        info.append(tr("Число исход. дуг: ") + QString::number(top->outArcs().count()) + "\n");
+        info.append(tr("Число вход. дуг: ") + QString::number(top->inArcs().count()) + "\n");
+        info.append(tr("Left: ") + QString::number(top->mapRectToScene(top->rect()).left()) + "\n");
+        info.append(tr("Top: ") + QString::number(top->mapRectToScene(top->rect()).top()) + "\n");
+        info.append(tr("Right: ") + QString::number(top->mapRectToScene(top->rect()).right()) + "\n");
+        info.append(tr("Bottom: ") + QString::number(top->mapRectToScene(top->rect()).bottom()) + "\n");
+        if (top->actor != NULL) {
+            info.append(tr("\nОб акторе\n"));
+            info.append(tr("Тип: ") + actorTypeToString(top->actor) + "\n");
+            info.append(tr("Название: ") + top->actor->extName + "\n");
+            info.append(tr("Внутреннее имя: ") + top->actor->name+ "\n");
+            if (top->actor->type == Actor::NormalType)
+                info.append(tr("Базовый модуль: ") + top->actor->baseModule->name + "\n");
         }
+        break;
+    case QSyncArc::Type:
+        syncArc = qgraphicsitem_cast<QSyncArc* >(item);
+        break;
     }
 
     globalInfoLabel->setText(info);
@@ -742,11 +694,11 @@ void TMyWindow::CMCompile()
 //                                        + globalDBManager->lastError().databaseText(),
 //                              QMessageBox::Ok);
 
-    Compi(activeDrawWindow()->myGraphName);
+    GraphCompiler gc(activeDrawWindow()->myGraphName);
+    gc.compile();
     // Определение размера структуры описания графа
     // (кол-во строк в GRAPH для данного агрегата)
-    int temp_var;
-    globalDBManager->Compi_get_root_top(activeDrawWindow()->myGraphName, &temp_var);
+    // int temp_var = globalDBManager->Compi_get_root_top(activeDrawWindow()->myGraphName);
 }
 
 void TMyWindow::showDataLayerClicked(bool clicked)
@@ -771,6 +723,6 @@ void TMyWindow::CMEPaste()
 
 void TMyWindow::CMCompileData()
 {
-    Compiler c;
-    c.compileData();
+    DataCompiler c;
+    c.compile();
 }

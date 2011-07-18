@@ -61,7 +61,7 @@ TDrawWindow::TDrawWindow(ShowRole role, QWidget *parent)
     view->setScene(scene);
     view->setAlignment(Qt::AlignCenter);
     /*
-      Рисуем сетку
+      � исуем сетку
     QBrush myBackgroundBrush = view->backgroundBrush();
     myBackgroundBrush.setColor(Qt::lightGray);
     myBackgroundBrush.setStyle(Qt::CrossPattern);
@@ -78,7 +78,7 @@ TDrawWindow::TDrawWindow(ShowRole role, QWidget *parent)
 
 void TDrawWindow::createMenus()
 {
-    //Режим только чтения
+    //� ежим только чтения
     if (myRole == ReadOnly) {
         topMenu = NULL;
         arcMenu = NULL;
@@ -144,7 +144,7 @@ void TDrawWindow::createActions()
         viewSubGraphAct->setStatusTip(tr("Открывает подграф для просмотра"));
         connect(viewSubGraphAct, SIGNAL(triggered()), this, SLOT(viewSubGraph()));
 
-        editSubGraphAct = new QAction(tr("Редактировать подграф"), this);
+        editSubGraphAct = new QAction(tr("� едактировать подграф"), this);
         editSubGraphAct->setStatusTip(tr("Открывает подграф для редактирования"));
         connect(editSubGraphAct, SIGNAL(triggered()), this, SLOT(editSubGraph()));
 
@@ -221,7 +221,7 @@ void TDrawWindow::setMode(QDiagramScene::Mode mode)
 }
 
 /*!
-  Реакция на нажатие пункта меню: Загрузить иконку
+  � еакция на нажатие пункта меню: Загрузить иконку
 */
 void TDrawWindow::setItemIcon()
 {
@@ -229,21 +229,20 @@ void TDrawWindow::setItemIcon()
                                                     tr("Открыть картинку..."),
                                                     "",
                                                     tr("Images (*.png *.xpm *.jpg *.jpeg)"));
-    foreach (QGraphicsItem *item, scene->selectedItems())
-        if (item->type() == QTop::Type)
-            if (!fileName.isEmpty()) {
-                QImage img(fileName);
-                if (!img.isNull()) {
-                    qgraphicsitem_cast<QNormalTop *>(item)->setIcon(img);
-                    scene->invalidate(item->mapRectToScene(item->boundingRect()));
-                }
-            }
+    if (fileName.isEmpty())
+        return;
+    QNormalTop *top = qgraphicsitem_cast<QNormalTop *>(scene->selectedItems().first());
+    QImage img(fileName);
+    if (!img.isNull()) {
+        top->setIcon(img);
+        scene->invalidate(top->mapRectToScene(top->boundingRect()));
+    }
 
     emit sceneChanged();
 }
 
 /*!
-  Реакция на нажатие пункта меню: Свойства вершины
+  � еакция на нажатие пункта меню: Свойства вершины
 */
 void TDrawWindow::showTopPropDialog(){
     TopPropertyDialog dlg;
@@ -258,22 +257,22 @@ void TDrawWindow::showTopPropDialog(){
 
 
 /*!
-  Реакция на нажатие пункта меню: Сохранить как картинку
+  � еакция на нажатие пункта меню: Сохранить как картинку
 */
 void TDrawWindow::saveAsImage(QString filename)
 {
-    if (scene != NULL) {
-        QSizeF size = scene->sceneRect().size();
-        QImage Image(size.toSize(), QImage::Format_ARGB32_Premultiplied);
-        Image.fill(0);
-        QPainter painter(&Image);
-        view->render(&painter, scene->sceneRect(), scene->sceneRect().toRect(), Qt::KeepAspectRatio);
-        Image.save(filename);
-    }
+    if (scene == NULL)
+        return;
+    QSizeF size = scene->sceneRect().size();
+    QImage Image(size.toSize(), QImage::Format_ARGB32_Premultiplied);
+    Image.fill(0);
+    QPainter painter(&Image);
+    view->render(&painter, scene->sceneRect(), scene->sceneRect().toRect(), Qt::KeepAspectRatio);
+    Image.save(filename);
 }
 
 /*!
-  Реакция на нажатие пункта меню: Свойства дуги
+  � еакция на нажатие пункта меню: Свойства дуги
 */
 void TDrawWindow::showArcPropDialog()
 {
@@ -284,10 +283,11 @@ void TDrawWindow::showArcPropDialog()
         emit itemChanged(arc);
         emit sceneChanged();
     }
+    delete dlg;
 }
 
 /*!
-  Реакция на нажатие пункта меню: Сделать корневой
+  � еакция на нажатие пункта меню: Сделать корневой
 */
 void TDrawWindow::makeAsRoot()
 {
@@ -302,9 +302,11 @@ void TDrawWindow::makeAsRoot()
 QList<QTop* > TDrawWindow::allTops() const
 {
     QList<QTop* > topList;
-    for (int i = 0; i < scene->items().count(); i++)
-        if (scene->items().at(i)->type() == QTop::Type)
-            topList.append(qgraphicsitem_cast<QTop* >(scene->items().at(i)));
+    QList<QGraphicsItem *> items = scene->items();
+    foreach (QGraphicsItem *item, items)
+        if (item->type() == QTop::Type)
+            topList.append(qgraphicsitem_cast<QTop* >(item));
+
     return topList;
 }
 
@@ -314,9 +316,10 @@ QList<QTop* > TDrawWindow::allTops() const
 QList<QArc* > TDrawWindow::allArcs() const
 {
     QList<QArc* > arcList;
-    for (int i = 0; i < scene->items().count(); i++)
-        if (scene->items().at(i)->type() == QArc::Type)
-            arcList.append(qgraphicsitem_cast<QArc* >(scene->items().at(i)));
+    QList<QGraphicsItem *> items = scene->items();
+    foreach (QGraphicsItem *item, items)
+        if (item->type() == QArc::Type)
+            arcList.append(qgraphicsitem_cast<QArc* >(item));
     return arcList;
 }
 
@@ -326,9 +329,10 @@ QList<QArc* > TDrawWindow::allArcs() const
 QList<QMultiProcTop* > TDrawWindow::allMultiProcTop() const
 {
     QList<QMultiProcTop* > topList;
-    for (int i = 0; i < scene->items().count(); i++)
-        if (scene->items().at(i)->type() == QMultiProcTop::Type)
-            topList.append(qgraphicsitem_cast<QMultiProcTop* >(scene->items().at(i)));
+    QList<QGraphicsItem *> items = scene->items();
+    foreach (QGraphicsItem *item, items)
+        if (item->type() == QMultiProcTop::Type)
+            topList.append(qgraphicsitem_cast<QMultiProcTop* >(item));
     return topList;
 }
 
@@ -338,9 +342,10 @@ QList<QMultiProcTop* > TDrawWindow::allMultiProcTop() const
 QList<QComment* > TDrawWindow::allComments() const
 {
     QList<QComment* > commentList;
-    for (int i = 0; i < scene->items().count(); i++)
-        if (scene->items().at(i)->type() == QComment::Type)
-            commentList.append(qgraphicsitem_cast<QComment* >(scene->items().at(i)));
+    QList<QGraphicsItem *> items = scene->items();
+    foreach (QGraphicsItem *item, items)
+        if (item->type() == QComment::Type)
+            commentList.append(qgraphicsitem_cast<QComment* >(item));
     return commentList;
 }
 
@@ -350,9 +355,10 @@ QList<QComment* > TDrawWindow::allComments() const
 QList<QSyncArc* > TDrawWindow::allSyncArcs() const
 {
     QList<QSyncArc* > arcList;
-    for (int i = 0; i < scene->items().count(); i++)
-        if (scene->items().at(i)->type() == QSyncArc::Type)
-            arcList.append(qgraphicsitem_cast<QSyncArc* >(scene->items().at(i)));
+    QList<QGraphicsItem *> items = scene->items();
+    foreach (QGraphicsItem *item, items)
+        if (item->type() == QSyncArc::Type)
+            arcList.append(qgraphicsitem_cast<QSyncArc* >(item));
     return arcList;
 }
 
@@ -427,10 +433,10 @@ void TDrawWindow::loadGraph(const QString &name)
             qarc->addLine(qarc->currentLine);
             qarc->currentLine = NULL;
             qarc->setArcType(QArc::ArcType(arc.type));
-            qarc->setPredicate(arc.predicate);
+            qarc->predicate = arc.predicate;
 
-            if (qarc->getPredicate() != NULL && !globalPredicateList.contains(qarc->getPredicate()->name))
-                globalPredicateList.append(qarc->getPredicate()->name);
+            if (qarc->predicate != NULL && !globalPredicateList.contains(qarc->predicate->name))
+                globalPredicateList.append(qarc->predicate->name);
             startTop->addArc(qarc);
             endTop->addArc(qarc);
             qarcList.append(qMakePair(qarc, arc.priority));
@@ -498,7 +504,7 @@ bool TDrawWindow::saveStruct()
     Graph graph = getGraph();
     if (graph.extName != "") {
         try {
-            globalDBManager->saveStruct(graph);
+            globalDBManager->saveStructDB(graph);
         } catch (QString s) {
             return false;
             QMessageBox::critical(this, tr("Ошибка"), s, QMessageBox::Ok);
@@ -577,7 +583,7 @@ void TDrawWindow::alignHRight()
         QList<QGraphicsItem* > itemList = scene->collidingItems(top, Qt::IntersectsItemBoundingRect);
         foreach(QGraphicsItem* item, itemList)
             //если есть хотя бы одна вершина
-            if (item->type() == QTop::Type){
+            if (item->type() == QTop::Type) {
                 //запретим перемещение
                 allowMove = false;
                 break;

@@ -12,7 +12,10 @@
 #define RIGHT	0x02
 
 QString getCRC(QByteArray in);
-QString itemTypeToString(QGraphicsItem *item);
+QString itemTypeToString(const QGraphicsItem *item);
+QString arcTypeToString(const  QArc *arc);
+QString actorTypeToString(const Actor *actor);
+QString predicateTypeToString(const Predicate *predicate);
 bool topUpperThan(const QTop* top1, const QTop* top2);
 bool topLeftThan(const QTop* top1, const QTop* top2);
 int dvec2log(float dx, float dy);

@@ -432,7 +432,7 @@ QArc::QArc(QTop *startItem, QTop *endItem, QMenu *contextMenu,
     //инициализация указателей
     arcTop          = NULL;
     currentLine     = NULL;
-    myPredicate       = NULL;
+    predicate       = NULL;
     myStartTop      = startItem;
     myEndTop        = endItem;
     myContextMenu   = contextMenu;
@@ -647,7 +647,7 @@ Arc QArc::toArc()
                priority(),
                myStartTop->number,
                myEndTop->number,
-               myPredicate,
+               predicate,
                nodes);
 }
 
@@ -762,12 +762,4 @@ void QArc::unfreeze()
     freezed = false;
 }
 
-void QArc::setPredicate(const Predicate *predicate)
-{
-    myPredicate = predicate;
-}
 
-const Predicate *QArc::getPredicate() const
-{
-    return myPredicate;
-}

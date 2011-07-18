@@ -20,21 +20,21 @@ public:
     static ArcPropertyDialog *getDialog(QArc *arc);
     ~ArcPropertyDialog();
     bool makeResult();
-    QArc *getResult();
+    QArc *getResult() const;
 
 protected:
     void changeEvent(QEvent *e);
 
 private:
     ArcPropertyDialog(QWidget *parent = 0);
-    Ui::ArcPropertyDialog *ui;
-    QArc *myArc;
-    QList<const Predicate *> myPredicateList;
-
     void prepareForm(QArc *arc);
+
+    QArc                    *myArc;
+    Ui::ArcPropertyDialog   *ui;
+    QList<const Predicate *> myPredicateList;
 private slots:
-    void on_predicateList_itemDoubleClicked(QListWidgetItem* item);
     void on_buttonBox_accepted();
+    void on_predicateList_itemDoubleClicked(QListWidgetItem* item);
     void on_predicateList_currentRowChanged(int currentRow);
 };
 
