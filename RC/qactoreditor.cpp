@@ -70,6 +70,16 @@ void QActorEditor::prepareForm(const Actor *actor)
     tempActor = new Actor(myActor->name, myActor->extName, myActor->type, myActor->baseModule, myActor->variableList, myActor->varAccModeList, myActor->icon);
 
     //заполняем форму
+    myVariableList = globalDBManager->getVariableList();
+    QStringList varnames;
+    foreach (const Variable *var, myVariableList)
+        varnames << var->name;
+    myCompleter = new QCompleter(varnames, this);
+    myCompleter->setModelSorting(QCompleter::CaseSensitivelySortedModel);
+    myCompleter->setCaseSensitivity(Qt::CaseInsensitive);
+    myCompleter->setWrapAround(true);
+    ui->inlineModuleTxtEdt->setCompleter(myCompleter);
+
     switch(tempActor->type) {
     case Actor::NormalType:
         ui->actorNameEdt->setText(tempActor->extName);
@@ -105,7 +115,6 @@ void QActorEditor::prepareForm(const Actor *actor)
         }
         //Получаем список перемерных
         ui->inlineModuleTxtEdt->blockSignals(false);
-        myVariableList = globalDBManager->getVariableList();
         ui->inlineModuleTxtEdt->setFocus();
         ui->normalWidget->setVisible(false);
         break;

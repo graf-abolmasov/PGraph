@@ -72,6 +72,15 @@ void QPredicateEditor::prepareForm(const Predicate *predicate)
     myPredicate = predicate;
     tempPre = new Predicate(myPredicate->name, myPredicate->extName, myPredicate->type, myPredicate->baseModule, myPredicate->variableList);
     //заполняем форму
+    myVariableList = globalDBManager->getVariableList();
+    QStringList varnames;
+    foreach (const Variable *var, myVariableList)
+        varnames << var->name;
+    myCompleter = new QCompleter(varnames, this);
+    myCompleter->setModelSorting(QCompleter::CaseSensitivelySortedModel);
+    myCompleter->setCaseSensitivity(Qt::CaseInsensitive);
+    myCompleter->setWrapAround(true);
+    ui->inlineModuleTxtEdt->setCompleter(myCompleter);
     switch(tempPre->type){
     case Predicate::NormalType:
         myModuleList = globalDBManager->getBaseModuleList();

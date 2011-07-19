@@ -41,8 +41,9 @@ public:
 
 class DefinePredicate
 {
+public:
     DefinePredicate(const QString &name, int (*predicate)(void*[]));
-    QString name[10]; /*Внутреннее название предиката*/
+    QString name; /*Внутреннее название предиката*/
     int (*predicate)(void*[]);
 };
 

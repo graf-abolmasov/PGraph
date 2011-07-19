@@ -15,6 +15,7 @@ QT_BEGIN_NAMESPACE
 class QToolButton;
 class QHBoxLayout;
 class QComboBox;
+class QCompleter;
 QT_END_NAMESPACE
 
 class QActorEditor : public QDialog {
@@ -38,6 +39,7 @@ private:
     Actor *tempActor;
     const Actor *myActor;
     Ui::QActorEditor *ui;
+    QCompleter *myCompleter;
     QList<const Variable *>   myVariableList;
     QList<const BaseModule *> myModuleList;
     QComboBox *paramTypeCmbBox;
