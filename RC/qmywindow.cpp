@@ -686,19 +686,8 @@ void TMyWindow::grafMenuAboutToShow()
 
 void TMyWindow::CMCompile()
 {
-//        if (!globalDBManager->Compi_get_GSP_Shab_List())
-//                QMessageBox::critical(NULL,
-//                              QObject::tr("Ошибка"),
-//                              QObject::tr("Не удалось прочитать из БД шаблон "
-//                                          "для генерации исходного файла (GSP_SHAB).\n")
-//                                        + globalDBManager->lastError().databaseText(),
-//                              QMessageBox::Ok);
-
     GraphCompiler gc(activeDrawWindow()->myGraphName);
     gc.compile();
-    // Определение размера структуры описания графа
-    // (кол-во строк в GRAPH для данного агрегата)
-    // int temp_var = globalDBManager->Compi_get_root_top(activeDrawWindow()->myGraphName);
 }
 
 void TMyWindow::showDataLayerClicked(bool clicked)

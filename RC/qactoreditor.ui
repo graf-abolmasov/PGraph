@@ -81,7 +81,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QPlainTextEdit" name="inlineModuleTxtEdt">
+          <widget class="QCodeEditor" name="inlineModuleTxtEdt">
            <property name="maximumBlockCount">
             <number>0</number>
            </property>
@@ -543,6 +543,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QCodeEditor</class>
+   <extends>QPlainTextEdit</extends>
+   <header>qcodeeditor.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>actorNameEdt</tabstop>
   <tabstop>baseModuleList</tabstop>

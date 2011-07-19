@@ -13,6 +13,7 @@ QT_BEGIN_NAMESPACE
 class QToolButton;
 class QHBoxLayout;
 class QComboBox;
+class QCompleter;
 QT_END_NAMESPACE
 
 class BaseModule;
@@ -38,6 +39,7 @@ private:
     Predicate *tempPre;
     const Predicate *myPredicate;
     Ui::QPredicateEditor *ui;
+    QCompleter *myCompleter;
     QList<const Variable *>   myVariableList;
     QList<const BaseModule *> myModuleList;
     QPointer<QWidget>     varWidget;
