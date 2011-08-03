@@ -275,61 +275,73 @@ bool QActorEditor::makeResult()
         return false;
     }
 
-    QSettings myLocSettings("graph.ini", QSettings::IniFormat);
-    QDir currentDir;
-    currentDir.setCurrent(myLocSettings.value("Location/BaseDir", QApplication::applicationDirPath() + "\\BaseDir\\").toString());
+    QSettings mySettings("graph.ini", QSettings::IniFormat);
+    const QString myOutputDirectory = QFileInfo(mySettings.value("Location/BaseDir", "./BaseDir/").toString()).canonicalFilePath();
 
     QByteArray outputData;
     QFile output;
 
+    const BaseModule *currentBaseModule = NULL;
+    QStringList params;
+    QStringList signature;
     // Создаем сpp файл
+    outputData.append("#include \"tpodata.h\"\r\n");
     switch(tempActor->type) {
     case Actor::NormalType:
+        Q_ASSERT(currentBaseModule = myModuleList[ui->baseModuleList->currentRow()]);
         // Генерируем актор
-        outputData.append("#include \"stype.h\"\r\n");
+        foreach (QString parameter, tempActor->baseModule->parameterList) {
+            const QStringList parsedParameter = parameter.split(";;");
+            const QString constStr = parsedParameter[2] == QObject::tr("Исходный") ? QObject::tr("const ") : "";
+            signature << QString("%1%2 *%3").arg(constStr).arg(parsedParameter[0]).arg(parsedParameter[1]);
+        }
+        outputData.append("extern int " + tempActor->baseModule->uniqName + "(" + signature.join(", ") + ");\r\n");
         outputData.append("int ");
         outputData.append(tempActor->name.toUtf8());
         outputData.append("(TPOData *D)\r\n");
         outputData.append("{\r\n");
         // Инициализуем данные
         for (int i = 0; i < tempActor->variableList.count(); i++) {
-            QStringList parameter = myModuleList[ui->baseModuleList->currentRow()]->parameterList[i].split(";;");
-            outputData.append(tr("\t%1 %2 = D->%3;\r\n").arg(parameter[0]).arg(parameter[1]).arg(tempActor->variableList[i]->name).toUtf8());
+            QStringList parameter = currentBaseModule->parameterList[i].split(";;");
+            const QString constStr = parameter[2] == tr("Исходный") ? tr("const ") : "";
+            outputData.append(tr("\t%1%2 _%3 = D->%4;\r\n").arg(constStr).arg(parameter[0]).arg(parameter[1]).arg(tempActor->variableList[i]->name).toUtf8());
         }
         // Вызываем прототип
         outputData.append("\r\n\tint result = ");
-        outputData.append(tempActor->baseModule->unicName);
+        outputData.append(tempActor->baseModule->uniqName);
         outputData.append("(");
         for(int i = 0; i < tempActor->variableList.count(); i++) {
-            QStringList parameter = myModuleList[ui->baseModuleList->currentRow()]->parameterList[i].split(";;");
-            outputData.append(QString(tr("&%1, ")).arg(parameter[1]).toUtf8());
+            QStringList parameter = currentBaseModule->parameterList[i].split(";;");
+            params << tr("&_") + parameter[1];
         }
-        if (tempActor->variableList.count() > 0)
-            outputData.remove(outputData.length()-2,2);
+        outputData.append(params.join(", ").toUtf8());
         outputData.append(");\r\n\r\n");
         // сохраняем данные
         for(int i = 0; i < tempActor->variableList.count(); i++) {
-            QStringList parameter = myModuleList[ui->baseModuleList->currentRow()]->parameterList[i].split(";;");
-            outputData.append(QString(tr("\tD->%1 = %2;\n")).arg(tempActor->variableList[i]->name).arg(parameter[1]).toUtf8());
+            QStringList parameter = currentBaseModule->parameterList[i].split(";;");
+            if (parameter[2] != tr("Исходный"))
+                outputData.append(QString(tr("\tD->%1 = _%2;\n")).arg(tempActor->variableList[i]->name).arg(parameter[1]).toUtf8());
         }
         // выход
         outputData.append("\r\n\r\n\treturn result;\r\n}");
         break;
     case Actor::InlineType:
         //генерируем с++ файл
-        outputData.append("#include \"stype.h\"\r\n");
         outputData.append("int " + tempActor->name + "(TPOData *D)\r\n");
         outputData.append("{\r\n");
         QString code(tempActor->extName);
-        for (int i = 0; i < tempActor->variableList.count(); i++)
-            code.replace(QRegExp("(\\b)" + tempActor->variableList[i]->name + "(\\b)", Qt::CaseSensitive), "(D->" + tempActor->variableList[i]->name + ")");
+        foreach (const Variable *variable, tempActor->variableList) {
+            QRegExp r("\\b" + variable->name + "\\b", Qt::CaseSensitive);
+            r.setMinimal(true);
+            code.replace(r, "D->" + variable->name);
+        }
         outputData.append("  " + code + "\r\n");
         outputData.append("  return 1;\r\n");
         outputData.append("}\r\n");
         break;
     }
 
-    output.setFileName(currentDir.canonicalPath() + "/" + tempActor->name + ".cpp");
+    output.setFileName(myOutputDirectory + "/" + tempActor->name + ".cpp");
     output.open(QFile::WriteOnly);
     output.write(outputData);
     output.close();

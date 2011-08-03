@@ -37,8 +37,8 @@ void TopPropertyDialog::prepareForm(QNormalTop* top){
 
     myActorList.append(NULL);
     myActorList.append(globalDBManager->getActorList());
-    QList<Graph*> graphList = globalDBManager->getGraphList();
-    foreach (Graph *graph, graphList)
+    QList<const Graph*> graphList = globalDBManager->getGraphList();
+    foreach (const Graph *graph, graphList)
         myActorList.append(graph);
     ui->actorsListWidget->addItem(tr("Нет"));
     for (int i = 1; i < myActorList.length(); i++)

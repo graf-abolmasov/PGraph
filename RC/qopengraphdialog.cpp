@@ -33,17 +33,24 @@ void QOpenGraphDialog::changeEvent(QEvent *e)
 
 QString QOpenGraphDialog::getResult()
 {
-    return myGraphList[ui->listWidget->currentRow()].name;
+    return myGraphList[ui->listWidget->currentRow()]->name;
 }
 
 void QOpenGraphDialog::prepareForm()
 {
-    myGraphList = globalDBManager->getGraphListDB();
-    foreach (Graph graph, myGraphList)
-        ui->listWidget->addItem(new QListWidgetItem(graph.extName));
+    myGraphList = globalDBManager->getGraphList();
+    foreach (const Graph *graph, myGraphList)
+        ui->listWidget->addItem(new QListWidgetItem(graph->extName));
+    enableOkButton(-1);
+    connect(ui->listWidget, SIGNAL(currentRowChanged(int)), this, SLOT(enableOkButton(int)));
 }
 
 void QOpenGraphDialog::on_listWidget_itemDoubleClicked(QListWidgetItem *)
 {
     accept();
+}
+
+void QOpenGraphDialog::enableOkButton(int currentRow)
+{
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(currentRow != -1);
 }

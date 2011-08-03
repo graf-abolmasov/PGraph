@@ -3,7 +3,7 @@
 BaseModule::BaseModule(QString name, QString unicName, QString comment, QStringList parameterList)
 {
     this->name = name;
-    this->unicName = unicName;
+    this->uniqName = unicName;
     this->parameterList = parameterList;
     this->comment = comment;
 }

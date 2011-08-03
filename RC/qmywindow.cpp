@@ -156,12 +156,12 @@ void TMyWindow::createActions()
     runAct = new QAction(QIcon(":/images/build.png"), tr("Запуск"), this);
     runAct->setStatusTip(tr("Компиляция и запуск"));
     connect(runAct, SIGNAL(triggered()), this, SLOT(CMRun()));
-    //// runAct->setEnabled(false);
+    runAct->setEnabled(false);
 
     compileAct = new QAction(QIcon(":/images/compile.png"), tr("Компилировать"), this);
     compileAct->setStatusTip(tr("Компилировать в exe"));
     connect(compileAct, SIGNAL(triggered()), this, SLOT(CMCompile()));
-    //// compileAct->setEnabled(false);
+    compileAct->setEnabled(false);
 
     saveStructAct = new QAction(tr("Записать структуру"), this);
     saveStructAct->setStatusTip(tr("Записать структуру графа в базу"));
@@ -659,9 +659,11 @@ void TMyWindow::graphLoaded(QString name, QString extName)
     if (name.isEmpty()){
         buildMenu->setEnabled(false);
         saveGraphAct->setEnabled(false);
+        compileAct->setEnabled(false);
     } else {
         buildMenu->setEnabled(true);
         saveGraphAct->setEnabled(true);
+        compileAct->setEnabled(true);
     }
 
     if (extName.isEmpty())
@@ -686,7 +688,7 @@ void TMyWindow::grafMenuAboutToShow()
 
 void TMyWindow::CMCompile()
 {
-    GraphCompiler gc(activeDrawWindow()->myGraphName);
+    GraphCompiler gc(activeDrawWindow()->getGraph());
     gc.compile();
 }
 
@@ -712,6 +714,6 @@ void TMyWindow::CMEPaste()
 
 void TMyWindow::CMCompileData()
 {
-    DataCompiler c;
+    DataCompiler c(DataCompiler::Parallel);
     c.compile();
 }

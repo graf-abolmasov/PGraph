@@ -7,9 +7,9 @@
 class BaseModule
 {
 public:
-    BaseModule(QString name, QString unicName, QString comment, QStringList parameterList);
+    BaseModule(QString name, QString uniqName, QString comment, QStringList parameterList);
     QString name;
-    QString unicName;
+    QString uniqName;
     QStringList parameterList;
     QString comment;
 

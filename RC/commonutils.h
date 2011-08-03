@@ -18,5 +18,6 @@ QString actorTypeToString(const Actor *actor);
 QString predicateTypeToString(const Predicate *predicate);
 bool topUpperThan(const QTop* top1, const QTop* top2);
 bool topLeftThan(const QTop* top1, const QTop* top2);
+bool orderArcByPriorityAsc(const Arc &arc1, const Arc &arc2);
 int dvec2log(float dx, float dy);
 #endif // COMMONUTILS_H

@@ -26,7 +26,6 @@ protected:
 
 private:
     Ui::QModuleRegister *ui;
-    QDir workingDir;
     QFileInfoList fileList;
     QComboBox *paramTypeCmbBox;
     QTextEdit *paramCommentEdt;
