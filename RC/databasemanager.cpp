@@ -65,6 +65,7 @@ Graph DataBaseManager::getGraphDB(const QString &name) throw (QString)
     QList<Top> topList;
     while (query.next()){
         QSqlRecord record = query.record();
+        const Actor *actor = getActor(record.value("Actor").toString());
         if (record.value("Type").toString() == "T") {
             topList.append(Top(record.value("X").toFloat(),
                     record.value("Y").toFloat(),
@@ -73,8 +74,8 @@ Graph DataBaseManager::getGraphDB(const QString &name) throw (QString)
                     record.value("ntop").toInt(),
                     -1,
                     record.value("isRoot").toBool(),
-                    record.value("Actor").toString(),
-                    "T"));
+                    actor,
+                    Top::NormalTop));
         } else if (record.value("Type").toString() == "M") {
             topList.append(Top(record.value("X").toFloat(),
                     record.value("Y").toFloat(),
@@ -83,8 +84,8 @@ Graph DataBaseManager::getGraphDB(const QString &name) throw (QString)
                     record.value("ntop").toInt(),
                     record.value("procCount").toInt(),
                     false,
-                    record.value("Actor").toString(),
-                    "M"));
+                    actor,
+                    Top::MultiProcTop));
         }
     }
 
@@ -154,7 +155,7 @@ Graph DataBaseManager::getGraphDB(const QString &name) throw (QString)
     return result;
 }
 
-QList<Graph *> DataBaseManager::getGraphList()
+QList<const Graph *> DataBaseManager::getGraphList()
 {
     return myGraphList;
 }
@@ -216,12 +217,12 @@ void DataBaseManager::saveGraphDB(const Graph &graph) throw (QString)
         query.bindValue(":NAMEPR",      graph.name);
         query.bindValue(":X",           top.x);
         query.bindValue(":Y",           top.y);
-        query.bindValue(":SizeX",       top.type == "M" ? top.procCount : top.sizeX);
+        query.bindValue(":SizeX",       top.type == Top::MultiProcTop ? top.procCount : top.sizeX);
         query.bindValue(":SizeY",       top.sizeY);
         query.bindValue(":ntop",        top.number);
         query.bindValue(":isRoot",      top.isRoot ? 1 : 0 );
-        query.bindValue(":Actor",       top.actor);
-        query.bindValue(":Type",        top.type);
+        query.bindValue(":Actor",       top.actor == NULL ? "" : top.actor->name );
+        query.bindValue(":Type",        top.type == Top::MultiProcTop ? "M" : "T");
         if (!query.exec()) {
             globalLogger->writeLog(db.lastError().text(), Logger::Critical);
             db.close();
@@ -274,8 +275,22 @@ void DataBaseManager::saveGraphDB(const Graph &graph) throw (QString)
             throw QObject::tr("Не удалось сохранить список дуг.\n") + db.lastError().text();
         }
     }
+
+    Graph *newGraph = const_cast<Graph *>(getGraph(graph.name));
+    if (newGraph == NULL) {
+        newGraph = new Graph(graph.name, graph.extName, graph.topList, graph.arcList, graph.commentList, graph.syncArcList);
+    } else {
+        newGraph->name = graph.name;
+        newGraph->extName = graph.extName;
+        newGraph->topList = graph.topList;
+        newGraph->arcList = graph.arcList;
+        newGraph->commentList = graph.commentList;
+        newGraph->syncArcList = graph.syncArcList;
+    }
+
+    if (!myGraphList.contains(newGraph))
+        myGraphList.append(newGraph);
     db.close();
-    myGraphList.append(new Graph(graph.name, graph.extName, graph.topList, graph.arcList, graph.commentList, graph.syncArcList));
 }
 
 /*!
@@ -609,8 +624,23 @@ const Actor *DataBaseManager::getActor(const QString &name) const
             break;
         }
     }
+    if (result)
+        return result;
+    return getGraph(name);
+}
+
+const Graph *DataBaseManager::getGraph(const QString &name) const
+{
+    const Graph *result = NULL;
+    foreach (const Graph *Graph, myGraphList) {
+        if (Graph->name == name) {
+            result = Graph;
+            break;
+        }
+    }
     return result;
 }
+
 
 const Predicate *DataBaseManager::getPredicate(const QString &name) const
 {
@@ -711,7 +741,7 @@ QList<Predicate> DataBaseManager::getPredicateListDB() throw (QString)
     return result;
 }
 
-void DataBaseManager::registerModuleDB(const QString &uniqName, const QString &fileName, const QString &comment, const QStringList &paramList) throw (QString)
+void DataBaseManager::registerModuleDB(const BaseModule *baseModule) throw (QString)
 {
     if (!db.open()) {
         globalLogger->writeLog(db.lastError().text(), Logger::Critical);
@@ -720,9 +750,9 @@ void DataBaseManager::registerModuleDB(const QString &uniqName, const QString &f
     QSqlQuery query;
     query.prepare("INSERT INTO bazmod (PROJECT_ID, PROTOTIP, NAMEPR, COMMENT)"
                   "VALUES (:PROJECT_ID, :PROTOTIP, :NAMEPR, :COMMENT);");
-    query.bindValue(":NAMEPR",   fileName);
-    query.bindValue(":COMMENT",  comment);
-    query.bindValue(":PROTOTIP", uniqName);
+    query.bindValue(":NAMEPR",   baseModule->name);
+    query.bindValue(":COMMENT",  baseModule->comment);
+    query.bindValue(":PROTOTIP", baseModule->uniqName);
     query.bindValue(":PROJECT_ID", myProjectId);
     if (!query.exec()) {
         globalLogger->writeLog(db.lastError().text(), Logger::Critical);
@@ -730,15 +760,15 @@ void DataBaseManager::registerModuleDB(const QString &uniqName, const QString &f
         throw QObject::tr("Не удалось сохранить базовый модуль.\n") + db.lastError().text();
     }
 
-    for (int i = 0; i < paramList.count(); i++){
+    for (int i = 0; i < baseModule->parameterList.count(); i++){
         query.clear();
         query.prepare("INSERT INTO databaz (PROJECT_ID, PROTOTIP, DATA, TYPE, MODE, NEV, COMMENT)"
                       "VALUES (:PROJECT_ID, :PROTOTIP, :DATA, :TYPE, :MODE, :NEV, :COMMENT);");
-        QStringList parameter = paramList.at(i).split(";;");
+        QStringList parameter = baseModule->parameterList[i].split(";;");
         query.bindValue(":NEV",         i);
         query.bindValue(":DATA",        parameter[0]);
         query.bindValue(":TYPE",        parameter[1]);
-        query.bindValue(":PROTOTIP",    uniqName);
+        query.bindValue(":PROTOTIP",    baseModule->uniqName);
         query.bindValue(":PROJECT_ID",  myProjectId);
         QString vaMode;
         if (parameter.at(2) == QObject::tr("Исходный"))
@@ -748,13 +778,14 @@ void DataBaseManager::registerModuleDB(const QString &uniqName, const QString &f
         else if (parameter.at(2) == QObject::tr("Вычисляемый"))
             vaMode = "R";
         query.bindValue(":MODE",        vaMode);
-        query.bindValue(":COMMENT",     parameter.at(3));
+        query.bindValue(":COMMENT",     parameter[3]);
         if (!query.exec()) {
             globalLogger->writeLog(db.lastError().text(), Logger::Critical);
             db.close();
             throw QObject::tr("Не удалось сохранить параметры базового модуля.\n") + db.lastError().text();
         }
     }
+    myBaseModuleList.append(baseModule);
     db.close();
 }
 
@@ -939,258 +970,6 @@ DataBaseManager::~DataBaseManager()
 {
     if (db.isOpen())
         db.close();
-}
-
-int DataBaseManager::Compi_count_MaxGH(const QString &myGraphName)
-{
-    if (!db.open())
-        return false;
-
-    QSqlQuery query;
-    query.prepare("SELECT COUNT(*) c FROM graph "
-                  "WHERE NAMEPR = :EXTNAME AND PROJECT_ID = :PROJECT_ID;");
-    query.bindValue(":PROJECT_ID", globalDBManager->getProjectId());
-    query.bindValue(":EXTNAME", myGraphName);
-
-    if (!query.exec()) {
-        QMessageBox::critical(NULL, QObject::tr("Ошибка"),
-                              QObject::tr("GRAPHTOP doesn't contain ") + myGraphName,
-                              QMessageBox::Ok);
-        db.close();
-        return -1;
-    }
-
-    QSqlRecord r = query.record();
-    const int result = r.value("c").toInt();
-    db.close();
-
-    return result;
-}
-
-int DataBaseManager::Compi_count_MaxLT(const QString &myGraphName)
-{
-    if (!db.open())
-        return false;
-
-    QSqlQuery query;
-    query.prepare("SELECT COUNT(*) c FROM graphtop "
-                  "WHERE NAMEPR = :EXTNAME AND PROJECT_ID = :PROJECT_ID;");
-    query.bindValue(":PROJECT_ID", globalDBManager->getProjectId());
-    query.bindValue(":EXTNAME", myGraphName);
-
-    if (!query.exec()) {
-        QMessageBox::critical(NULL, QObject::tr("Ошибка"),
-                              QObject::tr("GRAPHTOP doesn't contain ") + myGraphName,
-                              QMessageBox::Ok);
-        db.close();
-        return -1;
-    }
-
-    QSqlRecord r = query.record();
-    const int result = r.value("c").toInt();
-    db.close();
-
-    return result;
-}
-
-int DataBaseManager::Compi_count_MaxLP(const QString &myGraphName)
-{
-    if (!db.open())
-        return false;
-
-    QSqlQuery query;
-    query.prepare("SELECT COUNT(*) c FROM graphpre "
-                  "WHERE NAMEPR = :EXTNAME AND PROJECT_ID = :PROJECT_ID;");
-    query.bindValue(":PROJECT_ID", globalDBManager->getProjectId());
-    query.bindValue(":EXTNAME", myGraphName);
-
-    if (!query.exec()) {
-        QMessageBox::critical(NULL, QObject::tr("Ошибка"),
-                              QObject::tr("GRAPHTOP doesn't contain ") + myGraphName,
-                              QMessageBox::Ok);
-        db.close();
-        return -1;
-    }
-
-    QSqlRecord r = query.record();
-    const int result = r.value("c").toInt();
-    db.close();
-
-    return result;
-}
-
-int DataBaseManager::Compi_get_root_top(const QString &myGraphName)
-{
-
-    if (!db.open())
-        return false;
-
-    QSqlQuery query;
-    query.prepare("SELECT NFROM FROM graph "
-                  "WHERE NAMEPR = :EXTNAME AND PROJECT_ID = :PROJECT_ID AND PRIOR = 0;");
-    query.bindValue(":PROJECT_ID", myProjectId);
-    query.bindValue(":EXTNAME", myGraphName);
-    bool queryres = query.exec();
-
-    int root_top = -1;
-    if ((queryres) && (query.next())) {
-        if (query.first())
-            root_top = (query.value(0).toInt());
-    } else {
-        QMessageBox::critical(NULL, QObject::tr("Ошибка"),
-                              QObject::tr("GRAPH doesn't contain ") + myGraphName,
-                              QMessageBox::Ok);
-    }
-
-    db.close();
-    return root_top;
-}
-
-bool DataBaseManager::Compi_get_GSP_Shab_List()
-{
-    if (!db.open())
-        return false;
-    QSqlQuery query;
-    query.prepare("SELECT * FROM gsp_shab;");
-    bool queryres = query.exec();
-    globalLogger->writeLog(query.executedQuery().toUtf8());
-
-    while ( (queryres) && (query.next()) ){
-        myShabList.append(new Shab(query.value(1).toInt(),query.value(2).toString(),query.value(3).toString()));
-    }
-
-    db.close();
-
-    return (db.lastError().type() == QSqlError::NoError);
-}
-
-
-int DataBaseManager::Compi_fill_Graph_struct(const QString &myGraphName, int MaxGH, COMPHs *Graph)
-{
-    int i=0;
-
-    if (!db.open())
-        return false;
-
-    QSqlQuery query;
-    query.prepare("SELECT * FROM graph"
-                  " WHERE NAMEPR = :EXTNAME AND PROJECT_ID = :PROJECT_ID;");
-    query.bindValue(":PROJECT_ID", globalDBManager->getProjectId());
-    query.bindValue(":EXTNAME", myGraphName);
-
-    if (query.exec()) {
-        while (query.next() && i < MaxGH) {
-            (*(*Graph+i)).FromTop = (query.value(2).toInt());   //f4int(f4ref("NFROM"));
-            (*(*Graph+i)).ToTop   = (query.value(3).toInt());   //f4int(f4ref("NTO"));
-            (*(*Graph+i)).Pred    = (query.value(4).toInt());   //f4int(f4ref("NPRED"));
-            (*(*Graph+i)).ArcType = (query.value(7).toInt());   //f4int(f4ref("ARCTYPE"));
-            i++;
-        }
-    } else {
-        QMessageBox::critical(NULL,
-                              QObject::tr("Ошибка"),
-                              QObject::tr("GRAPH doesn't contain ")
-                              + myGraphName,
-                              QMessageBox::Ok);
-    }
-    db.close();
-    return 0;
-}
-
-
-int DataBaseManager::Compi_fill_ListT_struct(const QString &myGraphName, int MaxLT, COMPTOPs *ListTop)
-{
-    int i=0;
-    int SPRED_exists = 0;
-    int SMSG_exists = 0;
-
-    if (!db.open())
-        return false;
-
-    //    QSqlTableModel *model = new QSqlTableModel;
-    //    model->setTable("graphtop");
-    //    model->select();
-
-    //    if ( model->fieldIndex("SPRED") >= 0 )
-    //    { SPRED_exists = 1; }
-    //    else
-    //    { SPRED_exists = 0; }
-
-    //    if ( model->fieldIndex("SMSG") >= 0 )
-    //    { SMSG_exists = 1; }
-    //    else
-    //    { SMSG_exists = 0; }
-
-
-    QSqlQuery query;
-    query.prepare("SELECT GT.PROJECT_ID, GT.NAMEPR, GT.NTOP, GT.NAME, GT.EXCL, GT.SPRED, GT.SMSG, A.PROTOTIP FROM graphtop AS GT, actor AS A"
-                  " WHERE GT.NAMEPR = :EXTNAME AND GT.PROJECT_ID = :PROJECT_ID AND A.NAMEPR = GT.NAME AND A.PROJECT_ID = GT.PROJECT_ID;");
-    query.bindValue(":PROJECT_ID", globalDBManager->getProjectId());
-    query.bindValue(":EXTNAME", myGraphName);
-
-    if (query.exec()) {
-        i=0;
-        while (query.next() &&  i < MaxLT) {
-            strncpy((*(*ListTop+i)).Name, (query.value(3).toString().toStdString().c_str()), 8);   //f4str(f4ref("NAME"))
-            (*(*ListTop+i)).Top   = (query.value(2).toInt());   //f4int(f4ref("NTOP"));
-            (*(*ListTop+i)).FirstDef =-77;
-            (*(*ListTop+i)).LastDef  =-77;
-            if ( strncmp( query.value(5).toString().toStdString().c_str(), "        ",8 ) ) {
-                strncpy((*(*ListTop + i)).SPred,query.value(5).toString().toStdString().c_str(),8);
-            }
-            else {  strcpy((*(*ListTop + i)).SPred,"NULL");  }
-
-            if ( strncmp( query.value(6).toString().toStdString().c_str(), "        ",8 ) ) {
-                strncpy((*(*ListTop + i)).SMsg,query.value(6).toString().toStdString().c_str(),8);
-            }
-            else {  strcpy((*(*ListTop + i)).SMsg,"NULL");  }
-
-            strncpy((*(*ListTop + i)).NameProt,query.value(7).toString().toStdString().c_str(),8);
-
-            i++;
-        }
-    }
-    else
-    {
-        QMessageBox::critical(NULL,
-                              QObject::tr("Ошибка in DataBaseManager::Compi_fill_ListT_struct()"),
-                              QObject::tr("Таблицы: GRAPHTOP, ACTOR. Агрегат: ")
-                              + myGraphName,
-                              QMessageBox::Ok);
-    }
-
-    db.close();
-
-    return 0;
-}
-
-int DataBaseManager::Compi_fill_ListP_struct(const QString &myGraphName, int MaxLP, COMPREs *ListP)
-{
-    int i=0;
-
-    if (!db.open())
-        return false;
-
-    QSqlQuery query;
-    query.prepare("SELECT GP.PROJECT_ID, GP.NAMEPR, GP.NPRED, GP.NAME, A.PROTOTIP FROM graphpre AS GP, actor AS A"
-                  " WHERE GP.NAMEPR = :EXTNAME AND GP.PROJECT_ID = :PROJECT_ID AND A.NAMEPR = GP.NAME AND A.PROJECT_ID = GP.PROJECT_ID;");
-    query.bindValue(":PROJECT_ID", myProjectId);
-    query.bindValue(":EXTNAME", myGraphName);
-
-    if (query.exec()) {
-        while (query.next() && i < MaxLP) {
-            strncpy((*(*ListP+i)).Name, (query.value(3).toString().toStdString().c_str()), 8);   //f4str(f4ref("NAME"))
-            (*(*ListP+i)).Pred = (query.value(2).toInt());  // f4int(f4ref("NPRED"));
-            strncpy((*(*ListP + i)).NameProt,query.value(4).toString().toStdString().c_str(),8);    // f4str(f4ref("PROTOTIP"))
-            i++;
-        }
-    } else {
-        QMessageBox::critical(NULL, QObject::tr("Ошибка in DataBaseManager::Compi_fill_ListP_struct()"),
-                              QObject::tr("Таблицы: GRAPHPRE, ACTOR. Агрегат: ") + myGraphName,
-                              QMessageBox::Ok);
-    }
-    db.close();
-    return 0;
 }
 
 void DataBaseManager::openProjectDB(int projectId)

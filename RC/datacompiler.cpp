@@ -5,16 +5,15 @@
 #include <QtCore>
 #include <QtGui>
 
-DataCompiler::DataCompiler()
+DataCompiler::DataCompiler(Type type) :
+    myType(type)
 {
-
+   init();
 }
 
 QString DataCompiler::getTemplate(const QString &fileName) const
 {
-    QSettings settings("graph.ini", QSettings::IniFormat);
-    QString baseDir = settings.value("Location/TemplateDir", QApplication::applicationDirPath() + "\\BaseDir\\").toString();
-    QString name = baseDir + "/" + fileName;
+    QString name = myTemplateDirectory + "/" + fileName;
     QFile f(name);
     f.open(QIODevice::ReadOnly);
     QTextStream ts(&f);
@@ -27,7 +26,8 @@ QString DataCompiler::getTemplate(const QString &fileName) const
 void DataCompiler::init()
 {
     QSettings settings("graph.ini", QSettings::IniFormat);
-    myOutputDirectory = settings.value("Location/OutputDir", QApplication::applicationDirPath() + "\\BaseDir\\").toString();
+    myOutputDirectory = QFileInfo(settings.value("Location/OutputDir", "./Out/").toString()).canonicalFilePath();
+    myTemplateDirectory = QFileInfo(settings.value("Location/TemplateDir", "./Templates/").toString()).canonicalFilePath();
 }
 
 void DataCompiler::compile()
@@ -101,9 +101,9 @@ void DataCompiler::compile()
         userTypes.close();
     }
 
-    //Компиляруем класс POData
+    //Компиляруем класс TPOData
     {
-        //Создаем файл podata.h
+        //Создаем файл TPOData.h
         QString poDataText = getTemplate(QString(PODATA_FILE_NAME) + ".h.template");
         Q_ASSERT(!poDataText.isEmpty());
 
@@ -139,11 +139,11 @@ void DataCompiler::compile()
                 setGetBlock.append("ptr" + var->type->name + " set_" + var->name + "(const ptr" + var->type->name + "& value);\n");
                 setGetBlock.append(intType + " get_" + var->name + "(const int& index);\n");
                 setGetBlock.append(intType + " set_" + var->name + "(const int& index, const " + intType + "& value);\n");
-                varPropertyBlock.append("__property_rw_indexed<" + intType + ", int, POData> " + var->name + ";\n");
+                varPropertyBlock.append("__property_rw_indexed<" + intType + ", int, TPOData> " + var->name + ";\n");
             } else {
                 setGetBlock.append(var->type->name + " get_" + var->name + "();\n");
                 setGetBlock.append(var->type->name + " set_" + var->name + "(const " + var->type->name + "& value);\n");
-                varPropertyBlock.append("__property_rw<" + var->type->name + ", POData> " + var->name + ";\n");
+                varPropertyBlock.append("__property_rw<" + var->type->name + ", TPOData> " + var->name + ";\n");
             }
         }
         poDataText.replace("<#setGet>", setGetBlock);
@@ -155,7 +155,7 @@ void DataCompiler::compile()
         poDataH.write(poDataText.toUtf8());
         poDataH.close();
 
-        //Создаем файл podata.cpp
+        //Создаем файл TPOData.cpp
         poDataText = getTemplate(QString(PODATA_FILE_NAME) + ".cpp.template");
 
         //Шаблон <#assignSetterGetter> В конструкторе присваевает методы доступа к свойствам
@@ -204,42 +204,42 @@ void DataCompiler::compile()
                                     "\tbreak;\n");
             //Если встертился массив
             if (type->typedefStr.contains("[")) {
-                assignSetterGetterBlock.append(var->name + ".Assign(this, &POData::set_" + var->name + ", &POData::get_" + var->name + ", &POData::set_" + var->name + ", &POData::get_" + var->name + ");\n");
+                assignSetterGetterBlock.append(var->name + ".Assign(this, &TPOData::set_" + var->name + ", &TPOData::get_" + var->name + ", &TPOData::set_" + var->name + ", &TPOData::get_" + var->name + ");\n");
                 deleteBlock.append("delete[] _" + var->name + ";\n");
                 initMemoryBlock.append("_" + var->name + " = (" + var->type->name + "*)" + "(new " + var->type->name + ");\n");
                 getDataSizeBlock.append("case " + QString::number(i++) + ":\n"
                                         "\tresult = sizeof(" + var->type->name + ") / " + var->type->name + "_LENGTH;\n"
                                         "\tbreak;\n");
                 //getter by index
-                setGetBlock.append(intType + " POData::get_" + var->name + "(const int& index)\n{\n"
+                setGetBlock.append(intType + " TPOData::get_" + var->name + "(const int& index)\n{\n"
                                    "\tif (_" + var->name + " == NULL) _" + var->name + " = (" + var->type->name + "*)" + "(new " + var->type->name + ");\n" +
                                    "\tgetData(" + var->name + "_id, index, 1, &(*_" + var->name + ")[index]);\n"
                                    "\treturn (*_" + var->name + ")[index];\n}\n\n");
                 //setter by index
-                setGetBlock.append(intType + " POData::set_" + var->name + "(const int& index, const " + intType + " &value)\n{\n"
+                setGetBlock.append(intType + " TPOData::set_" + var->name + "(const int& index, const " + intType + " &value)\n{\n"
                                    "\tsetData(" + var->name + "_id, index, 1, &value);\n"
                                    "\treturn value;\n}\n\n");
                 //getter all array
-                setGetBlock.append("ptr" + var->type->name + " POData::get_" + var->name + "()\n{\n"
+                setGetBlock.append("ptr" + var->type->name + " TPOData::get_" + var->name + "()\n{\n"
                                    "\tif (_" + var->name + " == NULL) _" + var->name + " = (" + var->type->name + "*)" + "(new " + var->type->name + ");\n" +
                                    "\tgetData(" + var->name + "_id, 0, " + var->type->name + "_LENGTH" + ", _" + var->name +");\n"
                                    "\treturn *_" + var->name + ";\n}\n\n");
                 //setter all array
-                setGetBlock.append("ptr" + var->type->name + " POData::set_" + var->name + "(const " + "ptr" + var->type->name + " &value)\n{\n"
+                setGetBlock.append("ptr" + var->type->name + " TPOData::set_" + var->name + "(const " + "ptr" + var->type->name + " &value)\n{\n"
                                    "\tsetData(" + var->name + "_id, 0, " + var->type->name + "_LENGTH" ", *(&value));\n"
                                    "\treturn (" + intType + " *)value;\n}\n\n");
             } else {
-                assignSetterGetterBlock.append(var->name + ".Assign(this, &POData::set_" + var->name + ", &POData::get_" + var->name + ");\n");
+                assignSetterGetterBlock.append(var->name + ".Assign(this, &TPOData::set_" + var->name + ", &TPOData::get_" + var->name + ");\n");
                 deleteBlock.append("delete _" + var->name + ";\n");
                 initMemoryBlock.append("*(_" + var->name + " = new " + var->type->name + ")" + (var->initValue.isEmpty() ? ";\n" : " = " + var->initValue + ";\n"));
                 getDataSizeBlock.append("case " + QString::number(i++) + ":\n"
                                         "\tresult = sizeof(" + var->type->name + ");\n"
                                         "\tbreak;\n");
-                setGetBlock.append(var->type->name + " POData::get_" + var->name + "()\n{\n"
+                setGetBlock.append(var->type->name + " TPOData::get_" + var->name + "()\n{\n"
                                    "\tif (_" + var->name + " == NULL) *(_" + var->name + " = new " + var->type->name + ")" + (var->initValue.isEmpty() ? ";\n" : " = " + var->initValue + ";\n") +
                                    "\tgetData(" + var->name + "_id, 0, 1, _" + var->name +");\n"
                                    "\treturn *_" + var->name + ";\n}\n\n");
-                setGetBlock.append(var->type->name + " POData::set_" + var->name + "(const " + var->type->name + " &value)\n{\n"
+                setGetBlock.append(var->type->name + " TPOData::set_" + var->name + "(const " + var->type->name + " &value)\n{\n"
                                    "\tsetData(" + var->name + "_id, 0, 1, &value);\n"
                                    "\treturn value;\n}\n\n");
             }

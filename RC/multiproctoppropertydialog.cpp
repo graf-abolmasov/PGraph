@@ -51,9 +51,9 @@ void MultiProcTopPropertyDialog::prepareForm(QMultiProcTop *top)
     ui->actorsListWidget->addItem(tr("Нет"));
 
     //Добавляем агрегаты
-    QList<Graph *> myGraphList;
+    QList<const Graph *> myGraphList;
     myGraphList = globalDBManager->getGraphList();
-    foreach(Graph *graph, myGraphList)
+    foreach(const Graph *graph, myGraphList)
         myActorList.append(graph);
 
     //Добавляем акторы
@@ -118,10 +118,10 @@ void MultiProcTopPropertyDialog::on_buttonBox_accepted()
     QString extName = theirTop->actor->extName + " " + QString::number(theirTop->procCount) + tr(" процессов");
     QString name = getCRC(extName.toUtf8());
     Graph newGraph(name, extName, QList<Top>(),  QList<Arc>(), QList<Comment>(), QList<SyncArc>());
-    Top headTop(0, -85, theirTop->procCount*50 - 10, 30, 0, -1, true, "", "T");
+    Top headTop(0, -85, theirTop->procCount*50 - 10, 30, 0, -1, true, NULL, Top::NormalTop);
     newGraph.topList.append(headTop);
     for (int i = 0; i < theirTop->procCount; i++) {
-        Top newTop(-(theirTop->procCount-1)*25+i*50, 0, 40, 30, i+1, -1, false, theirTop->actor->name, "T");
+        Top newTop(-(theirTop->procCount-1)*25+i*50, 0, 40, 30, i+1, -1, false, theirTop->actor, Top::NormalTop);
         newGraph.topList.append(newTop);
         QStringList nodes;
         nodes.append(QString::number(-(theirTop->procCount-1)*25+i*50) + " " +
@@ -138,7 +138,7 @@ void MultiProcTopPropertyDialog::on_buttonBox_accepted()
         newArc = Arc(Arc::TerminateArc, 1, i+1, theirTop->procCount + 1, NULL, nodes);
         newGraph.arcList.append(newArc);
     }
-    Top endTop(0, 85, theirTop->procCount*50 - 10, 30, theirTop->procCount + 1, -1, true, "", "T");
+    Top endTop(0, 85, theirTop->procCount*50 - 10, 30, theirTop->procCount + 1, -1, true, NULL, Top::NormalTop);
     newGraph.topList.append(endTop);
     globalDBManager->saveGraphDB(newGraph);
     theirTop->actor = globalDBManager->getActor(name);

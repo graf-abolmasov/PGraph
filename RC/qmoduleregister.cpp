@@ -16,13 +16,13 @@ QModuleRegister::QModuleRegister(QWidget *parent) :
     ui->parametersTable->setColumnWidth(0, 70);
     ui->parametersTable->setColumnWidth(1, 60);
     ui->parametersTable->setColumnWidth(3, 90);
+    QSettings myLocSettings("graph.ini", QSettings::IniFormat);
+    QDir workingDir(myLocSettings.value("Location/BaseDir", "./BaseDir/").toString());
 
     QStringList filters;
     filters << tr("*.c") << tr("*.C");
     workingDir.setNameFilters(filters);
     workingDir.setFilter(QDir::Files);
-    QSettings myLocSettings("graph.ini", QSettings::IniFormat);
-    workingDir.setCurrent(myLocSettings.value("Location/BaseDir", QApplication::applicationDirPath() + "\\BaseDir\\").toString());
     fileList = workingDir.entryInfoList();
     prepareForm();
 }
@@ -105,6 +105,11 @@ void QModuleRegister::on_parametersTable_currentCellChanged(int currentRow, int 
 
 void QModuleRegister::on_buttonBox_accepted()
 {
+    if (ui->fileList->count() == 0) {
+        accept();
+        return;
+    }
+
     ui->parametersTable->setCurrentCell(-1, -1);
     bool readyToSave = true;
     for (int i = 0; i < ui->parametersTable->rowCount(); i++){
@@ -132,40 +137,43 @@ void QModuleRegister::on_buttonBox_accepted()
                          ui->parametersTable->item(i, 3)->text());
     }
 
-    if (ui->fileList->count() == 0) {
-        accept();
-        return;
-    }
-
     QString uniqName = "S" + getCRC(ui->fileList->currentItem()->text().toUtf8());
-    globalDBManager->registerModuleDB(uniqName,
-                                    fileList.at(ui->fileList->currentRow()).baseName(),
-                                    ui->commentTxtEdt->document()->toPlainText(), paramList);
+    const BaseModule *newBaseModule = new BaseModule(fileList.at(ui->fileList->currentRow()).baseName(),
+                                                    uniqName, ui->commentTxtEdt->document()->toPlainText(), paramList);
+    globalDBManager->registerModuleDB(newBaseModule);
     // Читаем файл
-    QFile input(fileList.at(ui->fileList->currentRow()).absoluteFilePath());
+    QFile input(fileList.at(ui->fileList->currentRow()).canonicalFilePath());
     input.open(QFile::ReadOnly);
     QString buff(input.readAll());
     input.close();
 
-    // Ищим заголовок (без регэкспа способ ужасен :((
-    int start = buff.indexOf(fileList.at(ui->fileList->currentRow()).baseName() + "(", 0, Qt::CaseSensitive) + fileList.at(ui->fileList->currentRow()).baseName().length() + 1;
-    int end   = buff.indexOf(")", start, Qt::CaseSensitive);
-    QString signature(buff.mid(start, end-start));
+    const QString function = fileList.at(ui->fileList->currentRow()).baseName();
+    QRegExp rx(function + "\\((.*)\\)");
+    rx.setMinimal(true);
+    rx.indexIn(buff, 0);
+    QString signature = rx.cap(1).simplified();
     QByteArray outputData;
-    outputData.append("#include \"graph.h\"\r\nextern int ");
-    outputData.append(fileList.at(ui->fileList->currentRow()).baseName() + "(" + signature + ");\r\n");
+    //outputData.append("#include \"graph.h\"\r\n");
+    rx.setPattern("(#include\\s*[\"<].*[\">])");
+    QStringList includes;
+    int pos = 0;
+    while ((pos = rx.indexIn(buff, pos)) != -1) {
+        includes << rx.cap(1);
+        pos += rx.matchedLength();
+    }
+    outputData.append(includes.join("\r\n").toUtf8());
+    outputData.append("\r\nextern \"C\" int ");
+    outputData.append(function + "(" + signature + ");\r\n");
     outputData.append("int " + uniqName + "(" + signature + ")\r\n{\r\n");
 
-    outputData.append("\treturn " + fileList.at(ui->fileList->currentRow()).baseName() + "(");
-    for (int i = 0; i < ui->parametersTable->rowCount(); i++){
-        QString paramName = ui->parametersTable->item(i, 0)->text();
-        outputData.append(paramName + ", ");
-    }
-    if (ui->parametersTable->rowCount() > 0)
-        outputData.remove(outputData.size()-2, 2);
+    outputData.append("\treturn " + function + "(");
+    QStringList params;
+    for (int i = 0; i < ui->parametersTable->rowCount(); i++)
+        params << ui->parametersTable->item(i, 0)->text();
+    outputData.append(params.join(", ").toUtf8());
     outputData.append(");\r\n");
     outputData.append("}\r\n");
-    QFile output(uniqName + ".CPP");
+    QFile output(uniqName + ".cpp");
     output.open(QFile::WriteOnly);
     output.write(outputData);
     output.close();
@@ -181,18 +189,22 @@ void QModuleRegister::on_fileList_currentRowChanged(int currentRow)
     file.open(QFile::ReadOnly);
     QString buff(file.readAll());
     file.close();
-    int start = buff.indexOf(fileList.at(currentRow).baseName() + "(", 0, Qt::CaseSensitive) + fileList.at(currentRow).baseName().length() + 1;
+    const QString function = fileList.at(currentRow).baseName();
+    int start = buff.indexOf(function + "(", 0, Qt::CaseSensitive) + function.length() + 1;
     int end   = buff.indexOf(")", start, Qt::CaseSensitive);
     QString signature(buff.mid(start, end-start));
-    if (signature.isEmpty()) return;
+    if (signature.isEmpty())
+        return;
     QStringList paramsList = signature.split(QRegExp(",{1,}\\s*"));
     for (int i = 0; i < paramsList.count(); i++){
         ui->parametersTable->insertRow(i);
-        QString paramName = paramsList.at(i).split(QRegExp("\\*?\\s{1,}\\*?")).at(1);
-        QString paramType = paramsList.at(i).split(QRegExp("\\*?\\s{1,}\\*?")).at(0);
+        const QStringList param = paramsList.at(i).split(QRegExp("(\\s*\\*)|(\\*\\s*)"));
+        QString paramName = param.at(1).simplified();
+        QString paramType = param.at(0).simplified();
         ui->parametersTable->setItem(i, 0, new QTableWidgetItem(paramName));
-        ui->parametersTable->setItem(i, 1, new QTableWidgetItem(paramType));
-        ui->parametersTable->setItem(i, 2, new QTableWidgetItem(""));
+        const QString accMode = paramType.contains("const") ? tr("Исходный") : tr("Модифицируемый");
+        ui->parametersTable->setItem(i, 1, new QTableWidgetItem(paramType.remove(QRegExp("const")).simplified()));
+        ui->parametersTable->setItem(i, 2, new QTableWidgetItem(accMode));
         ui->parametersTable->setItem(i, 3, new QTableWidgetItem(""));
     }
 }

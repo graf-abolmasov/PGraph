@@ -195,3 +195,8 @@ QString arcTypeToString(const QArc *arc)
     }
     return result;
 }
+
+bool orderArcByPriorityAsc(const Arc &arc1, const Arc &arc2)
+{
+    return arc1.priority < arc2.priority;
+}

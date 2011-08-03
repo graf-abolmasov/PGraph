@@ -246,7 +246,7 @@ QList<QArc *> QTop::outArcs() const
     return result;
 }
 
-Top::Top(float x, float y, float sizeX, float sizeY, int number, int procCount, bool isRoot, QString actor, QString type)
+Top::Top(float x, float y, float sizeX, float sizeY, int number, int procCount, bool isRoot, const Actor *actor, TopType type)
 {
     this->x = x;
     this->y = y;

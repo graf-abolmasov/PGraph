@@ -61,7 +61,7 @@ TDrawWindow::TDrawWindow(ShowRole role, QWidget *parent)
     view->setScene(scene);
     view->setAlignment(Qt::AlignCenter);
     /*
-      � исуем сетку
+      Рисуем сетку
     QBrush myBackgroundBrush = view->backgroundBrush();
     myBackgroundBrush.setColor(Qt::lightGray);
     myBackgroundBrush.setStyle(Qt::CrossPattern);
@@ -78,7 +78,7 @@ TDrawWindow::TDrawWindow(ShowRole role, QWidget *parent)
 
 void TDrawWindow::createMenus()
 {
-    //� ежим только чтения
+    //Режим только чтения
     if (myRole == ReadOnly) {
         topMenu = NULL;
         arcMenu = NULL;
@@ -144,7 +144,7 @@ void TDrawWindow::createActions()
         viewSubGraphAct->setStatusTip(tr("Открывает подграф для просмотра"));
         connect(viewSubGraphAct, SIGNAL(triggered()), this, SLOT(viewSubGraph()));
 
-        editSubGraphAct = new QAction(tr("� едактировать подграф"), this);
+        editSubGraphAct = new QAction(tr("Редактировать подграф"), this);
         editSubGraphAct->setStatusTip(tr("Открывает подграф для редактирования"));
         connect(editSubGraphAct, SIGNAL(triggered()), this, SLOT(editSubGraph()));
 
@@ -221,7 +221,7 @@ void TDrawWindow::setMode(QDiagramScene::Mode mode)
 }
 
 /*!
-  � еакция на нажатие пункта меню: Загрузить иконку
+  Реакция на нажатие пункта меню: Загрузить иконку
 */
 void TDrawWindow::setItemIcon()
 {
@@ -242,7 +242,7 @@ void TDrawWindow::setItemIcon()
 }
 
 /*!
-  � еакция на нажатие пункта меню: Свойства вершины
+  Реакция на нажатие пункта меню: Свойства вершины
 */
 void TDrawWindow::showTopPropDialog(){
     TopPropertyDialog dlg;
@@ -257,7 +257,7 @@ void TDrawWindow::showTopPropDialog(){
 
 
 /*!
-  � еакция на нажатие пункта меню: Сохранить как картинку
+  Реакция на нажатие пункта меню: Сохранить как картинку
 */
 void TDrawWindow::saveAsImage(QString filename)
 {
@@ -272,7 +272,7 @@ void TDrawWindow::saveAsImage(QString filename)
 }
 
 /*!
-  � еакция на нажатие пункта меню: Свойства дуги
+  Реакция на нажатие пункта меню: Свойства дуги
 */
 void TDrawWindow::showArcPropDialog()
 {
@@ -287,7 +287,7 @@ void TDrawWindow::showArcPropDialog()
 }
 
 /*!
-  � еакция на нажатие пункта меню: Сделать корневой
+  Реакция на нажатие пункта меню: Сделать корневой
 */
 void TDrawWindow::makeAsRoot()
 {
@@ -394,21 +394,21 @@ void TDrawWindow::loadGraph(const QString &name)
 
         foreach (Top top, graph.topList) {
             QTop *qtop = NULL;
-            if (top.type == "T") {
+            if (top.type == Top::NormalTop) {
                 qtop = new QNormalTop(topMenu, NULL, scene);
                 if (top.isRoot)
                     scene->setRootTop(qgraphicsitem_cast<QNormalTop *>(qtop));
                 double w = top.sizeX;
                 double h = top.sizeY;
                 qtop->setRect(-w/2, -h/2, w, h);
-            } else if (top.type == "M") {
+            } else if (top.type == Top::MultiProcTop) {
                 QMultiProcTop *qtop1 = new QMultiProcTop(multiProcMenu, NULL, scene);
                 qtop1->procCount = top.procCount;
                 qtop = qtop1;
             }
             qtop->number = top.number;
             qtop->setPos(top.x, top.y);
-            qtop->actor = globalDBManager->getActor(top.actor);
+            qtop->actor = top.actor;
         }
 
         QList<QPair<QArc *, int> > qarcList;

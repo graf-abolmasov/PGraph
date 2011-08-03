@@ -214,17 +214,24 @@ bool QPredicateEditor::makeResult()
         return false;
     }
 
-    QSettings myLocSettings("graph.ini", QSettings::IniFormat);
-    QDir currentDir;
-    currentDir.setCurrent(myLocSettings.value("Location/BaseDir", QApplication::applicationDirPath() + "\\BaseDir\\").toString());
+    QSettings mySettings("graph.ini", QSettings::IniFormat);
+    const QString myOutputDirectory = QFileInfo(mySettings.value("Location/BaseDir", "./BaseDir/").toString()).canonicalFilePath();
 
     QByteArray outputData;
     QFile output;
 
+    QStringList params;
+    QStringList signature;
+    outputData.append("#include \"tpodata.h\"\r\n");
     switch(tempPre->type){
     case Predicate::NormalType:
         // Генерируем предикат
-        outputData.append("#include \"stype.h\"\r\n");
+        foreach (QString parameter, tempPre->baseModule->parameterList) {
+            const QStringList parsedParameter = parameter.split(";;");
+            const QString constStr = parsedParameter[2] == QObject::tr("Исходный") ? QObject::tr("const ") : "";
+            signature << QString("%1%2 *%3").arg(constStr).arg(parsedParameter[0]).arg(parsedParameter[1]);
+        }
+        outputData.append("extern int " + tempPre->baseModule->uniqName + "(" + signature.join(", ") + ");\r\n");
         outputData.append("int ");
         outputData.append(tempPre->name.toUtf8());
         outputData.append("(TPOData *D)\r\n");
@@ -232,43 +239,36 @@ bool QPredicateEditor::makeResult()
         // Инициализуем данные
         for(int i = 0; i < tempPre->variableList.count(); i++) {
             QStringList parameter = myModuleList[ui->baseModuleList->currentRow()]->parameterList[i].split(";;");
-            outputData.append(QString(tr("\t%1 %2 = D->%3;\r\n")).arg(parameter[0]).arg(parameter[1]).arg(tempPre->variableList[i]->name).toUtf8());
+            outputData.append(QString(tr("\t%1 _%2 = D->%3;\r\n")).arg(parameter[0]).arg(parameter[1]).arg(tempPre->variableList[i]->name).toUtf8());
         }
         // Вызываем прототип
         outputData.append("\r\n\tint result = ");
-        outputData.append(tempPre->baseModule->name);
+        outputData.append(tempPre->baseModule->uniqName);
         outputData.append("(");
         for(int i = 0; i < tempPre->variableList.count(); i++) {
             QStringList parameter = myModuleList[ui->baseModuleList->currentRow()]->parameterList[i].split(";;");
-            outputData.append(QString(tr("&%1, ")).arg(parameter[1]).toUtf8());
+            params << tr("&_") + parameter[1];
         }
-        if (tempPre->variableList.count() > 0)
-            outputData.remove(outputData.length()-2,2);
+        outputData.append(params.join(", ").toUtf8());
         outputData.append(");\r\n\r\n");
-        // сохраняем данные
-        for(int i = 0; i < tempPre->variableList.count(); i++) {
-            QStringList parameter = myModuleList[ui->baseModuleList->currentRow()]->parameterList[i].split(";;");
-            outputData.append(QString(tr("\tD->%1 = %2;\n")).arg(tempPre->variableList[i]->name).arg(parameter[1]).toUtf8());
-        }
         // выход
         outputData.append("\r\n\r\n\treturn result;\r\n}");
         break;
     case Predicate::InlineType:
         //генерируем с++ файл
-        outputData.append("#include \"stype.h\"\r\n");
         outputData.append("int " + tempPre->name + "(TPOData *D)\r\n");
         outputData.append("{\r\n");
         QString code(tempPre->extName);
         for (int i = 0; i < tempPre->variableList.count(); i++) {
-            code.replace(QRegExp("(\\b)" + tempPre->variableList.at(i)->name + "(\\b)", Qt::CaseSensitive), "D->" + tempPre->variableList.at(i)->name);
+            code.replace(QRegExp("\\b" + tempPre->variableList[i]->name + "\\b", Qt::CaseSensitive), "D->" + tempPre->variableList.at(i)->name);
         }
         //code.replace(QRegExp("\\n"), "\n  ");
-        outputData.append("  return (" + code + ")\r\n");
+        outputData.append("  return (" + code + ");\r\n");
         outputData.append("}\r\n");
         break;
     }
 
-    output.setFileName(currentDir.canonicalPath() + "/" + tempPre->name + ".cpp");
+    output.setFileName(myOutputDirectory + "/" + tempPre->name + ".cpp");
     output.open(QFile::WriteOnly);
     output.write(outputData);
     output.close();

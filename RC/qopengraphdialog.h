@@ -25,10 +25,11 @@ protected:
 
 private:
     Ui::QOpenGraphDialog *ui;
-    QList<Graph> myGraphList;
+    QList<const Graph *> myGraphList;
 
     void prepareForm();
 private slots:
+    void enableOkButton(int currentRow);
     void on_listWidget_itemDoubleClicked(QListWidgetItem* item);
 };
 

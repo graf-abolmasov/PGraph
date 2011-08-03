@@ -42,7 +42,8 @@ public:
 class Top
 {
 public:
-    Top(float x, float y, float sizeX, float sizeY, int number, int procCount, bool isRoot, QString actor, QString type);
+    enum TopType { NormalTop, MultiProcTop };
+    Top(float x, float y, float sizeX, float sizeY, int number, int procCount, bool isRoot, const Actor *actor, TopType type);
     float x;
     float y;
     float sizeX;
@@ -50,8 +51,8 @@ public:
     int number;
     int procCount;
     bool isRoot;
-    QString actor;
-    QString type;
+    const Actor *actor;
+    TopType type;
 };
 
 class Graph  : public Actor
@@ -62,6 +63,9 @@ public:
     QList<Arc>           arcList;
     QList<Comment>       commentList;
     QList<SyncArc>       syncArcList;
+
+    QList<Arc> getOutArcs(int topNumber) const;
+    int getRootTop() const;
 };
 
 #endif // GRAPH_H
