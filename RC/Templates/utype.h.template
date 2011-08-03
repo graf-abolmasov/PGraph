@@ -1,0 +1,16 @@
+#ifndef UTYPE_H
+#define UTYPE_H
+
+#ifdef PARALLEL
+#include "mpi.h"
+#endif
+
+//Пользовательские типы
+<#userTypes>
+
+//Типы MPI
+#ifdef PARALLEL
+<#mpiTypes>
+#endif
+
+#endif
