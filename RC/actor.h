@@ -5,6 +5,7 @@
 #include <QtCore/QList>
 #include <QtCore/QString>
 #include <QtCore/QStringList>
+#include "errors.h"
 
 class Variable;
 class BaseModule;
@@ -23,6 +24,7 @@ public:
     const BaseModule *baseModule;
     QImage icon;
     QList<const Variable *> variableList;
+    QStringList validate() const;
 };
 
 #endif // ACTOR_H

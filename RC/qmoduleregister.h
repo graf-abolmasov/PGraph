@@ -30,6 +30,8 @@ private:
     QComboBox *paramTypeCmbBox;
     QTextEdit *paramCommentEdt;
 
+    QString myBaseDirectory;
+
     void prepareForm();
 private slots:
     void on_fileList_currentRowChanged(int currentRow);

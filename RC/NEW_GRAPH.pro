@@ -42,10 +42,11 @@ SOURCES += main.cpp \
     graph.cpp \
     logger.cpp \
     undocommand.cpp \
-    shab.cpp \
     compi.cpp \
     datacompiler.cpp \
-    qcodeeditor.cpp
+    qcodeeditor.cpp \
+    compiler.cpp \
+    qgraphsettings.cpp
 HEADERS += qmywindow.h \
     qdrawwindow.h \
     qtop.h \
@@ -84,11 +85,12 @@ HEADERS += qmywindow.h \
     logger.h \
     globalvariables.h \
     undocommand.h \
-    shab.h \
     compi.h \
     compiler.h \
     datacompiler.h \
-    qcodeeditor.h
+    qcodeeditor.h \
+    errors.h \
+    qgraphsettings.h
 RESOURCES += resources.qrc
 FORMS += toppropertydialog.ui \
     qobjecteditor.ui \

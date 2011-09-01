@@ -1,44 +1,57 @@
+#include <QtGui/QListWidget>
 #include <QtCore/QSettings>
+#include <QtCore/QStringList>
 #include <QtCore/QDebug>
 #include <QtCore/QDateTime>
 
 #include "logger.h"
+#include "globalvariables.h"
 
 Logger *globalLogger;
 
-Logger::Logger()
+Logger::Logger(LogLevel level, QList<Output> output)
 {
-    QSettings myLoggerSettings("graph.ini", QSettings::IniFormat);
-    logFile = NULL;
-    toConsole = false;
-    if (myLoggerSettings.value("Logger/WriteLog", true).toBool()) {
-        myDebugLevel = DebugLevel(myLoggerSettings.value("Logger/DebugLevel", int(All)).toInt());
-        QString fileName = myLoggerSettings.value("Logger/FileName", "console").toString();
-        if (fileName == "console")
-            toConsole = true;
-        else {
-            toConsole = false;
-            logFile = new QFile(fileName);
-            logFile->open(QFile::WriteOnly);
-            logFile->reset();
-        }
-    }
-}
-
-void Logger::writeLog(QString message, DebugLevel level)
-{
-    if (logFile != NULL && level <= myDebugLevel) {
-        QString text;
-        text.append(QDateTime::currentDateTime().toUTC().toString() + ": " + message + "\r\n");
-        logFile->write(text.toUtf8());
-    } else if (toConsole && level <= myDebugLevel)
-        qDebug() << (QDateTime::currentDateTime().toUTC().toString() + ": " + message + "\r\n");
+    myLogLevel = level;
+    myLogTo = output;
+    globalOutput = new QListWidget();
 }
 
 Logger::~Logger()
 {
-    if (logFile != NULL) {
-        logFile->close();
-        delete logFile;
+    delete globalOutput;
+}
+
+void Logger::skipLine() const
+{
+    if (myLogTo.contains(File)) {
+        QFile logFile("log.txt");
+        logFile.open(QFile::Append);
+        logFile.write("\r\n");
+        logFile.close();
+    }
+    if (myLogTo.contains(Console))
+        qDebug() << "";
+    if (myLogTo.contains(Window))
+        globalOutput->addItem("");
+}
+
+void Logger::log(QString message, LogLevel level) const
+{
+    if (myLogLevel < level)
+        return;
+    const QString msg = QDateTime::currentDateTime().toUTC().toString() + ": " + message;
+    if (myLogTo.contains(File)) {
+        QFile logFile("log.txt");
+        logFile.open(QFile::Append);
+        logFile.write(msg.toUtf8());
+        logFile.write("\r\n");
+        logFile.close();
+    }
+    if (myLogTo.contains(Console)) {
+        qDebug() << msg;
+    }
+    if (myLogTo.contains(Window)) {
+        globalOutput->addItem(msg);
+        globalOutput->scrollToBottom();
     }
 }

@@ -1,4 +1,5 @@
 #include "actor.h"
+#include "basemodule.h"
 
 Actor::Actor(const QString &name, const QString &extName, const Type &type, const BaseModule *baseModule, const QList<const Variable *> &variableList, const QStringList &varAccModeList, const QImage &icon)
 {
@@ -28,4 +29,20 @@ Actor::Actor(const QString &name, const QString &extName, const Type &type)
     this->extName = extName;
     this->type = type;
     this->baseModule = NULL;
+}
+
+QStringList Actor::validate() const
+{
+    QStringList msgs;
+    if (type == NormalType && baseModule == NULL)
+        msgs << QObject::tr(ERR_ACTOR_NULL_BASEMODULE).arg(name);
+    if (name.isEmpty())
+        msgs << QObject::tr(ERR_ACTOR_EMPTY_NAME).arg(name);
+    if (extName.isEmpty())
+        msgs << QObject::tr(ERR_ACTOR_EMPTY_EXTNAME).arg(name);
+    if (baseModule != NULL && variableList.count() != baseModule->parameterList.count())
+        msgs << QObject::tr(ERR_ACTOR_UNDEF_VAR).arg(name);
+    if (variableList.count() != varAccModeList.count())
+        msgs << QObject::tr(ERR_ACTOR_UNDEF_VAR_ACC).arg(name);
+    return msgs;
 }

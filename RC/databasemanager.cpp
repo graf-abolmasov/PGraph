@@ -32,7 +32,7 @@ DataBaseManager::DataBaseManager()
 {
     db = QSqlDatabase::addDatabase("QMYSQL");
     if (db.lastError().type() != QSqlError::NoError)
-        globalLogger->writeLog(db.lastError().driverText(), Logger::Critical);
+        globalLogger->log(db.lastError().driverText(), Logger::Critical);
     QSettings myDBSettings("graph.ini", QSettings::IniFormat);
     db.setHostName(myDBSettings.value("DB/hostname", "localhost").toString());
     db.setPort(myDBSettings.value("DB/port", 3306).toInt());
@@ -47,7 +47,7 @@ DataBaseManager::DataBaseManager()
 Graph DataBaseManager::getGraphDB(const QString &name) throw (QString)
 {
     if (!db.open()) {
-        globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+        globalLogger->log(db.lastError().text(), Logger::Critical);
         throw QObject::tr("Не удалось открыть базу данных.\n") + db.lastError().text();
     }
 
@@ -58,7 +58,7 @@ Graph DataBaseManager::getGraphDB(const QString &name) throw (QString)
     query.bindValue(":PROJECT_ID", myProjectId);
     query.bindValue(":NAMEPR", name);
     if (!query.exec()) {
-        globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+        globalLogger->log(db.lastError().text(), Logger::Critical);
         db.close();
         throw QObject::tr("Не удалось получить список вершин.\n") + db.lastError().text();
     }
@@ -95,7 +95,7 @@ Graph DataBaseManager::getGraphDB(const QString &name) throw (QString)
     query.bindValue(":PROJECT_ID", myProjectId);
     query.bindValue(":NAMEPR", name);
     if (!query.exec()) {
-        globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+        globalLogger->log(db.lastError().text(), Logger::Critical);
         db.close();
         throw QObject::tr("Не удалось получить список дуг.\n") + db.lastError().text();
     }
@@ -124,7 +124,7 @@ Graph DataBaseManager::getGraphDB(const QString &name) throw (QString)
     query.bindValue(":PROJECT_ID", myProjectId);
     query.bindValue(":NAMEPR", name);
     if (!query.exec()) {
-        globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+        globalLogger->log(db.lastError().text(), Logger::Critical);
         db.close();
         throw QObject::tr("Не удалось получить список коментариев.\n") + db.lastError().text();
     }
@@ -144,7 +144,7 @@ Graph DataBaseManager::getGraphDB(const QString &name) throw (QString)
     query.bindValue(":PROJECT_ID", myProjectId);
     query.bindValue(":NAMEPR", name);
     if (!query.exec()) {
-        globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+        globalLogger->log(db.lastError().text(), Logger::Critical);
         db.close();
         throw QObject::tr("Не удалось получить полное название агрегата.\n") + db.lastError().text();
     }
@@ -191,7 +191,7 @@ void DataBaseManager::setVariableList(const QList<const Variable *> &list)
 void DataBaseManager::saveGraphDB(const Graph &graph) throw (QString)
 {
     if (!db.open()) {
-        globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+        globalLogger->log(db.lastError().text(), Logger::Critical);
         throw QObject::tr("Не удалось открыть базу данных.\n") + db.lastError().text();
     }
 
@@ -204,7 +204,7 @@ void DataBaseManager::saveGraphDB(const Graph &graph) throw (QString)
     query.bindValue(":CLASPR",  "g");
     query.bindValue(":EXTNAME",  graph.extName);
     if (!query.exec()) {
-        globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+        globalLogger->log(db.lastError().text(), Logger::Critical);
         db.close();
         throw QObject::tr("Не удалось сохранить агрегат.\n") + db.lastError().text();
     }
@@ -224,7 +224,7 @@ void DataBaseManager::saveGraphDB(const Graph &graph) throw (QString)
         query.bindValue(":Actor",       top.actor == NULL ? "" : top.actor->name );
         query.bindValue(":Type",        top.type == Top::MultiProcTop ? "M" : "T");
         if (!query.exec()) {
-            globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+            globalLogger->log(db.lastError().text(), Logger::Critical);
             db.close();
             throw QObject::tr("Не удалось сохранить список вершин.\n") + db.lastError().text();
         }
@@ -240,7 +240,7 @@ void DataBaseManager::saveGraphDB(const Graph &graph) throw (QString)
         query.bindValue(":TEXT",       comment.text);
         query.bindValue(":FONT",       comment.font.toString());
         if (!query.exec()) {
-            globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+            globalLogger->log(db.lastError().text(), Logger::Critical);
             db.close();
             throw QObject::tr("Не удалось сохранить список комментариев.\n") + db.lastError().text();
         }
@@ -270,7 +270,7 @@ void DataBaseManager::saveGraphDB(const Graph &graph) throw (QString)
         query.bindValue(":ToTop",     arc.endTop);
         query.bindValue(":Predicate", arc.predicate == NULL ? "" : arc.predicate->name);
         if (!query.exec()) {
-            globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+            globalLogger->log(db.lastError().text(), Logger::Critical);
             db.close();
             throw QObject::tr("Не удалось сохранить список дуг.\n") + db.lastError().text();
         }
@@ -299,7 +299,7 @@ void DataBaseManager::saveGraphDB(const Graph &graph) throw (QString)
 void DataBaseManager::updateGraphDB(const Graph &graph) throw (QString)
 {
     if (!db.open()) {
-        globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+        globalLogger->log(db.lastError().text(), Logger::Critical);
         throw QObject::tr("Не удалось открыть базу данных.\n") + db.lastError().text();
     }
     QSqlQuery query;
@@ -307,7 +307,7 @@ void DataBaseManager::updateGraphDB(const Graph &graph) throw (QString)
     query.bindValue(":PROJECT_ID", myProjectId);
     query.bindValue(":NAMEPR", graph.name);
     if (!query.exec()) {
-        globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+        globalLogger->log(db.lastError().text(), Logger::Critical);
         db.close();
         throw QObject::tr("Не удалось удалить агрегат.\n") + db.lastError().text();
     }
@@ -318,14 +318,14 @@ void DataBaseManager::updateGraphDB(const Graph &graph) throw (QString)
 QList<Graph> DataBaseManager::getGraphListDB() throw (QString)
 {
     if (!db.open()) {
-        globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+        globalLogger->log(db.lastError().text(), Logger::Critical);
         throw QObject::tr("Не удалось открыть базу данных.\n") + db.lastError().text();
     }
     QSqlQuery query;
     query.prepare("SELECT NAMEPR, EXTNAME FROM actor WHERE CLASPR = 'g' AND PROJECT_ID = :PROJECT_ID ORDER BY EXTNAME;");
     query.bindValue(":PROJECT_ID", myProjectId);
     if (!query.exec()) {
-        globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+        globalLogger->log(db.lastError().text(), Logger::Critical);
         db.close();
         throw QObject::tr("Не удалось получить список агрегатов.\n") + db.lastError().text();
     }
@@ -344,14 +344,14 @@ QList<Graph> DataBaseManager::getGraphListDB() throw (QString)
 void DataBaseManager::saveDataTypeListDB(const QList<DataType> &typeList) throw (QString)
 {
     if (!db.open()) {
-        globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+        globalLogger->log(db.lastError().text(), Logger::Critical);
         throw QObject::tr("Не удалось открыть базу данных.\n") + db.lastError().text();
     }
     QSqlQuery query;
     query.prepare("DELETE FROM typsys WHERE PROJECT_ID = :PROJECT_ID;");
     query.bindValue(":PROJECT_ID", myProjectId);
     if (!query.exec()) {
-        globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+        globalLogger->log(db.lastError().text(), Logger::Critical);
         db.close();
         throw QObject::tr("Не удалось удалить список типов.\n") + db.lastError().text();
     }
@@ -362,7 +362,7 @@ void DataBaseManager::saveDataTypeListDB(const QList<DataType> &typeList) throw 
         query.bindValue(":PROJECT_ID",  myProjectId);
         query.bindValue(":TYPEDEF",     type.typedefStr);
         if (!query.exec()) {
-            globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+            globalLogger->log(db.lastError().text(), Logger::Critical);
             db.close();
             throw QObject::tr("Не удалось сохранить список типов.\n") + db.lastError().text();
         }
@@ -374,14 +374,14 @@ void DataBaseManager::saveDataTypeListDB(const QList<DataType> &typeList) throw 
 QList<DataType> DataBaseManager::getDataTypeListDB() throw (QString)
 {
     if (!db.open()) {
-        globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+        globalLogger->log(db.lastError().text(), Logger::Critical);
         throw QObject::tr("Не удалось открыть базу данных.\n") + db.lastError().text();
     }
     QSqlQuery query;
     query.prepare("SELECT PROJECT_ID, TYPE, TYPEDEF FROM typsys WHERE PROJECT_ID = :PROJECT_ID;");
     query.bindValue(":PROJECT_ID", myProjectId);
     if (!query.exec()) {
-        globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+        globalLogger->log(db.lastError().text(), Logger::Critical);
         db.close();
         throw QObject::tr("Не удалось получить список типов.\n") + db.lastError().text();
     }
@@ -409,14 +409,14 @@ const DataType *DataBaseManager::getDataType(const QString &name) const
 void DataBaseManager::saveVariableListDB(const QList<Variable> &varList) throw (QString)
 {
     if (!db.open()) {
-        globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+        globalLogger->log(db.lastError().text(), Logger::Critical);
         throw QObject::tr("Не удалось открыть базу данных.\n") + db.lastError().text();
     }
     QSqlQuery query;
     query.prepare("DELETE FROM data WHERE PROJECT_ID = :PROJECT_ID;");
     query.bindValue(":PROJECT_ID", myProjectId);
     if (!query.exec()) {
-        globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+        globalLogger->log(db.lastError().text(), Logger::Critical);
         db.close();
         throw QObject::tr("Не удалось удалить список переменных.\n") + db.lastError().text();
     }
@@ -430,7 +430,7 @@ void DataBaseManager::saveVariableListDB(const QList<Variable> &varList) throw (
         query.bindValue(":INIT",        var.initValue);
         query.bindValue(":COMMENT",     var.comment);
         if (!query.exec()) {
-            globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+            globalLogger->log(db.lastError().text(), Logger::Critical);
             db.close();
             throw QObject::tr("Не удалось сохранить переменную.\n") + db.lastError().text();
         }
@@ -442,14 +442,14 @@ void DataBaseManager::saveVariableListDB(const QList<Variable> &varList) throw (
 QList<Variable> DataBaseManager::getVariableListDB() throw (QString)
 {
     if (!db.open()) {
-        globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+        globalLogger->log(db.lastError().text(), Logger::Critical);
         throw QObject::tr("Не удалось открыть базу данных.\n") + db.lastError().text();
     }
     QSqlQuery query;
     query.prepare("SELECT DATA, TYPE, INIT, COMMENT FROM data d WHERE PROJECT_ID = :PROJECT_ID ORDER BY DATA;");
     query.bindValue(":PROJECT_ID", myProjectId);
     if (!query.exec()) {
-        globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+        globalLogger->log(db.lastError().text(), Logger::Critical);
         db.close();
         throw QObject::tr("Не удалось получить список переменных.\n") + db.lastError().text();
     }
@@ -509,14 +509,14 @@ QList<const BaseModule *> DataBaseManager::getBaseModuleList() const
 void DataBaseManager::saveActorListDB(const QList<Actor> &actorList) throw (QString)
 {
     if (!db.open()) {
-        globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+        globalLogger->log(db.lastError().text(), Logger::Critical);
         throw QObject::tr("Не удалось открыть базу данных.\n") + db.lastError().text();
     }
     QSqlQuery query1;
     query1.prepare("DELETE FROM actor WHERE PROJECT_ID = :PROJECT_ID AND CLASPR = 'a'");
     query1.bindValue(":PROJECT_ID", myProjectId);
     if (!query1.exec()) {
-        globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+        globalLogger->log(db.lastError().text(), Logger::Critical);
         db.close();
         throw QObject::tr("Не удалось удалить список акторов.\n") + db.lastError().text();
     }
@@ -531,7 +531,7 @@ void DataBaseManager::saveActorListDB(const QList<Actor> &actorList) throw (QStr
         query1.bindValue(":PROTOTIP",   actor.baseModule == NULL ? NULL : actor.baseModule->name);
         query1.bindValue(":PROJECT_ID", myProjectId);
         if (!query1.exec()) {
-            globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+            globalLogger->log(db.lastError().text(), Logger::Critical);
             db.close();
             throw QObject::tr("Не удалось сохранить актор.\n") + db.lastError().text();
         }
@@ -556,7 +556,7 @@ void DataBaseManager::saveActorListDB(const QList<Actor> &actorList) throw (QStr
 
             query2.bindValue(":MODE", vaMode);
             if (!query2.exec()) {
-                globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+                globalLogger->log(db.lastError().text(), Logger::Critical);
                 db.close();
                 throw QObject::tr("Не удалось сохранить параметры для актора.\n") + db.lastError().text();
             }
@@ -568,7 +568,7 @@ void DataBaseManager::saveActorListDB(const QList<Actor> &actorList) throw (QStr
 QList<Actor> DataBaseManager::getActorListDB() throw (QString)
 {
     if (!db.open()) {
-        globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+        globalLogger->log(db.lastError().text(), Logger::Critical);
         throw QObject::tr("Не удалось открыть базу данных.\n") + db.lastError().text();
     }
     QSqlQuery query1;
@@ -576,7 +576,7 @@ QList<Actor> DataBaseManager::getActorListDB() throw (QString)
     query1.prepare("SELECT NAMEPR, CLASPR, EXTNAME, DATE, TIME, ICON, PROTOTIP FROM actor WHERE CLASPR = 'a' AND PROJECT_ID = :PROJECT_ID ORDER BY EXTNAME;");
     query1.bindValue(":PROJECT_ID", myProjectId);
     if (!query1.exec()) {
-        globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+        globalLogger->log(db.lastError().text(), Logger::Critical);
         db.close();
         throw QObject::tr("Не удалось получить список акторов.\n") + db.lastError().text();
     }
@@ -585,7 +585,7 @@ QList<Actor> DataBaseManager::getActorListDB() throw (QString)
         query2.prepare("SELECT NEV, DATA, MODE FROM pasport WHERE NAMEPR = :NAMEPR ORDER BY NEV");
         query2.bindValue(":NAMEPR", query1.value(0).toString());
         if (!query2.exec()) {
-            globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+            globalLogger->log(db.lastError().text(), Logger::Critical);
             db.close();
             throw QObject::tr("Не удалось получить параметры для актора.\n") + db.lastError().text();
         }
@@ -657,14 +657,14 @@ const Predicate *DataBaseManager::getPredicate(const QString &name) const
 void DataBaseManager::savePredicateListDB(const QList<Predicate> &predList) throw (QString)
 {
     if (!db.open()) {
-        globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+        globalLogger->log(db.lastError().text(), Logger::Critical);
         throw QObject::tr("Не удалось открыть базу данных.\n") + db.lastError().text();
     }
     QSqlQuery query;
     query.prepare("DELETE FROM actor WHERE PROJECT_ID = :PROJECT_ID AND CLASPR = 'p'");
     query.bindValue(":PROJECT_ID", myProjectId);
     if (!query.exec()) {
-        globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+        globalLogger->log(db.lastError().text(), Logger::Critical);
         db.close();
         throw QObject::tr("Не удалось удалить список предикатов.\n") + db.lastError().text();
     }
@@ -678,7 +678,7 @@ void DataBaseManager::savePredicateListDB(const QList<Predicate> &predList) thro
         query.bindValue(":PROTOTIP",    predicate.baseModule == NULL ? NULL : predicate.baseModule->name);
         query.bindValue(":PROJECT_ID",  myProjectId);
         if (!query.exec()) {
-            globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+            globalLogger->log(db.lastError().text(), Logger::Critical);
             db.close();
             throw QObject::tr("Не удалось сохранить предикат.\n") + db.lastError().text();
         }
@@ -694,7 +694,7 @@ void DataBaseManager::savePredicateListDB(const QList<Predicate> &predList) thro
             query.bindValue(":NAMEPR",      predicate.name);
             query.bindValue(":PROJECT_ID",  myProjectId);
             if (!query.exec()) {
-                globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+                globalLogger->log(db.lastError().text(), Logger::Critical);
                 db.close();
                 throw QObject::tr("Не удалось получить список параметров для предиката.\n") + db.lastError().text();
             }
@@ -706,7 +706,7 @@ void DataBaseManager::savePredicateListDB(const QList<Predicate> &predList) thro
 QList<Predicate> DataBaseManager::getPredicateListDB() throw (QString)
 {
     if (!db.open()) {
-        globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+        globalLogger->log(db.lastError().text(), Logger::Critical);
         throw QObject::tr("Не удалось открыть базу данных.\n") + db.lastError().text();
     }
     QSqlQuery query1;
@@ -714,7 +714,7 @@ QList<Predicate> DataBaseManager::getPredicateListDB() throw (QString)
     query1.prepare("SELECT NAMEPR, CLASPR, EXTNAME, DATE, TIME, ICON, PROTOTIP FROM actor WHERE CLASPR = 'p' AND PROJECT_ID = :PROJECT_ID ORDER BY EXTNAME;");
     query1.bindValue(":PROJECT_ID", myProjectId);
     if (!query1.exec()) {
-        globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+        globalLogger->log(db.lastError().text(), Logger::Critical);
         db.close();
         throw QObject::tr("Не удалось получить список предикатов.\n") + db.lastError().text();
     }
@@ -724,7 +724,7 @@ QList<Predicate> DataBaseManager::getPredicateListDB() throw (QString)
         query2.prepare("SELECT NEV, DATA, MODE FROM pasport WHERE NAMEPR = :NAMEPR ORDER BY NEV");
         query2.bindValue(":NAMEPR", query1.value(0).toString());
         if (!query2.exec()) {
-            globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+            globalLogger->log(db.lastError().text(), Logger::Critical);
             db.close();
             throw QObject::tr("Не удалось получить список параметров для предиката.\n") + db.lastError().text();
         }
@@ -744,7 +744,7 @@ QList<Predicate> DataBaseManager::getPredicateListDB() throw (QString)
 void DataBaseManager::registerModuleDB(const BaseModule *baseModule) throw (QString)
 {
     if (!db.open()) {
-        globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+        globalLogger->log(db.lastError().text(), Logger::Critical);
         throw QObject::tr("Не удалось открыть базу данных.\n") + db.lastError().text();
     }
     QSqlQuery query;
@@ -755,7 +755,7 @@ void DataBaseManager::registerModuleDB(const BaseModule *baseModule) throw (QStr
     query.bindValue(":PROTOTIP", baseModule->uniqName);
     query.bindValue(":PROJECT_ID", myProjectId);
     if (!query.exec()) {
-        globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+        globalLogger->log(db.lastError().text(), Logger::Critical);
         db.close();
         throw QObject::tr("Не удалось сохранить базовый модуль.\n") + db.lastError().text();
     }
@@ -780,7 +780,7 @@ void DataBaseManager::registerModuleDB(const BaseModule *baseModule) throw (QStr
         query.bindValue(":MODE",        vaMode);
         query.bindValue(":COMMENT",     parameter[3]);
         if (!query.exec()) {
-            globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+            globalLogger->log(db.lastError().text(), Logger::Critical);
             db.close();
             throw QObject::tr("Не удалось сохранить параметры базового модуля.\n") + db.lastError().text();
         }
@@ -792,7 +792,7 @@ void DataBaseManager::registerModuleDB(const BaseModule *baseModule) throw (QStr
 QList<BaseModule> DataBaseManager::getBaseModuleListDB() throw (QString)
 {
     if (!db.open()) {
-        globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+        globalLogger->log(db.lastError().text(), Logger::Critical);
         throw QObject::tr("Не удалось открыть базу данных.\n") + db.lastError().text();
     }
     QSqlQuery query1;
@@ -800,7 +800,7 @@ QList<BaseModule> DataBaseManager::getBaseModuleListDB() throw (QString)
     query1.prepare("SELECT PROTOTIP, NAMEPR, COMMENT FROM bazmod WHERE PROJECT_ID = :PROJECT_ID;");
     query1.bindValue(":PROJECT_ID", myProjectId);
     if (!query1.exec()) {
-        globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+        globalLogger->log(db.lastError().text(), Logger::Critical);
         db.close();
         throw QObject::tr("Не удалось список базовых модулей.\n") + db.lastError().text();
     }
@@ -811,11 +811,11 @@ QList<BaseModule> DataBaseManager::getBaseModuleListDB() throw (QString)
         query2.bindValue(":PROTOTIP", query1.value(0).toString());
         query2.bindValue(":PROJECT_ID", myProjectId);
         if (!query2.exec()) {
-            globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+            globalLogger->log(db.lastError().text(), Logger::Critical);
             db.close();
             throw QObject::tr("Не удалось параметры модулей.\n") + db.lastError().text();
         }
-        globalLogger->writeLog(query2.executedQuery().toUtf8());
+        globalLogger->log(query2.executedQuery().toUtf8());
         QStringList parameterList;
         while (query2.next()){
             QString vaMode;
@@ -852,7 +852,7 @@ const BaseModule *DataBaseManager::getBaseModule(const QString &name) const
 void DataBaseManager::saveStructDB(const Graph &graph) throw (QString)
 {
     if (!db.open()) {
-        globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+        globalLogger->log(db.lastError().text(), Logger::Critical);
         throw QObject::tr("Не удалось открыть базу данных.\n") + db.lastError().text();
     }
 
@@ -863,7 +863,7 @@ void DataBaseManager::saveStructDB(const Graph &graph) throw (QString)
     query.bindValue(":NAMEPR",      graph.name);
     query.bindValue(":PROJECT_ID",  myProjectId);
     if (!query.exec()) {
-        globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+        globalLogger->log(db.lastError().text(), Logger::Critical);
         db.close();
         throw QObject::tr("Не удалось удалить структуру.\n") + db.lastError().text();
     }
@@ -871,7 +871,7 @@ void DataBaseManager::saveStructDB(const Graph &graph) throw (QString)
     query.bindValue(":NAMEPR",      graph.name);
     query.bindValue(":PROJECT_ID",  myProjectId);
     if (!query.exec()) {
-        globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+        globalLogger->log(db.lastError().text(), Logger::Critical);
         db.close();
         throw QObject::tr("Не удалось удалить структуру.\n") + db.lastError().text();
     }
@@ -879,7 +879,7 @@ void DataBaseManager::saveStructDB(const Graph &graph) throw (QString)
     query.bindValue(":NAMEPR",      graph.name);
     query.bindValue(":PROJECT_ID",  myProjectId);
     if (!query.exec()) {
-        globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+        globalLogger->log(db.lastError().text(), Logger::Critical);
         db.close();
         throw QObject::tr("Не удалось удалить структуру.\n") + db.lastError().text();
     }
@@ -894,7 +894,7 @@ void DataBaseManager::saveStructDB(const Graph &graph) throw (QString)
             query.bindValue(":NPRED", i);
             query.bindValue(":NAME", arc.predicate);
             if (!query.exec()) {
-                globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+                globalLogger->log(db.lastError().text(), Logger::Critical);
                 db.close();
                 throw QObject::tr("Не удалось записать структуру.\n") + db.lastError().text();
             }
@@ -921,7 +921,7 @@ void DataBaseManager::saveStructDB(const Graph &graph) throw (QString)
         }
         query.bindValue(":ARCTYPE", arcType);
         if (!query.exec()) {
-            globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+            globalLogger->log(db.lastError().text(), Logger::Critical);
             db.close();
             throw QObject::tr("Не удалось записать структуру.\n") + db.lastError().text();
         }
@@ -938,7 +938,7 @@ void DataBaseManager::saveStructDB(const Graph &graph) throw (QString)
         if (top.isRoot)
             rootTop = top.number;
         if (!query.exec()) {
-            globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+            globalLogger->log(db.lastError().text(), Logger::Critical);
             db.close();
             throw QObject::tr("Не удалось записать структуру.\n") + db.lastError().text();
         }
@@ -953,7 +953,7 @@ void DataBaseManager::saveStructDB(const Graph &graph) throw (QString)
     query.bindValue(":PRIOR", 0);
     query.bindValue(":ARCTYPE", 0);
     if (!query.exec()) {
-        globalLogger->writeLog(db.lastError().text(), Logger::Critical);
+        globalLogger->log(db.lastError().text(), Logger::Critical);
         db.close();
         throw QObject::tr("Не удалось записать структуру.\n") + db.lastError().text();
     }

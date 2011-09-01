@@ -44,6 +44,9 @@ public:
 public slots:
     void editorLostFocus(QComment *item);
 
+public Q_SLOTS:
+    void clear();
+
 signals:
     void itemInserted(QGraphicsItem *item);
     void itemMoved(QGraphicsItem *item, QLineF vector);

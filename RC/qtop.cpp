@@ -259,6 +259,20 @@ Top::Top(float x, float y, float sizeX, float sizeY, int number, int procCount, 
     this->procCount = procCount;
 }
 
+QStringList Top::validate() const
+{
+    QStringList msgs;
+    if (sizeX == 0 || sizeY == 0)
+        msgs << QObject::tr(ERR_TOP_ZERO_SIZE).arg(QString::number(number)).arg(QString::number(sizeX)).arg(QString::number(sizeY));
+    if (number < 0)
+        msgs << QObject::tr(ERR_TOP_WRONG_NUMBER).arg(QString::number(number));
+    if (actor == NULL)
+        msgs << QObject::tr(ERR_TOP_NULL_ACTOR).arg(QString::number(number));
+    if (type == MultiProcTop && procCount < 2)
+        msgs << QObject::tr(ERR_TOP_WRONG_PROCNUM).arg(QString::number(number)).arg(QString::number(procCount));
+    return msgs;
+}
+
 QTop::~QTop()
 {
     qDeleteAll(arcs);

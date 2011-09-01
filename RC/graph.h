@@ -6,14 +6,17 @@
 #include <QtGui/QFont>
 #include "actor.h"
 #include "predicate.h"
+#include "errors.h"
 
 class SyncArc
 {
+public:
     SyncArc(QString startGraph, int startTop, QString endGraph, int endTop);
     QString startGraph;
     int startTop;
     QString endGraph;
     int endTop;
+    QStringList validate() const {return QStringList();}
 };
 
 class Comment
@@ -37,6 +40,8 @@ public:
     int endTop;
     QStringList lines;
     const Predicate *predicate;
+
+    QStringList validate() const;
 };
 
 class Top
@@ -53,6 +58,8 @@ public:
     bool isRoot;
     const Actor *actor;
     TopType type;
+
+    QStringList validate() const;
 };
 
 class Graph  : public Actor
@@ -66,6 +73,7 @@ public:
 
     QList<Arc> getOutArcs(int topNumber) const;
     int getRootTop() const;
+    QStringList validate() const;
 };
 
 #endif // GRAPH_H

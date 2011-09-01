@@ -6,12 +6,14 @@
 
 QT_BEGIN_NAMESPACE
 class QLabel;
+class QListWidget;
 QT_END_NAMESPACE
 
-extern DataBaseManager *globalDBManager;
-extern Logger *globalLogger;
-extern QLabel *globalInfoLabel;
-extern QStringList globalPredicateList;
-extern Graph *globalClipboard;
+extern Graph            *globalClipboard;
+extern Logger           *globalLogger;
+extern QLabel           *globalInfoLabel;
+extern QListWidget      *globalOutput;
+extern QStringList      globalPredicateList;
+extern DataBaseManager  *globalDBManager;
 
 #endif // GLOBALVARIABLES_H

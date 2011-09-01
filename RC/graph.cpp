@@ -20,6 +20,10 @@ QList<Arc> Graph::getOutArcs(int topNumber) const
     return result;
 }
 
+/*!
+  Номер кореновой вершины.
+  \return Номер кореневой вершины или -1, если вершина не задана
+*/
 int Graph::getRootTop() const
 {
     int rootTop = -1;
@@ -29,6 +33,20 @@ int Graph::getRootTop() const
             break;
         }
     }
-    Q_ASSERT(rootTop != -1);
     return rootTop;
+}
+
+QStringList Graph::validate() const
+{
+    QStringList msgs;
+    msgs.append(Actor::validate());
+    foreach (Arc arc, arcList)
+        msgs.append(arc.validate());
+    foreach (Top top, topList)
+        msgs.append(top.validate());
+    foreach (SyncArc sync, syncArcList)
+        msgs.append(sync.validate());
+    if (getRootTop() == -1)
+        msgs << QObject::tr(ERR_GRAPH_UNDEF_ROOT).arg(name);
+    return msgs;
 }

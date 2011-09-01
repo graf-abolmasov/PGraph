@@ -1,0 +1,9 @@
+#include "tpodata.h"
+int <#graphname>(TPOData *D);
+int main(int argc, char *argv[])
+{
+    TPOData D(0);
+    <#graphname>(&D);
+
+    return 0;
+}

@@ -1,5 +1,5 @@
 #include "datatype.h"
-#include <QDebug>
+#include "errors.h"
 
 DataType::DataType(QString name, QString typedefStr)
 {
@@ -7,7 +7,12 @@ DataType::DataType(QString name, QString typedefStr)
     this->typedefStr = typedefStr;
 }
 
-DataType::~DataType()
+QStringList DataType::validate() const
 {
+    QStringList msgs;
+    if (name.isEmpty())
+        msgs << QObject::tr(ERR_DATATYPE_EMPTY_NAME);
+    if (typedefStr.isEmpty())
+        msgs << QObject::tr(ERR_DATATYPE_EMPTY_TYPEDEF);
+    return msgs;
 }
-
