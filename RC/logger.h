@@ -7,15 +7,16 @@
 class Logger
 {
 public:
-    enum DebugLevel {Critical, All};
+    enum LogLevel {Critical, Warning, Compile, Debug, All};
+    enum Output {File, Console, Window};
 
-    Logger();
+    Logger(LogLevel level, QList<Output> output);
     ~Logger();
-    void writeLog(QString message, DebugLevel level = All);
+    void log(QString message, LogLevel level = All) const;
+    void skipLine() const;
 private:
-    QFile *logFile;
-    DebugLevel myDebugLevel;
-    bool toConsole;
+    LogLevel myLogLevel;
+    QList<Output> myLogTo;
 };
 
 #endif // LOGGER_H

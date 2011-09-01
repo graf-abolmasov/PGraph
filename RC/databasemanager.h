@@ -6,7 +6,6 @@
 
 #include "graph.h"
 #include "compi.h"
-#include "shab.h"
 
 class DataBaseManager
 {
@@ -44,6 +43,8 @@ public:
         { myProjectId = pid; }
     int getProjectId()
         { return myProjectId; }
+    QString getProjectName()
+        { return QString::number(myProjectId); }
 
     const Actor *getActor(const QString &name) const;
     const Graph *getGraph(const QString &name) const;
@@ -72,7 +73,6 @@ public:
 
     QSqlError lastError();
 
-    QList<Shab*> myShabList;
 };
 
 #endif // DATABASEMANAGER_H

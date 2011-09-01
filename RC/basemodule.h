@@ -12,7 +12,6 @@ public:
     QString uniqName;
     QStringList parameterList;
     QString comment;
-
 };
 
 #endif // BASEMODULE_H

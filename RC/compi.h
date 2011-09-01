@@ -9,15 +9,33 @@
 class GraphCompiler : public ICompiler
 {
 public:
-//    GraphCompiler(const QString &graphName);
     GraphCompiler(const Graph &graph);
     virtual void compile();
 private:
-
-    QString myGraphName;
     Graph myGraph;
-    virtual void init(){}
-    virtual void finalize(){}
+
+    GraphCompiler(const Graph &graph, QSet<QString> &skip);
+    void initDirectories();
+
+    QSet<QString> mySkipList;
+
+    QString myOutputDirectory;
+    QString myBaseDirectory;
+    QString myTemplateDirectory;
+
+    QList<const Predicate *> usedPredicateList;
+    QList<const Actor *> usedActorList;
+    QList<const BaseModule *> usedBaseModuleList;
+
+    void collectUsedData();
+    void copyStaticTemplates();
+    void copyUsedFiles();
+    void unpackGraph(const Graph &graph, QSet<const Predicate *> &predicates, QSet<const Actor *> &actors, QSet<QString> &exrtractedGraphs);
+
+    void compileMain() const;
+    void compileStruct() const;
+    void compileMakefile(QString buildType) const;
+
 };
 
 #endif // COMPI_H

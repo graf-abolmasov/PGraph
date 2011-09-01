@@ -9,6 +9,7 @@
 #include "predicate.h"
 #include "basemodule.h"
 #include "variable.h"
+#include "qgraphsettings.h"
 
 QPredicateEditor::QPredicateEditor(QWidget *parent) :
     QDialog(parent),
@@ -75,7 +76,7 @@ void QPredicateEditor::prepareForm(const Predicate *predicate)
     myVariableList = globalDBManager->getVariableList();
     QStringList varnames;
     foreach (const Variable *var, myVariableList)
-        varnames << var->name;
+        varnames << var->name + " : " + var->type->name;
     myCompleter = new QCompleter(varnames, this);
     myCompleter->setModelSorting(QCompleter::CaseSensitivelySortedModel);
     myCompleter->setCaseSensitivity(Qt::CaseInsensitive);
@@ -214,8 +215,7 @@ bool QPredicateEditor::makeResult()
         return false;
     }
 
-    QSettings mySettings("graph.ini", QSettings::IniFormat);
-    const QString myOutputDirectory = QFileInfo(mySettings.value("Location/BaseDir", "./BaseDir/").toString()).canonicalFilePath();
+    const QString myBaseDirectory = QGraphSettings::getBaseDirectory();
 
     QByteArray outputData;
     QFile output;
@@ -229,7 +229,7 @@ bool QPredicateEditor::makeResult()
         foreach (QString parameter, tempPre->baseModule->parameterList) {
             const QStringList parsedParameter = parameter.split(";;");
             const QString constStr = parsedParameter[2] == QObject::tr("Исходный") ? QObject::tr("const ") : "";
-            signature << QString("%1%2 *%3").arg(constStr).arg(parsedParameter[0]).arg(parsedParameter[1]);
+            signature << QString("%1%2 *%3").arg(constStr).arg(parsedParameter[1]).arg(parsedParameter[0]);
         }
         outputData.append("extern int " + tempPre->baseModule->uniqName + "(" + signature.join(", ") + ");\r\n");
         outputData.append("int ");
@@ -239,7 +239,7 @@ bool QPredicateEditor::makeResult()
         // Инициализуем данные
         for(int i = 0; i < tempPre->variableList.count(); i++) {
             QStringList parameter = myModuleList[ui->baseModuleList->currentRow()]->parameterList[i].split(";;");
-            outputData.append(QString(tr("\t%1 _%2 = D->%3;\r\n")).arg(parameter[0]).arg(parameter[1]).arg(tempPre->variableList[i]->name).toUtf8());
+            outputData.append(QString(tr("\t%1 _%2 = D->%3;\r\n")).arg(parameter[1]).arg(parameter[0]).arg(tempPre->variableList[i]->name).toUtf8());
         }
         // Вызываем прототип
         outputData.append("\r\n\tint result = ");
@@ -247,7 +247,7 @@ bool QPredicateEditor::makeResult()
         outputData.append("(");
         for(int i = 0; i < tempPre->variableList.count(); i++) {
             QStringList parameter = myModuleList[ui->baseModuleList->currentRow()]->parameterList[i].split(";;");
-            params << tr("&_") + parameter[1];
+            params << tr("&_") + parameter[0];
         }
         outputData.append(params.join(", ").toUtf8());
         outputData.append(");\r\n\r\n");
@@ -268,7 +268,7 @@ bool QPredicateEditor::makeResult()
         break;
     }
 
-    output.setFileName(myOutputDirectory + "/" + tempPre->name + ".cpp");
+    output.setFileName(myBaseDirectory + "/" + tempPre->name + ".cpp");
     output.open(QFile::WriteOnly);
     output.write(outputData);
     output.close();

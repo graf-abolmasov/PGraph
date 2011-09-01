@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
 {  	
     QApplication::addLibraryPath("./");
     QApplication a(argc, argv);
-    a.setApplicationVersion("05.02.2011 14.45");
+    a.setApplicationVersion("25.08.2011 14.45");
 
     QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
     QTranslator qtTranslator;
@@ -23,7 +23,10 @@ int main(int argc, char *argv[])
 
     a.installTranslator(&qtTranslator);
 
-    globalLogger = new Logger();
+    QList<Logger::Output> logOutput;
+    logOutput.append(Logger::Console);
+    logOutput.append(Logger::Window);
+    globalLogger = new Logger(Logger::Debug, logOutput);
     globalDBManager = new DataBaseManager();
     globalDBManager->openProjectDB(1);
 
@@ -33,7 +36,7 @@ int main(int argc, char *argv[])
     }
 
     TMyWindow w;
-    w.show();
+    w.showMaximized();
 
     int result = a.exec();
 

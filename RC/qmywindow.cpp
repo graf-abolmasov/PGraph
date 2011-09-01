@@ -1,4 +1,4 @@
-#include <QtGui>
+﻿#include <QtGui>
 
 #include "qmywindow.h"
 #include "qdrawwindow.h"
@@ -19,6 +19,7 @@
 #include "datacompiler.h"
 
 QLabel *globalInfoLabel;
+QListWidget *globalOutput;
 
 TMyWindow::TMyWindow()
 {
@@ -31,6 +32,7 @@ TMyWindow::TMyWindow()
     createUndoView();
     createDockWindows();
     createDrawWindow();
+    createOutputWindow();
 
     setWindowIcon(QIcon(":/images/G.png"));
     readSettings();
@@ -471,6 +473,15 @@ void TMyWindow::createDockWindows()
     addDockWidget(Qt::RightDockWidgetArea, dock);
 }
 
+void TMyWindow::createOutputWindow()
+{
+    QDockWidget *outputDock = new QDockWidget(tr("Сообщения"), this);
+    globalOutput->setParent(outputDock);
+    outputDock->setAllowedAreas(Qt::BottomDockWidgetArea);
+    outputDock->setWidget(globalOutput);
+    addDockWidget(Qt::BottomDockWidgetArea, outputDock);
+}
+
 void TMyWindow::alignHLeft()
 {
     activeDrawWindow()->alignHLeft();
@@ -665,11 +676,7 @@ void TMyWindow::graphLoaded(QString name, QString extName)
         saveGraphAct->setEnabled(true);
         compileAct->setEnabled(true);
     }
-
-    if (extName.isEmpty())
-        setWindowTitle(tr("Untitled - Граф-редактор"));
-    else
-        setWindowTitle(extName + tr(" - Граф-редактор"));
+    setWindowTitle((extName.isEmpty() ? tr("Untitled") : extName) + tr(" - Граф-редактор"));
 }
 
 void TMyWindow::closeEvent(QCloseEvent *event)
@@ -689,6 +696,7 @@ void TMyWindow::grafMenuAboutToShow()
 void TMyWindow::CMCompile()
 {
     GraphCompiler gc(activeDrawWindow()->getGraph());
+    globalLogger->skipLine();
     gc.compile();
 }
 

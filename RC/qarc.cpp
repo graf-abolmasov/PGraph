@@ -661,12 +661,26 @@ Arc::Arc(ArcType type, int priority, int startTop, int endTop, const Predicate *
     this->lines = lines;
 }
 
+QStringList Arc::validate() const
+{
+    QStringList msgs;
+    if (startTop == -1)
+        msgs << QObject::tr(ERR_ARC_UNDEF_STARTOP).arg(QString::number(startTop)).arg(QString::number(endTop));
+    if (endTop == -1)
+        msgs << QObject::tr(ERR_ARC_UNDEF_ENDTOP).arg(QString::number(startTop)).arg(QString::number(endTop));
+    if (predicate == NULL)
+        msgs << QObject::tr(ERR_ARC_UNDEF_PREDICATE).arg(QString::number(startTop)).arg(QString::number(endTop));
+    if (lines.count() == 0)
+        msgs << QObject::tr(ERR_ARC_EMPTY_LINES).arg(QString::number(startTop)).arg(QString::number(endTop));
+    return msgs;
+}
+
 /*!
    Перемещает, если можно, часть дуги
-   @param line перемещаемая линия
-   @param dx перемещение по оси Ох
-   @param dy перемещение по оси Oy
-   @return true - если переместить удалось
+   \param line перемещаемая линия
+   \param dx перемещение по оси Ох
+   \param dy перемещение по оси Oy
+   \return true - если переместить удалось
 */
 bool QArc::moveLine(QArcLine *line, float dx, float dy)
 {

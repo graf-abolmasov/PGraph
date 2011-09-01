@@ -13,4 +13,10 @@
 <#mpiTypes>
 #endif
 
+//Часто включаемые файлы
+#include <stdio.h>
+#include <conio.h>
+#include <strings.h>
+#include <memory.h>
+
 #endif

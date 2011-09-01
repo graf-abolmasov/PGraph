@@ -7,6 +7,7 @@
 #include "commonutils.h"
 #include "basemodule.h"
 #include "globalvariables.h"
+#include "qgraphsettings.h"
 
 QModuleRegister::QModuleRegister(QWidget *parent) :
     QDialog(parent),
@@ -16,8 +17,9 @@ QModuleRegister::QModuleRegister(QWidget *parent) :
     ui->parametersTable->setColumnWidth(0, 70);
     ui->parametersTable->setColumnWidth(1, 60);
     ui->parametersTable->setColumnWidth(3, 90);
-    QSettings myLocSettings("graph.ini", QSettings::IniFormat);
-    QDir workingDir(myLocSettings.value("Location/BaseDir", "./BaseDir/").toString());
+    QSettings settings("graph.ini", QSettings::IniFormat);
+    myBaseDirectory = QGraphSettings::getBaseDirectory();
+    QDir workingDir(myBaseDirectory);
 
     QStringList filters;
     filters << tr("*.c") << tr("*.C");
@@ -173,7 +175,8 @@ void QModuleRegister::on_buttonBox_accepted()
     outputData.append(params.join(", ").toUtf8());
     outputData.append(");\r\n");
     outputData.append("}\r\n");
-    QFile output(uniqName + ".cpp");
+
+    QFile output(myBaseDirectory + "/" + uniqName + ".cpp");
     output.open(QFile::WriteOnly);
     output.write(outputData);
     output.close();

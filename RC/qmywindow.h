@@ -11,6 +11,7 @@ class QUndoView;
 class QButtonGroup;
 class QSlider;
 class QGraphicsItem;
+class QTextEdit;
 QT_END_NAMESPACE
 
 class TDrawWindow;
@@ -102,6 +103,7 @@ private:
     void createToolBar();
     void createUndoView();
     void createDockWindows();
+    void createOutputWindow();
     TDrawWindow *activeDrawWindow();
 
     TDrawWindow *createDrawWindow();

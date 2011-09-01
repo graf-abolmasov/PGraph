@@ -1,13 +1,18 @@
 #ifndef COMPILER_H
 #define COMPILER_H
 
+#include <QString>
+#include <QFile>
+#include <QTextStream>
+
+
 class ICompiler
 {
 public:
     virtual void compile() = 0;
-private:
-    virtual void init(){}
-    virtual void finalize(){}
+
+protected:
+    QString getTemplate(const QString &fileName) const;
 };
 
 

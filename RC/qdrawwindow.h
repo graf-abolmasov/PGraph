@@ -27,7 +27,7 @@ private:
     void createActions();
 
     QDiagramScene *scene;
-    QGraphicsView *view;
+    QGraphicsView *view;   
 
     QMenu *topMenu;
     QMenu *arcMenu;
@@ -87,6 +87,7 @@ public:
     void distribVertically();
     void distribHorizontally();
     void scale(float s);
+
 signals:
     void sceneChanged();
     void itemChanged(QGraphicsItem *item);

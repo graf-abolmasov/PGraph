@@ -32,6 +32,12 @@ void QDiagramScene::setMode(Mode mode)
     myMode = mode;
 }
 
+void QDiagramScene::clear()
+{
+    setRootTop(NULL);
+    QGraphicsScene::clear();
+}
+
 void QDiagramScene::editorLostFocus(QComment *item)
 {
     QTextCursor cursor = item->textCursor();
@@ -378,7 +384,8 @@ void QDiagramScene::setRootTop(QNormalTop* top){
     if (myRootTop != NULL)
         myRootTop->setAsRoot(false);
     myRootTop = top;
-    top->setAsRoot(true);
+    if (myRootTop)
+        myRootTop->setAsRoot(true);
 }
 
 QTop* QDiagramScene::addTop(const QPointF &point)

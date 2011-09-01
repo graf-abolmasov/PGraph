@@ -14,7 +14,7 @@ QCodeEditor::QCodeEditor(QWidget *parent)
 {
     setPlainText(tr("This QCodeEditor provides autocompletions for words that have more than"
                     " 3 characters. You can trigger autocompletion using ") +
-                    QKeySequence("Ctrl+E").toString(QKeySequence::NativeText));
+                    QKeySequence("Ctrl+SPACE").toString(QKeySequence::NativeText));
 }
 
 QCodeEditor::~QCodeEditor()
@@ -85,7 +85,7 @@ void QCodeEditor::keyPressEvent(QKeyEvent *e)
        }
     }
 
-    bool isShortcut = ((e->modifiers() & Qt::ControlModifier) && e->key() == Qt::Key_Space); // CTRL+E
+    bool isShortcut = ((e->modifiers() & Qt::ControlModifier) && e->key() == Qt::Key_Space); // CTRL+SPACE
     if (!c || !isShortcut) // do not process the shortcut when we have a completer
         QPlainTextEdit::keyPressEvent(e);
 

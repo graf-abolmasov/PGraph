@@ -2,6 +2,7 @@
 #define DATACOMPILER_H
 
 #include <QtCore/QString>
+#include <QtCore/QMap>
 #include "compiler.h"
 
 #define USER_TYPES_FILE_NAME   "utype"
@@ -15,15 +16,17 @@ public:
     DataCompiler(Type type);
     void compile();
 private:
-    void init();
-    QString getTemplate(const QString &fileName) const;
-
     void compileParallel();
     void compileSerial();
 
     QString myOutputDirectory;
     QString myTemplateDirectory;
     const Type myType;
+
+    QMap<QString, QString> mpiTypes;
+
+    void compileUserTypes();
+    void compileTpoData();
 };
 
 #endif // DATACOMPILER_H

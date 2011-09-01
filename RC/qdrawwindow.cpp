@@ -1,4 +1,4 @@
-#include <QtGui>
+﻿#include <QtGui>
 #include <QtCore>
 #include "qdrawwindow.h"
 #include "qtop.h"
@@ -136,7 +136,7 @@ void TDrawWindow::createActions()
         makeAsRootAction->setStatusTip(tr("Сделать корневой"));
         connect(makeAsRootAction, SIGNAL(triggered()), this, SLOT(makeAsRoot()));
 
-        deleteTopAction = new QAction(QIcon(";/images/delete.png"), tr("Удалить"), this);
+        deleteTopAction = new QAction(QIcon(":/images/delete.png"), tr("Удалить"), this);
         deleteTopAction->setStatusTip(tr("Удаляет вершину"));
         connect(deleteTopAction, SIGNAL(triggered()), this, SLOT(deleteTop()));
 
@@ -152,7 +152,7 @@ void TDrawWindow::createActions()
         setArcPropertyAction->setStatusTip(tr("Изменить свойства дуги"));
         connect(setArcPropertyAction, SIGNAL(triggered()), this, SLOT(showArcPropDialog()));
 
-        deleteArcAction = new QAction(QIcon(";/images/delete.png"), tr("Удалить"), this);
+        deleteArcAction = new QAction(QIcon(":/images/delete.png"), tr("Удалить"), this);
         deleteArcAction->setStatusTip(tr("Удаляет дугу"));
         connect(deleteArcAction, SIGNAL(triggered()), this, SLOT(deleteArc()));
 
@@ -160,18 +160,18 @@ void TDrawWindow::createActions()
         rebuildArcAction->setStatusTip(tr("Перестраивает дугу по внутреннему алгоритму"));
         connect(rebuildArcAction, SIGNAL(triggered()), this, SLOT(rebuildArc()));
 
-        deleteSyncAction = new QAction(QIcon(";/images/delete.png"), tr("Удалить"), this);
+        deleteSyncAction = new QAction(QIcon(":/images/delete.png"), tr("Удалить"), this);
         deleteSyncAction->setStatusTip(tr("Удалить дугу синхронизации"));
         connect(deleteSyncAction, SIGNAL(triggered()), this, SLOT(deleteSync()));
 
-        deleteCommentAction = new QAction(QIcon(";/images/delete.png"), tr("Удалить"), this);
+        deleteCommentAction = new QAction(QIcon(":/images/delete.png"), tr("Удалить"), this);
         deleteCommentAction->setStatusTip(tr("Удаляет комментарий"));
         connect(deleteCommentAction, SIGNAL(triggered()), this, SLOT(deleteComment()));
 
         setFontAction = new QAction(tr("Шрифт"), this);
         connect(setFontAction, SIGNAL(triggered()), this, SLOT(showFontDialog()));
 
-        deleteMultiProcTopAction = new QAction(QIcon(";/images/delete.png"), tr("Удалить"), this);
+        deleteMultiProcTopAction = new QAction(QIcon(":/images/delete.png"), tr("Удалить"), this);
         deleteMultiProcTopAction->setStatusTip(tr("Удалить многопоточную вершину"));
         connect(deleteMultiProcTopAction, SIGNAL(triggered()), this, SLOT(deleteTop()));
 
@@ -387,7 +387,7 @@ Graph TDrawWindow::getGraph() const
 
 void TDrawWindow::loadGraph(const QString &name)
 {
-    globalLogger->writeLog("TDrawWindow::loadGraph start", Logger::All);
+    globalLogger->log("TDrawWindow::loadGraph start", Logger::All);
     scene->clear();
     try {
         Graph graph = globalDBManager->getGraphDB(name);
