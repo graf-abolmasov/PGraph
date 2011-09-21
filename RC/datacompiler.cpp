@@ -21,14 +21,63 @@ DataCompiler::DataCompiler(Type type) :
     mpiTypes["double"] = "MPI_DOUBLE";
 }
 
-void DataCompiler::compile()
+bool DataCompiler::compile()
 {
     QTime t;
     t.start();
     globalLogger->log(QObject::tr("Компиляция данных....."), Logger::Compile);
     compileUserTypes();
-    compileTpoData();
+    compileSimpleTpoData();
+    //compileTpoData();
     globalLogger->log(QObject::tr("Компиляция завершена без ошибок за %1 с").arg(QString::number(qRound(t.elapsed()/1000))), Logger::Compile);
+    return true;
+}
+
+void DataCompiler::compileSimpleTpoData()
+{
+    QList<const Variable *> varList;
+    varList = globalDBManager->getVariableList();
+
+    QString poDataText = getTemplate(myTemplateDirectory + "/" + QString(PODATA_FILE_NAME) + ".h.template");
+    if (poDataText.isEmpty())
+        globalLogger->log(QObject::tr(ERR_DATACOMPI_EMPTY_TEMPL).arg(QString(PODATA_FILE_NAME) + ".h"), Logger::Warning);
+
+    QString varPtrBlock;
+    foreach (const Variable *var, varList)
+        varPtrBlock.append(var->type->name + " *" + var->name + ";\n");
+    poDataText.replace("<#varPtr>", varPtrBlock);
+
+    //Сохраняем файл
+    QFile poDataH(myOutputDirectory + "/" + PODATA_FILE_NAME + ".h");
+    poDataH.open(QFile::WriteOnly);
+    poDataH.write(poDataText.toUtf8());
+    poDataH.close();
+
+    //Создаем файл TPOData.cpp
+    poDataText = getTemplate(myTemplateDirectory + "/" + QString(PODATA_FILE_NAME) + ".cpp.template");
+    if (poDataText.isEmpty())
+        globalLogger->log(QObject::tr(ERR_DATACOMPI_EMPTY_TEMPL).arg(QString(PODATA_FILE_NAME) + ".cpp"), Logger::Warning);
+
+    //Шаблон <#delete> В деструкторе очищает память
+    QString deleteBlock;
+
+    //Шаблон <#initMemory> В функции initMemory() выделяет память для rank = 0, для остальных = NULL
+    QString initMemoryBlock;
+
+    foreach (const Variable* var, varList) {
+        deleteBlock.append("delete " + var->name + ";\n");
+        initMemoryBlock.append("*(" + var->name + " = new " + var->type->name + ")" + (var->initValue.isEmpty() ? ";\n" : " = " + var->initValue + ";\n"));
+    }
+
+    poDataText.replace("<#delete>", deleteBlock);
+    poDataText.replace("<#initMemory>", initMemoryBlock);
+
+    //Сохраняем файл
+    QFile poDataCpp(myOutputDirectory + "/" + PODATA_FILE_NAME + ".cpp");
+    poDataCpp.open(QFile::WriteOnly);
+    poDataCpp.write(poDataText.toUtf8());
+    poDataCpp.close();
+
 }
 
 void DataCompiler::compileTpoData()
@@ -224,9 +273,11 @@ void DataCompiler::compileUserTypes()
             userTypesBlock.append(type->typedefStr + "\n");
 
             //Если встертился массив
-            if (type->typedefStr.contains("[")) {
+            if (type->typedefStr.contains("struct")) {
+
+            } else if (type->typedefStr.contains("[")) {
                 //Парсим количество элементов
-                QRegExp r("(\\[(\\d+)\\])");
+                QRegExp r("(\\[(.+)\\])");
                 r.setMinimal(true);
                 Q_ASSERT(r.indexIn(type->typedefStr) != -1);
                 userTypesBlock.append("#define " + type->name + "_LENGTH " + r.cap(2) + "\n");

@@ -6,6 +6,7 @@
 #include "qsyncarc.h"
 #include "qarc.h"
 #include "actor.h"
+#include "globalvariables.h"
 
 QTop::QTop(QMenu *contextMenu,
              QGraphicsItem *parent, QGraphicsScene *scene)

@@ -9,7 +9,7 @@
 class ICompiler
 {
 public:
-    virtual void compile() = 0;
+    virtual bool compile() = 0;
 
 protected:
     QString getTemplate(const QString &fileName) const;

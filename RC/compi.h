@@ -10,7 +10,7 @@ class GraphCompiler : public ICompiler
 {
 public:
     GraphCompiler(const Graph &graph);
-    virtual void compile();
+    virtual bool compile();
 private:
     Graph myGraph;
 

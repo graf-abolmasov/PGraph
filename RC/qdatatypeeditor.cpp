@@ -114,7 +114,7 @@ QDataTypeEditor::QDataTypeEditor(const DataType *type, QWidget *parent) :
             ui->arrItemTypeCmbBox->setCurrentIndex(idx);
         }
         ui->arrTypeNameEdt->setText(type->name);
-        QRegExp regExp("[A-Za-z][A-Za-z1-9]{0,31}");
+        QRegExp regExp("[A-Za-z][A-Za-z0-9]{0,31}");
         ui->arrTypeNameEdt->setValidator(new QRegExpValidator(regExp, this));
         enableOkButton();
         ui->arrTypeNameEdt->setFocus();
@@ -126,7 +126,7 @@ QDataTypeEditor::QDataTypeEditor(const DataType *type, QWidget *parent) :
         myMode = Simple;
         ui->simpTypeNameEdt->setText(type->name);
         ui->simpTypedefTxtEdt->document()->setPlainText(type->typedefStr);
-        QRegExp regExp("[A-Za-z][A-Za-z1-9]{0,31}");
+        QRegExp regExp("[A-Za-z][A-Za-z0-9]{0,31}");
         ui->simpTypeNameEdt->setValidator(new QRegExpValidator(regExp, this));
         enableOkButton();
         ui->simpTypeNameEdt->setFocus();
@@ -226,7 +226,7 @@ void QDataTypeEditor::on_structFieldsTable_currentCellChanged(int currentRow, in
         varNameEdt = new QLineEdit(ui->structFieldsTable);
         varNameEdt->setText(ui->structFieldsTable->item(currentRow, 1)->text());
 
-        QRegExp regExp("[A-Za-z][A-Za-z1-9]{0,31}");
+        QRegExp regExp("[A-Za-z][A-Za-z0-9]{0,31}");
         varNameEdt->setValidator(new QRegExpValidator(regExp, this));
         ui->structFieldsTable->setCellWidget(currentRow, 1, varNameEdt);
     }
