@@ -14,7 +14,7 @@ public:
     enum Type {Serial, Parallel};
 
     DataCompiler(Type type);
-    void compile();
+    bool compile();
 private:
     void compileParallel();
     void compileSerial();
@@ -27,6 +27,7 @@ private:
 
     void compileUserTypes();
     void compileTpoData();
+    void compileSimpleTpoData();
 };
 
 #endif // DATACOMPILER_H

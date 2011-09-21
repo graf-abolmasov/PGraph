@@ -74,7 +74,7 @@ void QActorEditor::prepareForm(const Actor *actor)
     myVariableList = globalDBManager->getVariableList();
     QStringList varnames;
     foreach (const Variable *var, myVariableList)
-        varnames << var->name + " : " + var->type->name;
+        varnames << var->name;
     myCompleter = new QCompleter(varnames, this);
     myCompleter->setModelSorting(QCompleter::CaseSensitivelySortedModel);
     myCompleter->setCaseSensitivity(Qt::CaseInsensitive);
@@ -292,7 +292,7 @@ bool QActorEditor::makeResult()
         foreach (QString parameter, tempActor->baseModule->parameterList) {
             const QStringList parsedParameter = parameter.split(";;");
             const QString constStr = parsedParameter[2] == QObject::tr("Исходный") ? QObject::tr("const ") : "";
-            signature << QString("%1%2 *%3").arg(constStr).arg(parsedParameter[1]).arg(parsedParameter[0]);
+            signature << QString("%1%2 *%3").arg(constStr).arg(parsedParameter[0]).arg(parsedParameter[1]);
         }
         outputData.append("extern int " + tempActor->baseModule->uniqName + "(" + signature.join(", ") + ");\r\n");
         outputData.append("int ");
@@ -303,7 +303,7 @@ bool QActorEditor::makeResult()
         for (int i = 0; i < tempActor->variableList.count(); i++) {
             QStringList parameter = currentBaseModule->parameterList[i].split(";;");
             const QString constStr = parameter[2] == tr("Исходный") ? tr("const ") : "";
-            outputData.append(tr("\t%1%2 _%3 = D->%4;\r\n").arg(constStr).arg(parameter[1]).arg(parameter[0]).arg(tempActor->variableList[i]->name).toUtf8());
+            outputData.append(tr("\t%1%2 *_%3 = D->%4;\r\n").arg(constStr).arg(parameter[0]).arg(parameter[1]).arg(tempActor->variableList[i]->name).toUtf8());
         }
         // Вызываем прототип
         outputData.append("\r\n\tint result = ");
@@ -311,7 +311,7 @@ bool QActorEditor::makeResult()
         outputData.append("(");
         for(int i = 0; i < tempActor->variableList.count(); i++) {
             QStringList parameter = currentBaseModule->parameterList[i].split(";;");
-            params << tr("&_") + parameter[0];
+            params << tr("_") + parameter[1];
         }
         outputData.append(params.join(", ").toUtf8());
         outputData.append(");\r\n\r\n");
@@ -319,7 +319,7 @@ bool QActorEditor::makeResult()
         for(int i = 0; i < tempActor->variableList.count(); i++) {
             QStringList parameter = currentBaseModule->parameterList[i].split(";;");
             if (parameter[2] != tr("Исходный"))
-                outputData.append(QString(tr("\tD->%1 = _%2;\n")).arg(tempActor->variableList[i]->name).arg(parameter[0]).toUtf8());
+                outputData.append(QString(tr("\tD->%1 = _%2;\n")).arg(tempActor->variableList[i]->name).arg(parameter[1]).toUtf8());
         }
         // выход
         outputData.append("\r\n\r\n\treturn result;\r\n}");
@@ -332,7 +332,7 @@ bool QActorEditor::makeResult()
         foreach (const Variable *variable, tempActor->variableList) {
             QRegExp r("\\b" + variable->name + "\\b", Qt::CaseSensitive);
             r.setMinimal(true);
-            code.replace(r, "D->" + variable->name);
+            code.replace(r, "(*(D->" + variable->name + "))");
         }
         outputData.append("  " + code + "\r\n");
         outputData.append("  return 1;\r\n");

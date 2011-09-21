@@ -1,6 +1,6 @@
 #include <QtCore>
 #include <QtGui>
-#include <dir.h>
+//#include <dir.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -37,18 +37,23 @@ void GraphCompiler::unpackGraph(const Graph &graph, QSet<const Predicate *> &pre
     QList<Arc> arcList = graph.arcList;
     exrtractedGraphs.insert(graph.name);
     actors.insert(globalDBManager->getGraph(graph.name));
-    foreach (Arc arc, arcList)
+    foreach (Arc arc, arcList) {
+        Q_ASSERT(arc.predicate != NULL);
         predicates.insert(arc.predicate);
+    }
     // только используемые акторы
-    foreach (Top top, topList)
+    foreach (Top top, topList) {
+        Q_ASSERT(top.actor != NULL);
         actors.insert(top.actor);
-    foreach (const Actor *actor, actors)
+    }
+    foreach (const Actor *actor, actors) {
         if (actor->type == Actor::GraphType && !exrtractedGraphs.contains(actor->name)) {
             Graph newGraph = globalDBManager->getGraphDB(actor->name);
             GraphCompiler c(newGraph, mySkipList);
-            c.compile();
-            unpackGraph(newGraph, predicates, actors, exrtractedGraphs);
+            if (c.compile())
+                unpackGraph(newGraph, predicates, actors, exrtractedGraphs);
         }
+    }
 }
 
 void GraphCompiler::collectUsedData()
@@ -70,6 +75,7 @@ void GraphCompiler::collectUsedData()
         Q_ASSERT(actor != NULL);
         if (actor->type == Actor::InlineType || actor->type == Actor::GraphType)
             continue;
+        Q_ASSERT(actor->baseModule != NULL);
         if (!usedBaseModuleList.contains(actor->baseModule))
             usedBaseModuleList.append(actor->baseModule);
     }
@@ -79,12 +85,17 @@ void GraphCompiler::copyUsedFiles()
 {
     // копируем файлы используемых акторов и предикатов в выходной каталог
     foreach (const Actor *actor, usedActorList) {
+        if (actor->type == Actor::GraphType) continue;
+        Q_ASSERT(QFile::exists(myBaseDirectory + "/" + actor->name + ".cpp"));
         QFile::copy(myBaseDirectory + "/" + actor->name + ".cpp", myOutputDirectory + "/" + actor->name + ".cpp");
     }
     foreach (const Predicate *predicate, usedPredicateList) {
+        Q_ASSERT(QFile::exists(myBaseDirectory + "/" + predicate->name + ".cpp"));
         QFile::copy(myBaseDirectory + "/" + predicate->name + ".cpp", myOutputDirectory + "/" + predicate->name + ".cpp");
     }
     foreach (const BaseModule *baseModule, usedBaseModuleList) {
+        Q_ASSERT(QFile::exists(myBaseDirectory + "/" + baseModule->name + ".c"));
+        Q_ASSERT(QFile::exists(myBaseDirectory + "/" + baseModule->uniqName + ".cpp"));
         QFile::copy(myBaseDirectory + "/" + baseModule->name + ".c", myOutputDirectory + "/" + baseModule->name + ".c");
         QFile::copy(myBaseDirectory + "/" + baseModule->uniqName + ".cpp", myOutputDirectory + "/" + baseModule->uniqName + ".cpp");
     }
@@ -93,6 +104,14 @@ void GraphCompiler::copyUsedFiles()
 void GraphCompiler::copyStaticTemplates()
 {
     // копируем необходимые файлы
+    Q_ASSERT(QFile::exists(myTemplateDirectory + "/graph.h.template"));
+    Q_ASSERT(QFile::exists(myTemplateDirectory + "/memman.h.template"));
+    Q_ASSERT(QFile::exists(myTemplateDirectory + "/graph.cpp.template"));
+    Q_ASSERT(QFile::exists(myTemplateDirectory + "/property.h.template"));
+    Q_ASSERT(QFile::exists(myTemplateDirectory + "/memman.cpp.template"));
+    Q_ASSERT(QFile::exists(myTemplateDirectory + "/graphmv.cpp.template"));
+    Q_ASSERT(QFile::exists(myTemplateDirectory + "/Makefile.template"));
+    Q_ASSERT(QFile::exists(myTemplateDirectory + "/runme.bat.template"));
     QFile::copy(myTemplateDirectory + "/graph.h.template", myOutputDirectory + "/graph.h");
     QFile::copy(myTemplateDirectory + "/memman.h.template", myOutputDirectory + "/memman.h");
     QFile::copy(myTemplateDirectory + "/graph.cpp.template", myOutputDirectory + "/graph.cpp");
@@ -103,11 +122,8 @@ void GraphCompiler::copyStaticTemplates()
     QFile::copy(myTemplateDirectory + "/runme.bat.template", myOutputDirectory + "/runme.bat");
 }
 
-void GraphCompiler::compile()
+bool GraphCompiler::compile()
 {
-    if (mySkipList.contains(myGraph.name))
-        return;
-    mySkipList.insert(myGraph.name);
     QTime t;
     t.start();
     globalLogger->log(QObject::tr("Компиляция агрегата %1:%2.....").arg(myGraph.name).arg(myGraph.extName), Logger::Compile);
@@ -116,8 +132,11 @@ void GraphCompiler::compile()
         foreach (QString error, errors)
             globalLogger->log(error, Logger::Warning);
         globalLogger->log(QObject::tr("Компиляция провалилась. Всего %1 ошибок.").arg(QString::number(errors.count())), Logger::Warning);
-        return;
+        return false;
     }
+    if (mySkipList.contains(myGraph.name))
+        return true;
+    mySkipList.insert(myGraph.name);
 
     collectUsedData();
     compileStruct();
@@ -127,6 +146,7 @@ void GraphCompiler::compile()
     copyUsedFiles();
     copyStaticTemplates();
     globalLogger->log(QObject::tr("Компиляция завершена без ошибок за %1 с").arg(QString::number(qRound(t.elapsed()/1000))), Logger::Compile);
+    return true;
 }
 
 void GraphCompiler::compileStruct() const
@@ -203,8 +223,6 @@ void GraphCompiler::compileStruct() const
 void GraphCompiler::compileMakefile(const QString target) const
 {
     target.toLower();
-    QString buildTypeU = target;
-    buildTypeU[0] = buildTypeU[0].toUpper();
     QStringList objects;
     QStringList sources;
     QStringList targets;
@@ -220,24 +238,24 @@ void GraphCompiler::compileMakefile(const QString target) const
     foreach (QString name, names) {
         objects.append(target + "/" + name + ".o");
         sources.append(name + ".cpp");
-        targets.append(target + "/" + name + ".o:\r\n\t$(CXX) -c $(CXXFLAGS) $(INCPATH) -o " + target + "\\" + name + ".o " + name + ".cpp" );
+        targets.append(target + "/" + name + ".o:\r\n\t$(CXX) -c $(CXXFLAGS) $(INCPATH) -o " + target + QDir::separator() + name + ".o " + name + ".cpp" );
     }
     foreach (const BaseModule *baseModule, usedBaseModuleList) {
         objects.append(target + "/" + baseModule->name + ".o");
         sources.append(baseModule->name + ".c");
-        targets.append(target + "/" + baseModule->name + ".o:\r\n\t$(CC) -c $(CFLAGS) $(INCPATH) -o " + target + "\\" + baseModule->name + ".o " + baseModule->name + ".c" );
+        targets.append(target + "/" + baseModule->name + ".o:\r\n\t$(CC) -c $(CFLAGS) $(INCPATH) -o " + target + QDir::separator() + baseModule->name + ".o " + baseModule->name + ".c" );
     }
 
-    QString result = getTemplate(myTemplateDirectory + "/" + "Makefile." + buildTypeU + ".template");
+    QString result = getTemplate(myTemplateDirectory + "/" + "Makefile." + target + ".template");
     if (result.isEmpty())
-        globalLogger->log(QObject::tr(ERR_GRAPHCOMPI_EMPTY_TEMPL).arg("Makefile." + buildTypeU), Logger::Warning);
+        globalLogger->log(QObject::tr(ERR_GRAPHCOMPI_EMPTY_TEMPL).arg("Makefile." + target), Logger::Warning);
     result.replace("<#dateTime>", QDateTime::currentDateTime().toString());
     result.replace("<#project>", "Project" + QString::number(globalDBManager->getProjectId()));
     result.replace("<#objects>", objects.join(" \\\r\n\t\t"));
     result.replace("<#sources>", sources.join(" \\\r\n\t\t"));
     result.replace("<#targets>", targets.join("\r\n\r\n"));
 
-    QFile f(myOutputDirectory + "/" + "Makefile." + buildTypeU);
+    QFile f(myOutputDirectory + "/" + "Makefile." + target);
     f.open(QFile::WriteOnly);
     f.write(result.toUtf8());
     f.close();

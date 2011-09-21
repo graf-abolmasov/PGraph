@@ -139,12 +139,12 @@ Graph DataBaseManager::getGraphDB(const QString &name) throw (QString)
     }
 
     //Получаем полное название агрегата
-    query.prepare("SELECT NAMEPR, EXTNAME FROM Actor a "
-                  "WHERE a.NAMEPR=:NAMEPR AND a.PROJECT_ID=:PROJECT_ID");
+    query.prepare("SELECT actor.NAMEPR, actor.EXTNAME FROM actor "
+                  "WHERE actor.NAMEPR=:NAMEPR AND actor.PROJECT_ID=:PROJECT_ID");
     query.bindValue(":PROJECT_ID", myProjectId);
     query.bindValue(":NAMEPR", name);
     if (!query.exec()) {
-        globalLogger->log(db.lastError().text(), Logger::Critical);
+        globalLogger->log(query.lastError().driverText(), Logger::Critical);
         db.close();
         throw QObject::tr("Не удалось получить полное название агрегата.\n") + db.lastError().text();
     }
@@ -378,7 +378,7 @@ QList<DataType> DataBaseManager::getDataTypeListDB() throw (QString)
         throw QObject::tr("Не удалось открыть базу данных.\n") + db.lastError().text();
     }
     QSqlQuery query;
-    query.prepare("SELECT PROJECT_ID, TYPE, TYPEDEF FROM typsys WHERE PROJECT_ID = :PROJECT_ID;");
+    query.prepare("SELECT PROJECT_ID, TYPE, TYPEDEF FROM typsys WHERE PROJECT_ID = :PROJECT_ID ORDER BY TYPE;");
     query.bindValue(":PROJECT_ID", myProjectId);
     if (!query.exec()) {
         globalLogger->log(db.lastError().text(), Logger::Critical);

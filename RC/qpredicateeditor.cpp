@@ -76,7 +76,7 @@ void QPredicateEditor::prepareForm(const Predicate *predicate)
     myVariableList = globalDBManager->getVariableList();
     QStringList varnames;
     foreach (const Variable *var, myVariableList)
-        varnames << var->name + " : " + var->type->name;
+        varnames << var->name;
     myCompleter = new QCompleter(varnames, this);
     myCompleter->setModelSorting(QCompleter::CaseSensitivelySortedModel);
     myCompleter->setCaseSensitivity(Qt::CaseInsensitive);
@@ -87,7 +87,7 @@ void QPredicateEditor::prepareForm(const Predicate *predicate)
         myModuleList = globalDBManager->getBaseModuleList();
         ui->inlineWidget->setVisible(false);
         ui->predicateNameEdt->setText(myPredicate->extName);
-        ui->predicateNameEdt->setValidator(new QRegExpValidator(QRegExp(tr("[A-Za-zА-Яа-я1-9]{0,255}")), this));
+        ui->predicateNameEdt->setValidator(new QRegExpValidator(QRegExp(tr("[A-Za-zА-Яа-я0-9 ]{0,255}")), this));
         foreach(const BaseModule* baseModule, myModuleList){
             ui->baseModuleList->insertItem(ui->baseModuleList->count(), baseModule->name);
             if (myPredicate != NULL && myPredicate->baseModule == baseModule){
@@ -229,7 +229,7 @@ bool QPredicateEditor::makeResult()
         foreach (QString parameter, tempPre->baseModule->parameterList) {
             const QStringList parsedParameter = parameter.split(";;");
             const QString constStr = parsedParameter[2] == QObject::tr("Исходный") ? QObject::tr("const ") : "";
-            signature << QString("%1%2 *%3").arg(constStr).arg(parsedParameter[1]).arg(parsedParameter[0]);
+            signature << QString("%1%2 *%3").arg(constStr).arg(parsedParameter[0]).arg(parsedParameter[1]);
         }
         outputData.append("extern int " + tempPre->baseModule->uniqName + "(" + signature.join(", ") + ");\r\n");
         outputData.append("int ");
@@ -239,7 +239,7 @@ bool QPredicateEditor::makeResult()
         // Инициализуем данные
         for(int i = 0; i < tempPre->variableList.count(); i++) {
             QStringList parameter = myModuleList[ui->baseModuleList->currentRow()]->parameterList[i].split(";;");
-            outputData.append(QString(tr("\t%1 _%2 = D->%3;\r\n")).arg(parameter[1]).arg(parameter[0]).arg(tempPre->variableList[i]->name).toUtf8());
+            outputData.append(QString(tr("\t%1 *_%2 = D->%3;\r\n")).arg(parameter[0]).arg(parameter[1]).arg(tempPre->variableList[i]->name).toUtf8());
         }
         // Вызываем прототип
         outputData.append("\r\n\tint result = ");
@@ -247,7 +247,7 @@ bool QPredicateEditor::makeResult()
         outputData.append("(");
         for(int i = 0; i < tempPre->variableList.count(); i++) {
             QStringList parameter = myModuleList[ui->baseModuleList->currentRow()]->parameterList[i].split(";;");
-            params << tr("&_") + parameter[0];
+            params << tr("_") + parameter[1];
         }
         outputData.append(params.join(", ").toUtf8());
         outputData.append(");\r\n\r\n");
@@ -260,7 +260,7 @@ bool QPredicateEditor::makeResult()
         outputData.append("{\r\n");
         QString code(tempPre->extName);
         for (int i = 0; i < tempPre->variableList.count(); i++) {
-            code.replace(QRegExp("\\b" + tempPre->variableList[i]->name + "\\b", Qt::CaseSensitive), "D->" + tempPre->variableList.at(i)->name);
+            code.replace(QRegExp("\\b" + tempPre->variableList[i]->name + "\\b", Qt::CaseSensitive), "(*(D->" + tempPre->variableList.at(i)->name + "))");
         }
         //code.replace(QRegExp("\\n"), "\n  ");
         outputData.append("  return (" + code + ");\r\n");

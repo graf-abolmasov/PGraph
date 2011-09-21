@@ -1,6 +1,7 @@
-rmdir /S /Q debug
-rmdir /S /Q release
+#!/bin/sh
+rm -r debug
+rm -r release
 mkdir debug
 mkdir release
-mingw32-make debug
-mingw32-make release
+make debug
+make release
