@@ -16,6 +16,7 @@
 #define ERR_ACTOR_NULL_BASEMODULE "Actor %1: Нет базового модуля."
 #define ERR_ACTOR_EMPTY_NAME "Actor %1: Нет внутреннего имени."
 #define ERR_ACTOR_EMPTY_EXTNAME "Actor %1: Нет названия."
+#define ERR_ACTOR_EMPTY_INLINE "Actor %1: Пустой текст inline-актора."
 #define ERR_ACTOR_UNDEF_VAR "Actor %1: Определены не все переменные."
 #define ERR_ACTOR_UNDEF_VAR_ACC "Actor %1: Определены не все модификаторы доступа."
 

@@ -27,8 +27,8 @@ bool DataCompiler::compile()
     t.start();
     globalLogger->log(QObject::tr("Компиляция данных....."), Logger::Compile);
     compileUserTypes();
-    compileSimpleTpoData();
-    //compileTpoData();
+    //compileSimpleTpoData();
+    compileTpoData();
     globalLogger->log(QObject::tr("Компиляция завершена без ошибок за %1 с").arg(QString::number(qRound(t.elapsed()/1000))), Logger::Compile);
     return true;
 }

@@ -10,18 +10,60 @@ MPI_Datatype memoryPacketDatatype;
 
 TPOData::TPOData(int rank)
 {
-	myRank = rank;
-	initMemory();
-}
+myRank = rank;
+initMemory();
+initId();
+  
+<#assignSetterGetter>}
 
 TPOData::~TPOData()
 {
-<#delete>
-}
+<#delete>}
 
 void TPOData::initMemory()
 {
-<#initMemory>
+<#initMemory>}
+
+void TPOData::initId() 
+{
+<#initId>}
+
+void* TPOData::getDataAddr(int id)
+{
+<#getDataAddr>}
+
+int TPOData::getDataSize(int id)
+{
+<#getSizeAddr>}
+
+#ifdef PARALLEL
+MPI_Datatype TPOData::getMpiType(int id)
+{
+<#getMpiType>}
+#endif
+
+void TPOData::getData(int id, int offset, int count, void* recvBuf)
+{
+	if (myRank != 0) {
+	#ifdef PARALLEL
+		MemoryPacket p = { id, offset, count };
+		MPI_Sendrecv(&p, 1, memoryPacketDatatype, 0, MPI_TAG_GETDATA, recvBuf, count, getMpiType(id), 0, MPI_TAG_ACTUALDATA, MPI_COMM_WORLD, &status);
+	#endif
+	} else recvBuf = getDataAddr(id);
 }
+
+void TPOData::setData(int id, int offset, int count, const void *value)
+{
+    if (myRank != 0) {
+#ifdef PARALLEL
+        MemoryPacket p = { id, offset, count };
+        MPI_Ssend(&p, 1, memoryPacketDatatype, 0, MPI_TAG_PUTDATA, MPI_COMM_WORLD);
+        MPI_Ssend((void *)value, count, getMpiType(id), 0, MPI_TAG_ACTUALDATA, MPI_COMM_WORLD);
+#endif
+    } else memcpy((char *)getDataAddr(id) + getDataSize(id)*offset, value, count * getDataSize(id));
+}
+
+<#setGet>
+
 
 
