@@ -112,6 +112,7 @@ void GraphCompiler::copyStaticTemplates()
     Q_ASSERT(QFile::exists(myTemplateDirectory + "/graphmv.cpp.template"));
     Q_ASSERT(QFile::exists(myTemplateDirectory + "/Makefile.template"));
     Q_ASSERT(QFile::exists(myTemplateDirectory + "/runme.bat.template"));
+    Q_ASSERT(QFile::exists(myTemplateDirectory + "/stype.h.template"));
     QFile::copy(myTemplateDirectory + "/graph.h.template", myOutputDirectory + "/graph.h");
     QFile::copy(myTemplateDirectory + "/memman.h.template", myOutputDirectory + "/memman.h");
     QFile::copy(myTemplateDirectory + "/graph.cpp.template", myOutputDirectory + "/graph.cpp");
@@ -120,6 +121,7 @@ void GraphCompiler::copyStaticTemplates()
     QFile::copy(myTemplateDirectory + "/graphmv.cpp.template", myOutputDirectory + "/graphmv.cpp");
     QFile::copy(myTemplateDirectory + "/Makefile.template", myOutputDirectory + "/Makefile");
     QFile::copy(myTemplateDirectory + "/runme.bat.template", myOutputDirectory + "/runme.bat");
+    QFile::copy(myTemplateDirectory + "/stype.h.template", myOutputDirectory + "/stype.h");
 }
 
 bool GraphCompiler::compile()
@@ -186,7 +188,7 @@ void GraphCompiler::compileStruct() const
         qSort(outArcs.begin(), outArcs.end(), orderArcByPriorityAsc);
         const bool isTailTop = outArcs.count() == 0;
         const int first = isTailTop ? -77 : listGraph.count();
-        const int last = isTailTop ? -77 : first + outArcs.count();
+        const int last = isTailTop ? -77 : first + outArcs.count()-1;
         foreach (Arc arc, outArcs) {
             listGraph << "DefineGraph(" + QString::number(usedPredicateList.indexOf(arc.predicate)) + ", " + QString::number(arc.endTop) + ")";
         }

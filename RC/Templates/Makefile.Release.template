@@ -6,52 +6,72 @@
 
 ####### Compiler, tools and options
 
-CC            = gcc
-CXX           = g++
+CC            = mpicc
+CXX           = mpic++
 DEFINES       = 
-CFLAGS        = -O2 -Wall $(DEFINES)
-CXXFLAGS      = -O2 -frtti -fexceptions -mthreads -Wall $(DEFINES)
+CFLAGS        = -m32 -pipe -g -Wall -W -D_REENTRANT $(DEFINES)
+CXXFLAGS      = -m32 -pipe -g -O2 -Wall -W -D_REENTRANT $(DEFINES)
 INCPATH       = -I"release"
-LINK          = g++
-LFLAGS        = -enable-stdcall-fixup -Wl,-enable-auto-import -Wl,-enable-runtime-pseudo-reloc -Wl,-s -Wl,-subsystem,console -mthreads -Wl
-LIBS          = 
+LINK          = mpic++
+LFLAGS        = -m32 -Wl,-rpath,
+LIBS          = $(SUBLIBS)  -lpthread 
+AR            = ar cqs
+RANLIB        = 
+COPY          = cp -f
+SED           = sed
+COPY_FILE     = $(COPY)
+COPY_DIR      = $(COPY) -r
+STRIP         = strip
+INSTALL_FILE  = install -m 644 -p
+INSTALL_DIR   = $(COPY_DIR)
+INSTALL_PROGRAM = install -m 755 -p
+DEL_FILE      = rm -f
+SYMLINK       = ln -f -s
+DEL_DIR       = rmdir
+MOVE          = mv -f
+CHK_DIR_EXISTS= test -d
+MKDIR         = mkdir -p
 
 ####### Output directory
 
 OBJECTS_DIR   = release
 
-####### Files
+####### File
 
 SOURCES       = <#sources>
 OBJECTS       = <#objects>
 DESTDIR        = release\ #avoid trailing-slash linebreak
-TARGET         = result.exe
-DESTDIR_TARGET = release\result.exe
+TARGET         = result
+DESTDIR_TARGET = release/result
 
+first: all
 ####### Implicit rules
 
-.SUFFIXES: .cpp .cc .cxx .c
+.SUFFIXES: .o .c .cpp .cc .cxx .C
 
 .cpp.o:
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $<
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
 
 .cc.o:
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $<
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
 
 .cxx.o:
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $<
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
+
+.C.o:
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
 
 .c.o:
-	$(CC) -c $(CFLAGS) $(INCPATH) -o $@ $<
+	$(CC) -c $(CFLAGS) $(INCPATH) -o "$@" "$<"
 
 ####### Build rules
 
-first: all
-all: Makefile.release  $(DESTDIR_TARGET)
+all: Makefile $(DESTDIR_TARGET)
 
-$(DESTDIR_TARGET):  $(OBJECTS) 
-	$(LINK) $(LFLAGS) -o $(DESTDIR_TARGET) $(OBJECTS)  $(LIBS)
+$(DESTDIR_TARGET): $(OBJECTS)  
+	$(LINK) $(LFLAGS) -o $(DESTDIR_TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS)
 
 ####### Compile
 
 <#targets>
+

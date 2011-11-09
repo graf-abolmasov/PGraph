@@ -25,6 +25,7 @@ public:
     QImage icon;
     QList<const Variable *> variableList;
     QStringList validate() const;
+    void build() const;
 };
 
 #endif // ACTOR_H
