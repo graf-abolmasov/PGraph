@@ -157,6 +157,11 @@ void GraphCompiler::compileStruct() const
     QList<Top> topList = myGraph.topList;
     QList<Arc> arcList = myGraph.arcList;
 
+    QMap<int, Top> topMap;
+    int i = 0;
+    foreach (Top top, topList)
+        topMap.insert(i++, top);
+
     // делаем заголовки для предикатов
     QString predicateStr;
     foreach (const Predicate *predicate, usedPredicateList) 
@@ -181,18 +186,24 @@ void GraphCompiler::compileStruct() const
     QString _ListGraph;
     QStringList listTop;
     QStringList listGraph;
-    _ListT.append("static DefineTop ListTop[" + QString::number(topList.size()) + "] = {\r\n");
+    Top ghostTop(0, 0, 0, 0, -77, -77, false, NULL, Top::NormalTop);
+    const int lastTopNumber = topMap.value(topMap.keys().last(), ghostTop).number;
+    _ListT.append("static DefineTop ListTop[" + QString::number(lastTopNumber) + "] = {\r\n");
     _ListGraph.append("static DefineGraph ListGraf[" + QString::number(arcList.size()) + "] = {\r\n");
-    foreach (Top top, topList) {
-        QList<Arc> outArcs = myGraph.getOutArcs(top.number);
-        qSort(outArcs.begin(), outArcs.end(), orderArcByPriorityAsc);
-        const bool isTailTop = outArcs.count() == 0;
-        const int first = isTailTop ? -77 : listGraph.count();
-        const int last = isTailTop ? -77 : first + outArcs.count()-1;
-        foreach (Arc arc, outArcs) {
-            listGraph << "DefineGraph(" + QString::number(usedPredicateList.indexOf(arc.predicate)) + ", " + QString::number(arc.endTop) + ")";
+    for (int i = 0; i < lastTopNumber; i++) {
+        if (topMap.contains(i)) {
+            const Top top = topMap.value(i, ghostTop);
+            QList<Arc> outArcs = myGraph.getOutArcs(top.number);
+            qSort(outArcs.begin(), outArcs.end(), orderArcByPriorityAsc);
+            const bool isTailTop = outArcs.count() == 0;
+            const int first = isTailTop ? -77 : listGraph.count();
+            const int last = isTailTop ? -77 : first + outArcs.count()-1;
+            foreach (Arc arc, outArcs)
+                listGraph << "DefineGraph(" + QString::number(usedPredicateList.indexOf(arc.predicate)) + ", " + QString::number(arc.endTop) + ")";
+            listTop << "DefineTop(\"" + top.actor->name + "\", " + QString::number(first) + ", " + QString::number(last) + ", &" + top.actor->name + ")";
+        } else {
+            listTop << "DefineTop(\"GHOST TOP\", -77, -77, NULL)";
         }
-        listTop << "DefineTop(\"" + top.actor->name + "\", " + QString::number(first) + ", " + QString::number(last) + ", &" + top.actor->name + ")";
     }
     _ListT.append(listTop.join(",\r\n"));
     _ListT.append("\r\n};\r\n");
