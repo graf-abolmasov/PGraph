@@ -371,6 +371,7 @@ void TMyWindow::CMGNew()
     TDrawWindow *newDrawWindow = createDrawWindow();
     newDrawWindow->showMaximized();
     graphLoaded("", "");
+    globalPredicateList.clear();
 }
 
 void TMyWindow::CMGSaveAsImage()

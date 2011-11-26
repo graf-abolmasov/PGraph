@@ -524,7 +524,12 @@ void DataBaseManager::saveActorListDB(const QList<Actor> &actorList) throw (QStr
         query1.clear();
         query1.prepare("INSERT INTO actor (PROJECT_ID, NAMEPR, CLASPR, EXTNAME, DATE, TIME, ICON, PROTOTIP)"
                        "VALUES (:PROJECT_ID, :NAMEPR, :CLASPR, :EXTNAME, CURDATE(), CURTIME(), :ICON, :PROTOTIP);");
-        query1.bindValue(":ICON",       NULL);
+        QByteArray ba;
+        QBuffer buffer(&ba);
+        buffer.open(QIODevice::WriteOnly);
+        actor.icon.save(&buffer, "PNG");
+        query1.bindValue(":ICON",       ba);
+        buffer.close();
         query1.bindValue(":NAMEPR",     actor.name);
         query1.bindValue(":CLASPR",     "a");
         query1.bindValue(":EXTNAME",    actor.extName);
@@ -535,6 +540,7 @@ void DataBaseManager::saveActorListDB(const QList<Actor> &actorList) throw (QStr
             db.close();
             throw QObject::tr("Не удалось сохранить актор.\n") + db.lastError().text();
         }
+
 
         QSqlQuery query2;
         QList<const Variable *> actorVariables = actor.variableList;
@@ -608,7 +614,7 @@ QList<Actor> DataBaseManager::getActorListDB() throw (QString)
                             getBaseModule(query1.value(6).toString()),
                             actorVariableList,
                             actorVarAccList,
-                            QImage()));
+                            QImage::fromData(query1.value(5).toByteArray())));
         query2.clear();
     }
     db.close();

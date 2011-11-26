@@ -6,6 +6,7 @@
 #include "qarcline.h"
 #include "actor.h"
 #include "qarc.h"
+#include "globalvariables.h"
 
 QNormalTop::QNormalTop(QMenu *contextMenu, QGraphicsItem *parent, QGraphicsScene *scene)
         : QTop(contextMenu, parent, scene)
@@ -128,7 +129,8 @@ float QNormalTop::getMinHeight() const
 */
 void QNormalTop::setIcon(QImage &icon){
     if (actor != NULL)
-        QMessageBox::critical(0, QObject::tr("Ошибка"), QObject::tr("Функция пока недостуна"));
+        const_cast<Actor *>(actor)->icon = icon;
+    globalDBManager->setActorList(globalDBManager->getActorList());
 }
 
 /*!
