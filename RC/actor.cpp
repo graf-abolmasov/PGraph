@@ -55,10 +55,10 @@ void Actor::build() const
     Q_ASSERT(validate().isEmpty());
 
     const QString myOutputDirectory = QGraphSettings::getBaseDirectory();
-    QByteArray outputData;
+    QString outputData;
     QFile output;
 
-    const BaseModule *currentBaseModule = NULL;
+    const BaseModule *currentBaseModule = this->baseModule;
     QStringList params;
     QStringList signature;
     // Создаем сpp файл
@@ -73,10 +73,9 @@ void Actor::build() const
             signature << QString("%1%2 *%3").arg(constStr).arg(parsedParameter[0]).arg(parsedParameter[1]);
         }
         outputData.append("extern int " + this->baseModule->uniqName + "(" + signature.join(", ") + ");\r\n");
-        outputData.append("int ");
-        outputData.append(this->name.toUtf8());
-        outputData.append("(TPOData *D)\r\n");
+        outputData.append("int " + this->name + "(TPOData *D)\r\n");
         outputData.append("{\r\n");
+        outputData.append("//" + this->extName + "\r\n");
         // Инициализуем данные
         for (int i = 0; i < this->variableList.count(); i++) {
             QStringList parameter = currentBaseModule->parameterList[i].split(";;");
@@ -126,6 +125,6 @@ void Actor::build() const
 
     output.setFileName(myOutputDirectory + "/" + this->name + ".cpp");
     output.open(QFile::WriteOnly);
-    output.write(outputData);
+    output.write(outputData.toUtf8());
     output.close();
 }
