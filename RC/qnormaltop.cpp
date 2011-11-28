@@ -27,9 +27,9 @@ void QNormalTop::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
     if (actor != NULL && !actor->icon.isNull()) {
         if ((actor->icon.width() >= boundingRect().width()) ||
             (actor->icon.height() >= boundingRect().height())) {
-            painter->drawImage(boundingRect().adjusted(5, 5, -5, -5), actor->icon);
+            painter->drawImage(boundingRect().adjusted(5, 5, -5, -5), actor->icon.toImage());
         } else {
-            painter->drawImage(-actor->icon.width()/2, -actor->icon.height()/2, actor->icon);
+            painter->drawImage(-actor->icon.width()/2, -actor->icon.height()/2, actor->icon.toImage());
         }
     }
     //пишем текст
@@ -127,10 +127,11 @@ float QNormalTop::getMinHeight() const
   Устанавливает иконку.
   @param icon - иконка
 */
-void QNormalTop::setIcon(QImage &icon){
-    if (actor != NULL)
+void QNormalTop::setIcon(QPixmap &icon){
+    if (actor != NULL) {
         const_cast<Actor *>(actor)->icon = icon;
-    globalDBManager->setActorList(globalDBManager->getActorList());
+        globalDBManager->saveActorPictute(actor->name, icon);
+    }
 }
 
 /*!

@@ -3,8 +3,9 @@
 #include "qgraphsettings.h"
 #include "QtCore"
 #include "variable.h"
+#include "globalvariables.h"
 
-Actor::Actor(const QString &name, const QString &extName, const Type &type, const BaseModule *baseModule, const QList<const Variable *> &variableList, const QStringList &varAccModeList, const QImage &icon)
+Actor::Actor(const QString &name, const QString &extName, const Type &type, const BaseModule *baseModule, const QList<const Variable *> &variableList, const QStringList &varAccModeList, const QPixmap &icon)
 {
     this->extName = extName;
     this->name = name;

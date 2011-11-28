@@ -39,7 +39,7 @@ QActorEditor::QActorEditor(const Actor::Type &mode, QWidget *parent) :
     ui(new Ui::QActorEditor)
 {
     ui->setupUi(this);
-    prepareForm(new Actor("", "", mode, NULL, QList<const Variable *>(), QStringList(), QImage()));
+    prepareForm(new Actor("", "", mode, NULL, QList<const Variable *>(), QStringList(), QPixmap()));
 }
 
 QActorEditor::~QActorEditor()

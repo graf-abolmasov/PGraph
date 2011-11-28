@@ -232,11 +232,11 @@ void TDrawWindow::setItemIcon()
     if (fileName.isEmpty())
         return;
     QNormalTop *top = qgraphicsitem_cast<QNormalTop *>(scene->selectedItems().first());
-    QImage img(fileName);
-    if (!img.isNull()) {
+    QPixmap img(fileName);
+    if (!img.isNull() && QFileInfo(fileName).size() < 10000) {
         top->setIcon(img);
         scene->invalidate(top->mapRectToScene(top->boundingRect()));
-    }
+    } else QMessageBox::critical(NULL, tr("Ошибка"), tr("Размер картинки не должен превышать 10 кб"));
 
     emit sceneChanged();
 }
