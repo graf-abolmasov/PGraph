@@ -15,7 +15,7 @@ public:
     void setAsRoot(bool flag);
     float getMinWidth() const;
     float getMinHeight() const;
-    void setIcon(QImage &icon);
+    void setIcon(QPixmap &icon);
     Top toTop() const;
 protected:
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);

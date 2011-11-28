@@ -322,7 +322,7 @@ QList<Graph> DataBaseManager::getGraphListDB() throw (QString)
         throw QObject::tr("Не удалось открыть базу данных.\n") + db.lastError().text();
     }
     QSqlQuery query;
-    query.prepare("SELECT NAMEPR, EXTNAME FROM actor WHERE CLASPR = 'g' AND PROJECT_ID = :PROJECT_ID ORDER BY EXTNAME;");
+    query.prepare("SELECT NAMEPR, EXTNAME, ICON FROM actor WHERE CLASPR = 'g' AND PROJECT_ID = :PROJECT_ID ORDER BY EXTNAME;");
     query.bindValue(":PROJECT_ID", myProjectId);
     if (!query.exec()) {
         globalLogger->log(db.lastError().text(), Logger::Critical);
@@ -335,7 +335,11 @@ QList<Graph> DataBaseManager::getGraphListDB() throw (QString)
         QList<Arc> arcList;
         QList<Comment> commentList;
         QList<SyncArc> syncArcList;
-        result.append(Graph(query.value(0).toString(), query.value(1).toString(), topList, arcList, commentList, syncArcList));
+        Graph newGraph(query.value(0).toString(), query.value(1).toString(), topList, arcList, commentList, syncArcList);
+        QPixmap p;
+        p.loadFromData(query.value(2).toByteArray(), "PNG");
+        newGraph.icon = p;
+        result.append(newGraph);
     }
     db.close();
     return result;
@@ -522,14 +526,8 @@ void DataBaseManager::saveActorListDB(const QList<Actor> &actorList) throw (QStr
     }
     foreach (Actor actor, actorList) {
         query1.clear();
-        query1.prepare("INSERT INTO actor (PROJECT_ID, NAMEPR, CLASPR, EXTNAME, DATE, TIME, ICON, PROTOTIP)"
-                       "VALUES (:PROJECT_ID, :NAMEPR, :CLASPR, :EXTNAME, CURDATE(), CURTIME(), :ICON, :PROTOTIP);");
-        QByteArray ba;
-        QBuffer buffer(&ba);
-        buffer.open(QIODevice::WriteOnly);
-        actor.icon.save(&buffer, "PNG");
-        query1.bindValue(":ICON",       ba);
-        buffer.close();
+        query1.prepare("INSERT INTO actor (PROJECT_ID, NAMEPR, CLASPR, EXTNAME, DATE, TIME, PROTOTIP)"
+                       "VALUES (:PROJECT_ID, :NAMEPR, :CLASPR, :EXTNAME, CURDATE(), CURTIME(), :PROTOTIP);");
         query1.bindValue(":NAMEPR",     actor.name);
         query1.bindValue(":CLASPR",     "a");
         query1.bindValue(":EXTNAME",    actor.extName);
@@ -608,13 +606,16 @@ QList<Actor> DataBaseManager::getActorListDB() throw (QString)
                 vaMode = QObject::tr("Вычисляемый");
             actorVarAccList.append(vaMode);
         }
+        QSqlRecord r = query1.record();
+        QPixmap p;
+        p.loadFromData(r.value("ICON").toByteArray(), "PNG");
         result.append(Actor(query1.value(0).toString(),
                             query1.value(2).toString(),
                             query1.value(6).toString().isEmpty() ? Actor::InlineType : Actor::NormalType,
                             getBaseModule(query1.value(6).toString()),
                             actorVariableList,
                             actorVarAccList,
-                            QImage::fromData(query1.value(5).toByteArray())));
+                            p));
         query2.clear();
     }
     db.close();
@@ -1001,4 +1002,30 @@ void DataBaseManager::openProjectDB(int projectId)
     QList<Graph> dbGraphList = getGraphListDB();
     foreach (Graph graph, dbGraphList)
         myGraphList.append(new Graph(graph));
+}
+
+void DataBaseManager::saveActorPictute(const QString &actorName, const QPixmap &image)
+{
+    if (!db.open()) {
+        globalLogger->log(db.lastError().text(), Logger::Critical);
+        throw QObject::tr("Не удалось открыть базу данных.\n") + db.lastError().text();
+    }
+
+    QByteArray ba;
+    QBuffer buffer(&ba);
+    buffer.open(QIODevice::WriteOnly);
+    image.save(&buffer, "PNG");
+    buffer.close();
+
+    QSqlQuery query;
+    query.prepare("UPDATE actor SET ICON=:ICON WHERE NAMEPR=:NAMEPR AND PROJECT_ID=:PROJECT_ID");
+    query.bindValue(":ICON",       ba);
+    query.bindValue(":NAMEPR",     actorName);
+    query.bindValue(":PROJECT_ID", myProjectId);
+    if (!query.exec()) {
+        globalLogger->log(db.lastError().text(), Logger::Critical);
+        db.close();
+        throw QObject::tr("Не удалось сохранить актор.\n") + db.lastError().text();
+    }
+    db.close();
 }

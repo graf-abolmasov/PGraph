@@ -71,6 +71,8 @@ public:
     void saveStructDB(const Graph &graph) throw (QString);
     void registerModuleDB(const BaseModule *baseModule) throw (QString);
 
+    void saveActorPictute(const QString &actorName, const QPixmap &image);
+
     QSqlError lastError();
 
 };
