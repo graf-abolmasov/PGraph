@@ -196,8 +196,8 @@ void DataBaseManager::saveGraphDB(const Graph &graph) throw (QString)
     }
 
     QSqlQuery query;
-    query.prepare("INSERT INTO actor (PROJECT_ID, NAMEPR, CLASPR, EXTNAME, DATE, TIME, ICON, PROTOTIP, BAZIS)"
-                  "VALUES (:PROJECT_ID, :NAMEPR, :CLASPR, :EXTNAME, CURDATE(), CURTIME(), NULL, NULL, NULL)");
+    query.prepare("INSERT INTO actor (PROJECT_ID, NAMEPR, CLASPR, EXTNAME, DATE, TIME, PROTOTIP, BAZIS)"
+                  "VALUES (:PROJECT_ID, :NAMEPR, :CLASPR, :EXTNAME, CURDATE(), CURTIME(), NULL, NULL)");
 
     query.bindValue(":PROJECT_ID", myProjectId);
     query.bindValue(":NAMEPR", graph.name);

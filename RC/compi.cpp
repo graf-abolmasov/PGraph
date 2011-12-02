@@ -85,9 +85,13 @@ void GraphCompiler::copyUsedFiles()
 {
     // копируем файлы используемых акторов и предикатов в выходной каталог
     foreach (const Actor *actor, usedActorList) {
-        if (actor->type == Actor::GraphType) continue;
-        Q_ASSERT(QFile::exists(myBaseDirectory + "/" + actor->name + ".cpp"));
-        QFile::copy(myBaseDirectory + "/" + actor->name + ".cpp", myOutputDirectory + "/" + actor->name + ".cpp");
+        if (actor->type == Actor::GraphType)
+            continue;
+        const QString f = myBaseDirectory + "/" + actor->name + ".cpp";
+        if (!QFile::exists(f))
+            actor->build();
+        Q_ASSERT(QFile::exists(f));
+        QFile::copy(f, myOutputDirectory + "/" + actor->name + ".cpp");
     }
     foreach (const Predicate *predicate, usedPredicateList) {
         Q_ASSERT(QFile::exists(myBaseDirectory + "/" + predicate->name + ".cpp"));
@@ -172,7 +176,7 @@ void GraphCompiler::compileStruct() const
     _ListP.append("static DefinePredicate ListPred[" + QString::number(usedPredicateList.size()) + "] = {\r\n");
     QStringList list;
     foreach (const Predicate *predicate, usedPredicateList)
-        list << "DefinePredicate(\"" + predicate->name + "\", &" + predicate->name + ")";
+        list << "\tDefinePredicate(\"" + predicate->name + "\", &" + predicate->name + ")";
     _ListP.append(list.join(",\r\n"));
     _ListP.append("\r\n};\r\n");
 
@@ -190,14 +194,14 @@ void GraphCompiler::compileStruct() const
         const int first = isTailTop ? -77 : listGraph.count();
         const int last = isTailTop ? -77 : first + outArcs.count()-1;
         foreach (Arc arc, outArcs)
-            listGraph << "DefineGraph(" + QString::number(usedPredicateList.indexOf(arc.predicate)) + ", " + QString::number(arc.endTop) + ")";
+            listGraph << "\tDefineGraph(" + QString::number(usedPredicateList.indexOf(arc.predicate)) + ", " + QString::number(arc.endTop) + ")";
         if (vec.size() <= top.number)
             vec.resize(top.number + 1);
-        vec[top.number] = "DefineTop(\"" + top.actor->name + "\", " + QString::number(first) + ", " + QString::number(last) + ", &" + top.actor->name + ")";
+        vec[top.number] = "\tDefineTop(\"" + top.actor->name + "\", " + QString::number(first) + ", " + QString::number(last) + ", &" + top.actor->name + ")";
     }
     _ListT.append("static DefineTop ListTop[" + QString::number(vec.size()) + "] = {\r\n");
     foreach (QString deftop, vec)
-        listTop.append(deftop.isEmpty() ? "DefineTop(\"GHOST TOP\", -77, -77, NULL)" : deftop);
+        listTop.append(deftop.isEmpty() ? "\tDefineTop(\"GHOST TOP\", -77, -77, NULL)" : deftop);
     _ListT.append(listTop.join(",\r\n"));
     _ListT.append("\r\n};\r\n");
     _ListGraph.append(listGraph.join(",\r\n"));
@@ -214,12 +218,12 @@ void GraphCompiler::compileStruct() const
 
     main.append("int " + myGraph.name + "(TPOData *D)\r\n");
     main.append("{\r\n");
-    main.append("//" + myGraph.extName + "\r\n");
-    main.append("//printf(\"" + myGraph.extName + "\\r\\n\");\r\n");
-    main.append("int topCount = " + QString::number(myGraph.topList.count()) + ";\r\n");
-    main.append("int rootTop = " + QString::number(myGraph.getRootTop()) + ";\r\n");
-    main.append("GraphMV(D, rootTop, topCount, ListPred, ListTop, ListGraf);\r\n");
-    main.append("return 1;\r\n");
+    main.append("\t//" + myGraph.extName + "\r\n");
+    main.append("\t//printf(\"" + myGraph.extName + "\\r\\n\");\r\n");
+    main.append("\tint topCount = " + QString::number(myGraph.topList.count()) + ";\r\n");
+    main.append("\tint rootTop = " + QString::number(myGraph.getRootTop()) + ";\r\n");
+    main.append("\tGraphMV(D, rootTop, topCount, ListPred, ListTop, ListGraf);\r\n");
+    main.append("\treturn 1;\r\n");
     main.append("}\r\n");
 
     QFile f(myOutputDirectory + "/" + myGraph.name + ".cpp");
@@ -228,9 +232,9 @@ void GraphCompiler::compileStruct() const
     f.close();
 }
 
-void GraphCompiler::compileMakefile(const QString target) const
+void GraphCompiler::compileMakefile(QString target) const
 {
-    target.toLower();
+    target = target.toLower();
     QStringList objects;
     QStringList sources;
     QStringList targets;
