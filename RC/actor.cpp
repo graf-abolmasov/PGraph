@@ -55,7 +55,7 @@ void Actor::build() const
 {
     Q_ASSERT(validate().isEmpty());
 
-    const QString myOutputDirectory = QGraphSettings::getBaseDirectory();
+    const QString myBaseDirectory = QGraphSettings::getBaseDirectory();
     QString outputData;
     QFile output;
 
@@ -124,7 +124,7 @@ void Actor::build() const
         break;
     }
 
-    output.setFileName(myOutputDirectory + "/" + this->name + ".cpp");
+    output.setFileName(myBaseDirectory + "/" + this->name + ".cpp");
     output.open(QFile::WriteOnly);
     output.write(outputData.toUtf8());
     output.close();

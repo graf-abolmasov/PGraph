@@ -12,6 +12,10 @@ public:
     QString name;
     QString typedefStr;
     QStringList validate() const;
+    QString build() const;
+    bool isStruct() const;
+    bool isArray() const;
+    bool isSimple() const;
 };
 
 #endif // DATATYPE_H

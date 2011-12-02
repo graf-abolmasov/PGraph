@@ -172,7 +172,9 @@ void DataCompiler::compileTpoData()
     foreach (const Variable* var, varList) {
         const DataType* type = var->type;
         Q_ASSERT(type != NULL);
-        QString intType = var->type->name;
+        const QString tn = var->type->name;
+        const QString vn = var->name;
+        QString intType = tn;
         if (!type->typedefStr.isEmpty()) {
             //Парсим тип элемента
             QRegExp r("(typedef\\s+(\\b.+\\b))");
@@ -181,52 +183,52 @@ void DataCompiler::compileTpoData()
             intType = r.cap(2);
         }
         //Общее для всех типов
-        initIdBlock.append(var->name + "_id = " + QString::number(i) + ";\n");
+        initIdBlock.append(vn + "_id = " + QString::number(i) + ";\n");
         getDataAddrBlock.append("case " + QString::number(i) + ":\n"
-                                "\tresult = _" + var->name + ";\n"
+                                "\tresult = _" + vn + ";\n"
                                 "\tbreak;\n");
         getMpiTypeBlock.append("case " + QString::number(i) + ":\n"
-                                "\tresult = " + (mpiTypes.contains(var->type->name) ? mpiTypes[var->type->name] : "MPI_USER_TYPE_" + var->type->name.toUpper()) + ";\n"
+                                "\tresult = " + (mpiTypes.contains(tn) ? mpiTypes[tn] : "MPI_USER_TYPE_" + tn.toUpper()) + ";\n"
                                 "\tbreak;\n");
         //Если встертился массив
         if (type->typedefStr.contains("[")) {
-            assignSetterGetterBlock.append(var->name + ".Assign(this, &TPOData::set_" + var->name + ", &TPOData::get_" + var->name + ", &TPOData::set_" + var->name + ", &TPOData::get_" + var->name + ", " + var->type->name + "_LENGTH);\n");
-            deleteBlock.append("delete[] _" + var->name + ";\n");
-            initMemoryBlock.append("_" + var->name + " = (" + var->type->name + "*)" + "(new " + var->type->name + ");\n");
+            assignSetterGetterBlock.append(vn + ".Assign(this, &TPOData::set_" + vn + ", &TPOData::get_" + vn + ", &TPOData::set_" + vn + ", &TPOData::get_" + vn + ", " + tn + "_LENGTH);\n");
+            deleteBlock.append("delete[] _" + vn + ";\n");
+            initMemoryBlock.append("_" + vn + " = (" + tn + "*)" + "(new " + tn + ");\n");
             getDataSizeBlock.append("case " + QString::number(i++) + ":\n"
-                                    "\tresult = sizeof(" + var->type->name + ") / " + var->type->name + "_LENGTH;\n"
+                                    "\tresult = sizeof(" + tn + ") / " + tn + "_LENGTH;\n"
                                     "\tbreak;\n");
             //getter by index
-            setGetBlock.append(intType + " TPOData::get_" + var->name + "(const int& index)\n{\n"
-                               "\tif (_" + var->name + " == NULL) _" + var->name + " = (" + var->type->name + "*)" + "(new " + var->type->name + ");\n" +
-                               "\tgetData(" + var->name + "_id, index, 1, &(*_" + var->name + ")[index]);\n"
-                               "\treturn (*_" + var->name + ")[index];\n}\n\n");
+            setGetBlock.append(intType + " TPOData::get_" + vn + "(const int& index)\n{\n"
+                               "\tif (_" + vn + " == NULL) _" + vn + " = (" + tn + "*)" + "(new " + tn + ");\n" +
+                               "\tgetData(" + vn + "_id, index, 1, &(*_" + vn + ")[index]);\n"
+                               "\treturn (*_" + vn + ")[index];\n}\n\n");
             //setter by index
-            setGetBlock.append(intType + " TPOData::set_" + var->name + "(const int& index, const " + intType + " &value)\n{\n"
-                               "\tsetData(" + var->name + "_id, index, 1, &value);\n"
+            setGetBlock.append(intType + " TPOData::set_" + vn + "(const int& index, const " + intType + " &value)\n{\n"
+                               "\tsetData(" + vn + "_id, index, 1, &value);\n"
                                "\treturn value;\n}\n\n");
             //getter all array
-            setGetBlock.append("ptr" + var->type->name + " TPOData::get_" + var->name + "()\n{\n"
-                               "\tif (_" + var->name + " == NULL) _" + var->name + " = (" + var->type->name + "*)" + "(new " + var->type->name + ");\n" +
-                               "\tgetData(" + var->name + "_id, 0, " + var->type->name + "_LENGTH" + ", _" + var->name +");\n"
-                               "\treturn *_" + var->name + ";\n}\n\n");
+            setGetBlock.append("ptr" + tn + " TPOData::get_" + vn + "()\n{\n"
+                               "\tif (_" + vn + " == NULL) _" + vn + " = (" + tn + "*)" + "(new " + tn + ");\n" +
+                               "\tgetData(" + vn + "_id, 0, " + tn + "_LENGTH" + ", _" + vn +");\n"
+                               "\treturn *_" + vn + ";\n}\n\n");
             //setter all array
-            setGetBlock.append("ptr" + var->type->name + " TPOData::set_" + var->name + "(const " + "ptr" + var->type->name + " &value)\n{\n"
-                               "\tsetData(" + var->name + "_id, 0, " + var->type->name + "_LENGTH" ", *(&value));\n"
+            setGetBlock.append("ptr" + tn + " TPOData::set_" + vn + "(const " + "ptr" + tn + " &value)\n{\n"
+                               "\tsetData(" + vn + "_id, 0, " + tn + "_LENGTH" ", *(&value));\n"
                                "\treturn (" + intType + " *)value;\n}\n\n");
         } else {
-            assignSetterGetterBlock.append(var->name + ".Assign(this, &TPOData::set_" + var->name + ", &TPOData::get_" + var->name + ");\n");
-            deleteBlock.append("delete _" + var->name + ";\n");
-            initMemoryBlock.append("*(_" + var->name + " = new " + var->type->name + ")" + (var->initValue.isEmpty() ? ";\n" : " = " + var->initValue + ";\n"));
+            assignSetterGetterBlock.append(vn + ".Assign(this, &TPOData::set_" + vn + ", &TPOData::get_" + vn + ");\n");
+            deleteBlock.append("delete _" + vn + ";\n");
+            initMemoryBlock.append("*(_" + vn + " = new " + tn + ")" + (var->initValue.isEmpty() ? ";\n" : " = " + var->initValue + ";\n"));
             getDataSizeBlock.append("case " + QString::number(i++) + ":\n"
-                                    "\tresult = sizeof(" + var->type->name + ");\n"
+                                    "\tresult = sizeof(" + tn + ");\n"
                                     "\tbreak;\n");
-            setGetBlock.append(var->type->name + " TPOData::get_" + var->name + "()\n{\n"
-                               "\tif (_" + var->name + " == NULL) *(_" + var->name + " = new " + var->type->name + ")" + (var->initValue.isEmpty() ? ";\n" : " = " + var->initValue + ";\n") +
-                               "\tgetData(" + var->name + "_id, 0, 1, _" + var->name +");\n"
-                               "\treturn *_" + var->name + ";\n}\n\n");
-            setGetBlock.append(var->type->name + " TPOData::set_" + var->name + "(const " + var->type->name + " &value)\n{\n"
-                               "\tsetData(" + var->name + "_id, 0, 1, &value);\n"
+            setGetBlock.append(tn + " TPOData::get_" + vn + "()\n{\n"
+                               "\tif (_" + vn + " == NULL) *(_" + vn + " = new " + tn + ")" + (var->initValue.isEmpty() ? ";\n" : " = " + var->initValue + ";\n") +
+                               "\tgetData(" + vn + "_id, 0, 1, _" + vn +");\n"
+                               "\treturn *_" + vn + ";\n}\n\n");
+            setGetBlock.append(tn + " TPOData::set_" + vn + "(const " + tn + " &value)\n{\n"
+                               "\tsetData(" + vn + "_id, 0, 1, &value);\n"
                                "\treturn value;\n}\n\n");
         }
     }
@@ -267,44 +269,23 @@ void DataCompiler::compileUserTypes()
 
     //Создаем типы
     QString userTypesBlock;
-
-    foreach (const DataType *type, myTypeList) {
-        if (!type->typedefStr.isEmpty()) {
-            userTypesBlock.append(type->typedefStr + "\n");
-
-            //Если встертился массив
-            if (type->typedefStr.contains("struct")) {
-
-            } else if (type->typedefStr.contains("[")) {
-                //Парсим количество элементов
-                QRegExp r("(\\[(.+)\\])");
-                r.setMinimal(true);
-                Q_ASSERT(r.indexIn(type->typedefStr) != -1);
-                userTypesBlock.append("#define " + type->name + "_LENGTH " + r.cap(2) + "\n");
-
-                //Парсим тип элемента
-                r.setPattern("(typedef\\s+(\\b.+\\b))");
-                Q_ASSERT(r.indexIn(type->typedefStr) != -1);
-                userTypesBlock.append("typedef " + r.cap(2) + "* ptr" + type->name  + ";\n");
-            }
-            userTypesBlock.append("\n");
-        }
-    }
-
+    foreach (const DataType *type, myTypeList)
+        userTypesBlock.append(type->build());
     utypeText.replace("<#userTypes>", userTypesBlock);
 
     //Создаем типы MPI
+    //TODO: ДЛЯ СТРУКТУР ПОКА НИЧЕГО НЕТ
     QString mpiTypesBlock;
     foreach (const DataType *type, myTypeList) {
-        if (!type->typedefStr.isEmpty()) {
-            QRegExp r("(typedef\\s+(\\b.+\\b))");
-            r.setMinimal(true);
-            Q_ASSERT(r.indexIn(type->typedefStr) != -1);
-            QString intType = r.cap(2);
-            mpiTypesBlock.append("#define MPI_USER_TYPE_" + type->name.toUpper() + " " + (mpiTypes.contains(intType) ? mpiTypes[r.cap(2)] : "MPI_USER_TYPE_" + r.cap(2).toUpper()) + "\n");
-        }
+        if (type->typedefStr.isEmpty() || type->isStruct())
+            continue;
+        QRegExp r("(typedef\\s+(\\b.+\\b))");
+        r.setMinimal(true);
+        Q_ASSERT(r.indexIn(type->typedefStr) != -1);
+        const QString intType = r.cap(2);
+        const QString baseMpiType = mpiTypes.contains(intType) ? mpiTypes[r.cap(2)] : "MPI_USER_TYPE_" + r.cap(2).toUpper();
+        mpiTypesBlock.append("#define MPI_USER_TYPE_").append(type->name.toUpper()).append(" ").append(baseMpiType).append("\r\n");
     }
-
     utypeText.replace("<#mpiTypes>", mpiTypesBlock);
 
     //Сохраняем файл
