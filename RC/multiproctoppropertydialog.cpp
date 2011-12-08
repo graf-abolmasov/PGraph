@@ -100,7 +100,8 @@ void MultiProcTopPropertyDialog::on_actorsListWidget_currentRowChanged(int curre
             break;
         }
         info.append(tr("Type: ") + type + "\r\n");
-        info.append(tr("Base module: ") + actor->baseModule->name + "\r\n");
+        if (Actor::NormalType == actor->type)
+            info.append(tr("Base module: ") + actor->baseModule->name + "\r\n");
     }
     ui->descriptionLbl->setText(info);
 }
