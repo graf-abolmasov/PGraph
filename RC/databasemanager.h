@@ -12,6 +12,7 @@ class DataBaseManager
 private:
     QSqlDatabase db;
     int myProjectId;
+    QString myProjectName;
 
     QList<const Graph *>      myGraphList;
     QList<const Actor *>      myActorList;
@@ -44,7 +45,7 @@ public:
     int getProjectId()
         { return myProjectId; }
     QString getProjectName()
-        { return QString::number(myProjectId); }
+        { return myProjectName; }
 
     const Actor *getActor(const QString &name) const;
     const Graph *getGraph(const QString &name) const;

@@ -3,6 +3,7 @@
 
 #include <QSettings>
 #include <QString>
+#include "globalvariables.h"
 
 class QGraphSettings
 {
