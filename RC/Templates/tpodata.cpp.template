@@ -6,6 +6,9 @@
 
 #ifdef PARALLEL
 MPI_Datatype memoryPacketDatatype;
+
+MPI_Status status;
+int myProcNum, totalProc;
 #endif
 
 TPOData::TPOData(int rank)

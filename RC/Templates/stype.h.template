@@ -13,8 +13,8 @@ typedef struct {
 extern MPI_Datatype memoryPacketDatatype;
 
 //Служебные типы и переменные
-static MPI_Status status;
-static int myProcNum, totalProc;
+extern MPI_Status status;
+extern int myProcNum, totalProc;
 
 //Идентификаторы сообщений отсчитываются от этого значения
 #define MPI_TAG_BASE             32740

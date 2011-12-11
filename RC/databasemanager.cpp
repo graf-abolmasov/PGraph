@@ -984,6 +984,28 @@ void DataBaseManager::openProjectDB(int projectId)
     if (myProjectId != -1)
         return;
     myProjectId = projectId;
+
+    if (!db.open()) {
+        globalLogger->log(db.lastError().text(), Logger::Critical);
+        throw QObject::tr("Не удалось открыть базу данных.\n") + db.lastError().text();
+    }
+
+    QSqlQuery query;
+    query.prepare("SELECT * from project WHERE PROJECT_ID=:PROJECT_ID");
+    query.bindValue(":PROJECT_ID", myProjectId);
+    if (!query.exec()) {
+        globalLogger->log(db.lastError().text(), Logger::Critical);
+        db.close();
+        throw QObject::tr("Не удалось открыть проект.\n") + db.lastError().text();
+    }
+    if (!query.next()) {
+        globalLogger->log(db.lastError().text(), Logger::Critical);
+        db.close();
+        throw QObject::tr("Нет такого проекта.\n") + db.lastError().text();
+    }
+    myProjectName = query.value(1).toString();
+    db.close();
+
     QList<DataType> dbDataTypeList = getDataTypeListDB();
     foreach (DataType dataType, dbDataTypeList)
         myDataTypeList.append(new DataType(dataType));
