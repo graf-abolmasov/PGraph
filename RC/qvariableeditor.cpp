@@ -26,7 +26,7 @@ QVariableEditor::QVariableEditor(QWidget *parent) :
 {
     ui->setupUi(this);
     myVariable = NULL;
-    QRegExp regExp("[_A-Za-z][_A-Za-z1-9]{0,31}");
+    QRegExp regExp("[_A-Za-z][_A-Za-z0-9]{0,31}");
     ui->nameEdt->setValidator(new QRegExpValidator(regExp, this));
     ui->nameEdt->setFocus();
 
@@ -42,7 +42,7 @@ QVariableEditor::QVariableEditor(const Variable *var, QWidget *parent) :
 {
     ui->setupUi(this);
     myVariable = var;
-    QRegExp regExp("[_A-Za-z][_A-Za-z1-9]{0,31}");
+    QRegExp regExp("[_A-Za-z][_A-Za-z0-9]{0,31}");
     ui->nameEdt->setValidator(new QRegExpValidator(regExp, this));
     ui->nameEdt->setFocus();
 
@@ -54,8 +54,7 @@ QVariableEditor::QVariableEditor(const Variable *var, QWidget *parent) :
     ui->nameEdt->setText(var->name);
     ui->commentTxtEdt->setPlainText(var->comment);
     ui->initValueEdt->setText(var->initValue);
-    int idx = myTypeList.indexOf(var->type);
-    ui->typeCmbBox->setCurrentIndex(idx);
+    ui->typeCmbBox->setCurrentIndex(myTypeList.indexOf(var->type));
     enableOkButton();
 }
 
@@ -82,6 +81,7 @@ void QVariableEditor::makeResult()
         result = new Variable(ui->nameEdt->text(),
                                   ui->initValueEdt->text(),
                                   ui->commentTxtEdt->document()->toPlainText(),
+                                  false,
                                   myTypeList[ui->typeCmbBox->currentIndex()]);
     else {
         result = const_cast<Variable *>(myVariable);
@@ -89,6 +89,7 @@ void QVariableEditor::makeResult()
         result->initValue = ui->initValueEdt->text();
         result->type = myTypeList[ui->typeCmbBox->currentIndex()];
         result->comment = ui->commentTxtEdt->document()->toPlainText();
+        result->isGlobal = false;
     }
 }
 

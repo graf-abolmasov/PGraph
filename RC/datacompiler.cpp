@@ -77,7 +77,6 @@ void DataCompiler::compileSimpleTpoData()
     poDataCpp.open(QFile::WriteOnly);
     poDataCpp.write(poDataText.toUtf8());
     poDataCpp.close();
-
 }
 
 void DataCompiler::compileTpoData()
@@ -94,25 +93,28 @@ void DataCompiler::compileTpoData()
     //Заполняем блок Id
     QString varIdBlock;
     for (int i = 0; i < varList.count(); i++)
-        varIdBlock.append("int " + varList[i]->name + "_id;\n");
+        if (varList[i]->isGlobal)
+            varIdBlock.append("int " + varList[i]->name + "_id;\n");
     poDataText.replace("<#varId>", varIdBlock);
 
     //Заполняем блок указателей на данные
     QString varPtrBlock;
     foreach (const Variable *var, varList)
-        varPtrBlock.append(var->type->name + " *_" + var->name + ";\n");
+        varPtrBlock.append(var->type->name + (var->isGlobal ? " *_" : " *") + var->name + ";\n");
     poDataText.replace("<#varPtr>", varPtrBlock);
 
     //Заполняем блок свойств
     QString varPropertyBlock;
 
-    //Заполняем блок setter/getter
+    //Заполняем блок setter/getter/property
     QString setGetBlock;
     foreach (const Variable *var, varList) {
+        if (!var->isGlobal)
+            continue;
         const DataType* type = var->type;
         Q_ASSERT(type != NULL);
         //Если встертился массив
-        if (type->typedefStr.contains("[")) {
+        if (type->isArray()) {
             //Парсим тип элемента
             QRegExp r("(typedef\\s+(\\b.+\\b))");
             r.setMinimal(true);
@@ -183,53 +185,63 @@ void DataCompiler::compileTpoData()
             intType = r.cap(2);
         }
         //Общее для всех типов
-        initIdBlock.append(vn + "_id = " + QString::number(i) + ";\n");
-        getDataAddrBlock.append("case " + QString::number(i) + ":\n"
-                                "\tresult = _" + vn + ";\n"
-                                "\tbreak;\n");
-        getMpiTypeBlock.append("case " + QString::number(i) + ":\n"
-                                "\tresult = " + (mpiTypes.contains(tn) ? mpiTypes[tn] : "MPI_USER_TYPE_" + tn.toUpper()) + ";\n"
-                                "\tbreak;\n");
-        //Если встертился массив
-        if (type->typedefStr.contains("[")) {
-            assignSetterGetterBlock.append(vn + ".Assign(this, &TPOData::set_" + vn + ", &TPOData::get_" + vn + ", &TPOData::set_" + vn + ", &TPOData::get_" + vn + ", " + tn + "_LENGTH);\n");
-            deleteBlock.append("delete[] _" + vn + ";\n");
-            initMemoryBlock.append("_" + vn + " = (" + tn + "*)" + "(new " + tn + ");\n");
-            getDataSizeBlock.append("case " + QString::number(i++) + ":\n"
-                                    "\tresult = sizeof(" + tn + ") / " + tn + "_LENGTH;\n"
+        if (var->isGlobal) {
+            initIdBlock.append(vn + "_id = " + QString::number(i) + ";\n");
+            getDataAddrBlock.append("case " + QString::number(i) + ":\n"
+                                    "\tresult = _" + vn + ";\n"
                                     "\tbreak;\n");
-            //getter by index
-            setGetBlock.append(intType + " TPOData::get_" + vn + "(const int& index)\n{\n"
-                               "\tif (_" + vn + " == NULL) _" + vn + " = (" + tn + "*)" + "(new " + tn + ");\n" +
-                               "\tgetData(" + vn + "_id, index, 1, &(*_" + vn + ")[index]);\n"
-                               "\treturn (*_" + vn + ")[index];\n}\n\n");
-            //setter by index
-            setGetBlock.append(intType + " TPOData::set_" + vn + "(const int& index, const " + intType + " &value)\n{\n"
-                               "\tsetData(" + vn + "_id, index, 1, &value);\n"
-                               "\treturn value;\n}\n\n");
-            //getter all array
-            setGetBlock.append("ptr" + tn + " TPOData::get_" + vn + "()\n{\n"
-                               "\tif (_" + vn + " == NULL) _" + vn + " = (" + tn + "*)" + "(new " + tn + ");\n" +
-                               "\tgetData(" + vn + "_id, 0, " + tn + "_LENGTH" + ", _" + vn +");\n"
-                               "\treturn *_" + vn + ";\n}\n\n");
-            //setter all array
-            setGetBlock.append("ptr" + tn + " TPOData::set_" + vn + "(const " + "ptr" + tn + " &value)\n{\n"
-                               "\tsetData(" + vn + "_id, 0, " + tn + "_LENGTH" ", *(&value));\n"
-                               "\treturn (" + intType + " *)value;\n}\n\n");
+            getMpiTypeBlock.append("case " + QString::number(i) + ":\n"
+                                   "\tresult = " + (mpiTypes.contains(tn) ? mpiTypes[tn] : "MPI_USER_TYPE_" + tn.toUpper()) + ";\n"
+                                   "\tbreak;\n");
+        }
+        //Блок очистки памяти
+        deleteBlock.append("if " + vn + " != NULL\r\n"
+                           "\tdelete _" + vn + ";\n");
+
+        //Блок инициализации памяти на менеджере памяти и блок setters/getters
+        if (var->isGlobal) {
+            //Если встертился массив
+            if (type->isArray()) {
+                initMemoryBlock.append("_" + vn + " = (" + tn + "*)" + "(new " + tn + ");\n");
+                assignSetterGetterBlock.append(vn + ".Assign(this, &TPOData::set_" + vn + ", &TPOData::get_" + vn + ", &TPOData::set_" + vn + ", &TPOData::get_" + vn + ", " + tn + "_LENGTH);\n");
+                getDataSizeBlock.append("case " + QString::number(i++) + ":\n"
+                                        "\tresult = sizeof(" + tn + ") / " + tn + "_LENGTH;\n"
+                                        "\tbreak;\n");
+                //getter by index
+                setGetBlock.append(intType + " TPOData::get_" + vn + "(const int& index)\n{\n"
+                                   "\tif (_" + vn + " == NULL) _" + vn + " = (" + tn + "*)" + "(new " + tn + ");\n" +
+                                   "\tgetData(" + vn + "_id, index, 1, &(*_" + vn + ")[index]);\n"
+                                   "\treturn (*_" + vn + ")[index];\n}\n\n");
+                //setter by index
+                setGetBlock.append(intType + " TPOData::set_" + vn + "(const int& index, const " + intType + " &value)\n{\n"
+                                   "\tsetData(" + vn + "_id, index, 1, &value);\n"
+                                   "\treturn value;\n}\n\n");
+                //getter all array
+                setGetBlock.append("ptr" + tn + " TPOData::get_" + vn + "()\n{\n"
+                                   "\tif (_" + vn + " == NULL) _" + vn + " = (" + tn + "*)" + "(new " + tn + ");\n" +
+                                   "\tgetData(" + vn + "_id, 0, " + tn + "_LENGTH" + ", _" + vn +");\n"
+                                   "\treturn *_" + vn + ";\n}\n\n");
+                //setter all array
+                setGetBlock.append("ptr" + tn + " TPOData::set_" + vn + "(const " + "ptr" + tn + " &value)\n{\n"
+                                   "\tsetData(" + vn + "_id, 0, " + tn + "_LENGTH" ", *(&value));\n"
+                                   "\treturn (" + intType + " *)value;\n}\n\n");
+            } else {
+                initMemoryBlock.append("*(_" + vn + " = new " + tn + ")" + (var->initValue.isEmpty() ? ";\n" : " = " + var->initValue + ";\n"));
+                assignSetterGetterBlock.append(vn + ".Assign(this, &TPOData::set_" + vn + ", &TPOData::get_" + vn + ");\n");
+                getDataSizeBlock.append("case " + QString::number(i++) + ":\n"
+                                        "\tresult = sizeof(" + tn + ");\n"
+                                        "\tbreak;\n");
+                setGetBlock.append(tn + " TPOData::get_" + vn + "()\n{\n"
+                                   "\tif (_" + vn + " == NULL) *(_" + vn + " = new " + tn + ")" + (var->initValue.isEmpty() ? ";\n" : " = " + var->initValue + ";\n") +
+                                   "\tgetData(" + vn + "_id, 0, 1, _" + vn +");\n"
+                                   "\treturn *_" + vn + ";\n}\n\n");
+                setGetBlock.append(tn + " TPOData::set_" + vn + "(const " + tn + " &value)\n{\n"
+                                   "\tsetData(" + vn + "_id, 0, 1, &value);\n"
+                                   "\treturn value;\n}\n\n");
+            }
         } else {
-            assignSetterGetterBlock.append(vn + ".Assign(this, &TPOData::set_" + vn + ", &TPOData::get_" + vn + ");\n");
-            deleteBlock.append("delete _" + vn + ";\n");
-            initMemoryBlock.append("*(_" + vn + " = new " + tn + ")" + (var->initValue.isEmpty() ? ";\n" : " = " + var->initValue + ";\n"));
-            getDataSizeBlock.append("case " + QString::number(i++) + ":\n"
-                                    "\tresult = sizeof(" + tn + ");\n"
-                                    "\tbreak;\n");
-            setGetBlock.append(tn + " TPOData::get_" + vn + "()\n{\n"
-                               "\tif (_" + vn + " == NULL) *(_" + vn + " = new " + tn + ")" + (var->initValue.isEmpty() ? ";\n" : " = " + var->initValue + ";\n") +
-                               "\tgetData(" + vn + "_id, 0, 1, _" + vn +");\n"
-                               "\treturn *_" + vn + ";\n}\n\n");
-            setGetBlock.append(tn + " TPOData::set_" + vn + "(const " + tn + " &value)\n{\n"
-                               "\tsetData(" + vn + "_id, 0, 1, &value);\n"
-                               "\treturn value;\n}\n\n");
+            //Не выделяем память под локальные переменные на менеджере памяти
+            initMemoryBlock.append("_" + var->name + " = NULL;\n");
         }
     }
     poDataText.replace("<#assignSetterGetter>", assignSetterGetterBlock);
@@ -245,8 +257,17 @@ void DataCompiler::compileTpoData()
     poDataText.replace("<#getSizeAddr>", getDataSizeBlock);
     poDataText.replace("<#getMpiType>", getMpiTypeBlock);
 
-    foreach (const Variable* var, varList)
-        initMemoryBlock.append("_" + var->name + " = NULL;\n");
+    //Инициализация памяти для каждого процессора
+    foreach (const Variable* var, varList) {
+        const QString tn = var->type->name;
+        const QString vn = var->name;
+        initMemoryBlock.append(var->isGlobal
+                               ? "_" + var->name + " = NULL"
+                               : (var->type->isArray()
+                                  ? QString("_%1 = (%2*)(new %3)").arg(vn).arg(tn).arg(vn)
+                                  : QString("*(_%1 = new %2)" + QString(var->initValue.isEmpty() ? "" : " = ") + var->initValue).arg(vn).arg(tn)));
+        initMemoryBlock.append(";\r\n");
+    }
     initMemoryBlock.append("}\n");
     poDataText.replace("<#initMemory>", initMemoryBlock);
 
