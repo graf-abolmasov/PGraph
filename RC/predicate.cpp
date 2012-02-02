@@ -55,9 +55,7 @@ void Predicate::build() const
         // Инициализуем данные
         for (int i = 0; i < this->variableList.count(); i++) {
             BaseModuleParameter parameter = currentBaseModule->parameterList[i];
-//            outputData.append(QString("\t%1%2 _%3 = D->%4;\r\n").arg(constStr).arg(parameter[0]).arg(parameter[1]).arg(this->variableList[i]->name).toUtf8());
-            //для простого TPOData на указателях
-            outputData.append(QObject::tr("\tconst %1 *_%2 = D->%3;\r\n")
+            outputData.append(this->variableList[i]->isGlobal ? QString("\t%1%2 _%3 = D->%4;\r\n") : QObject::tr("\tconst %1 *_%2 = D->%3;\r\n")
                               .arg(parameter.type)
                               .arg(parameter.name)
                               .arg(this->variableList[i]->name).toUtf8());
@@ -68,9 +66,7 @@ void Predicate::build() const
         outputData.append("(");
         for(int i = 0; i < this->variableList.count(); i++) {
             BaseModuleParameter parameter = currentBaseModule->parameterList[i];
-//            params << QObject::tr("&_") + parameter[1];
-            //для простого TPOData
-            params << QObject::tr("_") + parameter.name;
+            params << ((this->variableList[i]->isGlobal ? QObject::tr("&_") : QObject::tr("_")) + parameter.name);
         }
         outputData.append(params.join(", ").toUtf8());
         outputData.append(");\r\n\r\n");
@@ -83,9 +79,7 @@ void Predicate::build() const
         foreach (const Variable *variable, this->variableList) {
             QRegExp r("\\b" + variable->name + "\\b", Qt::CaseSensitive);
             r.setMinimal(true);
-//            code.replace(r, "D->" + variable->name);
-            //для простого TPOData
-            code.replace(r, "(*(D->" + variable->name + "))");
+            code.replace(r, variable->isGlobal ? "D->" + variable->name : "(*(D->" + variable->name + "))");
         }
         outputData.append("  return (" + code + ")\r\n");
         outputData.append("}\r\n");

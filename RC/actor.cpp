@@ -82,13 +82,11 @@ void Actor::build() const
         for (int i = 0; i < this->variableList.count(); i++) {
             BaseModuleParameter parameter = currentBaseModule->parameterList[i];
             const QString constStr = parameter.accessMode == QObject::tr("Исходный") ? QObject::tr("const ") : "";
-//            outputData.append(QString("\t%1%2 _%3 = D->%4;\r\n").arg(constStr).arg(parameter[0]).arg(parameter[1]).arg(this->variableList[i]->name).toUtf8());
-            //для простого TPOData на указателях
-            outputData.append(QObject::tr("\t%1%2 *_%3 = D->%4;\r\n")
-                              .arg(constStr)
-                              .arg(parameter.type)
-                              .arg(parameter.name)
-                              .arg(this->variableList[i]->name).toUtf8());
+            outputData.append(this->variableList[i]->isGlobal ? QObject::tr("\t%1%2 _%3 = D->%4;\r\n") : QObject::tr("\t%1%2 *_%3 = D->%4;\r\n")
+                                                                .arg(constStr)
+                                                                .arg(parameter.type)
+                                                                .arg(parameter.name)
+                                                                .arg(this->variableList[i]->name).toUtf8());
         }
         // Вызываем прототип
         outputData.append("\r\n\tint result = ");
@@ -96,9 +94,7 @@ void Actor::build() const
         outputData.append("(");
         for(int i = 0; i < this->variableList.count(); i++) {
             BaseModuleParameter parameter = currentBaseModule->parameterList[i];
-//            params << QObject::tr("&_") + parameter[1];
-            //для простого TPOData
-            params << QObject::tr("_") + parameter.name;
+            params << ((this->variableList[i]->isGlobal ? QObject::tr("&_") : QObject::tr("_")) + parameter.name);
         }
         outputData.append(params.join(", ").toUtf8());
         outputData.append(");\r\n\r\n");
@@ -121,9 +117,7 @@ void Actor::build() const
         foreach (const Variable *variable, this->variableList) {
             QRegExp r("\\b" + variable->name + "\\b", Qt::CaseSensitive);
             r.setMinimal(true);
-//            code.replace(r, "D->" + variable->name);
-            //для простого TPOData
-            code.replace(r, "(*(D->" + variable->name + "))");
+            code.replace(r, variable->isGlobal ? "D->" + variable->name : "(*(D->" + variable->name + "))");
         }
         outputData.append("  " + code + "\r\n");
         outputData.append("  return 1;\r\n");
