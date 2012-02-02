@@ -11,6 +11,8 @@ public:
     static QString getOutputDirectory();
     static QString getBaseDirectory();
     static QString getTemplateDirectory();
+
+    static bool isParallel();
 };
 
 #endif // QGRAPHSETTINGS_H

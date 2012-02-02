@@ -68,10 +68,11 @@ void Actor::build() const
     case Actor::NormalType:
         Q_ASSERT(currentBaseModule);
         // Генерируем актор
-        foreach (QString parameter, this->baseModule->parameterList) {
-            const QStringList parsedParameter = parameter.split(";;");
-            const QString constStr = parsedParameter[2] == QObject::tr("Исходный") ? QObject::tr("const ") : "";
-            signature << QString("%1%2 *%3").arg(constStr).arg(parsedParameter[0]).arg(parsedParameter[1]);
+        foreach (BaseModuleParameter parameter, this->baseModule->parameterList) {
+            const QString constStr = parameter.accessMode == QObject::tr("Исходный") ? QObject::tr("const ") : "";
+            signature << QString("%1%2 *%3").arg(constStr)
+                         .arg(parameter.type)
+                         .arg(parameter.name);
         }
         outputData.append("extern int " + this->baseModule->uniqName + "(" + signature.join(", ") + ");\r\n");
         outputData.append("int " + this->name + "(TPOData *D)\r\n");
@@ -79,29 +80,35 @@ void Actor::build() const
         outputData.append("//" + this->extName + "\r\n");
         // Инициализуем данные
         for (int i = 0; i < this->variableList.count(); i++) {
-            QStringList parameter = currentBaseModule->parameterList[i].split(";;");
-            const QString constStr = parameter[2] == QObject::tr("Исходный") ? QObject::tr("const ") : "";
+            BaseModuleParameter parameter = currentBaseModule->parameterList[i];
+            const QString constStr = parameter.accessMode == QObject::tr("Исходный") ? QObject::tr("const ") : "";
 //            outputData.append(QString("\t%1%2 _%3 = D->%4;\r\n").arg(constStr).arg(parameter[0]).arg(parameter[1]).arg(this->variableList[i]->name).toUtf8());
             //для простого TPOData на указателях
-            outputData.append(QObject::tr("\t%1%2 *_%3 = D->%4;\r\n").arg(constStr).arg(parameter[0]).arg(parameter[1]).arg(this->variableList[i]->name).toUtf8());
+            outputData.append(QObject::tr("\t%1%2 *_%3 = D->%4;\r\n")
+                              .arg(constStr)
+                              .arg(parameter.type)
+                              .arg(parameter.name)
+                              .arg(this->variableList[i]->name).toUtf8());
         }
         // Вызываем прототип
         outputData.append("\r\n\tint result = ");
         outputData.append(this->baseModule->uniqName);
         outputData.append("(");
         for(int i = 0; i < this->variableList.count(); i++) {
-            QStringList parameter = currentBaseModule->parameterList[i].split(";;");
+            BaseModuleParameter parameter = currentBaseModule->parameterList[i];
 //            params << QObject::tr("&_") + parameter[1];
             //для простого TPOData
-            params << QObject::tr("_") + parameter[1];
+            params << QObject::tr("_") + parameter.name;
         }
         outputData.append(params.join(", ").toUtf8());
         outputData.append(");\r\n\r\n");
         // сохраняем данные
         for(int i = 0; i < this->variableList.count(); i++) {
-            QStringList parameter = currentBaseModule->parameterList[i].split(";;");
-            if (parameter[2] != QObject::tr("Исходный"))
-                outputData.append(QString(QObject::tr("\tD->%1 = _%2;\n")).arg(this->variableList[i]->name).arg(parameter[1]).toUtf8());
+            BaseModuleParameter parameter = currentBaseModule->parameterList[i];
+            if (parameter.accessMode != QObject::tr("Исходный"))
+                outputData.append(QString(QObject::tr("\tD->%1 = _%2;\n"))
+                                  .arg(this->variableList[i]->name)
+                                  .arg(parameter.name).toUtf8());
         }
         // выход
         outputData.append("\r\n\r\n\treturn result;\r\n}");

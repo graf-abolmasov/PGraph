@@ -131,17 +131,17 @@ void QModuleRegister::on_buttonBox_accepted()
         return;
     }
 
-    QStringList paramList;
+    QList<BaseModuleParameter> paramList;
     for (int i = 0; i < ui->parametersTable->rowCount(); i++){
-        paramList.append(ui->parametersTable->item(i, 0)->text() + ";;" +
-                         ui->parametersTable->item(i, 1)->text() + ";;" +
-                         ui->parametersTable->item(i, 2)->text() + ";;" +
-                         ui->parametersTable->item(i, 3)->text());
+        paramList.append(BaseModuleParameter(ui->parametersTable->item(i, 2)->text(),
+                                             ui->parametersTable->item(i, 0)->text(),
+                                             ui->parametersTable->item(i, 1)->text(),
+                                             ui->parametersTable->item(i, 3)->text()));
     }
 
     QString uniqName = "S" + getCRC(ui->fileList->currentItem()->text().toUtf8());
     const BaseModule *newBaseModule = new BaseModule(fileList.at(ui->fileList->currentRow()).baseName(),
-                                                    uniqName, ui->commentTxtEdt->document()->toPlainText(), paramList);
+                                                     uniqName, ui->commentTxtEdt->document()->toPlainText(), paramList);
     globalDBManager->registerModuleDB(newBaseModule);
     // Читаем файл
     QFile input(fileList.at(ui->fileList->currentRow()).canonicalFilePath());
