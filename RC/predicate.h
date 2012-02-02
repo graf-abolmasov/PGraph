@@ -16,6 +16,8 @@ public:
     Type type;
     QList<const Variable *> variableList;
     const BaseModule *baseModule;
+    QStringList validate() const;
+    void build() const;
 };
 
 #endif // PREDICATE_H

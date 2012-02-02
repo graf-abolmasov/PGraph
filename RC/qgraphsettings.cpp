@@ -21,3 +21,10 @@ QString QGraphSettings::getTemplateDirectory()
     QSettings c("graph.ini", QSettings::IniFormat);
     return QFileInfo(c.value("Location/TemplateDir", "./Templates").toString()).canonicalFilePath();
 }
+
+bool QGraphSettings::isParallel()
+{
+    QSettings c("graph.ini", QSettings::IniFormat);
+    return c.value("Compiler/Parallel", false).toBool();
+}
+

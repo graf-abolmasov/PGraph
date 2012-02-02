@@ -92,10 +92,10 @@ void QActorEditor::prepareForm(const Actor *actor)
             if (tempActor->baseModule == baseModule) {
                 ui->baseModuleList->setCurrentRow(ui->baseModuleList->count()-1);
                 for (int i = 0; i < myModuleList[ui->baseModuleList->currentRow()]->parameterList.count(); i++){
-                    QStringList parameter = myModuleList[ui->baseModuleList->currentRow()]->parameterList[i].split(";;");
+                    BaseModuleParameter parameter = myModuleList[ui->baseModuleList->currentRow()]->parameterList[i];
                     ui->paramsNormalTable->insertRow(i);
-                    ui->paramsNormalTable->setItem(i, 0, new QTableWidgetItem(parameter[1]));
-                    ui->paramsNormalTable->setItem(i, 1, new QTableWidgetItem(parameter[0]));
+                    ui->paramsNormalTable->setItem(i, 0, new QTableWidgetItem(parameter.name));
+                    ui->paramsNormalTable->setItem(i, 1, new QTableWidgetItem(parameter.type));
                     ui->paramsNormalTable->setItem(i, 2, new QTableWidgetItem(tempActor->variableList[i] == NULL ? "N/A" : tempActor->variableList[i]->name));
                 }
             }
@@ -139,11 +139,11 @@ void QActorEditor::on_baseModuleList_currentRowChanged(int currentRow)
     tempActor->varAccModeList.clear();
     for (int i = 0; i < myModuleList[currentRow]->parameterList.count(); i++){
         tempActor->variableList.append(NULL);
-        QStringList parameter = myModuleList[currentRow]->parameterList[i].split(";;");
-        tempActor->varAccModeList.append(parameter[2]);
+        BaseModuleParameter parameter = myModuleList[currentRow]->parameterList[i];
+        tempActor->varAccModeList.append(parameter.accessMode);
         ui->paramsNormalTable->insertRow(i);
-        ui->paramsNormalTable->setItem(i, 0, new QTableWidgetItem(parameter[1]));
-        ui->paramsNormalTable->setItem(i, 1, new QTableWidgetItem(parameter[0]));
+        ui->paramsNormalTable->setItem(i, 0, new QTableWidgetItem(parameter.name));
+        ui->paramsNormalTable->setItem(i, 1, new QTableWidgetItem(parameter.type));
         ui->paramsNormalTable->setItem(i, 2, new QTableWidgetItem("N/A"));
     }
 }
@@ -171,7 +171,7 @@ void QActorEditor::on_paramsNormalTable_currentCellChanged(int currentRow, int, 
     ui->descriptionPOLbl_2->setText("");
     if (tempActor->variableList[currentRow] != NULL)
         ui->descriptionPOLbl_2->setText(tempActor->variableList[currentRow]->comment);
-    ui->descriptionBMLbl_2->setText(myModuleList[ui->baseModuleList->currentRow()]->parameterList.at(currentRow).split(";;").at(3));
+    ui->descriptionBMLbl_2->setText(myModuleList[ui->baseModuleList->currentRow()]->parameterList.at(currentRow).comment);
 }
 
 void QActorEditor::showVariableEditor()

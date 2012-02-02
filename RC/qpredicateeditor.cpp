@@ -94,10 +94,10 @@ void QPredicateEditor::prepareForm(const Predicate *predicate)
                 ui->baseModuleList->blockSignals(true);
                 ui->baseModuleList->setCurrentRow(ui->baseModuleList->count()-1);
                 for (int i = 0; i < myModuleList.at(ui->baseModuleList->currentRow())->parameterList.count(); i++){
-                    QStringList parameter = myModuleList.at(ui->baseModuleList->currentRow())->parameterList.at(i).split(";;");
+                    BaseModuleParameter parameter = myModuleList.at(ui->baseModuleList->currentRow())->parameterList[i];
                     ui->paramsNormalTable->insertRow(i);
-                    ui->paramsNormalTable->setItem(i, 0, new QTableWidgetItem(parameter.at(1)));
-                    ui->paramsNormalTable->setItem(i, 1, new QTableWidgetItem(parameter.at(0)));
+                    ui->paramsNormalTable->setItem(i, 0, new QTableWidgetItem(parameter.name));
+                    ui->paramsNormalTable->setItem(i, 1, new QTableWidgetItem(parameter.type));
                     ui->paramsNormalTable->setItem(i, 2, new QTableWidgetItem(myPredicate->variableList[i] == NULL ? "N/A" : myPredicate->variableList[i]->name));
                 }
                 ui->baseModuleList->blockSignals(false);
@@ -126,10 +126,10 @@ void QPredicateEditor::on_baseModuleList_currentRowChanged(int currentRow)
     tempPre->variableList.clear();
     for (int i = 0; i < myModuleList[currentRow]->parameterList.count(); i++){
         tempPre->variableList.append(NULL);
-        QStringList parameter = myModuleList[currentRow]->parameterList[i].split(";;");
+        BaseModuleParameter parameter = myModuleList[currentRow]->parameterList[i];
         ui->paramsNormalTable->insertRow(i);
-        ui->paramsNormalTable->setItem(i, 0, new QTableWidgetItem(parameter[1]));
-        ui->paramsNormalTable->setItem(i, 1, new QTableWidgetItem(parameter[0]));
+        ui->paramsNormalTable->setItem(i, 0, new QTableWidgetItem(parameter.name));
+        ui->paramsNormalTable->setItem(i, 1, new QTableWidgetItem(parameter.type));
         ui->paramsNormalTable->setItem(i, 2, new QTableWidgetItem("N/A"));
     }
     tempPre->baseModule = myModuleList[currentRow];
@@ -157,7 +157,7 @@ void QPredicateEditor::on_paramsNormalTable_currentCellChanged(int currentRow, i
     if (tempPre->variableList[currentRow] != NULL) {
         ui->descriptionPOLbl_2->setText(tempPre->variableList[currentRow]->comment);
     }
-    ui->descriptionBMLbl_2->setText(myModuleList[ui->baseModuleList->currentRow()]->parameterList[currentRow].split(";;")[03]);
+    ui->descriptionBMLbl_2->setText(myModuleList[ui->baseModuleList->currentRow()]->parameterList[currentRow].comment);
 }
 
 void QPredicateEditor::showVariableDialog()
@@ -179,11 +179,9 @@ void QPredicateEditor::on_buttonBox_accepted()
 void QPredicateEditor::on_inlineModuleTxtEdt_textChanged()
 {
     tempPre->variableList.clear();
-    for (int i = 0; i < myVariableList.count(); i++){
-        if (ui->inlineModuleTxtEdt->document()->toPlainText().contains(QRegExp("(\\s|\\b|\\W)" + myVariableList[i]->name + "(\\s|\\b|\\W)", Qt::CaseSensitive))){
+    for (int i = 0; i < myVariableList.count(); i++)
+        if (ui->inlineModuleTxtEdt->document()->toPlainText().contains(QRegExp("(\\s|\\b|\\W)" + myVariableList[i]->name + "(\\s|\\b|\\W)", Qt::CaseSensitive)))
             tempPre->variableList.append(myVariableList.at(i));
-        }
-    }
 }
 
 bool QPredicateEditor::makeResult()
@@ -191,88 +189,21 @@ bool QPredicateEditor::makeResult()
     switch(tempPre->type){
     case Predicate::NormalType:
         tempPre->extName = ui->predicateNameEdt->text();
-        tempPre->name = "P" + getCRC(tempPre->extName.toUtf8());
         break;
     case Predicate::InlineType:
         tempPre->extName = ui->inlineModuleTxtEdt->document()->toPlainText();
-        tempPre->name = "P" + getCRC(tempPre->extName.toUtf8());
         break;
     }
 
-    if (tempPre->extName.isEmpty()) {
-        QString mes = tempPre->type == Predicate::InlineType ? tr("Тело inline-предиката не может быть пустым") : tr("Название предиката не может быть пустым");
-        QMessageBox::critical(NULL, tr("Ошибка"), mes);
+    tempPre->name = "P" + getCRC(tempPre->extName.toUtf8());
+
+    const QStringList errors = tempPre->validate();
+    if (!errors.isEmpty()) {
+        QMessageBox::warning(0, tr("Ошибка"), errors.join("\n"));
         return false;
     }
 
-    if (tempPre->type == Predicate::NormalType && tempPre->baseModule == NULL) {
-        QMessageBox::critical(NULL, tr("Ошибка"), tr("Не указан базовый модуль"));
-        return false;
-    }
-
-    if (tempPre->variableList.size() > 0 && tempPre->variableList.contains(NULL)) {
-        QMessageBox::critical(NULL, tr("Ошибка"), tr("Необходимо указать переменные для всех параметров базового модуля"));
-        return false;
-    }
-
-    const QString myBaseDirectory = QGraphSettings::getBaseDirectory();
-
-    QByteArray outputData;
-    QFile output;
-
-    QStringList params;
-    QStringList signature;
-    outputData.append("#include \"tpodata.h\"\r\n");
-    switch(tempPre->type){
-    case Predicate::NormalType:
-        // Генерируем предикат
-        foreach (QString parameter, tempPre->baseModule->parameterList) {
-            const QStringList parsedParameter = parameter.split(";;");
-            const QString constStr = parsedParameter[2] == QObject::tr("Исходный") ? QObject::tr("const ") : "";
-            signature << QString("%1%2 *%3").arg(constStr).arg(parsedParameter[0]).arg(parsedParameter[1]);
-        }
-        outputData.append("extern int " + tempPre->baseModule->uniqName + "(" + signature.join(", ") + ");\r\n");
-        outputData.append("int ");
-        outputData.append(tempPre->name.toUtf8());
-        outputData.append("(TPOData *D)\r\n");
-        outputData.append("{\r\n");
-        // Инициализуем данные
-        for(int i = 0; i < tempPre->variableList.count(); i++) {
-            QStringList parameter = myModuleList[ui->baseModuleList->currentRow()]->parameterList[i].split(";;");
-            outputData.append(QString(tr("\t%1 *_%2 = D->%3;\r\n")).arg(parameter[0]).arg(parameter[1]).arg(tempPre->variableList[i]->name).toUtf8());
-        }
-        // Вызываем прототип
-        outputData.append("\r\n\tint result = ");
-        outputData.append(tempPre->baseModule->uniqName);
-        outputData.append("(");
-        for(int i = 0; i < tempPre->variableList.count(); i++) {
-            QStringList parameter = myModuleList[ui->baseModuleList->currentRow()]->parameterList[i].split(";;");
-            params << tr("_") + parameter[1];
-        }
-        outputData.append(params.join(", ").toUtf8());
-        outputData.append(");\r\n\r\n");
-        // выход
-        outputData.append("\r\n\r\n\treturn result;\r\n}");
-        break;
-    case Predicate::InlineType:
-        //генерируем с++ файл
-        outputData.append("int " + tempPre->name + "(TPOData *D)\r\n");
-        outputData.append("{\r\n");
-        QString code(tempPre->extName);
-        for (int i = 0; i < tempPre->variableList.count(); i++) {
-            code.replace(QRegExp("\\b" + tempPre->variableList[i]->name + "\\b", Qt::CaseSensitive), "(*(D->" + tempPre->variableList.at(i)->name + "))");
-        }
-        //code.replace(QRegExp("\\n"), "\n  ");
-        outputData.append("  return (" + code + ");\r\n");
-        outputData.append("}\r\n");
-        break;
-    }
-
-    output.setFileName(myBaseDirectory + "/" + tempPre->name + ".cpp");
-    output.open(QFile::WriteOnly);
-    output.write(outputData);
-    output.close();
-
+    tempPre->build();
     result = const_cast<Predicate *>(myPredicate);
     result->name = tempPre->name;
     result->extName = tempPre->extName;

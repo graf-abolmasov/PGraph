@@ -771,21 +771,21 @@ void DataBaseManager::registerModuleDB(const BaseModule *baseModule) throw (QStr
         query.clear();
         query.prepare("INSERT INTO databaz (PROJECT_ID, PROTOTIP, DATA, TYPE, MODE, NEV, COMMENT)"
                       "VALUES (:PROJECT_ID, :PROTOTIP, :DATA, :TYPE, :MODE, :NEV, :COMMENT);");
-        QStringList parameter = baseModule->parameterList[i].split(";;");
+        BaseModuleParameter parameter = baseModule->parameterList[i];
         query.bindValue(":NEV",         i);
-        query.bindValue(":DATA",        parameter[0]);
-        query.bindValue(":TYPE",        parameter[1]);
+        query.bindValue(":DATA",        parameter.name);
+        query.bindValue(":TYPE",        parameter.type);
         query.bindValue(":PROTOTIP",    baseModule->uniqName);
         query.bindValue(":PROJECT_ID",  myProjectId);
         QString vaMode;
-        if (parameter.at(2) == QObject::tr("Исходный"))
+        if (parameter.accessMode == QObject::tr("Исходный"))
             vaMode = "I";
-        else if (parameter.at(2) == QObject::tr("Модифицируемый"))
+        else if (parameter.accessMode == QObject::tr("Модифицируемый"))
             vaMode = "M";
-        else if (parameter.at(2) == QObject::tr("Вычисляемый"))
+        else if (parameter.accessMode == QObject::tr("Вычисляемый"))
             vaMode = "R";
         query.bindValue(":MODE",        vaMode);
-        query.bindValue(":COMMENT",     parameter[3]);
+        query.bindValue(":COMMENT",     parameter.comment);
         if (!query.exec()) {
             globalLogger->log(db.lastError().text(), Logger::Critical);
             db.close();
@@ -820,10 +820,10 @@ QList<BaseModule> DataBaseManager::getBaseModuleListDB() throw (QString)
         if (!query2.exec()) {
             globalLogger->log(db.lastError().text(), Logger::Critical);
             db.close();
-            throw QObject::tr("Не удалось параметры модулей.\n") + db.lastError().text();
+            throw QObject::tr("Не удалось получить параметры модулей.\n") + db.lastError().text();
         }
         globalLogger->log(query2.executedQuery().toUtf8());
-        QStringList parameterList;
+        QList<BaseModuleParameter> parameterList;
         while (query2.next()){
             QString vaMode;
             if (query2.value(2).toString() == "I")
@@ -832,10 +832,7 @@ QList<BaseModule> DataBaseManager::getBaseModuleListDB() throw (QString)
                 vaMode = QObject::tr("Модифицируемый");
             else if (query2.value(2).toString() == "R")
                 vaMode = QObject::tr("Вычисляемый");
-            parameterList.append(query2.value(0).toString() + ";;" +
-                                 query2.value(1).toString() + ";;" +
-                                 vaMode + ";;" +
-                                 query2.value(3).toString());
+            parameterList.append(BaseModuleParameter(vaMode,  query2.value(1).toString(), query2.value(0).toString(), query2.value(3).toString()));
         }
         query2.clear();
         result.append(BaseModule(query1.value(1).toString(), query1.value(0).toString(), query1.value(2).toString(), parameterList));
