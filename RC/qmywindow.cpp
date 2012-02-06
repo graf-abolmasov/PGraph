@@ -17,25 +17,31 @@
 #include "qarc.h"
 #include "qcomment.h"
 #include "datacompiler.h"
+#include "projectdialog.h"
 
 QLabel *globalInfoLabel;
 QListWidget *globalOutput;
 
 TMyWindow::TMyWindow()
 {
-    QStatusBar* statusBar = new QStatusBar(this);
-    setStatusBar(statusBar);
-
-    createActions();
-    createMenus();
-    createToolBar();
-    createUndoView();
-    createDockWindows();
-    createDrawWindow();
-    createOutputWindow();
-
     setWindowIcon(QIcon(":/images/G.png"));
-    readSettings();
+
+    ProjectDialog dlg;
+    dlg.exec();
+
+    if (globalDBManager->getProjectId() != -1) {
+        setStatusBar(new QStatusBar(this));
+        createActions();
+        createMenus();
+        createToolBar();
+        createUndoView();
+        createDockWindows();
+        createDrawWindow();
+        createOutputWindow();
+        readSettings();
+    }
+
+    saveGraphAct = NULL;
 }
 
 TMyWindow::~TMyWindow()
@@ -355,7 +361,9 @@ TDrawWindow *TMyWindow::activeDrawWindow()
 
 void TMyWindow::pointerGroupClicked(int)
 {
-    activeDrawWindow()->setMode(QDiagramScene::Mode(pointerTypeGroup->checkedId()));
+    TDrawWindow *drawWindow  = activeDrawWindow();
+    if (drawWindow != NULL)
+        drawWindow->setMode(QDiagramScene::Mode(pointerTypeGroup->checkedId()));
 }
 
 void TMyWindow::sceneChanged()
@@ -683,7 +691,7 @@ void TMyWindow::graphLoaded(QString name, QString extName)
 void TMyWindow::closeEvent(QCloseEvent *event)
 {
     writeSettings();
-    if (saveGraphAct->isEnabled())
+    if (saveGraphAct != NULL && saveGraphAct->isEnabled())
         if (QMessageBox::question(this, tr("Сохранить"), tr("Сохранить изменения в ") + activeDrawWindow()->myGraphExtName + tr("?"), QMessageBox::Yes, QMessageBox::No, QMessageBox::NoButton) == QMessageBox::Yes)
             CMGSave();
     event->accept();

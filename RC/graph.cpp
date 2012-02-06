@@ -36,6 +36,7 @@ int Graph::getRootTop() const
     return rootTop;
 }
 
+
 QStringList Graph::validate() const
 {
     QStringList msgs;
@@ -49,4 +50,10 @@ QStringList Graph::validate() const
     if (getRootTop() == -1)
         msgs << QObject::tr(ERR_GRAPH_UNDEF_ROOT).arg(name);
     return msgs;
+}
+
+Project::Project(int id, QString name)
+{
+    this->id = id;
+    this->name = name;
 }
