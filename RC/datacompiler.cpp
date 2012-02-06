@@ -301,7 +301,7 @@ void DataCompiler::compileUserTypes()
             continue;
         QRegExp r("(typedef\\s+(\\b.+\\b))");
         r.setMinimal(true);
-        Q_ASSERT(r.indexIn(type->typedefStr) != -1);
+//        Q_ASSERT(r.indexIn(type->typedefStr) != -1);
         const QString intType = r.cap(2);
         const QString baseMpiType = mpiTypes.contains(intType) ? mpiTypes[r.cap(2)] : "MPI_USER_TYPE_" + r.cap(2).toUpper();
         mpiTypesBlock.append("#define MPI_USER_TYPE_").append(type->name.toUpper()).append(" ").append(baseMpiType).append("\r\n");

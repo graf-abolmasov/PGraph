@@ -78,12 +78,12 @@ private:
     QAction* distribVerticallyAct;
     QAction* distribHorizontallyAct;
 
-    //scaleToolbar
-    QComboBox *sceneScaleCombo;
+    //Масштаб
+    QComboBox *scaleCombo;
     QSlider *scaleSlider;
 
-    //LayerToolBar
-    QToolButton *showDataLayer;
+    //Слои
+    //QToolButton *showDataLayer;
 
     //EditToolBar
     QAction *cutAct;

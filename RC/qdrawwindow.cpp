@@ -60,13 +60,11 @@ TDrawWindow::TDrawWindow(ShowRole role, QWidget *parent)
 
     view->setScene(scene);
     view->setAlignment(Qt::AlignCenter);
-    /*
-      Рисуем сетку
+//      Рисуем сетку
     QBrush myBackgroundBrush = view->backgroundBrush();
     myBackgroundBrush.setColor(Qt::lightGray);
-    myBackgroundBrush.setStyle(Qt::CrossPattern);
+    myBackgroundBrush.setStyle(Qt::Dense7Pattern);
     view->setBackgroundBrush(myBackgroundBrush);
-    */
     setCentralWidget(view);
     setWindowTitle("");
     if (myRole == NormalEditor)
