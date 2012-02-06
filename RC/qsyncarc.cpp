@@ -20,7 +20,7 @@ QSyncArc::QSyncArc(QTop *startItem, QTop *endItem, QMenu *contextMenu, QGraphics
 
     setPen(myPen);
     myContextMenu = contextMenu;
-};
+}
 
 void QSyncArc::contextMenuEvent(QGraphicsSceneContextMenuEvent *event){
     scene()->clearSelection();

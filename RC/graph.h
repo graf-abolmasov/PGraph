@@ -62,6 +62,16 @@ public:
     QStringList validate() const;
 };
 
+class Project
+{
+public:
+    int id;
+    QString name;
+    QString description;
+    QString author;
+    Project(int id, QString name);
+};
+
 class Graph  : public Actor
 {
 public:

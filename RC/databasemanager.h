@@ -7,6 +7,7 @@
 #include "graph.h"
 #include "compi.h"
 
+
 class DataBaseManager
 {
 private:
@@ -22,9 +23,11 @@ private:
     QList<const BaseModule *> myBaseModuleList;
 
 
+    void saveVariableListDB();
     void saveVariableListDB(const QList<Variable> &varList) throw (QString);
     QList<Variable> getVariableListDB() throw (QString);
 
+    void saveDataTypeListDB();
     void saveDataTypeListDB(const QList<DataType> &typeList) throw (QString);
     QList<DataType> getDataTypeListDB() throw (QString);
 
@@ -36,6 +39,9 @@ private:
 
     QList<BaseModule> getBaseModuleListDB() throw (QString);
     QList<Graph> getGraphListDB() throw (QString);
+
+    void openDB();
+    void execQuery(QSqlQuery &query);
 public:
     DataBaseManager();
     ~DataBaseManager();
@@ -68,8 +74,14 @@ public:
     Graph getGraphDB(const QString &namepr) throw (QString);
     void saveGraphDB(const Graph &graph) throw (QString);
     void updateGraphDB(const Graph &graph) throw (QString);
+
     void openProjectDB(int projectId);
+    void createProjectDB(QString projectName, QString author, QString description);
+    void removeProjectDB(int projectId);
+    QList<Project> getProjectListDB();
+
     void saveStructDB(const Graph &graph) throw (QString);
+
     void registerModuleDB(const BaseModule *baseModule) throw (QString);
 
     void saveActorPictute(const QString &actorName, const QPixmap &image);

@@ -46,7 +46,8 @@ SOURCES += main.cpp \
     datacompiler.cpp \
     qcodeeditor.cpp \
     compiler.cpp \
-    qgraphsettings.cpp
+    qgraphsettings.cpp \
+    projectdialog.cpp
 HEADERS += qmywindow.h \
     qdrawwindow.h \
     qtop.h \
@@ -90,7 +91,8 @@ HEADERS += qmywindow.h \
     datacompiler.h \
     qcodeeditor.h \
     errors.h \
-    qgraphsettings.h
+    qgraphsettings.h \
+    projectdialog.h
 RESOURCES += resources.qrc
 FORMS += toppropertydialog.ui \
     qobjecteditor.ui \
@@ -104,5 +106,6 @@ FORMS += toppropertydialog.ui \
     arcpropertydialog.ui \
     qsavegraphdialog.ui \
     qopengraphdialog.ui \
-    multiproctoppropertydialog.ui
+    multiproctoppropertydialog.ui \
+    projectdialog.ui
 RC_FILE = images/resources.rc
