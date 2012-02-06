@@ -203,7 +203,7 @@ void TMyWindow::createActions()
     addSyncArcButton = new QToolButton;
     addSyncArcButton->setCheckable(true);
     addSyncArcButton->setIcon(QIcon(":/images/syncarc.png"));
-    //addSyncArcButton->setEnabled(false);
+    addSyncArcButton->setEnabled(false);
 
     addMultiProcTopButton = new QToolButton;
     addMultiProcTopButton->setCheckable(true);
@@ -242,11 +242,11 @@ void TMyWindow::createActions()
     distribHorizontallyAct->setStatusTip(tr("Распределить вершиные по горизонтали на одинаковом расстоянии"));
     connect(distribHorizontallyAct, SIGNAL(triggered()), this, SLOT(distribHorizontally()));
 
-    sceneScaleCombo = new QComboBox;
+    scaleCombo = new QComboBox;
     QStringList scales;
     scales << tr("50%") << tr("75%") << tr("100%") << tr("125%") << tr("150%");
-    sceneScaleCombo->addItems(scales);
-    connect(sceneScaleCombo, SIGNAL(currentIndexChanged(QString)),
+    scaleCombo->addItems(scales);
+    connect(scaleCombo, SIGNAL(currentIndexChanged(QString)),
             this, SLOT(setFixedScale(QString)));
 
     scaleSlider = new QSlider;
@@ -254,12 +254,12 @@ void TMyWindow::createActions()
     scaleSlider->setValue(100);
     scaleSlider->setOrientation(Qt::Horizontal);
     scaleSlider->setMaximumWidth(100);
-    connect(scaleSlider, SIGNAL(sliderMoved(int)), this, SLOT(setFloatScale(int)));
+    connect(scaleSlider, SIGNAL(valueChanged(int)), this, SLOT(setFloatScale(int)));
 
-    showDataLayer = new QToolButton();
-    showDataLayer->setText(tr("Данные"));
-    showDataLayer ->setCheckable(true);
-    connect(showDataLayer, SIGNAL(clicked(bool)), this, SLOT(showDataLayerClicked(bool)));
+//    showDataLayer = new QToolButton();
+//    showDataLayer->setText(tr("Данные"));
+//    showDataLayer ->setCheckable(true);
+//    connect(showDataLayer, SIGNAL(clicked(bool)), this, SLOT(showDataLayerClicked(bool)));
 }
 
 TDrawWindow* TMyWindow::createDrawWindow()
@@ -289,7 +289,7 @@ TDrawWindow* TMyWindow::createDrawWindow()
     distribHorizontallyAct->setEnabled(false);
 
     globalInfoLabel->setText("\n\n\n\n\n\n\n");
-    sceneScaleCombo->setCurrentIndex(2);
+    scaleCombo->setCurrentIndex(2);
     return newDrawWindow;
 }
 
@@ -344,13 +344,13 @@ void TMyWindow::createToolBar()
 
     scaleToolBar = addToolBar(tr("Масштаб"));
     scaleToolBar->addWidget(new QLabel(tr("Масштаб: ")));
-    scaleToolBar->addWidget(sceneScaleCombo);
+    scaleToolBar->addWidget(scaleCombo);
 
-    layerToolBar = addToolBar(tr("Слои"));
-    layerToolBar->addWidget(showDataLayer);
-    //Если нужен ползунковый регулятор масштаба
-    //scaleToolBar->addSeparator();
-    //scaleToolBar->addWidget(scaleSlider);
+//    layerToolBar = addToolBar(tr("Слои"));
+//    layerToolBar->addWidget(showDataLayer);
+//    Если нужен ползунковый регулятор масштаба
+//    scaleToolBar->addSeparator();
+    scaleToolBar->addWidget(scaleSlider);
 }
 
 
@@ -667,6 +667,7 @@ void TMyWindow::setFloatScale(const int scale)
 
 void TMyWindow::readSettings()
 {
+
 }
 
 void TMyWindow::writeSettings()
@@ -711,7 +712,7 @@ void TMyWindow::CMCompile()
 
 void TMyWindow::showDataLayerClicked(bool clicked)
 {
-    activeDrawWindow()->showDataLayer(clicked);
+//    activeDrawWindow()->showDataLayer(clicked);
 }
 
 void TMyWindow::CMECopy()
