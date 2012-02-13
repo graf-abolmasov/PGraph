@@ -469,7 +469,7 @@ QList<Variable> DataBaseManager::getVariableListDB() throw (QString)
     }
     QList<Variable> result;
     while (query.next())
-        result.append(Variable(query.value(0).toString(),query.value(2).toString(),query.value(3).toString(), true, getDataType(query.value(1).toString())));
+        result.append(Variable(query.value(0).toString(),query.value(2).toString(),query.value(3).toString(), false, getDataType(query.value(1).toString())));
 
     db.close();
     return result;
