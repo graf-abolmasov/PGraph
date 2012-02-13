@@ -460,7 +460,7 @@ QList<Variable> DataBaseManager::getVariableListDB() throw (QString)
         throw QObject::tr("Не удалось открыть базу данных.\n") + db.lastError().text();
     }
     QSqlQuery query;
-    query.prepare("SELECT DATA, TYPE, INIT, COMMENT FROM data d WHERE PROJECT_ID = :PROJECT_ID ORDER BY DATA;");
+    query.prepare("SELECT DATA, TYPE, INIT, COMMENT FROM data WHERE PROJECT_ID = :PROJECT_ID ORDER BY DATA;");
     query.bindValue(":PROJECT_ID", myProjectId);
     if (!query.exec()) {
         globalLogger->log(db.lastError().text(), Logger::Critical);
@@ -469,7 +469,7 @@ QList<Variable> DataBaseManager::getVariableListDB() throw (QString)
     }
     QList<Variable> result;
     while (query.next())
-        result.append(Variable(query.value(0).toString(),query.value(2).toString(),query.value(3).toString(), false, getDataType(query.value(1).toString())));
+        result.append(Variable(query.value(0).toString(),query.value(2).toString(),query.value(3).toString(), true, getDataType(query.value(1).toString())));
 
     db.close();
     return result;
@@ -495,6 +495,11 @@ QList<const Actor *> DataBaseManager::getActorList() const
 void DataBaseManager::setActorList(const QList<const Actor *> &list)
 {
     myActorList = list;
+    saveActorListDB();
+}
+
+void DataBaseManager::saveActorListDB()
+{
     QList<Actor> dbActorList;
     foreach (const Actor *actor, myActorList)
         dbActorList.append(Actor(*actor));
@@ -509,6 +514,11 @@ QList<const Predicate *> DataBaseManager::getPredicateList() const
 void DataBaseManager::setPredicateList(const QList<const Predicate *> &list)
 {
     myPredicateList = list;
+    savePredicateListDB();
+}
+
+void DataBaseManager::savePredicateListDB()
+{
     QList<Predicate> dbPredicateList;
     foreach (const Predicate *predicate, myPredicateList)
         dbPredicateList.append(Predicate(*predicate));
@@ -596,8 +606,9 @@ QList<Actor> DataBaseManager::getActorListDB() throw (QString)
     }
     QList<Actor> result;
     while (query1.next()){
-        query2.prepare("SELECT NEV, DATA, MODE FROM pasport WHERE NAMEPR = :NAMEPR ORDER BY NEV");
+        query2.prepare("SELECT NEV, DATA, MODE FROM pasport WHERE NAMEPR = :NAMEPR AND PROJECT_ID = :PROJECT_ID ORDER BY NEV");
         query2.bindValue(":NAMEPR", query1.value(0).toString());
+        query2.bindValue(":PROJECT_ID", myProjectId);
         if (!query2.exec()) {
             globalLogger->log(db.lastError().text(), Logger::Critical);
             db.close();
@@ -981,6 +992,7 @@ void DataBaseManager::openProjectDB(int projectId)
     query.prepare("SELECT * from project WHERE PROJECT_ID=:PROJECT_ID");
     query.bindValue(":PROJECT_ID", myProjectId);
     execQuery(query);
+    query.next();
     myProjectName = query.value(1).toString();
     db.close();
 
@@ -1004,16 +1016,37 @@ void DataBaseManager::openProjectDB(int projectId)
         myGraphList.append(new Graph(graph));
 }
 
-void DataBaseManager::createProjectDB(QString projectName, QString author, QString description)
+void DataBaseManager::cloneProjectDB(int srcProjectId, QString projectName, QString author, QString description)
+{
+    openProjectDB(srcProjectId);
+    int dstProjectId = createProjectDB(projectName, author, description);
+    myProjectId = dstProjectId;
+    saveVariableListDB();
+    saveDataTypeListDB();
+    saveActorListDB();
+    savePredicateListDB();
+    QList<const BaseModule *> baseModules = getBaseModuleList();
+    foreach (const BaseModule *baseModule, baseModules)
+        registerModuleDB(baseModule);
+    QList<const Graph*> graphs = getGraphList();
+    foreach (const Graph *graph, graphs) {
+        myProjectId = srcProjectId;
+        const Graph g = getGraphDB(graph->name);
+        myProjectId = dstProjectId;
+        saveGraphDB(g);
+    }
+}
+
+int DataBaseManager::createProjectDB(QString projectName, QString author, QString description)
 {
     openDB();
     QSqlQuery query;
     query.prepare("INSERT INTO project (PROJECT_NAME) VALUES (PROJECT_NAME=:PROJECT_NAME)");
     query.bindValue(":PROJECT_NAME", projectName);
     execQuery(query);
-    myProjectId = query.lastInsertId().toInt();
-    myProjectName = projectName;
+    int result = query.lastInsertId().toInt();
     db.close();
+    return result;
 }
 
 void DataBaseManager::removeProjectDB(int projectId)

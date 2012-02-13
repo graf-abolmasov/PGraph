@@ -35,3 +35,10 @@ void ProjectDialog::on_buttonBox_accepted()
     int projectId = ui->projectsTable->currentItem()->data(Qt::UserRole).toInt();
     globalDBManager->openProjectDB(projectId);
 }
+
+void ProjectDialog::on_cloneProjectBtn_clicked()
+{
+    int projectId = ui->projectsTable->currentItem()->data(Qt::UserRole).toInt();
+    globalDBManager->cloneProjectDB(projectId, globalDBManager->getProjectName() + tr("_copy"), "", "");
+    QMessageBox::information(NULL, tr("Скопировано"), tr("Проект скопирован"));
+}

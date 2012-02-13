@@ -7,6 +7,7 @@
 #include "globalvariables.h"
 #include "predicate.h"
 #include "qtop.h"
+#include "qgraphsettings.h"
 
 ArcPropertyDialog::ArcPropertyDialog(QWidget *parent) :
     QDialog(parent),
@@ -52,6 +53,9 @@ void ArcPropertyDialog::prepareForm(QArc *arc)
         ui->terminateRadioBtn->setChecked(true);
         break;
     }
+    bool isParallel = QGraphSettings::isParallel();
+    ui->terminateRadioBtn->setEnabled(isParallel);
+    ui->parallelRadioBtn->setEnabled(isParallel);
 
     ui->prioritySpnBox->setValue(arc->priority());
     ui->prioritySpnBox->setMaximum(arc->startItem()->outArcs().count());

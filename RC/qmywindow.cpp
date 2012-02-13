@@ -18,6 +18,7 @@
 #include "qcomment.h"
 #include "datacompiler.h"
 #include "projectdialog.h"
+#include "qgraphsettings.h"
 
 QLabel *globalInfoLabel;
 QListWidget *globalOutput;
@@ -26,8 +27,11 @@ TMyWindow::TMyWindow()
 {
     setWindowIcon(QIcon(":/images/G.png"));
 
-    ProjectDialog dlg;
-    dlg.exec();
+//    ProjectDialog dlg;
+//    dlg.exec();
+
+    saveGraphAct = NULL;
+    isParallel = QGraphSettings::isParallel();
 
     if (globalDBManager->getProjectId() != -1) {
         setStatusBar(new QStatusBar(this));
@@ -41,7 +45,6 @@ TMyWindow::TMyWindow()
         readSettings();
     }
 
-    saveGraphAct = NULL;
 }
 
 TMyWindow::~TMyWindow()
@@ -200,14 +203,18 @@ void TMyWindow::createActions()
     addArcButton->setCheckable(true);
     addArcButton->setIcon(QIcon(":/images/linepointer.png"));
 
-    addSyncArcButton = new QToolButton;
-    addSyncArcButton->setCheckable(true);
-    addSyncArcButton->setIcon(QIcon(":/images/syncarc.png"));
-    addSyncArcButton->setEnabled(false);
+    addSyncArcButton = NULL;
+    addMultiProcTopButton = NULL;
+    if (isParallel) {
+        addSyncArcButton = new QToolButton;
+        addSyncArcButton->setCheckable(true);
+        addSyncArcButton->setIcon(QIcon(":/images/syncarc.png"));
+        addSyncArcButton->setEnabled(false);
 
-    addMultiProcTopButton = new QToolButton;
-    addMultiProcTopButton->setCheckable(true);
-    addMultiProcTopButton->setIcon(QIcon(":/images/multiproctop.png"));
+        addMultiProcTopButton = new QToolButton;
+        addMultiProcTopButton->setCheckable(true);
+        addMultiProcTopButton->setIcon(QIcon(":/images/multiproctop.png"));
+    }
 
     //AlignToolBar
     alignHLeftAct = new QAction(QIcon(":/images/shape_align_left.png"), tr("Выровнить к левому краю"), this);
@@ -314,8 +321,10 @@ void TMyWindow::createToolBar()
     pointerTypeGroup->addButton(addCommentButton, int(QDiagramScene::InsertText));
     pointerTypeGroup->addButton(pointerButton, int(QDiagramScene::MoveItem));
     pointerTypeGroup->addButton(addArcButton, int(QDiagramScene::InsertLine));
-    pointerTypeGroup->addButton(addSyncArcButton, int(QDiagramScene::InsertSync));
-    pointerTypeGroup->addButton(addMultiProcTopButton, int(QDiagramScene::InsertMultiProcTop));
+    if (isParallel) {
+        pointerTypeGroup->addButton(addSyncArcButton, int(QDiagramScene::InsertSync));
+        pointerTypeGroup->addButton(addMultiProcTopButton, int(QDiagramScene::InsertMultiProcTop));
+    }
     connect(pointerTypeGroup, SIGNAL(buttonClicked(int)), this, SLOT(pointerGroupClicked(int)));
 
     leftToolBar = new QToolBar(tr("Палитра инструментов"), this);
@@ -323,10 +332,12 @@ void TMyWindow::createToolBar()
     leftToolBar->addWidget(pointerButton);
     leftToolBar->addSeparator();
     leftToolBar->addWidget(addTopButton);
-    leftToolBar->addWidget(addMultiProcTopButton);
+    if (isParallel)
+        leftToolBar->addWidget(addMultiProcTopButton);
     leftToolBar->addSeparator();
     leftToolBar->addWidget(addArcButton);
-    leftToolBar->addWidget(addSyncArcButton);
+    if (isParallel)
+        leftToolBar->addWidget(addSyncArcButton);
     leftToolBar->addSeparator();
     leftToolBar->addWidget(addCommentButton);
 

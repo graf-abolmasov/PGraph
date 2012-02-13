@@ -31,12 +31,16 @@ bool QArc::autoBuild(QTop* top, float dx, float dy){
 
     QPointF startPoint;
     QPointF endPoint;
-    if (top == startItem()){
-        startPoint = lines.first()->line().p1() + QPointF(dx, dy);
-        endPoint = lines.last()->line().p2();
+    const QArcLine *first = lines.first();
+    const QArcLine *last = lines.last();
+    Q_ASSERT(first);
+    Q_ASSERT(last);
+    if (top == startItem()) {
+        startPoint = first->line().p1() + QPointF(dx, dy);
+        endPoint = last->line().p2();
     } else {
-        startPoint = lines.first()->line().p1();
-        endPoint = lines.last()->line().p2() + QPointF(dx, dy);
+        startPoint = first->line().p1();
+        endPoint = last->line().p2() + QPointF(dx, dy);
     }
 
     qDeleteAll(lines);
@@ -52,16 +56,15 @@ bool QArc::autoBuild(QTop* top, float dx, float dy){
     QLineF polyLineEnd;
     polyLineEnd = endItem()->getIntersectBound(centerLine);
 
-    double deltaY = endPoint.y() - startPoint.y();
-    double deltaX = endPoint.x() - startPoint.x();
+    const double deltaY = endPoint.y() - startPoint.y();
+    const double deltaX = endPoint.x() - startPoint.x();
     QPointF P1, P2;
     //vertical border start
-    if ((polyLineStart.angle() == 90) ||
-            (polyLineStart.angle() == 270)) {
-
+    const double startAngle = polyLineStart.angle();
+    const double end2StartAngle = polyLineEnd.angleTo(polyLineStart);
+    if (( startAngle == 90.0) || (startAngle == 270.0)) {
         //parallel border end
-        if ((polyLineEnd.angleTo(polyLineStart) == 0) ||
-                (polyLineEnd.angleTo(polyLineStart) == 180)) {
+        if ((end2StartAngle == 0.0) || (end2StartAngle == 180.0)) {
             P1.setX(startPoint.x() + deltaX/2);
             P1.setY(startPoint.y());
             P2.setX(P1.x());
@@ -71,8 +74,7 @@ bool QArc::autoBuild(QTop* top, float dx, float dy){
             newLine(P2, endPoint);
         }
         //perpendicular border end
-        if ((polyLineEnd.angleTo(polyLineStart) == 90) ||
-                (polyLineEnd.angleTo(polyLineStart) == 270)) {
+        if ((end2StartAngle == 90.0) || (end2StartAngle == 270.0)) {
             P1.setX(endPoint.x());
             P1.setY(startPoint.y());
             newLine(startPoint, P1);
@@ -80,19 +82,16 @@ bool QArc::autoBuild(QTop* top, float dx, float dy){
         }
     }
     //horizontal border start
-    if ((polyLineStart.angle() == 0) ||
-            (polyLineStart.angle() == 180)) {
+    if ((startAngle == 0.0) || (startAngle == 180.0)) {
         //perpendicular border end
-        if ((polyLineEnd.angleTo(polyLineStart) == 90) ||
-                (polyLineEnd.angleTo(polyLineStart) == 270)) {
+        if ((end2StartAngle == 90.0) || (end2StartAngle == 270.0)) {
             P1.setX(startPoint.x());
             P1.setY(endPoint.y());
             newLine(startPoint, P1);
             newLine(P1, endPoint);
         }
         //parallel border end
-        if ((polyLineEnd.angleTo(polyLineStart) == 0) ||
-                (polyLineEnd.angleTo(polyLineStart) == 180)) {
+        if ((end2StartAngle == 0.0) || (end2StartAngle == 180.0)) {
             P1.setX(startPoint.x());
             P1.setY(startPoint.y() + deltaY/2);
             P2.setX(endPoint.x());
@@ -102,6 +101,10 @@ bool QArc::autoBuild(QTop* top, float dx, float dy){
             newLine(P2, endPoint);
         }
     }
+
+    if (currentLine == NULL)
+        qDebug() << startAngle << end2StartAngle;
+
     addLine(currentLine);
     updateBounds();
 
@@ -137,7 +140,7 @@ bool QArc::remake(QTop* aMovedTop, float dx, float dy){
         return true;
     }
 
-    if (lines.count() == 1 || lines.count() == 3){
+    if (lines.count() == 1 || lines.count() == 3) {
         //старый алгоритм
         //переработано, дополнено, прокоментировано
         //и как ни странно - не работает
@@ -147,8 +150,10 @@ bool QArc::remake(QTop* aMovedTop, float dx, float dy){
         QPointF pts[4];
         int i;
         for(i =0; i < otr; i++){
-            pts[i] = lines.at(i)->line().p1();
-            pts[i+1] = lines.at(i)->line().p2();
+            const QArcLine *line =lines.at(i);
+            Q_ASSERT(line);
+            pts[i] = line->line().p1();
+            pts[i+1] = line->line().p2();
         }
 
         QLineF startBorder = startItem()->getIntersectBound(lines.first()->line());
@@ -268,7 +273,7 @@ bool QArc::remake(QTop* aMovedTop, float dx, float dy){
     }
     
     //если передвинутая вершина - начало
-    if (aMovedTop == myStartTop){
+    if (aMovedTop == myStartTop) {
         //вертикальную линию двигаем только вправо/влево или удлинняем/укорачиваем
         if (lines.first()->line().p1().x() == lines.first()->line().p2().x()){
             //можно двигать пока остается место для серого квадратика
@@ -526,6 +531,7 @@ void QArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 */
 bool QArc::addLine(QArcLine *line)
 {
+    Q_ASSERT(line);
     if ((prevLine() != NULL) &&
             (prevLine()->line().p2() == line->line().p1()) &&
             (prevLine() != line) &&
@@ -591,9 +597,16 @@ QArcLine* QArc::newLine(QPointF p1, QPointF p2)
 /*!
   Обновляет границы. Необходимо вызывать после изменения размеров, перемещения и т.д.
 */
-void QArc::updateBounds(){
-    if (lines.count() > 0)
-        setLine(QLineF(lines.first()->line().p1(), lines.last()->line().p2()));
+void QArc::updateBounds() {
+    if (lines.count() > 0) {
+        const QArcLine *firstLine = lines.first();
+        const QArcLine *lastLine = lines.last();
+        Q_ASSERT(firstLine);
+        Q_ASSERT(lastLine);
+        if (firstLine == NULL || lastLine == NULL)
+            qDebug() << QString("Ошибка!!");
+        setLine(QLineF(firstLine->line().p1(), lastLine->line().p2()));
+    }
 }
 
 /*!
@@ -603,7 +616,8 @@ void QArc::updateBounds(){
 void QArc::setPriority(int w){
     myPriority = w;
     QPen myPen = pen();
-    myPen.setWidth(myStartTop->outArcs().count() - myPriority + 2);
+    if (myArcType == SerialArc)
+        myPen.setWidth(myStartTop->outArcs().count() - myPriority + 2);
     setPen(myPen);
 }
 

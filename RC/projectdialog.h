@@ -19,6 +19,8 @@ private slots:
     void on_openProjectBtn_clicked();
     void on_buttonBox_accepted();
 
+    void on_cloneProjectBtn_clicked();
+
 private:
     Ui::ProjectDialog *ui;
 };
