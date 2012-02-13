@@ -31,9 +31,11 @@ private:
     void saveDataTypeListDB(const QList<DataType> &typeList) throw (QString);
     QList<DataType> getDataTypeListDB() throw (QString);
 
+    void saveActorListDB();
     void saveActorListDB(const QList<Actor> &actorList) throw (QString);
     QList<Actor> getActorListDB() throw (QString);
 
+    void savePredicateListDB();
     void savePredicateListDB(const QList<Predicate> &predList) throw (QString);
     QList<Predicate> getPredicateListDB() throw (QString);
 
@@ -75,10 +77,11 @@ public:
     void saveGraphDB(const Graph &graph) throw (QString);
     void updateGraphDB(const Graph &graph) throw (QString);
 
-    void openProjectDB(int projectId);
-    void createProjectDB(QString projectName, QString author, QString description);
-    void removeProjectDB(int projectId);
+    void cloneProjectDB(int srcProjectId, QString projectName, QString author, QString description);
     QList<Project> getProjectListDB();
+    void openProjectDB(int projectId);
+    void removeProjectDB(int projectId);
+    int createProjectDB(QString projectName, QString author, QString description);
 
     void saveStructDB(const Graph &graph) throw (QString);
 

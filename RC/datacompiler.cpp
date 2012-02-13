@@ -194,8 +194,8 @@ void DataCompiler::compileTpoData()
                                    "\tbreak;\n");
         }
         //Блок очистки памяти
-        deleteBlock.append("if " + vn + " != NULL\r\n"
-                           "\tdelete _" + vn + ";\n");
+        deleteBlock.append("if (" + QString(var->isGlobal ? "_" : "") + vn + " != NULL)\r\n"
+                           "\tdelete " + (var->isGlobal ? "_" : "") + vn + ";\n");
 
         //Блок инициализации памяти на менеджере памяти и блок setters/getters
         if (var->isGlobal) {

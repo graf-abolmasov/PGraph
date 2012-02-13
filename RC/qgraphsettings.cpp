@@ -13,7 +13,10 @@ QString QGraphSettings::getOutputDirectory()
 QString QGraphSettings::getBaseDirectory()
 {
     QSettings c("graph.ini", QSettings::IniFormat);
-    return QFileInfo(c.value("Location/BaseDir", "./BaseDir").toString()).canonicalFilePath();
+    const QString baseDirectory = c.value("Location/BaseDir", "./BaseDir").toString() + "/" + globalDBManager->getProjectName();
+    if (!QDir(baseDirectory).exists())
+        QDir().mkpath(baseDirectory);
+    return QFileInfo(baseDirectory).canonicalFilePath();
 }
 
 QString QGraphSettings::getTemplateDirectory()

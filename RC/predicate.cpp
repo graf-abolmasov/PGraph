@@ -81,7 +81,7 @@ void Predicate::build() const
             r.setMinimal(true);
             code.replace(r, variable->isGlobal ? "D->" + variable->name : "(*(D->" + variable->name + "))");
         }
-        outputData.append("  return (" + code + ")\r\n");
+        outputData.append("  return (" + code + ");\r\n");
         outputData.append("}\r\n");
         break;
     }

@@ -59,8 +59,8 @@ void TopPropertyDialog::prepareForm(QNormalTop* top){
     float minHeight = top->getMinHeight() > 10 ? top->getMinHeight() : 10;
     float minWidth = top->getMinWidth() > 10 ? top->getMinWidth() : 10;
 
-    ui->spnBoxHeight->setProperty("minimum", minHeight);
-    ui->spnBoxWidth->setProperty("minimum", minWidth);
+//    ui->spnBoxHeight->setProperty("minimum", minHeight);
+//    ui->spnBoxWidth->setProperty("minimum", minWidth);
 }
 
 QNormalTop* TopPropertyDialog::getResult(){
@@ -91,6 +91,7 @@ void TopPropertyDialog::on_actorsListWidget_currentRowChanged(int currentRow)
         }        info.append(tr("Type: ") + type + "\r\n");
         if (actor->baseModule != NULL)
             info.append(tr("Base module: ") + actor->baseModule->name + "\r\n");
+        info.append(actor->extName).append("\r\n");
     }
     ui->descriptionLbl->setText(info);
 }

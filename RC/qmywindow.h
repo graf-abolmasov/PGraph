@@ -25,6 +25,9 @@ public:
     ~TMyWindow();
 
 private:
+
+    bool isParallel;
+
     QMenu *grafMenu;
     QMenu *objectMenu;
     QMenu *dataMenu;
