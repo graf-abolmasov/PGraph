@@ -50,7 +50,7 @@ bool DataType::isArray() const
 
 bool DataType::isSimple() const
 {
-    !(isStruct() || isArray());
+    return (!(isStruct() || isArray()));
 }
 
 bool DataType::isStruct() const
