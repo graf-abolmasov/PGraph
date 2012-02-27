@@ -477,7 +477,7 @@ bool TDrawWindow::saveGraph(QString name, QString extName)
     try {
         globalDBManager->saveGraphDB(graph);
         emit graphLoaded(graph.name, graph.extName);
-    } catch (QString s) {
+    } catch (const QString s) {
         QMessageBox::critical(this, tr("Ошибка"), s, QMessageBox::Ok);
         return false;
     }
@@ -490,9 +490,9 @@ bool TDrawWindow::updateGraph()
     if (graph.extName != "") {
         try {
             globalDBManager->updateGraphDB(graph);
-        } catch (QString s) {
-            return false;
+        } catch (const QString s) {
             QMessageBox::critical(this, tr("Ошибка"), s, QMessageBox::Ok);
+            return false;
         }
         return true;
     } else return false;
@@ -504,9 +504,9 @@ bool TDrawWindow::saveStruct()
     if (graph.extName != "") {
         try {
             globalDBManager->saveStructDB(graph);
-        } catch (QString s) {
-            return false;
+        } catch (const QString s) {
             QMessageBox::critical(this, tr("Ошибка"), s, QMessageBox::Ok);
+            return false;
         }
         return true;
     } else return false;

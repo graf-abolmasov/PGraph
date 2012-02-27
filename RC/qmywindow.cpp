@@ -209,7 +209,7 @@ void TMyWindow::createActions()
         addSyncArcButton = new QToolButton;
         addSyncArcButton->setCheckable(true);
         addSyncArcButton->setIcon(QIcon(":/images/syncarc.png"));
-        addSyncArcButton->setEnabled(false);
+//        addSyncArcButton->setEnabled(false);
 
         addMultiProcTopButton = new QToolButton;
         addMultiProcTopButton->setCheckable(true);
@@ -303,7 +303,7 @@ TDrawWindow* TMyWindow::createDrawWindow()
 
 void TMyWindow::createToolBar()
 {
-    mainToolBar = addToolBar(tr("Инструменты"));
+    mainToolBar = addToolBar(tr("Инструменты"));
     mainToolBar->addAction(newGraphAct);
     mainToolBar->addAction(openGraphAct);
     mainToolBar->addAction(saveGraphAct);
@@ -751,6 +751,7 @@ void TMyWindow::CMEPaste()
 void TMyWindow::CMCompileData()
 {
     DataCompiler c(DataCompiler::Parallel);
+    globalLogger->skipLine();
     c.compile();
 }
 
