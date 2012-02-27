@@ -213,8 +213,8 @@ bool QArc::remake(QTop* aMovedTop, float dx, float dy){
                 pnts[1] += QPointF(dx*!(!(pnts[1].x() - pnts[0].x())), dy*!(!(pnts[1].y()-pnts[0].y())));
                 pnts[2] += QPointF(dx, dy);
             }
-            else flag = false;*/
-            break;
+            else flag = false;
+            break;*/
         case 3:
             lgolddir = dvec2log(pnts[3].x() - pnts[2].x(), pnts[3].y() - pnts[2].y());
             lgdir    = dvec2log(pnts[3].x() + dx - pnts[1].x(), pnts[3].y() + dy - pnts[1].y());

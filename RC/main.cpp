@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
     logOutput.append(Logger::Window);
     globalLogger = new Logger(Logger::Debug, logOutput);
     globalDBManager = new DataBaseManager();
-    globalDBManager->openProjectDB(11);
+//    globalDBManager->openProjectDB(1);
 
     if (globalDBManager->lastError().type() != QSqlError::NoError) {
         QMessageBox::critical(NULL, QObject::tr("Ошибка"), QObject::tr("Ошибка подключения к базе данных.\n") + globalDBManager->lastError().databaseText(), QMessageBox::Ok);
