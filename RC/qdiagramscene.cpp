@@ -428,3 +428,11 @@ int QDiagramScene::getNextTopNumber()
 
     return maxNumber+1;
 }
+
+void QDiagramScene::wheelEvent(QGraphicsSceneWheelEvent *wheelEvent)
+{
+    if (wheelEvent->modifiers() & Qt::ControlModifier) {
+        emit mouseScrollScaleChanged(wheelEvent->delta()/8);
+        wheelEvent->accept();
+    }
+}

@@ -176,6 +176,7 @@ private slots:
 
     void setFixedScale(const QString &scale);
     void setFloatScale(const int scale);
+    void updateScaleSlider(const float scale);
 
     void updateToolBar(QList<QGraphicsItem *> items);
     void getInfo(QGraphicsItem *item);

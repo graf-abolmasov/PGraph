@@ -44,9 +44,9 @@ public:
     const Actor *actor;
 protected:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
-private:
     QList<QArc *> arcs;
     QList<QSyncArc *> sync;
+private:
     QMenu *myContextMenu;
 };
 

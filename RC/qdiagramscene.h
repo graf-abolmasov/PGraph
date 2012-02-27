@@ -52,11 +52,13 @@ signals:
     void itemMoved(QGraphicsItem *item, QLineF vector);
     void itemDeleted(QGraphicsItem *item);
     void itemsMoved(QList<QGraphicsItem*> items, QLineF vector);
+    void mouseScrollScaleChanged(float delta);
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent);
     void mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent);
+    void wheelEvent(QGraphicsSceneWheelEvent *wheelEvent) ;
     void keyReleaseEvent(QKeyEvent *keyEvent);
 
 private:
