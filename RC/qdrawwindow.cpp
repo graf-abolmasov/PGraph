@@ -57,6 +57,7 @@ TDrawWindow::TDrawWindow(ShowRole role, QWidget *parent)
     //обработчик удаления объекта
     connect(scene, SIGNAL(itemDeleted(QGraphicsItem*)),
             this, SLOT(itemDeleted(QGraphicsItem*)));
+    connect(scene, SIGNAL(mouseScrollScaleChanged(float)), this, SIGNAL(mouseScrollScaleChanged(float)));
 
     view->setScene(scene);
     view->setAlignment(Qt::AlignCenter);

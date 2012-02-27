@@ -163,25 +163,48 @@ void QNormalTop::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *)
 
 void QNormalTop::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
+    QList<QGraphicsItem *> otherItems = scene()->items();
+    otherItems.removeAll(this);
+
     QPen myPen = pen();
     myPen.setColor(Qt::red);
     setPen(myPen);
+
+    foreach(QArc *arc, arcs) {
+        QPen arcPen = arc->pen();
+        arcPen.setColor(arc->startItem() == this ? Qt::blue : Qt::green);
+        arc->setPen(arcPen);
+        foreach(QArcLine *line, arc->lines)
+            otherItems.removeAll(line);
+        otherItems.removeAll(arc->arcTop);
+        otherItems.removeAll(arc);
+        otherItems.removeAll(arc->startItem());
+        otherItems.removeAll(arc->endItem());
+    }
+
+    foreach(QGraphicsItem *item, otherItems)
+        item->setOpacity(0.3);
+
     event->accept();
 }
 
 void QNormalTop::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
+    QList<QGraphicsItem *> allItems = scene()->items();
+
     QPen myPen = pen();
     myPen.setColor(Qt::black);
     setPen(myPen);
-    event->accept();
-}
 
-void QNormalTop::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
-{
-    QPen myPen = pen();
-    myPen.setColor(Qt::red);
-    setPen(myPen);
+    foreach(QArc *arc, arcs) {
+        QPen arcPen = arc->pen();
+        arcPen.setColor(Qt::black);
+        arc->setPen(arcPen);
+    }
+
+    foreach(QGraphicsItem *item, allItems)
+        item->setOpacity(1.0);
+
     event->accept();
 }
 

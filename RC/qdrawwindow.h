@@ -90,6 +90,7 @@ public:
 
 signals:
     void sceneChanged();
+    void mouseScrollScaleChanged(float);
     void itemChanged(QGraphicsItem *item);
     void selectionChanged(QList<QGraphicsItem *>);
     void graphLoaded(QString, QString);

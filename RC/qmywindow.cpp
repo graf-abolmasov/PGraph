@@ -27,8 +27,8 @@ TMyWindow::TMyWindow()
 {
     setWindowIcon(QIcon(":/images/G.png"));
 
-//    ProjectDialog dlg;
-//    dlg.exec();
+    ProjectDialog dlg;
+    dlg.exec();
 
     saveGraphAct = NULL;
     isParallel = QGraphSettings::isParallel();
@@ -283,6 +283,7 @@ TDrawWindow* TMyWindow::createDrawWindow()
             this, SLOT(updateToolBar(QList<QGraphicsItem*>)));
     connect(newDrawWindow, SIGNAL(graphLoaded(QString,QString)), this,
             SLOT(graphLoaded(QString,QString)));
+    connect(newDrawWindow, SIGNAL(mouseScrollScaleChanged(float)), this, SLOT(updateScaleSlider(float)));
 
     undoView->setStack(activeDrawWindow()->undoStack);
 
@@ -439,6 +440,7 @@ void TMyWindow::CMGOpen()
     if (dialog.exec()){
         CMGNew();
         activeDrawWindow()->loadGraph(dialog.getResult());
+        scaleSlider->setValue(100);
     }
 }
 
@@ -485,11 +487,13 @@ void TMyWindow::createDockWindows()
     globalInfoLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
     dock->setAllowedAreas(Qt::RightDockWidgetArea);
     dock->setWidget(globalInfoLabel);
+    dock->setMinimumWidth(250);
     addDockWidget(Qt::RightDockWidgetArea, dock);
 
     dock = new QDockWidget(tr("Список команд"), this);
     dock->setAllowedAreas(Qt::RightDockWidgetArea);
     dock->setWidget(undoView);
+    dock->setMinimumWidth(250);
     addDockWidget(Qt::RightDockWidgetArea, dock);
 }
 
@@ -673,6 +677,9 @@ void TMyWindow::setFixedScale(const QString &scale)
 
 void TMyWindow::setFloatScale(const int scale)
 {
+    int idx = scaleCombo->findText(QString::number(scale) + "%");
+    if (idx > 0)
+        scaleCombo->setCurrentIndex(idx);
     activeDrawWindow()->scale(scale/100.0);
 }
 
@@ -745,4 +752,9 @@ void TMyWindow::CMCompileData()
 {
     DataCompiler c(DataCompiler::Parallel);
     c.compile();
+}
+
+void TMyWindow::updateScaleSlider(const float scale)
+{
+    scaleSlider->setValue(scaleSlider->value() + scale);
 }

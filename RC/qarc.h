@@ -18,6 +18,7 @@ public:
     enum ArcType { SerialArc, ParallelArc, TerminateArc };
 
     QList<QArcLine *> lines;
+    QGraphicsItem *arcTop;
     QArcLine *currentLine;
     const Predicate *predicate;
     QArc(QTop *startItem, QTop *endItem, QMenu *contextMenu,
@@ -68,7 +69,6 @@ private:
     QTop *myEndTop;
     QMenu *myContextMenu;
     QPolygonF arcHead;
-    QGraphicsItem *arcTop;
     int myPriority;  //приоритет
 };
 
