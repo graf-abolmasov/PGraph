@@ -41,6 +41,7 @@ void NativeCompiler::readyRead()
 
 NativeCompiler::~NativeCompiler()
 {
+    if (buildScript == NULL) return;
     if (buildScript->state() != QProcess::NotRunning)
         buildScript->kill();
     delete buildScript;
