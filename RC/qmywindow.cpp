@@ -77,7 +77,7 @@ void TMyWindow::createMenus()
     dataMenu->addAction(compileDataAct);
 
     buildMenu = menuBar()->addMenu(tr("Запуск"));
-    buildMenu->addAction(runAct);
+    buildMenu->addAction(buildAct);
     buildMenu->addAction(saveStructAct);
     buildMenu->addAction(compileAct);
     buildMenu->addAction(manualInputAct);
@@ -164,13 +164,12 @@ void TMyWindow::createActions()
     compileDataAct = new QAction(tr("Компиляция данных"), this);
     connect(compileDataAct, SIGNAL(triggered()), this, SLOT(CMCompileData()));
 
-    runAct = new QAction(QIcon(":/images/build.png"), tr("Запуск"), this);
-    runAct->setStatusTip(tr("Компиляция и запуск"));
-    connect(runAct, SIGNAL(triggered()), this, SLOT(CMRun()));
-    runAct->setEnabled(false);
+    buildAct = new QAction(QIcon(":/images/build.png"), tr("Компилировать с++"), this);
+    buildAct->setStatusTip(tr("Компиляция"));
+    connect(buildAct, SIGNAL(triggered()), this, SLOT(CMBuild()));
 
-    compileAct = new QAction(QIcon(":/images/compile.png"), tr("Компилировать"), this);
-    compileAct->setStatusTip(tr("Компилировать в exe"));
+    compileAct = new QAction(QIcon(":/images/compile.png"), tr("Компилировать Граф-модель"), this);
+    compileAct->setStatusTip(tr("Компилировать"));
     connect(compileAct, SIGNAL(triggered()), this, SLOT(CMCompile()));
     compileAct->setEnabled(false);
 
@@ -209,7 +208,7 @@ void TMyWindow::createActions()
         addSyncArcButton = new QToolButton;
         addSyncArcButton->setCheckable(true);
         addSyncArcButton->setIcon(QIcon(":/images/syncarc.png"));
-//        addSyncArcButton->setEnabled(false);
+        //        addSyncArcButton->setEnabled(false);
 
         addMultiProcTopButton = new QToolButton;
         addMultiProcTopButton->setCheckable(true);
@@ -263,10 +262,10 @@ void TMyWindow::createActions()
     scaleSlider->setMaximumWidth(100);
     connect(scaleSlider, SIGNAL(valueChanged(int)), this, SLOT(setFloatScale(int)));
 
-//    showDataLayer = new QToolButton();
-//    showDataLayer->setText(tr("Данные"));
-//    showDataLayer ->setCheckable(true);
-//    connect(showDataLayer, SIGNAL(clicked(bool)), this, SLOT(showDataLayerClicked(bool)));
+    //    showDataLayer = new QToolButton();
+    //    showDataLayer->setText(tr("Данные"));
+    //    showDataLayer ->setCheckable(true);
+    //    connect(showDataLayer, SIGNAL(clicked(bool)), this, SLOT(showDataLayerClicked(bool)));
 }
 
 TDrawWindow* TMyWindow::createDrawWindow()
@@ -314,7 +313,7 @@ void TMyWindow::createToolBar()
     mainToolBar->addSeparator();
     mainToolBar->addAction(openObjectEditorAct);
     mainToolBar->addSeparator();
-    mainToolBar->addAction(runAct);
+    mainToolBar->addAction(buildAct);
     mainToolBar->addAction(compileAct);
 
     pointerTypeGroup = new QButtonGroup;
@@ -358,10 +357,10 @@ void TMyWindow::createToolBar()
     scaleToolBar->addWidget(new QLabel(tr("Масштаб: ")));
     scaleToolBar->addWidget(scaleCombo);
 
-//    layerToolBar = addToolBar(tr("Слои"));
-//    layerToolBar->addWidget(showDataLayer);
-//    Если нужен ползунковый регулятор масштаба
-//    scaleToolBar->addSeparator();
+    //    layerToolBar = addToolBar(tr("Слои"));
+    //    layerToolBar->addWidget(showDataLayer);
+    //    Если нужен ползунковый регулятор масштаба
+    //    scaleToolBar->addSeparator();
     scaleToolBar->addWidget(scaleSlider);
 }
 
@@ -666,6 +665,11 @@ void TMyWindow::updateToolBar(QList<QGraphicsItem *> items)
         copyAct->setEnabled(true);
         pasteAct->setEnabled(true);
     }
+
+    /*NOT IMPLEMENTED YET*/
+    cutAct->setEnabled(false);
+    copyAct->setEnabled(false);
+    pasteAct->setEnabled(false);
 }
 
 void TMyWindow::setFixedScale(const QString &scale)
@@ -730,7 +734,7 @@ void TMyWindow::CMCompile()
 
 void TMyWindow::showDataLayerClicked(bool clicked)
 {
-//    activeDrawWindow()->showDataLayer(clicked);
+    //    activeDrawWindow()->showDataLayer(clicked);
 }
 
 void TMyWindow::CMECopy()
@@ -758,4 +762,19 @@ void TMyWindow::CMCompileData()
 void TMyWindow::updateScaleSlider(const float scale)
 {
     scaleSlider->setValue(scaleSlider->value() + scale);
+}
+void TMyWindow::buildScriptFinished()
+{
+    QString msg = "OK!";
+    if (buildScript->exitCode() != 0)
+        msg = buildScript->readAll();
+    globalLogger->log(msg, Logger::Compile);
+}
+
+void TMyWindow::CMBuild()
+{
+    buildScript = new QProcess();
+    buildScript->setWorkingDirectory(QGraphSettings::getOutputDirectory());
+    buildScript->start("cmd.exe /C runme.bat", QProcess::ReadOnly);
+    connect(buildScript, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(buildScriptFinished()));
 }

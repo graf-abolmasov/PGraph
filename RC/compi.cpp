@@ -94,7 +94,10 @@ void GraphCompiler::copyUsedFiles()
         QFile::copy(f, myOutputDirectory + "/" + actor->name + ".cpp");
     }
     foreach (const Predicate *predicate, usedPredicateList) {
-        Q_ASSERT(QFile::exists(myBaseDirectory + "/" + predicate->name + ".cpp"));
+        const QString f = myBaseDirectory + "/" + predicate->name + ".cpp";
+        if (!QFile::exists(f))
+            predicate->build();
+        Q_ASSERT(QFile::exists(f));
         QFile::copy(myBaseDirectory + "/" + predicate->name + ".cpp", myOutputDirectory + "/" + predicate->name + ".cpp");
     }
     foreach (const BaseModule *baseModule, usedBaseModuleList) {
