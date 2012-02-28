@@ -31,6 +31,7 @@ TMyWindow::TMyWindow()
     dlg.exec();
 
     saveGraphAct = NULL;
+    nativeCompiler = new NativeCompiler(this);
     isParallel = QGraphSettings::isParallel();
 
     if (globalDBManager->getProjectId() != -1) {
@@ -49,7 +50,7 @@ TMyWindow::TMyWindow()
 
 TMyWindow::~TMyWindow()
 {
-
+    delete nativeCompiler;
 }
 
 void TMyWindow::createMenus()
@@ -763,18 +764,9 @@ void TMyWindow::updateScaleSlider(const float scale)
 {
     scaleSlider->setValue(scaleSlider->value() + scale);
 }
-void TMyWindow::buildScriptFinished()
-{
-    QString msg = "OK!";
-    if (buildScript->exitCode() != 0)
-        msg = buildScript->readAll();
-    globalLogger->log(msg, Logger::Compile);
-}
 
 void TMyWindow::CMBuild()
 {
-    buildScript = new QProcess();
-    buildScript->setWorkingDirectory(QGraphSettings::getOutputDirectory());
-    buildScript->start("cmd.exe /C runme.bat", QProcess::ReadOnly);
-    connect(buildScript, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(buildScriptFinished()));
+    globalLogger->skipLine();
+    nativeCompiler->compile();
 }
