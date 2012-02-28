@@ -12,6 +12,7 @@ class QButtonGroup;
 class QSlider;
 class QGraphicsItem;
 class QTextEdit;
+class QProcess;
 QT_END_NAMESPACE
 
 class TDrawWindow;
@@ -49,7 +50,7 @@ private:
     QAction *openObjectEditorAct;
 
     //Запуск
-    QAction *runAct;
+    QAction *buildAct;
     QAction *compileAct;
     QAction *saveStructAct;
     QAction *manualInputAct;
@@ -117,6 +118,8 @@ private:
 
     QMap<QString, QVariant> recentGraphs;
 
+    QProcess *buildScript;
+
 protected:
     void closeEvent(QCloseEvent *); // реакция на закрытие окна
 
@@ -153,7 +156,7 @@ private slots:
     void CMDoUserDialog(){}	//+ Запуск->Режим ручного ввода данных
     void CMSaveStruct();        //+ Запуск->Запись структуры
     void CMCompile();           //+ Запуск->Компиляция
-    void CMRun(){}              //+ Запуск->Построение и запуск
+    void CMBuild();              //+ Запуск->Построение и запуск
     void CMHelpContents(){}	// Помощь->Содержание
     void CMHelpAbout(); 	//+ Помощь->О программе
 
@@ -186,6 +189,8 @@ private slots:
     void showDataLayerClicked(bool clicked);
 
     void graphLoaded(QString name, QString extName);
+
+    void buildScriptFinished();
 };
 
 #endif // QMYWINDOW_H
