@@ -4,12 +4,15 @@
 NativeCompiler::NativeCompiler(QObject *parent)
     : QObject(parent)
 {
-    buildScript = new QProcess();
-    buildScript->setProcessChannelMode(QProcess::MergedChannels);
+    buildScript = NULL;
 }
 
 bool NativeCompiler::compile()
 {
+    if (buildScript != NULL && buildScript->state() != QProcess::NotRunning)
+        return false;
+    buildScript = new QProcess();
+    buildScript->setProcessChannelMode(QProcess::MergedChannels);
     globalLogger->log(QObject::tr("Компиляция проекта %1.....").arg(globalDBManager->getProjectName()), Logger::Compile);
     t.start();
     buildScript->setWorkingDirectory(QGraphSettings::getOutputDirectory());
@@ -24,6 +27,9 @@ void NativeCompiler::finished(int exitCode, QProcess::ExitStatus exitStatus)
         globalLogger->log(QObject::tr("Компиляция завершена без ошибок за %1 с.").arg(QString::number(qRound(t.elapsed()/1000))), Logger::Compile);
     else
         globalLogger->log(QObject::tr("Компиляция провалилась.").arg(QString::number(qRound(t.elapsed()/1000))), Logger::Compile);
+    buildScript->close();
+    delete buildScript;
+    buildScript = NULL;
 }
 
 void NativeCompiler::readyRead()
