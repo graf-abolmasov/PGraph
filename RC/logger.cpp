@@ -39,7 +39,7 @@ void Logger::log(QString message, LogLevel level) const
 {
     if (myLogLevel < level)
         return;
-    const QString msg = QDateTime::currentDateTime().toUTC().toString() + ": " + message;
+    QString msg = QDateTime::currentDateTime().toUTC().toString() + ": " + message;
     if (myLogTo.contains(File)) {
         QFile logFile("log.txt");
         logFile.open(QFile::Append);
@@ -51,6 +51,7 @@ void Logger::log(QString message, LogLevel level) const
         qDebug() << msg;
     }
     if (myLogTo.contains(Window)) {
+        msg.replace(QRegExp("[\\n\\r]"), "");
         globalOutput->addItem(msg);
         globalOutput->scrollToBottom();
     }
