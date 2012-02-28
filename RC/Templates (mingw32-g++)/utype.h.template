@@ -1,0 +1,12 @@
+#ifndef UTYPE_H
+#define UTYPE_H
+
+//Пользовательские типы
+<#userTypes>
+
+//Часто включаемые файлы
+#include <stdio.h>
+#include <strings.h>
+#include <memory.h>
+
+#endif
