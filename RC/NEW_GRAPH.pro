@@ -47,7 +47,8 @@ SOURCES += main.cpp \
     qcodeeditor.cpp \
     compiler.cpp \
     qgraphsettings.cpp \
-    projectdialog.cpp
+    projectdialog.cpp \
+    nativecompiler.cpp
 HEADERS += qmywindow.h \
     qdrawwindow.h \
     qtop.h \
@@ -92,7 +93,8 @@ HEADERS += qmywindow.h \
     qcodeeditor.h \
     errors.h \
     qgraphsettings.h \
-    projectdialog.h
+    projectdialog.h \
+    nativecompiler.h
 RESOURCES += resources.qrc
 FORMS += toppropertydialog.ui \
     qobjecteditor.ui \

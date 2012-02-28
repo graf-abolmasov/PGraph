@@ -3,6 +3,7 @@
 
 #include <QtGui/QMainWindow>
 #include <QtCore/QMap>
+#include "nativecompiler.h"
 
 QT_BEGIN_NAMESPACE
 class QToolButton;
@@ -12,7 +13,7 @@ class QButtonGroup;
 class QSlider;
 class QGraphicsItem;
 class QTextEdit;
-class QProcess;
+
 QT_END_NAMESPACE
 
 class TDrawWindow;
@@ -118,7 +119,7 @@ private:
 
     QMap<QString, QVariant> recentGraphs;
 
-    QProcess *buildScript;
+    NativeCompiler *nativeCompiler;
 
 protected:
     void closeEvent(QCloseEvent *); // реакция на закрытие окна
@@ -189,8 +190,6 @@ private slots:
     void showDataLayerClicked(bool clicked);
 
     void graphLoaded(QString name, QString extName);
-
-    void buildScriptFinished();
 };
 
 #endif // QMYWINDOW_H
