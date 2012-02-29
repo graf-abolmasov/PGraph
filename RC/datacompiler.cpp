@@ -263,7 +263,7 @@ void DataCompiler::compileTpoData()
         initMemoryBlock.append(var->isGlobal
                                ? "_" + var->name + " = NULL"
                                : (var->type->isArray()
-                                  ? QString("%1 = (%2*)(new %3)").arg(vn).arg(tn).arg(vn)
+                                  ? QString("(%1 = (%2*)new %3)").arg(vn).arg(tn).arg(tn)
                                   : QString("*(%1 = new %2)" + QString(var->initValue.isEmpty() ? "" : " = ") + var->initValue).arg(vn).arg(tn)));
         initMemoryBlock.append(";\r\n");
     }

@@ -26,6 +26,7 @@ private:
     QList<const Predicate *> usedPredicateList;
     QList<const Actor *> usedActorList;
     QList<const BaseModule *> usedBaseModuleList;
+    QStringList myOtherFilesList;
 
     void collectUsedData();
     void copyStaticTemplates();

@@ -743,7 +743,8 @@ QList<Predicate> DataBaseManager::getPredicateListDB() throw (QString)
 
     QList<Predicate> result;
     while (query1.next()){
-        query2.prepare("SELECT NEV, DATA, MODE FROM pasport WHERE NAMEPR = :NAMEPR ORDER BY NEV");
+        query2.prepare("SELECT NEV, DATA, MODE FROM pasport WHERE NAMEPR = :NAMEPR AND PROJECT_ID = :PROJECT_ID ORDER BY NEV");
+        query2.bindValue(":PROJECT_ID", myProjectId);
         query2.bindValue(":NAMEPR", query1.value(0).toString());
         if (!query2.exec()) {
             globalLogger->log(db.lastError().text(), Logger::Critical);

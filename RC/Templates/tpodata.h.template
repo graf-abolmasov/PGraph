@@ -35,10 +35,11 @@ public:
         <#varProperty>
 
 
-private:
+
         //Указатели на память с данными
         <#varPtr>
 
+private:
         //Блок iD's
         <#varId>
 
