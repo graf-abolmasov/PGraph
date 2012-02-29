@@ -120,6 +120,8 @@ void GraphCompiler::copyStaticTemplates()
     Q_ASSERT(QFile::exists(myTemplateDirectory + "/Makefile.template"));
     Q_ASSERT(QFile::exists(myTemplateDirectory + "/runme.bat.template"));
     Q_ASSERT(QFile::exists(myTemplateDirectory + "/stype.h.template"));
+    Q_ASSERT(QFile::exists(myTemplateDirectory + "/defines.h.template"));
+
     QFile::copy(myTemplateDirectory + "/graph.h.template", myOutputDirectory + "/graph.h");
     QFile::copy(myTemplateDirectory + "/memman.h.template", myOutputDirectory + "/memman.h");
     QFile::copy(myTemplateDirectory + "/graph.cpp.template", myOutputDirectory + "/graph.cpp");
@@ -129,6 +131,7 @@ void GraphCompiler::copyStaticTemplates()
     QFile::copy(myTemplateDirectory + "/Makefile.template", myOutputDirectory + "/Makefile");
     QFile::copy(myTemplateDirectory + "/runme.bat.template", myOutputDirectory + "/runme.bat");
     QFile::copy(myTemplateDirectory + "/stype.h.template", myOutputDirectory + "/stype.h");
+    QFile::copy(myTemplateDirectory + "/defines.h.template", myOutputDirectory + "/defines.h");
 }
 
 bool GraphCompiler::compile()
