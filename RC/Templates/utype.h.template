@@ -6,6 +6,9 @@
 #include "stype.h"
 #endif
 
+#include "defines.h"
+
+
 //Пользовательские типы
 <#userTypes>
 
