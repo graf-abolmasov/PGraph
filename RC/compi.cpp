@@ -20,6 +20,7 @@ void GraphCompiler::initDirectories()
     myOutputDirectory = QGraphSettings::getOutputDirectory();
     myBaseDirectory = QGraphSettings::getBaseDirectory();
     myTemplateDirectory = QGraphSettings::getTemplateDirectory();
+    myOtherFilesList = getTemplate(myTemplateDirectory + "/otherfiles").split(QRegExp("[\\r\\n]"), QString::SkipEmptyParts);
 }
 
 GraphCompiler::GraphCompiler(const Graph &graph, QSet<QString> &skip) :
@@ -131,7 +132,8 @@ void GraphCompiler::copyStaticTemplates()
     QFile::copy(myTemplateDirectory + "/Makefile.template", myOutputDirectory + "/Makefile");
     QFile::copy(myTemplateDirectory + "/runme.bat.template", myOutputDirectory + "/runme.bat");
     QFile::copy(myTemplateDirectory + "/stype.h.template", myOutputDirectory + "/stype.h");
-    QFile::copy(myTemplateDirectory + "/defines.h.template", myOutputDirectory + "/defines.h");
+    if (!QFile::exists(myOutputDirectory + "/defines.h"))
+        QFile::copy(myTemplateDirectory + "/defines.h.template", myOutputDirectory + "/defines.h");
 }
 
 bool GraphCompiler::compile()
@@ -262,6 +264,12 @@ void GraphCompiler::compileMakefile(QString target) const
         objects.append(target + "/" + baseModule->name + ".o");
         sources.append(baseModule->name + ".c");
         targets.append(target + "/" + baseModule->name + ".o:\r\n\t$(CC) -c $(CFLAGS) $(INCPATH) -o " + target + QDir::separator() + baseModule->name + ".o " + baseModule->name + ".c" );
+    }
+
+    foreach (const QString  name, myOtherFilesList) {
+        objects.append(target + "/" + name + ".o");
+        sources.append(name + ".c");
+        targets.append(target + "/" + name + ".o:\r\n\t$(CC) -c $(CFLAGS) $(INCPATH) -o " + target + QDir::separator() + name + ".o " + name + ".c" );
     }
 
     QString result = getTemplate(myTemplateDirectory + "/" + "Makefile." + target + ".template");
