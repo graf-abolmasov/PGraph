@@ -12,6 +12,7 @@ private:
 
     QProcess *buildScript;
     QTime t;
+    QString sh;
 public:
     virtual bool compile();
     NativeCompiler(QObject *parent);

@@ -17,7 +17,6 @@ QModuleRegister::QModuleRegister(QWidget *parent) :
     ui->parametersTable->setColumnWidth(0, 70);
     ui->parametersTable->setColumnWidth(1, 60);
     ui->parametersTable->setColumnWidth(3, 90);
-    QSettings settings("graph.ini", QSettings::IniFormat);
     myBaseDirectory = QGraphSettings::getBaseDirectory();
     QDir workingDir(myBaseDirectory);
 
