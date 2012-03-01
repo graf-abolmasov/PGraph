@@ -24,6 +24,7 @@ private:
     Ui::QDataTypeDialog *ui;
     QList<const DataType *> myTypeList;
     void prepareForm();
+    void swap(int i, int j);
 
 private slots:
     void on_pushButton_5_clicked();
@@ -33,6 +34,8 @@ private slots:
     void on_pushButton_3_clicked();
     void on_pushButton_2_clicked();
     void on_pushButton_clicked();
+    void on_moveUp_clicked();
+    void on_moveDown_clicked();
 };
 
 #endif // QDATATYPEDIALOG_H

@@ -1,4 +1,6 @@
-gkls
-Rez
-rnd_gen
-Zfun3
+gkls.c
+Rez.c
+rnd_gen.c
+Zfun3.c
+gkls.h
+rnd_gen.h

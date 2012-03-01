@@ -149,3 +149,42 @@ void QDataTypeDialog::on_pushButton_5_clicked()
     }
     delete editor;
 }
+
+void QDataTypeDialog::on_moveUp_clicked()
+{
+    if (ui->tableWidget->currentRow() == 0)
+        return;
+
+    const int currRow = ui->tableWidget->currentRow();
+    const int prevRow = currRow - 1;
+
+    swap(currRow, prevRow);
+    ui->tableWidget->setCurrentCell(prevRow, 0);
+}
+
+void QDataTypeDialog::swap(int i, int j)
+{
+    const QString prevRowText0 = ui->tableWidget->item(i, 0)->text();
+    const QString prevRowText1 = ui->tableWidget->item(i, 1)->text();
+
+    ui->tableWidget->item(i, 0)->setText(ui->tableWidget->item(j, 0)->text());
+    ui->tableWidget->item(i, 1)->setText(ui->tableWidget->item(j, 1)->text());
+
+    ui->tableWidget->item(j, 0)->setText(prevRowText0);
+    ui->tableWidget->item(j, 1)->setText(prevRowText1);
+
+    this->myTypeList.swap(j, i);
+}
+
+
+void QDataTypeDialog::on_moveDown_clicked()
+{
+    if (ui->tableWidget->currentRow() == ui->tableWidget->rowCount()-1)
+        return;
+
+    const int currRow = ui->tableWidget->currentRow();
+    const int nextRow = currRow + 1;
+
+    swap(currRow, nextRow);
+    ui->tableWidget->setCurrentCell(nextRow, 0);
+}
