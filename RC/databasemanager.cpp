@@ -369,12 +369,14 @@ void DataBaseManager::saveDataTypeListDB(const QList<DataType> &typeList) throw 
         db.close();
         throw QObject::tr("Не удалось удалить список типов.\n") + db.lastError().text();
     }
+    int i = 0;
     foreach (DataType type, typeList) {
-        query.prepare("INSERT INTO typsys (PROJECT_ID, TYPE, TYPEDEF)"
-                      "VALUES (:PROJECT_ID, :TYPE, :TYPEDEF);");
+        query.prepare("INSERT INTO typsys (PROJECT_ID, TYPE, TYPEDEF, SEQNUM)"
+                      "VALUES (:PROJECT_ID, :TYPE, :TYPEDEF, :SEQNUM);");
         query.bindValue(":TYPE",        type.name);
         query.bindValue(":PROJECT_ID",  myProjectId);
         query.bindValue(":TYPEDEF",     type.typedefStr);
+        query.bindValue(":SEQNUM", i++);
         if (!query.exec()) {
             globalLogger->log(db.lastError().text(), Logger::Critical);
             db.close();
@@ -392,7 +394,7 @@ QList<DataType> DataBaseManager::getDataTypeListDB() throw (QString)
         throw QObject::tr("Не удалось открыть базу данных.\n") + db.lastError().text();
     }
     QSqlQuery query;
-    query.prepare("SELECT PROJECT_ID, TYPE, TYPEDEF FROM typsys WHERE PROJECT_ID = :PROJECT_ID ORDER BY TYPE;");
+    query.prepare("SELECT PROJECT_ID, TYPE, TYPEDEF FROM typsys WHERE PROJECT_ID = :PROJECT_ID ORDER BY SEQNUM;");
     query.bindValue(":PROJECT_ID", myProjectId);
     if (!query.exec()) {
         globalLogger->log(db.lastError().text(), Logger::Critical);

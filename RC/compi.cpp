@@ -134,6 +134,9 @@ void GraphCompiler::copyStaticTemplates()
     QFile::copy(myTemplateDirectory + "/stype.h.template", myOutputDirectory + "/stype.h");
     if (!QFile::exists(myOutputDirectory + "/defines.h"))
         QFile::copy(myTemplateDirectory + "/defines.h.template", myOutputDirectory + "/defines.h");
+
+    foreach (const QString  name, myOtherFilesList)
+        QFile::copy(myBaseDirectory + "/" + name, myOutputDirectory + "/" + name);
 }
 
 bool GraphCompiler::compile()
@@ -266,10 +269,19 @@ void GraphCompiler::compileMakefile(QString target) const
         targets.append(target + "/" + baseModule->name + ".o:\r\n\t$(CC) -c $(CFLAGS) $(INCPATH) -o " + target + QDir::separator() + baseModule->name + ".o " + baseModule->name + ".c" );
     }
 
-    foreach (const QString  name, myOtherFilesList) {
-        objects.append(target + "/" + name + ".o");
-        sources.append(name + ".c");
-        targets.append(target + "/" + name + ".o:\r\n\t$(CC) -c $(CFLAGS) $(INCPATH) -o " + target + QDir::separator() + name + ".o " + name + ".c" );
+    foreach (QString  name, myOtherFilesList) {
+        if (name.endsWith(".c")) {
+            name = name.left(name.lastIndexOf(".c"));
+            objects.append(target + "/" + name + ".o");
+            targets.append(target + "/" + name + ".o:\r\n\t$(CC) -c $(CFLAGS) $(INCPATH) -o " + target + QDir::separator() + name + ".o " + name + ".c" );
+            continue;
+        }
+        if (name.endsWith(".cpp")) {
+            name = name.left(name.lastIndexOf(".cpp"));
+            objects.append(target + "/" + name + ".o");
+            targets.append(target + "/" + name + ".o:\r\n\t$(CXX) -c $(CXXFLAGS) $(INCPATH) -o " + target + QDir::separator() + name + ".o " + name + ".cpp" );
+            continue;
+        }
     }
 
     QString result = getTemplate(myTemplateDirectory + "/" + "Makefile." + target + ".template");
