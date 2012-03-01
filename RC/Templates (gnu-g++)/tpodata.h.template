@@ -1,0 +1,22 @@
+#ifndef TPODATA_H
+#define TPODATA_H
+#include "utype.h"
+
+class TPOData
+{
+public:
+
+        TPOData(int rank);
+        ~TPOData();
+	int myRank;
+
+        //Указатели на память с данными
+        <#varPtr>
+
+private:
+
+
+        //Initialize memory
+        void initMemory();
+};
+#endif

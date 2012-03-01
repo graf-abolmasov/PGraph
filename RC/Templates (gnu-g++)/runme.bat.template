@@ -1,0 +1,7 @@
+#!/bin/sh
+rm -r debug
+rm -r release
+mkdir debug
+mkdir release
+make debug
+make release
