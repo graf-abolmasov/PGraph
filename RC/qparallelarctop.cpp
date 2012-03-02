@@ -2,7 +2,7 @@
 
 #include "qparallelarctop.h"
 #include "qarc.h"
-#include "arcpropertydialog.h"
+#include "dialogs/arcpropertydialog.h"
 #include "globalvariables.h"
 
 void QParallelArcTop::contextMenuEvent(QGraphicsSceneContextMenuEvent *event){
