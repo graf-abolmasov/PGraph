@@ -29,6 +29,8 @@ protected:
 private:
     Ui::QVariableDialog *ui;
     QList<const Variable *> myVariableList;
+    QList<const Variable *> myVariableListMod;
+    QList<const Variable *> myVariableListDel;
     QList<const DataType *> myTypeList;
     QComboBox *varTypeCmbBox;
     const Variable *myVariable;

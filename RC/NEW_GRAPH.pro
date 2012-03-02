@@ -48,7 +48,12 @@ SOURCES += main.cpp \
     compiler.cpp \
     qgraphsettings.cpp \
     projectdialog.cpp \
-    nativecompiler.cpp
+    nativecompiler.cpp \
+    DAO/datatypedao.cpp \
+    DAO/basedao.cpp \
+    DAO/variabledao.cpp \
+    DAO/actordao.cpp \
+    DAO/predicatedao.cpp
 HEADERS += qmywindow.h \
     qdrawwindow.h \
     qtop.h \
@@ -94,7 +99,12 @@ HEADERS += qmywindow.h \
     errors.h \
     qgraphsettings.h \
     projectdialog.h \
-    nativecompiler.h
+    nativecompiler.h \
+    DAO/datatypedao.h \
+    DAO/basedao.h \
+    DAO/variabledao.h \
+    DAO/actordao.h \
+    DAO/predicatedao.h
 RESOURCES += resources.qrc
 FORMS += toppropertydialog.ui \
     qobjecteditor.ui \

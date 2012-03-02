@@ -26,6 +26,11 @@
 #include "basemodule.h"
 #include "qcomment.h"
 
+#include "DAO/datatypedao.h"
+#include "DAO/variabledao.h"
+#include "DAO/actordao.h"
+#include "DAO/predicatedao.h"
+
 DataBaseManager* globalDBManager;
 
 DataBaseManager::DataBaseManager()
@@ -168,7 +173,7 @@ QList<const DataType *> DataBaseManager::getDataTypeList() const
 void DataBaseManager::setDatatypeList(const QList<const DataType *> &list)
 {
     myDataTypeList = list;
-    saveDataTypeListDB();
+    DataTypeDAO(db).persistList(myDataTypeList);
 }
 
 QList<const Variable *> DataBaseManager::getVariableList() const
@@ -179,23 +184,7 @@ QList<const Variable *> DataBaseManager::getVariableList() const
 void DataBaseManager::setVariableList(const QList<const Variable *> &list)
 {
     myVariableList = list;
-    saveVariableListDB();
-}
-
-void DataBaseManager::saveDataTypeListDB()
-{
-    QList<DataType> dbDataTypeList;
-    foreach (const DataType *dataType, myDataTypeList)
-        dbDataTypeList.append(DataType(*dataType));
-    saveDataTypeListDB(dbDataTypeList);
-}
-
-void DataBaseManager::saveVariableListDB()
-{
-    QList<Variable> dbVariablelist;
-    foreach (const Variable *variable, myVariableList)
-        dbVariablelist.append(Variable(*variable));
-    saveVariableListDB(dbVariablelist);
+    VariableDAO(db).persistList(myVariableList);
 }
 
 void DataBaseManager::saveGraphDB(const Graph &graph) throw (QString)
@@ -355,59 +344,6 @@ QList<Graph> DataBaseManager::getGraphListDB() throw (QString)
     return result;
 }
 
-void DataBaseManager::saveDataTypeListDB(const QList<DataType> &typeList) throw (QString)
-{
-    if (!db.open()) {
-        globalLogger->log(db.lastError().text(), Logger::Critical);
-        throw QObject::tr("Не удалось открыть базу данных.\n") + db.lastError().text();
-    }
-    QSqlQuery query;
-    query.prepare("DELETE FROM typsys WHERE PROJECT_ID = :PROJECT_ID;");
-    query.bindValue(":PROJECT_ID", myProjectId);
-    if (!query.exec()) {
-        globalLogger->log(db.lastError().text(), Logger::Critical);
-        db.close();
-        throw QObject::tr("Не удалось удалить список типов.\n") + db.lastError().text();
-    }
-    int i = 0;
-    foreach (DataType type, typeList) {
-        query.prepare("INSERT INTO typsys (PROJECT_ID, TYPE, TYPEDEF, SEQNUM)"
-                      "VALUES (:PROJECT_ID, :TYPE, :TYPEDEF, :SEQNUM);");
-        query.bindValue(":TYPE",        type.name);
-        query.bindValue(":PROJECT_ID",  myProjectId);
-        query.bindValue(":TYPEDEF",     type.typedefStr);
-        query.bindValue(":SEQNUM", i++);
-        if (!query.exec()) {
-            globalLogger->log(db.lastError().text(), Logger::Critical);
-            db.close();
-            throw QObject::tr("Не удалось сохранить список типов.\n") + db.lastError().text();
-        }
-        query.clear();
-    }
-    db.close();
-}
-
-QList<DataType> DataBaseManager::getDataTypeListDB() throw (QString)
-{
-    if (!db.open()) {
-        globalLogger->log(db.lastError().text(), Logger::Critical);
-        throw QObject::tr("Не удалось открыть базу данных.\n") + db.lastError().text();
-    }
-    QSqlQuery query;
-    query.prepare("SELECT PROJECT_ID, TYPE, TYPEDEF FROM typsys WHERE PROJECT_ID = :PROJECT_ID ORDER BY SEQNUM;");
-    query.bindValue(":PROJECT_ID", myProjectId);
-    if (!query.exec()) {
-        globalLogger->log(db.lastError().text(), Logger::Critical);
-        db.close();
-        throw QObject::tr("Не удалось получить список типов.\n") + db.lastError().text();
-    }
-    QList<DataType> result;
-    while (query.next())
-        result.append(DataType(query.value(1).toString(), query.value(2).toString()));
-    db.close();
-    return result;
-}
-
 const DataType *DataBaseManager::getDataType(const QString &name) const
 {
     const DataType *result = NULL;
@@ -417,63 +353,6 @@ const DataType *DataBaseManager::getDataType(const QString &name) const
             break;
         }
     }
-    return result;
-}
-
-
-
-void DataBaseManager::saveVariableListDB(const QList<Variable> &varList) throw (QString)
-{
-    if (!db.open()) {
-        globalLogger->log(db.lastError().text(), Logger::Critical);
-        throw QObject::tr("Не удалось открыть базу данных.\n") + db.lastError().text();
-    }
-    QSqlQuery query;
-    query.prepare("DELETE FROM data WHERE PROJECT_ID = :PROJECT_ID;");
-    query.bindValue(":PROJECT_ID", myProjectId);
-    if (!query.exec()) {
-        globalLogger->log(db.lastError().text(), Logger::Critical);
-        db.close();
-        throw QObject::tr("Не удалось удалить список переменных.\n") + db.lastError().text();
-    }
-    foreach (Variable var, varList) {
-        Q_ASSERT(var.type != NULL);
-        query.prepare("INSERT INTO data (PROJECT_ID, DATA, TYPE, INIT, COMMENT)"
-                      "VALUES (:PROJECT_ID, :DATA, :TYPE, :INIT, :COMMENT);");
-        query.bindValue(":PROJECT_ID",  myProjectId);
-        query.bindValue(":DATA",        var.name);
-        query.bindValue(":TYPE",        var.type->name);
-        query.bindValue(":INIT",        var.initValue);
-        query.bindValue(":COMMENT",     var.comment);
-        if (!query.exec()) {
-            globalLogger->log(db.lastError().text(), Logger::Critical);
-            db.close();
-            throw QObject::tr("Не удалось сохранить переменную.\n") + db.lastError().text();
-        }
-        query.clear();
-    }
-    db.close();
-}
-
-QList<Variable> DataBaseManager::getVariableListDB() throw (QString)
-{
-    if (!db.open()) {
-        globalLogger->log(db.lastError().text(), Logger::Critical);
-        throw QObject::tr("Не удалось открыть базу данных.\n") + db.lastError().text();
-    }
-    QSqlQuery query;
-    query.prepare("SELECT DATA, TYPE, INIT, COMMENT FROM data WHERE PROJECT_ID = :PROJECT_ID ORDER BY DATA;");
-    query.bindValue(":PROJECT_ID", myProjectId);
-    if (!query.exec()) {
-        globalLogger->log(db.lastError().text(), Logger::Critical);
-        db.close();
-        throw QObject::tr("Не удалось получить список переменных.\n") + db.lastError().text();
-    }
-    QList<Variable> result;
-    while (query.next())
-        result.append(Variable(query.value(0).toString(),query.value(2).toString(),query.value(3).toString(), false, getDataType(query.value(1).toString())));
-
-    db.close();
     return result;
 }
 
@@ -497,15 +376,7 @@ QList<const Actor *> DataBaseManager::getActorList() const
 void DataBaseManager::setActorList(const QList<const Actor *> &list)
 {
     myActorList = list;
-    saveActorListDB();
-}
-
-void DataBaseManager::saveActorListDB()
-{
-    QList<Actor> dbActorList;
-    foreach (const Actor *actor, myActorList)
-        dbActorList.append(Actor(*actor));
-    saveActorListDB(dbActorList);
+    ActorDAO(db).persistList(myActorList);
 }
 
 QList<const Predicate *> DataBaseManager::getPredicateList() const
@@ -516,133 +387,12 @@ QList<const Predicate *> DataBaseManager::getPredicateList() const
 void DataBaseManager::setPredicateList(const QList<const Predicate *> &list)
 {
     myPredicateList = list;
-    savePredicateListDB();
-}
-
-void DataBaseManager::savePredicateListDB()
-{
-    QList<Predicate> dbPredicateList;
-    foreach (const Predicate *predicate, myPredicateList)
-        dbPredicateList.append(Predicate(*predicate));
-    savePredicateListDB(dbPredicateList);
+    PredicateDAO(db).persistList(myPredicateList);
 }
 
 QList<const BaseModule *> DataBaseManager::getBaseModuleList() const
 {
     return myBaseModuleList;
-}
-
-void DataBaseManager::saveActorListDB(const QList<Actor> &actorList) throw (QString)
-{
-    if (!db.open()) {
-        globalLogger->log(db.lastError().text(), Logger::Critical);
-        throw QObject::tr("Не удалось открыть базу данных.\n") + db.lastError().text();
-    }
-    QSqlQuery query1;
-    query1.prepare("DELETE FROM actor WHERE PROJECT_ID = :PROJECT_ID AND CLASPR = 'a'");
-    query1.bindValue(":PROJECT_ID", myProjectId);
-    if (!query1.exec()) {
-        globalLogger->log(db.lastError().text(), Logger::Critical);
-        db.close();
-        throw QObject::tr("Не удалось удалить список акторов.\n") + db.lastError().text();
-    }
-    foreach (Actor actor, actorList) {
-        query1.clear();
-        query1.prepare("INSERT INTO actor (PROJECT_ID, NAMEPR, CLASPR, EXTNAME, DATE, TIME, PROTOTIP)"
-                       "VALUES (:PROJECT_ID, :NAMEPR, :CLASPR, :EXTNAME, CURDATE(), CURTIME(), :PROTOTIP);");
-        query1.bindValue(":NAMEPR",     actor.name);
-        query1.bindValue(":CLASPR",     "a");
-        query1.bindValue(":EXTNAME",    actor.extName);
-        query1.bindValue(":PROTOTIP",   actor.baseModule == NULL ? NULL : actor.baseModule->name);
-        query1.bindValue(":PROJECT_ID", myProjectId);
-        if (!query1.exec()) {
-            globalLogger->log(db.lastError().text(), Logger::Critical);
-            db.close();
-            throw QObject::tr("Не удалось сохранить актор.\n") + db.lastError().text();
-        }
-
-
-        QSqlQuery query2;
-        QList<const Variable *> actorVariables = actor.variableList;
-        for (int j = 0; j < actorVariables.count(); j++){
-            query2.clear();
-            query2.prepare("INSERT INTO pasport (PROJECT_ID, NAMEPR, NEV, DATA, MODE)"
-                           "VALUES (:PROJECT_ID, :NAMEPR, :NEV, :DATA, :MODE);");
-            query2.bindValue(":NEV",        j);
-            query2.bindValue(":DATA",       actorVariables[j]->name);
-            query2.bindValue(":NAMEPR",     actor.name);
-            query2.bindValue(":PROJECT_ID", myProjectId);
-            QString vaMode;
-            if (actor.varAccModeList.at(j) == QObject::tr("Исходный"))
-                vaMode = "I";
-            else if (actor.varAccModeList.at(j) ==  QObject::tr("Модифицируемый"))
-                vaMode = "M";
-            else if (actor.varAccModeList.at(j) ==  QObject::tr("Вычисляемый"))
-                vaMode = "R";
-
-            query2.bindValue(":MODE", vaMode);
-            if (!query2.exec()) {
-                globalLogger->log(db.lastError().text(), Logger::Critical);
-                db.close();
-                throw QObject::tr("Не удалось сохранить параметры для актора.\n") + db.lastError().text();
-            }
-        }
-    }
-    db.close();
-}
-
-QList<Actor> DataBaseManager::getActorListDB() throw (QString)
-{
-    if (!db.open()) {
-        globalLogger->log(db.lastError().text(), Logger::Critical);
-        throw QObject::tr("Не удалось открыть базу данных.\n") + db.lastError().text();
-    }
-    QSqlQuery query1;
-    QSqlQuery query2;
-    query1.prepare("SELECT NAMEPR, CLASPR, EXTNAME, DATE, TIME, ICON, PROTOTIP FROM actor WHERE CLASPR = 'a' AND PROJECT_ID = :PROJECT_ID ORDER BY EXTNAME;");
-    query1.bindValue(":PROJECT_ID", myProjectId);
-    if (!query1.exec()) {
-        globalLogger->log(db.lastError().text(), Logger::Critical);
-        db.close();
-        throw QObject::tr("Не удалось получить список акторов.\n") + db.lastError().text();
-    }
-    QList<Actor> result;
-    while (query1.next()){
-        query2.prepare("SELECT NEV, DATA, MODE FROM pasport WHERE NAMEPR = :NAMEPR AND PROJECT_ID = :PROJECT_ID ORDER BY NEV");
-        query2.bindValue(":NAMEPR", query1.value(0).toString());
-        query2.bindValue(":PROJECT_ID", myProjectId);
-        if (!query2.exec()) {
-            globalLogger->log(db.lastError().text(), Logger::Critical);
-            db.close();
-            throw QObject::tr("Не удалось получить параметры для актора.\n") + db.lastError().text();
-        }
-        QList<const Variable *> actorVariableList;
-        QStringList actorVarAccList;
-        while (query2.next()) {
-            actorVariableList.append(getVariable(query2.value(1).toString()));
-            QString vaMode;
-            if (query2.value(2).toString() == "I")
-                vaMode = QObject::tr("Исходный");
-            else if (query2.value(2).toString() == "M")
-                vaMode = QObject::tr("Модифицируемый");
-            else if (query2.value(2).toString() == "R")
-                vaMode = QObject::tr("Вычисляемый");
-            actorVarAccList.append(vaMode);
-        }
-        QSqlRecord r = query1.record();
-        QPixmap p;
-        p.loadFromData(r.value("ICON").toByteArray(), "PNG");
-        result.append(Actor(query1.value(0).toString(),
-                            query1.value(2).toString(),
-                            query1.value(6).toString().isEmpty() ? Actor::InlineType : Actor::NormalType,
-                            getBaseModule(query1.value(6).toString()),
-                            actorVariableList,
-                            actorVarAccList,
-                            p));
-        query2.clear();
-    }
-    db.close();
-    return result;
 }
 
 const Actor *DataBaseManager::getActor(const QString &name) const
@@ -681,88 +431,6 @@ const Predicate *DataBaseManager::getPredicate(const QString &name) const
             break;
         }
     }
-    return result;
-}
-
-void DataBaseManager::savePredicateListDB(const QList<Predicate> &predList) throw (QString)
-{
-    openDB();
-    QSqlQuery query;
-    query.prepare("DELETE FROM actor WHERE PROJECT_ID = :PROJECT_ID AND CLASPR = 'p'");
-    query.bindValue(":PROJECT_ID", myProjectId);
-    if (!query.exec()) {
-        globalLogger->log(db.lastError().text(), Logger::Critical);
-        db.close();
-        throw QObject::tr("Не удалось удалить список предикатов.\n") + db.lastError().text();
-    }
-
-    foreach (Predicate predicate, predList) {
-        query.prepare("INSERT INTO actor (PROJECT_ID, NAMEPR, CLASPR, EXTNAME, DATE, TIME, ICON, PROTOTIP)"
-                      "VALUES (:PROJECT_ID, :NAMEPR, :CLASPR, :EXTNAME, CURDATE(), CURTIME(), NULL, :PROTOTIP);");
-        query.bindValue(":NAMEPR",      predicate.name);
-        query.bindValue(":CLASPR",      "p");
-        query.bindValue(":EXTNAME",     predicate.extName);
-        query.bindValue(":PROTOTIP",    predicate.baseModule == NULL ? NULL : predicate.baseModule->name);
-        query.bindValue(":PROJECT_ID",  myProjectId);
-        if (!query.exec()) {
-            globalLogger->log(db.lastError().text(), Logger::Critical);
-            db.close();
-            throw QObject::tr("Не удалось сохранить предикат.\n") + db.lastError().text();
-        }
-
-        int j = 0;
-        foreach (const Variable *var, predicate.variableList) {
-            query.clear();
-            query.prepare("INSERT INTO pasport (PROJECT_ID, NAMEPR, NEV, DATA, MODE)"
-                          "VALUES (:PROJECT_ID, :NAMEPR, :NEV, :DATA, :MODE);");
-            query.bindValue(":NEV",         j++);
-            query.bindValue(":DATA",        var->name);
-            query.bindValue(":MODE",        "I");
-            query.bindValue(":NAMEPR",      predicate.name);
-            query.bindValue(":PROJECT_ID",  myProjectId);
-            if (!query.exec()) {
-                globalLogger->log(db.lastError().text(), Logger::Critical);
-                db.close();
-                throw QObject::tr("Не удалось получить список параметров для предиката.\n") + db.lastError().text();
-            }
-        }
-    }
-    db.close();
-}
-
-QList<Predicate> DataBaseManager::getPredicateListDB() throw (QString)
-{
-    openDB();
-    QSqlQuery query1;
-    QSqlQuery query2;
-    query1.prepare("SELECT NAMEPR, CLASPR, EXTNAME, DATE, TIME, ICON, PROTOTIP FROM actor WHERE CLASPR = 'p' AND PROJECT_ID = :PROJECT_ID ORDER BY EXTNAME;");
-    query1.bindValue(":PROJECT_ID", myProjectId);
-    if (!query1.exec()) {
-        globalLogger->log(db.lastError().text(), Logger::Critical);
-        db.close();
-        throw QObject::tr("Не удалось получить список предикатов.\n") + db.lastError().text();
-    }
-
-    QList<Predicate> result;
-    while (query1.next()){
-        query2.prepare("SELECT NEV, DATA, MODE FROM pasport WHERE NAMEPR = :NAMEPR AND PROJECT_ID = :PROJECT_ID ORDER BY NEV");
-        query2.bindValue(":PROJECT_ID", myProjectId);
-        query2.bindValue(":NAMEPR", query1.value(0).toString());
-        if (!query2.exec()) {
-            globalLogger->log(db.lastError().text(), Logger::Critical);
-            db.close();
-            throw QObject::tr("Не удалось получить список параметров для предиката.\n") + db.lastError().text();
-        }
-        QList<const Variable *> variableList;
-        while (query2.next())
-            variableList.append(getVariable(query2.value(1).toString()));
-        result.append(Predicate(query1.value(0).toString(),
-                                query1.value(2).toString(),
-                                query1.value(6).toString().isNull() ? Predicate::InlineType : Predicate::NormalType,
-                                getBaseModule(query1.value(6).toString()),
-                                variableList));
-    }
-    db.close();
     return result;
 }
 
@@ -999,19 +667,19 @@ void DataBaseManager::openProjectDB(int projectId)
     myProjectName = query.value(1).toString();
     db.close();
 
-    QList<DataType> dbDataTypeList = getDataTypeListDB();
+    const QList<DataType> dbDataTypeList = DataTypeDAO(db).findAll();
     foreach (DataType dataType, dbDataTypeList)
         myDataTypeList.append(new DataType(dataType));
-    QList<Variable> dbVariableList = getVariableListDB();
+    QList<Variable> dbVariableList = VariableDAO(db).findAll();
     foreach (Variable variable, dbVariableList)
         myVariableList.append(new Variable(variable));
     QList<BaseModule> dbModuleList = getBaseModuleListDB();
     foreach (BaseModule baseModule, dbModuleList)
         myBaseModuleList.append(new BaseModule(baseModule));
-    QList<Actor> dbActorList = getActorListDB();
+    QList<Actor> dbActorList = ActorDAO(db).findAll();
     foreach (Actor actor, dbActorList)
         myActorList.append(new Actor(actor));
-    QList<Predicate> dbPredicateList = getPredicateListDB();
+    QList<Predicate> dbPredicateList = PredicateDAO(db).findAll();
     foreach (Predicate predicate, dbPredicateList)
         myPredicateList.append(new Predicate(predicate));
     QList<Graph> dbGraphList = getGraphListDB();
@@ -1024,10 +692,10 @@ void DataBaseManager::cloneProjectDB(int srcProjectId, QString projectName, QStr
     openProjectDB(srcProjectId);
     int dstProjectId = createProjectDB(projectName, author, description);
     myProjectId = dstProjectId;
-    saveVariableListDB();
-    saveDataTypeListDB();
-    saveActorListDB();
-    savePredicateListDB();
+    DataTypeDAO(db).persistList(myDataTypeList);
+    VariableDAO(db).persistList(myVariableList);
+    ActorDAO(db).persistList(myActorList);
+    PredicateDAO(db).persistList(myPredicateList);
     QList<const BaseModule *> baseModules = getBaseModuleList();
     foreach (const BaseModule *baseModule, baseModules)
         registerModuleDB(baseModule);
@@ -1070,24 +738,7 @@ void DataBaseManager::removeProjectDB(int projectId)
 
 void DataBaseManager::saveActorPictute(const QString &actorName, const QPixmap &image)
 {
-    if (!db.open()) {
-        globalLogger->log(db.lastError().text(), Logger::Critical);
-        throw QObject::tr("Не удалось открыть базу данных.\n") + db.lastError().text();
-    }
-
-    QByteArray ba;
-    QBuffer buffer(&ba);
-    buffer.open(QIODevice::WriteOnly);
-    image.save(&buffer, "PNG");
-    buffer.close();
-
-    QSqlQuery query;
-    query.prepare("UPDATE actor SET ICON=:ICON WHERE NAMEPR=:NAMEPR AND PROJECT_ID=:PROJECT_ID");
-    query.bindValue(":ICON",       ba);
-    query.bindValue(":NAMEPR",     actorName);
-    query.bindValue(":PROJECT_ID", myProjectId);
-    execQuery(query);
-    db.close();
+    ActorDAO(db).saveIcon(actorName, image);
 }
 
 QList<Project> DataBaseManager::getProjectListDB()
@@ -1104,6 +755,8 @@ QList<Project> DataBaseManager::getProjectListDB()
 }
 
 void DataBaseManager::openDB() {
+    if (db.isOpen())
+        return;
     if (!db.open()) {
         globalLogger->log(db.lastError().text(), Logger::Critical);
         throw QObject::tr("Не удалось открыть базу данных.\n") + db.lastError().text();

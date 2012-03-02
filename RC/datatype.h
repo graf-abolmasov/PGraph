@@ -9,6 +9,7 @@ class DataType
 {
 public:
     DataType(QString name, QString typedefStr);
+    int sequenceNum;
     QString name;
     QString typedefStr;
     QStringList validate() const;
