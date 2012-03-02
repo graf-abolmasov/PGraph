@@ -5,7 +5,7 @@
 #include "qarc.h"
 #include "databasemanager.h"
 #include "globalvariables.h"
-#include "predicate.h"
+#include "VO/predicate.h"
 #include "qtop.h"
 #include "qgraphsettings.h"
 

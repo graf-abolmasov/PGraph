@@ -19,13 +19,13 @@
 #include "qarc.h"
 #include "globalvariables.h"
 #include "qdiagramscene.h"
-#include "datatype.h"
-#include "variable.h"
-#include "actor.h"
-#include "predicate.h"
-#include "basemodule.h"
 #include "qcomment.h"
 
+#include "VO/datatype.h"
+#include "VO/variable.h"
+#include "VO/actor.h"
+#include "VO/predicate.h"
+#include "VO/basemodule.h"
 #include "DAO/datatypedao.h"
 #include "DAO/variabledao.h"
 #include "DAO/actordao.h"
@@ -482,7 +482,6 @@ void DataBaseManager::registerModuleDB(const BaseModule *baseModule) throw (QStr
 QList<BaseModule> DataBaseManager::getBaseModuleListDB() throw (QString)
 {
     openDB();
-
     QSqlQuery query1;
     QSqlQuery query2;
     query1.prepare("SELECT PROTOTIP, NAMEPR, COMMENT FROM bazmod WHERE PROJECT_ID = :PROJECT_ID;");

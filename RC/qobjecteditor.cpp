@@ -5,16 +5,14 @@
 #include <QPushButton>
 #include <QListWidgetItem>
 #include <QList>
-#include "actor.h"
-#include "predicate.h"
 #include <QtCore>
 #include <QLayout>
 #include "qactoreditor.h"
 #include "qpredicateeditor.h"
 #include "databasemanager.h"
 #include "globalvariables.h"
-#include "actor.h"
-#include "predicate.h"
+#include "VO/actor.h"
+#include "VO/predicate.h"
 
 QObjectEditor::QObjectEditor(QWidget *parent) :
     QDialog(parent),

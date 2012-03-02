@@ -4,7 +4,7 @@
 #include "qnormaltop.h"
 #include "toppropertydialog.h"
 #include "qarcline.h"
-#include "actor.h"
+#include "VO/actor.h"
 #include "qarc.h"
 #include "globalvariables.h"
 

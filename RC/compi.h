@@ -3,8 +3,8 @@
 
 #include <QtCore/QString>
 #include <QDebug>
+#include "VO/graph.h"
 #include "compiler.h"
-#include "graph.h"
 
 class GraphCompiler : public ICompiler
 {

@@ -2,7 +2,7 @@
 #define QDATAITEM_H
 
 #include <QtGui>
-#include "variable.h"
+#include "VO/variable.h"
 
 #define DATA_ITEM_TYPE UserType+16
 

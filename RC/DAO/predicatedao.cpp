@@ -1,5 +1,5 @@
 #include "predicatedao.h"
-#include "predicate.h"
+#include "VO/predicate.h"
 #include "globalvariables.h"
 
 PredicateDAO::PredicateDAO(const QSqlDatabase &db)

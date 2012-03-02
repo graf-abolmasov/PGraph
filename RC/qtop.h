@@ -2,8 +2,8 @@
 #define QTOP_H
 
 #include <QtGui/QGraphicsRectItem>
-#include "actor.h"
-#include "graph.h"
+#include "VO/actor.h"
+#include "VO/graph.h"
 
 class QArc;
 class QSyncArc;

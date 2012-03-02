@@ -1,5 +1,5 @@
 #include "actordao.h"
-#include "actor.h"
+#include "VO/actor.h"
 #include "globalvariables.h"
 
 ActorDAO::ActorDAO(const QSqlDatabase &db)

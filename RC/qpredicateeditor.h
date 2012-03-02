@@ -3,7 +3,7 @@
 
 #include <QtGui/QDialog>
 #include <QtCore/QPointer>
-#include "predicate.h"
+#include "VO/predicate.h"
 
 namespace Ui {
     class QPredicateEditor;

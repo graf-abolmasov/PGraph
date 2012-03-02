@@ -3,7 +3,7 @@
 
 #include <QtGui/QDialog>
 #include <QString>
-#include "graph.h"
+#include "VO/graph.h"
 
 namespace Ui {
     class QOpenGraphDialog;

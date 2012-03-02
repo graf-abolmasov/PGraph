@@ -3,7 +3,7 @@
 
 #include "qmultiproctop.h"
 #include "multiproctoppropertydialog.h"
-#include "actor.h"
+#include "VO/actor.h"
 #include "qarc.h"
 
 QMultiProcTop::QMultiProcTop(QMenu *contextMenu,

@@ -1,6 +1,6 @@
 #include "datacompiler.h"
-#include "datatype.h"
-#include "variable.h"
+#include "VO/datatype.h"
+#include "VO/variable.h"
 #include "globalvariables.h"
 #include <QtCore>
 #include <QtGui>
