@@ -2,12 +2,12 @@
 
 #include "qmywindow.h"
 #include "qdrawwindow.h"
-#include "qobjecteditor.h"
-#include "qvariabledialog.h"
-#include "qdatatypedialog.h"
-#include "qmoduleregister.h"
-#include "qsavegraphdialog.h"
-#include "qopengraphdialog.h"
+#include "dialogs/qobjecteditor.h"
+#include "dialogs/qvariabledialog.h"
+#include "dialogs/qdatatypedialog.h"
+#include "dialogs/qmoduleregister.h"
+#include "dialogs/qsavegraphdialog.h"
+#include "dialogs/qopengraphdialog.h"
 #include "commonutils.h"
 #include "globalvariables.h"
 #include "compi.h"
@@ -17,7 +17,7 @@
 #include "qarc.h"
 #include "qcomment.h"
 #include "datacompiler.h"
-#include "projectdialog.h"
+#include "dialogs/projectdialog.h"
 #include "qgraphsettings.h"
 
 QLabel *globalInfoLabel;

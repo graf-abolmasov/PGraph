@@ -2,7 +2,7 @@
 #include <QtGui>
 
 #include "qmultiproctop.h"
-#include "multiproctoppropertydialog.h"
+#include "dialogs/multiproctoppropertydialog.h"
 #include "VO/actor.h"
 #include "qarc.h"
 

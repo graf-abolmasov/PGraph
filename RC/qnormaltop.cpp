@@ -2,7 +2,7 @@
 #include <QtGui>
 
 #include "qnormaltop.h"
-#include "toppropertydialog.h"
+#include "dialogs/toppropertydialog.h"
 #include "qarcline.h"
 #include "VO/actor.h"
 #include "qarc.h"

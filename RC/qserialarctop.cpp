@@ -1,7 +1,7 @@
 #include <QtGui>
 #include "qserialarctop.h"
 #include "qarc.h"
-#include "arcpropertydialog.h"
+#include "dialogs/arcpropertydialog.h"
 #include "globalvariables.h"
 
 void QSerialArcTop::contextMenuEvent(QGraphicsSceneContextMenuEvent *event){

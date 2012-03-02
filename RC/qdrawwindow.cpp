@@ -3,12 +3,10 @@
 #include "qdrawwindow.h"
 #include "qtop.h"
 #include "qsyncarc.h"
-#include "arcpropertydialog.h"
 #include "qserialarctop.h"
 #include "qparallelarctop.h"
 #include "qterminatearctop.h"
 #include "qnormaltop.h"
-#include "multiproctoppropertydialog.h"
 #include "globalvariables.h"
 #include "undocommand.h"
 #include "commonutils.h"
@@ -17,10 +15,12 @@
 #include "qdiagramscene.h"
 #include "qtop.h"
 #include "qcomment.h"
-#include "toppropertydialog.h"
-#include "VO/graph.h"
 #include "databasemanager.h"
 #include "qarc.h"
+#include "VO/graph.h"
+#include "dialogs/arcpropertydialog.h"
+#include "dialogs/multiproctoppropertydialog.h"
+#include "dialogs/toppropertydialog.h"
 
 QStringList globalPredicateList;
 

@@ -1,7 +1,7 @@
 #include "qterminatearctop.h"
 #include <QtGui>
 #include "qarc.h"
-#include "arcpropertydialog.h"
+#include "dialogs/arcpropertydialog.h"
 
 void QTerminateArcTop::contextMenuEvent(QGraphicsSceneContextMenuEvent *event){
     scene()->clearSelection();
