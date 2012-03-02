@@ -22,23 +22,6 @@ private:
     QList<const Predicate *>  myPredicateList;
     QList<const BaseModule *> myBaseModuleList;
 
-
-    void saveVariableListDB();
-    void saveVariableListDB(const QList<Variable> &varList) throw (QString);
-    QList<Variable> getVariableListDB() throw (QString);
-
-    void saveDataTypeListDB();
-    void saveDataTypeListDB(const QList<DataType> &typeList) throw (QString);
-    QList<DataType> getDataTypeListDB() throw (QString);
-
-    void saveActorListDB();
-    void saveActorListDB(const QList<Actor> &actorList) throw (QString);
-    QList<Actor> getActorListDB() throw (QString);
-
-    void savePredicateListDB();
-    void savePredicateListDB(const QList<Predicate> &predList) throw (QString);
-    QList<Predicate> getPredicateListDB() throw (QString);
-
     QList<BaseModule> getBaseModuleListDB() throw (QString);
     QList<Graph> getGraphListDB() throw (QString);
 
