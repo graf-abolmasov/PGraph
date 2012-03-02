@@ -18,7 +18,7 @@
 #include "qtop.h"
 #include "qcomment.h"
 #include "toppropertydialog.h"
-#include "graph.h"
+#include "VO/graph.h"
 #include "databasemanager.h"
 #include "qarc.h"
 
@@ -61,7 +61,7 @@ TDrawWindow::TDrawWindow(ShowRole role, QWidget *parent)
 
     view->setScene(scene);
     view->setAlignment(Qt::AlignCenter);
-//      Рисуем сетку
+    //Рисуем сетку
     QBrush myBackgroundBrush = view->backgroundBrush();
     myBackgroundBrush.setColor(Qt::lightGray);
     myBackgroundBrush.setStyle(Qt::Dense7Pattern);

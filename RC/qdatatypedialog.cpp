@@ -6,7 +6,7 @@
 #include "qdatatypeeditor.h"
 #include "databasemanager.h"
 #include "globalvariables.h"
-#include "datatype.h"
+#include "VO/datatype.h"
 
 QDataTypeDialog::QDataTypeDialog(QWidget *parent) :
     QDialog(parent),

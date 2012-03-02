@@ -3,7 +3,7 @@
 
 #include <QtGui/QGraphicsTextItem>
 #include <QtGui/QFont>
-#include "graph.h"
+#include "VO/graph.h"
 
 QT_BEGIN_NAMESPACE
 class QFocusEvent;

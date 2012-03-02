@@ -9,7 +9,7 @@
 #include "qtop.h"
 #include "qarcline.h"
 #include "qserialarctop.h"
-#include "predicate.h"
+#include "VO/predicate.h"
 
 const qreal Pi = M_PI;
 const int MINDELTA = 40;

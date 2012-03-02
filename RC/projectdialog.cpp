@@ -1,6 +1,6 @@
 #include "projectdialog.h"
 #include "ui_projectdialog.h"
-#include "graph.h"
+#include "VO/graph.h"
 #include "globalvariables.h"
 
 ProjectDialog::ProjectDialog(QWidget *parent) :

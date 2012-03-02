@@ -4,7 +4,7 @@
 #include <QSqlDatabase>
 #include <QSqlError>
 
-#include "graph.h"
+#include "VO/graph.h"
 #include "compi.h"
 
 

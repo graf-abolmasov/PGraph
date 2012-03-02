@@ -3,9 +3,9 @@
 
 #include <QtGui/QDialog>
 #include <QtCore/QPointer>
-#include "actor.h"
-#include "basemodule.h"
-#include "variable.h"
+#include "VO/actor.h"
+#include "VO/basemodule.h"
+#include "VO/variable.h"
 
 namespace Ui {
     class QActorEditor;

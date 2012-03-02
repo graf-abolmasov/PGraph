@@ -5,7 +5,7 @@
 #include "qarcline.h"
 #include "qsyncarc.h"
 #include "qarc.h"
-#include "actor.h"
+#include "VO/actor.h"
 #include "globalvariables.h"
 
 QTop::QTop(QMenu *contextMenu,

@@ -2,8 +2,8 @@
 #define QDATATYPEEDITOR_H
 
 #include <QtGui/QDialog>
-#include "datatype.h"
 #include <QPointer>
+#include "VO/datatype.h"
 
 namespace Ui {
     class QDataTypeEditor;

@@ -5,7 +5,7 @@
 #include "ui_qmoduleregister.h"
 #include "databasemanager.h"
 #include "commonutils.h"
-#include "basemodule.h"
+#include "VO/basemodule.h"
 #include "globalvariables.h"
 #include "qgraphsettings.h"
 

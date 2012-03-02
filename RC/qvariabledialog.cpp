@@ -7,8 +7,8 @@
 #include "qvariableeditor.h"
 #include "databasemanager.h"
 #include "globalvariables.h"
-#include "variable.h"
-#include "datatype.h"
+#include "VO/variable.h"
+#include "VO/datatype.h"
 
 QVariableDialog::QVariableDialog(const bool &editOnDblClick, QWidget *parent) :
     QDialog(parent),

@@ -1,4 +1,4 @@
-#include "variable.h"
+#include "VO/variable.h"
 #include "variabledao.h"
 #include "globalvariables.h"
 

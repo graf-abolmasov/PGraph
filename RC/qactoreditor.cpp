@@ -4,8 +4,8 @@
 #include "qvariabledialog.h"
 #include "commonutils.h"
 #include "globalvariables.h"
-#include "actor.h"
-#include "basemodule.h"
+#include "VO/actor.h"
+#include "VO/basemodule.h"
 #include "qgraphsettings.h"
 #include <QtGui>
 

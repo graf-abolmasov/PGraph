@@ -2,7 +2,7 @@
 #define QARC_H
 
 #include <QtGui/QGraphicsLineItem>
-#include "graph.h"
+#include "VO/graph.h"
 
 #define ARC_TYPE      UserType+4
 

@@ -16,14 +16,10 @@ SOURCES += main.cpp \
     qarcline.cpp \
     qserialarctop.cpp \
     qobjecteditor.cpp \
-    actor.cpp \
-    predicate.cpp \
     qdatatypeeditor.cpp \
     qdatatypedialog.cpp \
-    datatype.cpp \
     qvariableeditor.cpp \
     qvariabledialog.cpp \
-    variable.cpp \
     databasemanager.cpp \
     qactoreditor.cpp \
     qmoduleregister.cpp \
@@ -33,13 +29,11 @@ SOURCES += main.cpp \
     qterminatearctop.cpp \
     qmultiproctop.cpp \
     commonutils.cpp \
-    basemodule.cpp \
     qsavegraphdialog.cpp \
     qopengraphdialog.cpp \
     md5.cpp \
     qnormaltop.cpp \
     multiproctoppropertydialog.cpp \
-    graph.cpp \
     logger.cpp \
     undocommand.cpp \
     compi.cpp \
@@ -53,7 +47,13 @@ SOURCES += main.cpp \
     DAO/basedao.cpp \
     DAO/variabledao.cpp \
     DAO/actordao.cpp \
-    DAO/predicatedao.cpp
+    DAO/predicatedao.cpp \
+    VO/variable.cpp \
+    VO/predicate.cpp \
+    VO/graph.cpp \
+    VO/datatype.cpp \
+    VO/basemodule.cpp \
+    VO/actor.cpp
 HEADERS += qmywindow.h \
     qdrawwindow.h \
     qtop.h \
@@ -65,14 +65,10 @@ HEADERS += qmywindow.h \
     qarcline.h \
     qserialarctop.h \
     qobjecteditor.h \
-    actor.h \
-    predicate.h \
     qdatatypeeditor.h \
     qdatatypedialog.h \
-    datatype.h \
     qvariableeditor.h \
     qvariabledialog.h \
-    variable.h \
     databasemanager.h \
     qactoreditor.h \
     qmoduleregister.h \
@@ -82,13 +78,11 @@ HEADERS += qmywindow.h \
     qterminatearctop.h \
     qmultiproctop.h \
     commonutils.h \
-    basemodule.h \
     qsavegraphdialog.h \
     qopengraphdialog.h \
     md5.h \
     qnormaltop.h \
     multiproctoppropertydialog.h \
-    graph.h \
     logger.h \
     globalvariables.h \
     undocommand.h \
@@ -104,7 +98,13 @@ HEADERS += qmywindow.h \
     DAO/basedao.h \
     DAO/variabledao.h \
     DAO/actordao.h \
-    DAO/predicatedao.h
+    DAO/predicatedao.h \
+    VO/variable.h \
+    VO/predicate.h \
+    VO/graph.h \
+    VO/datatype.h \
+    VO/basemodule.h \
+    VO/actor.h
 RESOURCES += resources.qrc
 FORMS += toppropertydialog.ui \
     qobjecteditor.ui \

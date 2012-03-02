@@ -3,7 +3,7 @@
 
 #include "qdatatypeeditor.h"
 #include "ui_qdatatypeeditor.h"
-#include "datatype.h"
+#include "VO/datatype.h"
 #include "globalvariables.h"
 
 QDataTypeEditor *QDataTypeEditor::getCreator(Mode mode)

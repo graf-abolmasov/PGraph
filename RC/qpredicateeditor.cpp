@@ -6,9 +6,9 @@
 #include "qvariabledialog.h"
 #include "commonutils.h"
 #include "globalvariables.h"
-#include "predicate.h"
-#include "basemodule.h"
-#include "variable.h"
+#include "VO/predicate.h"
+#include "VO/basemodule.h"
+#include "VO/variable.h"
 #include "qgraphsettings.h"
 
 QPredicateEditor::QPredicateEditor(QWidget *parent) :
