@@ -4,6 +4,7 @@
 #include "../../src/common/DAO/basedao.h"
 
 class Actor;
+class Graph;
 class Variable;
 class ActorDAO : private BaseDAO
 {
@@ -17,6 +18,8 @@ public:
     void persistList(const QList<const Actor *> &actorList);
     void saveIcon(const QString &actorName, const QPixmap &image);
     QList<Actor> findAll();
+
+    QStringList findUsage(const QString &name);
 };
 
 #endif // ACTORDAO_H

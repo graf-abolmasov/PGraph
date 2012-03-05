@@ -560,3 +560,13 @@ void DataBaseManager::execQuery(QSqlQuery &query) {
         throw QObject::tr("SQL query error.\n") + db.lastError().text();
     }
 }
+
+QStringList DataBaseManager::findActorUsage(const QString &name)
+{
+    return ActorDAO(db).findUsage(name);
+}
+
+QStringList DataBaseManager::findPredicateUsage(const QString &name)
+{
+    return PredicateDAO(db).findUsage(name);
+}

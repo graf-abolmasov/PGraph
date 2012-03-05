@@ -87,3 +87,18 @@ void PredicateDAO::removeAll()
     execQuery(query);
     myDb.close();
 }
+
+QStringList PredicateDAO::findUsage(const QString &name)
+{
+    openDb();
+    QSqlQuery query;
+    query.prepare("select DISTINCT extname from arcpic ar JOIN actor ac ON ar.namepr=ac.namepr where ar.predicate=:predicate and ar.project_id=:project_id;");
+    query.bindValue(":predicate", name);
+    query.bindValue(":project_id", globalDBManager->getProjectId());
+    execQuery(query);
+    QStringList result;
+    while (query.next())
+        result.append(query.record().value("extname").toString());
+    myDb.close();
+    return result;
+}
