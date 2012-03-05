@@ -14,6 +14,8 @@
 #include "../../src/common/VO/actor.h"
 #include "../../src/common/VO/predicate.h"
 
+#include "../../src/common/DAO/ActorDAO.h"
+
 QObjectEditor::QObjectEditor(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::QObjectEditor)
@@ -221,42 +223,58 @@ void QObjectEditor::deleteButtonClicked()
     switch (ui->tab->currentIndex()){
     case 0: //Акторы
         idx = ui->actorList->currentRow();
-        if (idx != -1){
-            //TODO: Удалять только неиспользуемые акторы
-            delete ui->actorList->item(idx);
-            delete myActorsList[idx];
-            myActorsList.removeAt(idx);
+        if (idx != -1) {
+            const Actor *a = myActorsList[idx];
+            const QStringList usageList = globalDBManager->findActorUsage(a->name);
+            if (usageList.isEmpty()) {
+                delete ui->actorList->item(idx);
+                delete a;
+                myActorsList.removeAt(idx);
+            } else
+                QMessageBox::warning(NULL, QObject::tr(ERR_TITLE), QObject::tr(ERR_ACTOR_USING_IN).arg(usageList.join("\r\n")));
         }
         break;
     case 1: //Предикаты
         idx = ui->predicateList->currentRow();
-        if (idx != -1){
-            //TODO: Удалять только неиспользуемые предикаты
-            delete ui->predicateList->item(idx);
-            delete myPredicatesList[idx];
-            myPredicatesList.removeAt(idx);
+        if (idx != -1) {
+            const Predicate *p = myPredicatesList[idx];
+            const QStringList usageList = globalDBManager->findPredicateUsage(p->name);
+            if (usageList.isEmpty()) {
+                delete ui->predicateList->item(idx);
+                delete myPredicatesList[idx];
+                myPredicatesList.removeAt(idx);
+            } else
+                QMessageBox::warning(NULL, QObject::tr(ERR_TITLE), QObject::tr(ERR_PREDICATE_USING_IN).arg(usageList.join("\r\n")));
         }
         break;
     case 2: //I-акторы
         idx = ui->inlineActorList->currentRow();
-        if (idx != -1){
-            delete ui->inlineActorList->item(idx);
-            delete myInlineActorsList[idx];
-            myInlineActorsList.removeAt(idx);
+        if (idx != -1) {
+            const Actor *a = myInlineActorsList[idx];
+            const QStringList usageList = globalDBManager->findActorUsage(a->name);
+            if (usageList.isEmpty()) {
+                delete ui->inlineActorList->item(idx);
+                delete a;
+                myInlineActorsList.removeAt(idx);
+            } else
+                QMessageBox::warning(NULL, QObject::tr(ERR_TITLE), QObject::tr(ERR_ACTOR_USING_IN).arg(usageList.join("\r\n")));
         }
         break;
     case 3: //I-предикаты
         idx = ui->inlinePredicateList->currentRow();
-        if (idx != -1){
-            delete ui->inlinePredicateList->item(idx);
-            delete myInlinePredicateList[idx];
-            myInlinePredicateList.removeAt(idx);
+        if (idx != -1) {
+            const Predicate *p = myInlinePredicateList[idx];
+            const QStringList usageList = globalDBManager->findPredicateUsage(p->name);
+            if (usageList.isEmpty()) {
+                delete ui->inlinePredicateList->item(idx);
+                delete myInlinePredicateList[idx];
+                myInlinePredicateList.removeAt(idx);
+            } else
+                QMessageBox::warning(NULL, QObject::tr(ERR_TITLE), QObject::tr(ERR_PREDICATE_USING_IN).arg(usageList.join("\r\n")));
         }
         break;
     }
 }
-
-
 
 void QObjectEditor::on_buttonBox_accepted()
 {

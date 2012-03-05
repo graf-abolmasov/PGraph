@@ -12,7 +12,7 @@ void ActorDAO::persist(const Actor &actor)
     openDb();
     QSqlQuery query;
     query.prepare("INSERT INTO actor (PROJECT_ID, NAMEPR, CLASPR, EXTNAME, DATE, TIME, PROTOTIP)"
-                   "VALUES (:PROJECT_ID, :NAMEPR, :CLASPR, :EXTNAME, CURDATE(), CURTIME(), :PROTOTIP);");
+                  "VALUES (:PROJECT_ID, :NAMEPR, :CLASPR, :EXTNAME, CURDATE(), CURTIME(), :PROTOTIP);");
     query.bindValue(":NAMEPR",     actor.name);
     query.bindValue(":CLASPR",     "a");
     query.bindValue(":EXTNAME",    actor.extName);
@@ -111,7 +111,7 @@ void ActorDAO::saveIcon(const QString &actorName, const QPixmap &image)
     buffer.close();
 
     QSqlQuery query;
-    query.prepare("UPDATE actor SET ICON=:ICON WHERE NAMEPR=:NAMEPR AND PROJECT_ID=:PROJECT_ID");
+    query.prepare("UPDATE actor SET ICON=:ICON WHERE NAMEPR=:NAMEPR AND PROJECT_ID=:PROJECT_ID;");
     query.bindValue(":ICON",       ba);
     query.bindValue(":NAMEPR",     actorName);
     query.bindValue(":PROJECT_ID", globalDBManager->getProjectId());
@@ -127,4 +127,19 @@ void ActorDAO::removeAll()
     QSqlQuery query = prepareDelete(where);
     execQuery(query);
     myDb.close();
+}
+
+QStringList ActorDAO::findUsage(const QString &name)
+{
+    openDb();
+    QSqlQuery query;
+    query.prepare("select DISTINCT extname from toppic t JOIN actor a ON t.namepr=a.namepr where t.actor=:actor and t.project_id=:project_id;");
+    query.bindValue(":actor", name);
+    query.bindValue(":project_id", globalDBManager->getProjectId());
+    execQuery(query);
+    QStringList result;
+    while (query.next())
+        result.append(query.record().value("extname").toString());
+    myDb.close();
+    return result;
 }

@@ -45,6 +45,9 @@ public:
     const Predicate *getPredicate(const QString &name) const;
     const BaseModule *getBaseModule(const QString &name) const;
 
+    QStringList findActorUsage(const QString &name);
+    QStringList findPredicateUsage(const QString &name);
+
     QList<const DataType *> getDataTypeList() const;
     void setDatatypeList(const QList<const DataType *> &list);
     QList<const Variable *> getVariableList() const;

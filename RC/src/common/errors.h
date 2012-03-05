@@ -19,12 +19,14 @@
 #define ERR_ACTOR_EMPTY_INLINE "Actor %1: Пустой текст inline-актора."
 #define ERR_ACTOR_UNDEF_VAR "Actor %1: Определены не все переменные."
 #define ERR_ACTOR_UNDEF_VAR_ACC "Actor %1: Определены не все модификаторы доступа."
+#define ERR_ACTOR_USING_IN "Актор используется в слудеющих агрегатах:\r\n%1\r\nУдаление невозможно."
 
 #define ERR_PREDICATE_NULL_BASEMODULE "Predicate %1: Нет базового модуля."
 #define ERR_PREDICATE_EMPTY_NAME "Predicate %1: Нет внутреннего имени."
 #define ERR_PREDICATE_EMPTY_EXTNAME "Predicate %1: Нет названия."
 #define ERR_PREDICATE_EMPTY_INLINE "Predicate %1: Пустой текст inline-актора."
 #define ERR_PREDICATE_UNDEF_VAR "Predicate %1: Определены не все переменные."
+#define ERR_PREDICATE_USING_IN "Предикат используется в слудеющих агрегатах:\r\n%1\r\nУдаление невозможно."
 
 #define ERR_DATATYPE_EMPTY_NAME "DataType %1: Нет названия."
 #define ERR_DATATYPE_EMPTY_TYPEDEF "DataType %1: Нет описания."
