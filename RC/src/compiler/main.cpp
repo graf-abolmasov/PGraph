@@ -1,8 +1,6 @@
 #include <QtGui>
 #include <QtCore>
 #include <time.h>
-#include "../../src/editor/qmywindow.h"
-#include "../../src/editor/qdrawwindow.h"
 #include "../../src/common/databasemanager.h"
 #include "../../src/common/commonutils.h"
 #include "../../src/common/md5.h"
