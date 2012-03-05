@@ -335,6 +335,14 @@
  </widget>
  <tabstops>
   <tabstop>simpTypeNameEdt</tabstop>
+  <tabstop>simpTypedefTxtEdt</tabstop>
+  <tabstop>structTypeNameEdt</tabstop>
+  <tabstop>structFieldsTable</tabstop>
+  <tabstop>arrTypeNameEdt</tabstop>
+  <tabstop>arrDimensionSpnBox</tabstop>
+  <tabstop>arrItemTypeCmbBox</tabstop>
+  <tabstop>arrItemsCountTable</tabstop>
+  <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources>
   <include location="../../resources.qrc"/>

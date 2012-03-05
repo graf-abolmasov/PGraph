@@ -24,6 +24,7 @@
 #include "../../src/common/DAO/variabledao.h"
 #include "../../src/common/DAO/actordao.h"
 #include "../../src/common/DAO/predicatedao.h"
+#include "../../src/common/DAO/graphdao.h"
 
 DataBaseManager* globalDBManager;
 
@@ -45,113 +46,7 @@ DataBaseManager::DataBaseManager()
 
 Graph DataBaseManager::getGraphDB(const QString &name) throw (QString)
 {
-    if (!db.open()) {
-        globalLogger->log(db.lastError().text(), Logger::Critical);
-        throw QObject::tr("Не удалось открыть базу данных.\n") + db.lastError().text();
-    }
-
-    QSqlQuery query;
-    //получаем список вершин
-    query.prepare("SELECT toppic.*, toppic.SizeX AS procCount FROM toppic "
-                  "WHERE toppic.NAMEPR=:NAMEPR AND toppic.PROJECT_ID=:PROJECT_ID");
-    query.bindValue(":PROJECT_ID", myProjectId);
-    query.bindValue(":NAMEPR", name);
-    if (!query.exec()) {
-        globalLogger->log(db.lastError().text(), Logger::Critical);
-        db.close();
-        throw QObject::tr("Не удалось получить список вершин.\n") + db.lastError().text();
-    }
-    QList<Top> topList;
-    while (query.next()){
-        QSqlRecord record = query.record();
-        const Actor *actor = getActor(record.value("Actor").toString());
-        if (record.value("Type").toString() == "T") {
-            topList.append(Top(record.value("X").toFloat(),
-                    record.value("Y").toFloat(),
-                    record.value("SizeX").toFloat(),
-                    record.value("SizeY").toFloat(),
-                    record.value("ntop").toInt(),
-                    -1,
-                    record.value("isRoot").toBool(),
-                    actor,
-                    Top::NormalTop));
-        } else if (record.value("Type").toString() == "M") {
-            topList.append(Top(record.value("X").toFloat(),
-                    record.value("Y").toFloat(),
-                    -1,
-                    -1,
-                    record.value("ntop").toInt(),
-                    record.value("procCount").toInt(),
-                    false,
-                    actor,
-                    Top::MultiProcTop));
-        }
-    }
-
-    //получаем список дуг управления
-    query.prepare("SELECT arcpic.* FROM arcpic "
-                  "WHERE arcpic.NAMEPR=:NAMEPR AND arcpic.PROJECT_ID=:PROJECT_ID ");
-    query.bindValue(":PROJECT_ID", myProjectId);
-    query.bindValue(":NAMEPR", name);
-    if (!query.exec()) {
-        globalLogger->log(db.lastError().text(), Logger::Critical);
-        db.close();
-        throw QObject::tr("Не удалось получить список дуг.\n") + db.lastError().text();
-    }
-    QList<Arc> arcList;
-    while (query.next()){
-        QSqlRecord record = query.record();
-        Arc::ArcType arcType;
-        if (record.value("Type").toString() == QObject::tr("S"))
-            arcType = Arc::SerialArc;
-        else if (record.value("Type").toString() == QObject::tr("P"))
-            arcType = Arc::ParallelArc;
-        else if (record.value("Type").toString() == QObject::tr("T"))
-            arcType = Arc::TerminateArc;
-        QStringList lines = record.value("Nodes").toString().split(";;");
-        arcList.append(Arc(arcType,
-                record.value("Priority").toInt(),
-                record.value("FromTop").toInt(),
-                record.value("ToTop").toInt(),
-                getPredicate(record.value("Predicate").toString()),
-                lines));
-    }
-
-    //получаем список комментариев
-    query.prepare("SELECT commentpic.* FROM commentpic "
-                  "WHERE commentpic.NAMEPR=:NAMEPR AND commentpic.PROJECT_ID=:PROJECT_ID");
-    query.bindValue(":PROJECT_ID", myProjectId);
-    query.bindValue(":NAMEPR", name);
-    if (!query.exec()) {
-        globalLogger->log(db.lastError().text(), Logger::Critical);
-        db.close();
-        throw QObject::tr("Не удалось получить список коментариев.\n") + db.lastError().text();
-    }
-    QList<Comment> commentList;
-    while (query.next()) {
-        QSqlRecord record = query.record();
-        Comment comment(record.value("X").toFloat(),
-                        record.value("Y").toFloat(),
-                        record.value("TEXT").toString(),
-                        QFont(record.value("FONT").toString()));
-        commentList.append(comment);
-    }
-
-    //Получаем полное название агрегата
-    query.prepare("SELECT actor.NAMEPR, actor.EXTNAME FROM actor "
-                  "WHERE actor.NAMEPR=:NAMEPR AND actor.PROJECT_ID=:PROJECT_ID");
-    query.bindValue(":PROJECT_ID", myProjectId);
-    query.bindValue(":NAMEPR", name);
-    if (!query.exec()) {
-        globalLogger->log(query.lastError().driverText(), Logger::Critical);
-        db.close();
-        throw QObject::tr("Не удалось получить полное название агрегата.\n") + db.lastError().text();
-    }
-    query.next();
-    Graph result(query.value(0).toString(), query.value(1).toString(), topList, arcList, commentList, QList<SyncArc>());
-
-    db.close();
-    return result;
+    return GraphDAO(db).findByName(name);
 }
 
 QList<const Graph *> DataBaseManager::getGraphList()
@@ -183,91 +78,7 @@ void DataBaseManager::setVariableList(const QList<const Variable *> &list)
 
 void DataBaseManager::saveGraphDB(const Graph &graph) throw (QString)
 {
-    if (!db.open()) {
-        globalLogger->log(db.lastError().text(), Logger::Critical);
-        throw QObject::tr("Не удалось открыть базу данных.\n") + db.lastError().text();
-    }
-
-    QSqlQuery query;
-    query.prepare("INSERT INTO actor (PROJECT_ID, NAMEPR, CLASPR, EXTNAME, DATE, TIME, PROTOTIP, BAZIS)"
-                  "VALUES (:PROJECT_ID, :NAMEPR, :CLASPR, :EXTNAME, CURDATE(), CURTIME(), NULL, NULL)");
-
-    query.bindValue(":PROJECT_ID", myProjectId);
-    query.bindValue(":NAMEPR", graph.name);
-    query.bindValue(":CLASPR",  "g");
-    query.bindValue(":EXTNAME",  graph.extName);
-    if (!query.exec()) {
-        globalLogger->log(db.lastError().text(), Logger::Critical);
-        db.close();
-        throw QObject::tr("Не удалось сохранить агрегат.\n") + db.lastError().text();
-    }
-
-    foreach (Top top, graph.topList){
-        query.prepare("INSERT INTO toppic (PROJECT_ID, NAMEPR, X, Y, SizeX, SizeY, ntop, isRoot, Actor, Type) "
-                      "VALUES (:PROJECT_ID, :NAMEPR, :X, :Y, :SizeX, :SizeY, :ntop, :isRoot, :Actor, :Type)");
-
-        query.bindValue(":PROJECT_ID",  myProjectId);
-        query.bindValue(":NAMEPR",      graph.name);
-        query.bindValue(":X",           top.x);
-        query.bindValue(":Y",           top.y);
-        query.bindValue(":SizeX",       top.type == Top::MultiProcTop ? top.procCount : top.sizeX);
-        query.bindValue(":SizeY",       top.sizeY);
-        query.bindValue(":ntop",        top.number);
-        query.bindValue(":isRoot",      top.isRoot ? 1 : 0 );
-        query.bindValue(":Actor",       top.actor == NULL ? "" : top.actor->name );
-        query.bindValue(":Type",        top.type == Top::MultiProcTop ? "M" : "T");
-        if (!query.exec()) {
-            globalLogger->log(db.lastError().text(), Logger::Critical);
-            db.close();
-            throw QObject::tr("Не удалось сохранить список вершин.\n") + db.lastError().text();
-        }
-    }
-
-    foreach(Comment comment, graph.commentList) {
-        query.prepare("INSERT INTO commentpic (PROJECT_ID, NAMEPR, TEXT, FONT, X, Y) "
-                      "VALUES (:PROJECT_ID, :NAMEPR, :TEXT, :FONT, :X, :Y)");
-        query.bindValue(":PROJECT_ID", myProjectId);
-        query.bindValue(":NAMEPR",     graph.name);
-        query.bindValue(":X",          comment.x);
-        query.bindValue(":Y",          comment.y);
-        query.bindValue(":TEXT",       comment.text);
-        query.bindValue(":FONT",       comment.font.toString());
-        if (!query.exec()) {
-            globalLogger->log(db.lastError().text(), Logger::Critical);
-            db.close();
-            throw QObject::tr("Не удалось сохранить список комментариев.\n") + db.lastError().text();
-        }
-    }
-
-    foreach (Arc arc, graph.arcList){
-        query.prepare("INSERT INTO arcpic (PROJECT_ID, NAMEPR, Nodes, Priority, FromTop, ToTop, Predicate, Type) "
-                      "VALUES (:PROJECT_ID, :NAMEPR, :Nodes, :Priority, :FromTop, :ToTop, :Predicate, :Type)");
-        query.bindValue(":PROJECT_ID", myProjectId);
-        query.bindValue(":NAMEPR",     graph.name);
-        QString arcType;
-        switch (arc.type){
-        case Arc::SerialArc:
-            arcType = "S";
-            break;
-        case Arc::ParallelArc:
-            arcType = "P";
-            break;
-        case Arc::TerminateArc:
-            arcType = "T";
-            break;
-        }
-        query.bindValue(":Type",      arcType);
-        query.bindValue(":Nodes",     arc.lines.join(";;"));
-        query.bindValue(":Priority",  arc.priority);
-        query.bindValue(":FromTop",   arc.startTop);
-        query.bindValue(":ToTop",     arc.endTop);
-        query.bindValue(":Predicate", arc.predicate == NULL ? "" : arc.predicate->name);
-        if (!query.exec()) {
-            globalLogger->log(db.lastError().text(), Logger::Critical);
-            db.close();
-            throw QObject::tr("Не удалось сохранить список дуг.\n") + db.lastError().text();
-        }
-    }
+    GraphDAO(db).persist(graph);
 
     Graph *newGraph = const_cast<Graph *>(getGraph(graph.name));
     if (newGraph == NULL) {
@@ -291,37 +102,23 @@ void DataBaseManager::saveGraphDB(const Graph &graph) throw (QString)
 */
 void DataBaseManager::updateGraphDB(const Graph &graph) throw (QString)
 {
-    if (!db.open()) {
-        globalLogger->log(db.lastError().text(), Logger::Critical);
-        throw QObject::tr("Не удалось открыть базу данных.\n") + db.lastError().text();
-    }
+    openDB();
     QSqlQuery query;
     query.prepare("DELETE FROM actor WHERE PROJECT_ID = :PROJECT_ID AND NAMEPR = :NAMEPR;");
     query.bindValue(":PROJECT_ID", myProjectId);
     query.bindValue(":NAMEPR", graph.name);
-    if (!query.exec()) {
-        globalLogger->log(db.lastError().text(), Logger::Critical);
-        db.close();
-        throw QObject::tr("Не удалось удалить агрегат.\n") + db.lastError().text();
-    }
+    execQuery(query);
     db.close();
     return saveGraphDB(graph);
 }
 
 QList<Graph> DataBaseManager::getGraphListDB() throw (QString)
 {
-    if (!db.open()) {
-        globalLogger->log(db.lastError().text(), Logger::Critical);
-        throw QObject::tr("Не удалось открыть базу данных.\n") + db.lastError().text();
-    }
+    openDB();
     QSqlQuery query;
     query.prepare("SELECT NAMEPR, EXTNAME, ICON FROM actor WHERE CLASPR = 'g' AND PROJECT_ID = :PROJECT_ID ORDER BY EXTNAME;");
     query.bindValue(":PROJECT_ID", myProjectId);
-    if (!query.exec()) {
-        globalLogger->log(db.lastError().text(), Logger::Critical);
-        db.close();
-        throw QObject::tr("Не удалось получить список агрегатов.\n") + db.lastError().text();
-    }
+    execQuery(query);
     QList<Graph> result;
     while(query.next()){
         QList<Top> topList;

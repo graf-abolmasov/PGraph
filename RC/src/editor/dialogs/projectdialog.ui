@@ -134,6 +134,15 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>projectsTable</tabstop>
+  <tabstop>infoTable</tabstop>
+  <tabstop>createProjectBtn</tabstop>
+  <tabstop>openProjectBtn</tabstop>
+  <tabstop>delProjectBtn</tabstop>
+  <tabstop>cloneProjectBtn</tabstop>
+  <tabstop>buttonBox</tabstop>
+ </tabstops>
  <resources>
   <include location="../../resources.qrc"/>
  </resources>

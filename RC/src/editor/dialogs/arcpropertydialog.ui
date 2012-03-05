@@ -203,6 +203,14 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>predicateList</tabstop>
+  <tabstop>terminateRadioBtn</tabstop>
+  <tabstop>parallelRadioBtn</tabstop>
+  <tabstop>serialRadioBtn</tabstop>
+  <tabstop>prioritySpnBox</tabstop>
+  <tabstop>buttonBox</tabstop>
+ </tabstops>
  <resources>
   <include location="../../resources.qrc"/>
  </resources>

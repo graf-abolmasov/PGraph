@@ -31,6 +31,7 @@ private:
     Ui::MultiProcTopPropertyDialog *ui;
     QMultiProcTop *theirTop;
     QList<const Actor *> myActorList;
+    const Actor *makeInlineActor(const QString &code) const;
 
 private slots:
     void on_buttonBox_accepted();

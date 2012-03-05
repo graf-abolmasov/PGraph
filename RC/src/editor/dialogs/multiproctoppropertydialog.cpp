@@ -49,6 +49,7 @@ void MultiProcTopPropertyDialog::prepareForm(QMultiProcTop *top)
 
     //Добавляем пустой актор
     ui->actorsListWidget->addItem(tr("Нет"));
+    myActorList.append(NULL);
 
     //Добавляем агрегаты
     QList<const Graph *> myGraphList;
@@ -59,7 +60,7 @@ void MultiProcTopPropertyDialog::prepareForm(QMultiProcTop *top)
     //Добавляем акторы
     //Наверно это не нужно, т.к. в параллельных ветвях можно использовать только агрегаты
     myActorList.append(globalDBManager->getActorList());
-    for (int i = 0 ; i < myActorList.count(); i++)
+    for (int i = 1 ; i < myActorList.count(); i++)
         ui->actorsListWidget->addItem(myActorList[i]->extName);
 
     //Выделяем актор в списке
@@ -117,9 +118,9 @@ void MultiProcTopPropertyDialog::on_buttonBox_accepted()
     theirTop->procCount = ui->procCountSpnBox->value();
     if (theirTop->actor == NULL) return;
     QString extName = theirTop->actor->extName + " " + QString::number(theirTop->procCount) + tr(" процессов");
-    QString name = getCRC(extName.toUtf8());
+    QString name = "G" + getCRC(extName.toUtf8());
     Graph newGraph(name, extName, QList<Top>(),  QList<Arc>(), QList<Comment>(), QList<SyncArc>());
-    Top headTop(0, -85, theirTop->procCount*50 - 10, 30, 0, -1, true, NULL, Top::NormalTop);
+    Top headTop(0, -85, theirTop->procCount*50 - 10, 30, 0, -1, true, makeInlineActor(ui->prepareDataEdt->document()->toPlainText()), Top::NormalTop);
     newGraph.topList.append(headTop);
     for (int i = 0; i < theirTop->procCount; i++) {
         Top newTop(-(theirTop->procCount-1)*25+i*50, 0, 40, 30, i+1, -1, false, theirTop->actor, Top::NormalTop);
@@ -130,6 +131,7 @@ void MultiProcTopPropertyDialog::on_buttonBox_accepted()
                      QString::number(-(theirTop->procCount-1)*25+i*50) + " " +
                      QString::number(-1));
         Arc newArc(Arc::ParallelArc, i+1, 0, i+1, NULL, nodes);
+        newArc.predicate = globalDBManager->getPredicate("P" + getCRC("1"));
         newGraph.arcList.append(newArc);
         nodes.clear();
         nodes.append(QString::number(-(theirTop->procCount-1)*25+i*50) + " " +
@@ -137,10 +139,24 @@ void MultiProcTopPropertyDialog::on_buttonBox_accepted()
                      QString::number(-(theirTop->procCount-1)*25+i*50) + " " +
                      QString::number(85));
         newArc = Arc(Arc::TerminateArc, 1, i+1, theirTop->procCount + 1, NULL, nodes);
+        newArc.predicate = globalDBManager->getPredicate("P" + getCRC("1"));
         newGraph.arcList.append(newArc);
     }
-    Top endTop(0, 85, theirTop->procCount*50 - 10, 30, theirTop->procCount + 1, -1, true, NULL, Top::NormalTop);
+    Top endTop(0, 85, theirTop->procCount*50 - 10, 30, theirTop->procCount + 1, -1, false, makeInlineActor(ui->collectDataEdt->document()->toPlainText()), Top::NormalTop);
     newGraph.topList.append(endTop);
     globalDBManager->saveGraphDB(newGraph);
     theirTop->actor = globalDBManager->getActor(name);
+}
+
+const Actor *MultiProcTopPropertyDialog::makeInlineActor(const QString &code) const
+{
+    const QString name = "A" + getCRC(code.toUtf8());
+    const Actor *newActor = globalDBManager->getActor(name);
+    if (newActor == NULL) {
+        newActor = new Actor(name, code, Actor::InlineType);
+        QList<const Actor *> actorList = globalDBManager->getActorList();
+        actorList.append(newActor);
+        globalDBManager->setActorList(actorList);
+    }
+    return newActor;
 }

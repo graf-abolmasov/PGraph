@@ -178,6 +178,12 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>fileList</tabstop>
+  <tabstop>commentTxtEdt</tabstop>
+  <tabstop>parametersTable</tabstop>
+  <tabstop>buttonBox</tabstop>
+ </tabstops>
  <resources>
   <include location="../../resources.qrc"/>
  </resources>
