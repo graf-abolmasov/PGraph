@@ -6,14 +6,13 @@
 
 QT       += core sql gui
 
-#QT       -= gui
-
 TARGET = COMPI
 CONFIG   += console
 CONFIG   -= app_bundle
 
 TEMPLATE = app
 
+QMAKE_CXXFLAGS += -I"."
 
 SOURCES += ../../src/compiler/main.cpp \
     ../../src/compiler/nativecompiler.cpp \
@@ -37,8 +36,7 @@ SOURCES += ../../src/compiler/main.cpp \
     ../../src/common/databasemanager.cpp \
     ../../src/common/commonutils.cpp
 
-HEADERS += \
-    ../../src/compiler/nativecompiler.h \
+HEADERS += ../../src/compiler/nativecompiler.h \
     ../../src/compiler/datacompiler.h \
     ../../src/compiler/compiler.h \
     ../../src/compiler/compi.h \
