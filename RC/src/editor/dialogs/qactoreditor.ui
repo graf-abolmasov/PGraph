@@ -551,11 +551,12 @@
   </customwidget>
  </customwidgets>
  <tabstops>
+  <tabstop>inlineModuleTxtEdt</tabstop>
+  <tabstop>paramsInlineTable</tabstop>
   <tabstop>actorNameEdt</tabstop>
   <tabstop>baseModuleList</tabstop>
   <tabstop>paramsNormalTable</tabstop>
-  <tabstop>inlineModuleTxtEdt</tabstop>
-  <tabstop>paramsInlineTable</tabstop>
+  <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources>
   <include location="../../resources.qrc"/>

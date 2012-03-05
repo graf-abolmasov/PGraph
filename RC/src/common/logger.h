@@ -9,7 +9,7 @@ class Logger : public QObject
     Q_OBJECT
 
 public:
-    enum LogLevel {Critical, Warning, Compile, Debug, All};
+    enum LogLevel {Critical, Error, Warning, Compile, Debug, All};
     enum Output {File, Console};
 
     Logger(LogLevel level, QList<Output> output);
@@ -18,6 +18,12 @@ public:
     void skipLine();
 
 signals:
+    void critical(const QString &msg);
+    void error(const QString &msg);
+    void warning(const QString &msg);
+    void compile(const QString &msg);
+    void info(const QString &msg);
+    void emptyLine();
     void newMessage(const QString &msg);
 private:
     LogLevel myLogLevel;

@@ -51,8 +51,26 @@ void Logger::log(QString message, LogLevel level)
         logFile.write("\r\n");
         logFile.close();
     }
-    if (myLogTo.contains(Console)) {
+
+    if (myLogTo.contains(Console))
         qDebug() << message;
+
+    switch (level) {
+    case Critical:
+        emit critical(message);
+        break;
+    case Warning:
+        emit warning(message);
+        break;
+    case Error:
+        emit error(message);
+        break;
+    case Compile:
+        emit compile(message);
+        break;
+    case All:
+        emit info(message);
+        break;
     }
     emit newMessage(message);
 }

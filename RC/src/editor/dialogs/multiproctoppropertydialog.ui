@@ -114,7 +114,7 @@
       <enum>QTabWidget::Rounded</enum>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <property name="elideMode">
       <enum>Qt::ElideNone</enum>
@@ -237,7 +237,7 @@
      </widget>
      <widget class="QWidget" name="tab_2">
       <property name="enabled">
-       <bool>false</bool>
+       <bool>true</bool>
       </property>
       <attribute name="title">
        <string>Подготовка данных</string>
@@ -253,7 +253,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QPlainTextEdit" name="prepareDataEdt">
+          <widget class="QCodeEditor" name="prepareDataEdt">
            <property name="maximumBlockCount">
             <number>0</number>
            </property>
@@ -328,7 +328,7 @@
      </widget>
      <widget class="QWidget" name="tab_3">
       <property name="enabled">
-       <bool>false</bool>
+       <bool>true</bool>
       </property>
       <attribute name="title">
        <string>Сбор данных</string>
@@ -344,7 +344,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QPlainTextEdit" name="collectDataEdt">
+          <widget class="QCodeEditor" name="collectDataEdt">
            <property name="maximumBlockCount">
             <number>0</number>
            </property>
@@ -431,6 +431,23 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QCodeEditor</class>
+   <extends>QPlainTextEdit</extends>
+   <header>../../src/editor/qcodeeditor.h</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>actorsListWidget</tabstop>
+  <tabstop>procCountSpnBox</tabstop>
+  <tabstop>prepareDataEdt</tabstop>
+  <tabstop>paramsPrepDataTable</tabstop>
+  <tabstop>collectDataEdt</tabstop>
+  <tabstop>paramsCollDataTable</tabstop>
+  <tabstop>buttonBox</tabstop>
+ </tabstops>
  <resources>
   <include location="../../resources.qrc"/>
  </resources>

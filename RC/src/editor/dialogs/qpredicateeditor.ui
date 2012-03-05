@@ -431,6 +431,13 @@
    <header>../../src/editor/qcodeeditor.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>inlineModuleTxtEdt</tabstop>
+  <tabstop>predicateNameEdt</tabstop>
+  <tabstop>baseModuleList</tabstop>
+  <tabstop>paramsNormalTable</tabstop>
+  <tabstop>buttonBox</tabstop>
+ </tabstops>
  <resources>
   <include location="../../resources.qrc"/>
  </resources>
