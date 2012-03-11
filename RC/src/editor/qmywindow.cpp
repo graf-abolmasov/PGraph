@@ -25,9 +25,6 @@ TMyWindow::TMyWindow()
 {
     setWindowIcon(QIcon(":/images/G.png"));
 
-    ProjectDialog dlg;
-    dlg.exec();
-
     saveGraphAct = NULL;
     nativeCompiler = new NativeCompiler(this);
     isParallel = QGraphSettings::isParallel();
