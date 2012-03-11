@@ -236,14 +236,14 @@ void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
     }
     else if (line != NULL && newArc != NULL && myMode == InsertLine) {
         //дуга должна начинаться с вершины!
-        const QTop *startItem = newArc->startItem();
-        const QTop *endItem = newArc->endItem();
+        QTop *startItem = newArc->startItem();
+        QTop *endItem = newArc->endItem();
         if (startItem == NULL) {
             QList<QGraphicsItem *> startItems = items(line->line().p1());
             while (startItems.count() > 0 && startItems.first()->type() != QTop::Type)
                 startItems.removeFirst();
             if ((startItems.count() > 0) && (startItems.first()->type() == QTop::Type)) {
-                QTop *startItem = qgraphicsitem_cast<QTop *>(startItems.first());
+                startItem = qgraphicsitem_cast<QTop *>(startItems.first());
                 newArc->setStartTop(startItem);
                 newArc->addLine(qgraphicsitem_cast<QArcLine *>(line));
             } else {
@@ -260,14 +260,14 @@ void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
             while (endItems.count() > 0 && endItems.first()->type() != QTop::Type)
                 endItems.removeFirst();
             if ((endItems.count() > 0) && (endItems.first()->type() == QTop::Type)){
-                QTop *endItem = qgraphicsitem_cast<QTop *>(endItems.first());
+                endItem = qgraphicsitem_cast<QTop *>(endItems.first());
                 newArc->setEndTop(endItem);              
                 newArc->addLine(qgraphicsitem_cast<QArcLine *>(line));
             }
         }
 
         //плохая ситуация, когда начало и конец совпадают, но дуга имеет явно неправилную форму
-        if ((endItem != NULL) && (startItem != NULL) &&
+        if ((endItem != NULL) && (startItem != NULL) && (newArc != NULL) &&
             startItem->collidesWithItem(endItem) && (newArc->lines.count() == 1)){
             delete newArc;
             newArc = NULL;
@@ -275,7 +275,7 @@ void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
         }
 
         //условие выполнится когда у дуги будет начало и конец!
-        if ((endItem != NULL) && (startItem != NULL)){
+        if ((endItem != NULL) && (startItem != NULL) && (newArc != NULL)) {
             newArc->updateBounds();
             line->setSelected(false);
             emit itemInserted(newArc);
