@@ -11,6 +11,9 @@ public:
     void persist(const Graph &graph);
     void persist(const Graph *graph);
 
+    void remove(const Graph &graph);
+    void remove(const QString &name);
+
     Graph findByName(const QString &name);
     QList<Graph> findAll(bool loadContent = false);
 };

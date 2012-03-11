@@ -9,14 +9,12 @@ class BaseDAO
 private:
     QString table;
 
-public:
-    BaseDAO(const QSqlDatabase &db, const QString &table);
-    void persist(const QMap<QString, QVariant> &values);
-
 protected:
     QSqlDatabase myDb;
 
 public:
+    BaseDAO(const QSqlDatabase &db, const QString &table);
+
     void openDb();
     void execQuery(QSqlQuery &query) const;
     QSqlQuery prepareInsert(QMap<QString, QVariant> values) const;
@@ -29,6 +27,7 @@ public:
     QSqlQuery prepareDelete(const QString &where = "") const;
     QSqlQuery prepareDelete(const QMap<QString, QVariant> &where = QMap<QString, QVariant>()) const;
 
+    void persist(const QMap<QString, QVariant> &values);
     void removeAll();
 };
 

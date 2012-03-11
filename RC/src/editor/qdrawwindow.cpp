@@ -1,4 +1,4 @@
-п»ї#include <QtGui>
+#include <QtGui>
 #include <QtCore>
 #include "../../src/editor/qdrawwindow.h"
 #include "../../src/editor/qtop.h"
@@ -42,26 +42,26 @@ TDrawWindow::TDrawWindow(ShowRole role, QWidget *parent)
     scene->setMultiProcTopMenu(multiProcMenu);
     scene->setBackgroundBrush(QBrush(Qt::white));
     scene->setSceneRect(-800, -600, 1600, 1200);
-    //РѕР±СЂР°Р±РѕС‚С‡РёРє РґРѕР±Р°РІР»РµРЅРёСЏ РѕР±СЉРµРєС‚Р°
+    //обработчик добавления объекта
     connect(scene, SIGNAL(itemInserted(QGraphicsItem*)),
             this, SLOT(itemInserted(QGraphicsItem*)));
-    //РѕР±СЂР°Р±РѕС‚С‡РёРє РїРµСЂРµРјРµС‰РµРЅРёСЏ РѕР±СЉРµРєС‚Р°
+    //обработчик перемещения объекта
     connect(scene, SIGNAL(itemMoved(QGraphicsItem*,QLineF)),
             this, SLOT(itemMoved(QGraphicsItem*,QLineF)));
     connect(scene, SIGNAL(itemsMoved(QList<QGraphicsItem*>,QLineF)),
             this, SLOT(itemsMoved(QList<QGraphicsItem*>,QLineF)));
-    //РІС‹Р±РѕСЂ РѕР±СЉРµРєС‚Р° - С‚РѕР¶Рµ РёР·РјРµРЅРµРЅРёРµ СЃС†РµРЅС‹
+    //выбор объекта - тоже изменение сцены
     connect(scene, SIGNAL(selectionChanged()),
             this, SIGNAL(sceneChanged()));
     connect(scene, SIGNAL(selectionChanged()), this, SLOT(selectionChanged()));
-    //РѕР±СЂР°Р±РѕС‚С‡РёРє СѓРґР°Р»РµРЅРёСЏ РѕР±СЉРµРєС‚Р°
+    //обработчик удаления объекта
     connect(scene, SIGNAL(itemDeleted(QGraphicsItem*)),
             this, SLOT(itemDeleted(QGraphicsItem*)));
     connect(scene, SIGNAL(mouseScrollScaleChanged(float)), this, SIGNAL(mouseScrollScaleChanged(float)));
 
     view->setScene(scene);
     view->setAlignment(Qt::AlignCenter);
-    //Р РёСЃСѓРµРј СЃРµС‚РєСѓ
+    //Рисуем сетку
     QBrush myBackgroundBrush = view->backgroundBrush();
     myBackgroundBrush.setColor(Qt::lightGray);
     myBackgroundBrush.setStyle(Qt::Dense7Pattern);
@@ -77,7 +77,7 @@ TDrawWindow::TDrawWindow(ShowRole role, QWidget *parent)
 
 void TDrawWindow::createMenus()
 {
-    //Р РµР¶РёРј С‚РѕР»СЊРєРѕ С‡С‚РµРЅРёСЏ
+    //Режим только чтения
     if (myRole == ReadOnly) {
         topMenu = NULL;
         arcMenu = NULL;
@@ -86,7 +86,7 @@ void TDrawWindow::createMenus()
         multiProcMenu = NULL;
     }
 
-    //РћР±С‹С‡РЅС‹Р№ СЂРµР¶РёРј
+    //Обычный режим
     if (myRole == NormalEditor) {
         topMenu = new QMenu();
         connect(topMenu, SIGNAL(aboutToShow()), this, SLOT(topMenuAboutToShow()));
@@ -123,59 +123,59 @@ void TDrawWindow::createMenus()
 void TDrawWindow::createActions()
 {
     if (myRole == NormalEditor) {
-        setIconAction = new QAction(tr("Р—Р°РіСЂСѓР·РёС‚СЊ РёРєРѕРЅРєСѓ"), this);
-        setIconAction->setStatusTip(tr("РћС‚РѕР±СЂР°Р¶Р°РµС‚ РёРєРѕРЅРєСѓ РЅР° РІРµСЂС€РёРЅРµ РІРјРµСЃС‚Рѕ С‚РµРєСЃС‚Р°"));
+        setIconAction = new QAction(tr("Загрузить иконку"), this);
+        setIconAction->setStatusTip(tr("Отображает иконку на вершине вместо текста"));
         connect(setIconAction, SIGNAL(triggered()), this, SLOT(setItemIcon()));
 
-        setTopPropertyAction = new QAction(tr("РЎРІРѕР№СЃС‚РІР°"), this);
-        setTopPropertyAction->setStatusTip(tr("РР·РјРµРЅРёС‚СЊ СЃРІРѕР№СЃС‚РІР° РІРµСЂС€РёРЅС‹"));
+        setTopPropertyAction = new QAction(tr("Свойства"), this);
+        setTopPropertyAction->setStatusTip(tr("Изменить свойства вершины"));
         connect(setTopPropertyAction, SIGNAL(triggered()), this, SLOT(showTopPropDialog()));
 
-        makeAsRootAction = new QAction(tr("РЎРґРµР»Р°С‚СЊ РєРѕСЂРЅРµРІРѕР№"), this);
-        makeAsRootAction->setStatusTip(tr("РЎРґРµР»Р°С‚СЊ РєРѕСЂРЅРµРІРѕР№"));
+        makeAsRootAction = new QAction(tr("Сделать корневой"), this);
+        makeAsRootAction->setStatusTip(tr("Сделать корневой"));
         connect(makeAsRootAction, SIGNAL(triggered()), this, SLOT(makeAsRoot()));
 
-        deleteTopAction = new QAction(QIcon(":/images/delete.png"), tr("РЈРґР°Р»РёС‚СЊ"), this);
-        deleteTopAction->setStatusTip(tr("РЈРґР°Р»СЏРµС‚ РІРµСЂС€РёРЅСѓ"));
+        deleteTopAction = new QAction(QIcon(":/images/delete.png"), tr("Удалить"), this);
+        deleteTopAction->setStatusTip(tr("Удаляет вершину"));
         connect(deleteTopAction, SIGNAL(triggered()), this, SLOT(deleteTop()));
 
-        viewSubGraphAct = new QAction(tr("РџСЂРѕСЃРјРѕС‚СЂРµС‚СЊ РїРѕРґРіСЂР°С„"), this);
-        viewSubGraphAct->setStatusTip(tr("РћС‚РєСЂС‹РІР°РµС‚ РїРѕРґРіСЂР°С„ РґР»СЏ РїСЂРѕСЃРјРѕС‚СЂР°"));
+        viewSubGraphAct = new QAction(tr("Просмотреть подграф"), this);
+        viewSubGraphAct->setStatusTip(tr("Открывает подграф для просмотра"));
         connect(viewSubGraphAct, SIGNAL(triggered()), this, SLOT(viewSubGraph()));
 
-        editSubGraphAct = new QAction(tr("Р РµРґР°РєС‚РёСЂРѕРІР°С‚СЊ РїРѕРґРіСЂР°С„"), this);
-        editSubGraphAct->setStatusTip(tr("РћС‚РєСЂС‹РІР°РµС‚ РїРѕРґРіСЂР°С„ РґР»СЏ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ"));
+        editSubGraphAct = new QAction(tr("Редактировать подграф"), this);
+        editSubGraphAct->setStatusTip(tr("Открывает подграф для редактирования"));
         connect(editSubGraphAct, SIGNAL(triggered()), this, SLOT(editSubGraph()));
 
-        setArcPropertyAction = new QAction(tr("РЎРІРѕР№СЃС‚РІР°"), this);
-        setArcPropertyAction->setStatusTip(tr("РР·РјРµРЅРёС‚СЊ СЃРІРѕР№СЃС‚РІР° РґСѓРіРё"));
+        setArcPropertyAction = new QAction(tr("Свойства"), this);
+        setArcPropertyAction->setStatusTip(tr("Изменить свойства дуги"));
         connect(setArcPropertyAction, SIGNAL(triggered()), this, SLOT(showArcPropDialog()));
 
-        deleteArcAction = new QAction(QIcon(":/images/delete.png"), tr("РЈРґР°Р»РёС‚СЊ"), this);
-        deleteArcAction->setStatusTip(tr("РЈРґР°Р»СЏРµС‚ РґСѓРіСѓ"));
+        deleteArcAction = new QAction(QIcon(":/images/delete.png"), tr("Удалить"), this);
+        deleteArcAction->setStatusTip(tr("Удаляет дугу"));
         connect(deleteArcAction, SIGNAL(triggered()), this, SLOT(deleteArc()));
 
-        rebuildArcAction = new QAction(tr("РџРµСЂРµСЃС‚СЂРѕРёС‚СЊ"), this);
-        rebuildArcAction->setStatusTip(tr("РџРµСЂРµСЃС‚СЂР°РёРІР°РµС‚ РґСѓРіСѓ РїРѕ РІРЅСѓС‚СЂРµРЅРЅРµРјСѓ Р°Р»РіРѕСЂРёС‚РјСѓ"));
+        rebuildArcAction = new QAction(tr("Перестроить"), this);
+        rebuildArcAction->setStatusTip(tr("Перестраивает дугу по внутреннему алгоритму"));
         connect(rebuildArcAction, SIGNAL(triggered()), this, SLOT(rebuildArc()));
 
-        deleteSyncAction = new QAction(QIcon(":/images/delete.png"), tr("РЈРґР°Р»РёС‚СЊ"), this);
-        deleteSyncAction->setStatusTip(tr("РЈРґР°Р»РёС‚СЊ РґСѓРіСѓ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё"));
+        deleteSyncAction = new QAction(QIcon(":/images/delete.png"), tr("Удалить"), this);
+        deleteSyncAction->setStatusTip(tr("Удалить дугу синхронизации"));
         connect(deleteSyncAction, SIGNAL(triggered()), this, SLOT(deleteSync()));
 
-        deleteCommentAction = new QAction(QIcon(":/images/delete.png"), tr("РЈРґР°Р»РёС‚СЊ"), this);
-        deleteCommentAction->setStatusTip(tr("РЈРґР°Р»СЏРµС‚ РєРѕРјРјРµРЅС‚Р°СЂРёР№"));
+        deleteCommentAction = new QAction(QIcon(":/images/delete.png"), tr("Удалить"), this);
+        deleteCommentAction->setStatusTip(tr("Удаляет комментарий"));
         connect(deleteCommentAction, SIGNAL(triggered()), this, SLOT(deleteComment()));
 
-        setFontAction = new QAction(tr("РЁСЂРёС„С‚"), this);
+        setFontAction = new QAction(tr("Шрифт"), this);
         connect(setFontAction, SIGNAL(triggered()), this, SLOT(showFontDialog()));
 
-        deleteMultiProcTopAction = new QAction(QIcon(":/images/delete.png"), tr("РЈРґР°Р»РёС‚СЊ"), this);
-        deleteMultiProcTopAction->setStatusTip(tr("РЈРґР°Р»РёС‚СЊ РјРЅРѕРіРѕРїРѕС‚РѕС‡РЅСѓСЋ РІРµСЂС€РёРЅСѓ"));
+        deleteMultiProcTopAction = new QAction(QIcon(":/images/delete.png"), tr("Удалить"), this);
+        deleteMultiProcTopAction->setStatusTip(tr("Удалить многопоточную вершину"));
         connect(deleteMultiProcTopAction, SIGNAL(triggered()), this, SLOT(deleteTop()));
 
-        setMultiProcTopAction = new QAction(tr("РЎРІРѕР№СЃС‚РІР°"), this);
-        setMultiProcTopAction->setStatusTip(tr("РР·РјРµРЅРёС‚СЊ СЃРѕРІР№СЃС‚РІР° РјРЅРѕРіРѕРїРѕС‚РѕС‡РЅРѕР№ РІРµСЂС€РёРЅС‹"));
+        setMultiProcTopAction = new QAction(tr("Свойства"), this);
+        setMultiProcTopAction->setStatusTip(tr("Изменить совйства многопоточной вершины"));
         connect(setMultiProcTopAction, SIGNAL(triggered()), this, SLOT(showMultiProcTopDialog()));
     }
 }
@@ -209,7 +209,7 @@ void TDrawWindow::deleteComment()
 }
 
 /*!
-  РЈСЃС‚Р°РЅРѕРІРёС‚СЊ СЂРµР¶РёРј СЃС†РµРЅС‹
+  Установить режим сцены
 */
 void TDrawWindow::setMode(QDiagramScene::Mode mode)
 {
@@ -220,12 +220,12 @@ void TDrawWindow::setMode(QDiagramScene::Mode mode)
 }
 
 /*!
-  Р РµР°РєС†РёСЏ РЅР° РЅР°Р¶Р°С‚РёРµ РїСѓРЅРєС‚Р° РјРµРЅСЋ: Р—Р°РіСЂСѓР·РёС‚СЊ РёРєРѕРЅРєСѓ
+  Реакция на нажатие пункта меню: Загрузить иконку
 */
 void TDrawWindow::setItemIcon()
 {
     QString fileName = QFileDialog::getOpenFileName(0,
-                                                    tr("РћС‚РєСЂС‹С‚СЊ РєР°СЂС‚РёРЅРєСѓ..."),
+                                                    tr("Открыть картинку..."),
                                                     "",
                                                     tr("Images (*.png *.xpm *.jpg *.jpeg)"));
     if (fileName.isEmpty())
@@ -235,13 +235,13 @@ void TDrawWindow::setItemIcon()
     if (!img.isNull() && QFileInfo(fileName).size() < 10000) {
         top->setIcon(img);
         scene->invalidate(top->mapRectToScene(top->boundingRect()));
-    } else QMessageBox::critical(NULL, tr("РћС€РёР±РєР°"), tr("Р Р°Р·РјРµСЂ РєР°СЂС‚РёРЅРєРё РЅРµ РґРѕР»Р¶РµРЅ РїСЂРµРІС‹С€Р°С‚СЊ 10 РєР±"));
+    } else QMessageBox::critical(NULL, tr("Ошибка"), tr("Размер картинки не должен превышать 10 кб"));
 
     emit sceneChanged();
 }
 
 /*!
-  Р РµР°РєС†РёСЏ РЅР° РЅР°Р¶Р°С‚РёРµ РїСѓРЅРєС‚Р° РјРµРЅСЋ: РЎРІРѕР№СЃС‚РІР° РІРµСЂС€РёРЅС‹
+  Реакция на нажатие пункта меню: Свойства вершины
 */
 void TDrawWindow::showTopPropDialog(){
     TopPropertyDialog dlg;
@@ -256,7 +256,7 @@ void TDrawWindow::showTopPropDialog(){
 
 
 /*!
-  Р РµР°РєС†РёСЏ РЅР° РЅР°Р¶Р°С‚РёРµ РїСѓРЅРєС‚Р° РјРµРЅСЋ: РЎРѕС…СЂР°РЅРёС‚СЊ РєР°Рє РєР°СЂС‚РёРЅРєСѓ
+  Реакция на нажатие пункта меню: Сохранить как картинку
 */
 void TDrawWindow::saveAsImage(QString filename)
 {
@@ -271,7 +271,7 @@ void TDrawWindow::saveAsImage(QString filename)
 }
 
 /*!
-  Р РµР°РєС†РёСЏ РЅР° РЅР°Р¶Р°С‚РёРµ РїСѓРЅРєС‚Р° РјРµРЅСЋ: РЎРІРѕР№СЃС‚РІР° РґСѓРіРё
+  Реакция на нажатие пункта меню: Свойства дуги
 */
 void TDrawWindow::showArcPropDialog()
 {
@@ -286,7 +286,7 @@ void TDrawWindow::showArcPropDialog()
 }
 
 /*!
-  Р РµР°РєС†РёСЏ РЅР° РЅР°Р¶Р°С‚РёРµ РїСѓРЅРєС‚Р° РјРµРЅСЋ: РЎРґРµР»Р°С‚СЊ РєРѕСЂРЅРµРІРѕР№
+  Реакция на нажатие пункта меню: Сделать корневой
 */
 void TDrawWindow::makeAsRoot()
 {
@@ -296,7 +296,7 @@ void TDrawWindow::makeAsRoot()
 }
 
 /*!
-  Р’РѕР·РІСЂР°С‰Р°РµС‚ СЃРїРёСЃРѕРє РІСЃРµС… РІРµСЂС€РёРµРЅ Р»РµР¶Р°С‰РёС… РЅР° СЃС†РµРЅРµ
+  Возвращает список всех вершиен лежащих на сцене
 */
 QList<QTop* > TDrawWindow::allTops() const
 {
@@ -310,7 +310,7 @@ QList<QTop* > TDrawWindow::allTops() const
 }
 
 /*!
-  Р’РѕР·РІСЂР°С‰Р°РµС‚ СЃРїРёСЃРѕРє РІСЃРµС… РґСѓРі Р»РµР¶Р°С‰РёС… РЅР° СЃС†РµРЅРµ
+  Возвращает список всех дуг лежащих на сцене
 */
 QList<QArc* > TDrawWindow::allArcs() const
 {
@@ -323,7 +323,7 @@ QList<QArc* > TDrawWindow::allArcs() const
 }
 
 /*!
-  Р’РѕР·РІСЂР°С‰Р°РµС‚ СЃРїРёСЃРѕРє РІСЃРµС… РјРЅРѕРіРѕРїРѕС‚РѕС‡РЅС‹С… РІРµСЂС€РёРЅ Р»РµР¶Р°С‰РёС… РЅР° СЃС†РµРЅРµ
+  Возвращает список всех многопоточных вершин лежащих на сцене
 */
 QList<QMultiProcTop* > TDrawWindow::allMultiProcTop() const
 {
@@ -336,7 +336,7 @@ QList<QMultiProcTop* > TDrawWindow::allMultiProcTop() const
 }
 
 /*!
-  Р’РѕР·РІСЂР°С‰Р°РµС‚ СЃРїРёСЃРѕРє РІСЃРµС… РєРѕРјРјРµРЅС‚Р°СЂРёРµРІ Р»РµР¶Р°С‰РёС… РЅР° СЃС†РµРЅРµ
+  Возвращает список всех комментариев лежащих на сцене
 */
 QList<QComment* > TDrawWindow::allComments() const
 {
@@ -349,7 +349,7 @@ QList<QComment* > TDrawWindow::allComments() const
 }
 
 /*!
-  Р’РѕР·РІСЂР°С‰Р°РµС‚ СЃРїРёСЃРѕРє РІСЃРµС… РґСѓРі СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё Р»РµР¶Р°С‰РёС… РЅР° СЃС†РµРЅРµ
+  Возвращает список всех дуг синхронизации лежащих на сцене
 */
 QList<QSyncArc* > TDrawWindow::allSyncArcs() const
 {
@@ -362,7 +362,7 @@ QList<QSyncArc* > TDrawWindow::allSyncArcs() const
 }
 
 /*!
-  Р’РѕР·РІСЂР°С‰Р°РµС‚ РіСЂР°С„
+  Возвращает граф
 */
 Graph TDrawWindow::getGraph() const
 {
@@ -381,7 +381,7 @@ Graph TDrawWindow::getGraph() const
 }
 
 /*!
-  Р—Р°РіСЂСѓР¶Р°РµС‚ РіСЂР°С„ РІ СЂРµРґР°РєС‚РѕСЂ
+  Загружает граф в редактор
 */
 
 void TDrawWindow::loadGraph(const QString &name)
@@ -441,7 +441,7 @@ void TDrawWindow::loadGraph(const QString &name)
             qarcList.append(qMakePair(qarc, arc.priority));
         }
 
-        //СЂР°СЃСЃС‚Р°РІР»СЏРµРј РїСЂРёРѕСЂРёС‚РµС‚С‹ РґСѓРі
+        //расставляем приоритеты дуг
         for (int i = 0; i < qarcList.count(); i++) {
             qarcList.at(i).first->setPriority(qarcList.at(i).second);
         }
@@ -455,7 +455,7 @@ void TDrawWindow::loadGraph(const QString &name)
         myGraphName = graph.name;
         myGraphExtName = graph.extName;
     } catch (QString e) {
-        QMessageBox::critical(NULL, tr("РћС€РёР±РєР°"), e);
+        QMessageBox::critical(NULL, tr("Ошибка"), e);
     }
 
     if (myRole == ReadOnly)
@@ -468,17 +468,17 @@ void TDrawWindow::loadGraph(const QString &name)
 bool TDrawWindow::saveGraph(QString name, QString extName)
 {
     if (name.isEmpty() || extName.isEmpty()) {
-        QMessageBox::critical(this, tr("РћС€РёР±РєР°"), tr("РќРµР»СЊР·СЏ СЃРѕС…СЂР°РЅРёС‚СЊ РіСЂР°С„ Р±РµР· РёРјРµРЅРё."), QMessageBox::Ok);
+        QMessageBox::critical(this, tr("Ошибка"), tr("Нельзя сохранить граф без имени."), QMessageBox::Ok);
         return false;
     }
     myGraphExtName = extName;
     myGraphName = name;
     Graph graph = getGraph();
     try {
-        globalDBManager->saveGraphDB(graph);
+        globalDBManager->saveGraph(graph);
         emit graphLoaded(graph.name, graph.extName);
     } catch (const QString s) {
-        QMessageBox::critical(this, tr("РћС€РёР±РєР°"), s, QMessageBox::Ok);
+        QMessageBox::critical(this, tr("Ошибка"), s, QMessageBox::Ok);
         return false;
     }
     return true;
@@ -491,7 +491,7 @@ bool TDrawWindow::updateGraph()
         try {
             globalDBManager->updateGraphDB(graph);
         } catch (const QString s) {
-            QMessageBox::critical(this, tr("РћС€РёР±РєР°"), s, QMessageBox::Ok);
+            QMessageBox::critical(this, tr("Ошибка"), s, QMessageBox::Ok);
             return false;
         }
         return true;
@@ -505,7 +505,7 @@ bool TDrawWindow::saveStruct()
         try {
             globalDBManager->saveStructDB(graph);
         } catch (const QString s) {
-            QMessageBox::critical(this, tr("РћС€РёР±РєР°"), s, QMessageBox::Ok);
+            QMessageBox::critical(this, tr("Ошибка"), s, QMessageBox::Ok);
             return false;
         }
         return true;
@@ -541,17 +541,17 @@ void TDrawWindow::alignHLeft()
         bool allowMove = true;
         top->setPos(top->scenePos().x() + vector.dx(), top->scenePos().y() + vector.dy());
 
-        //РЅР°РґРµРј РїРµСЂРµСЃРµРєР°СЋС‰РёРµСЃСЏ СЌР»РµРјРµРЅС‚С‹
+        //надем пересекающиеся элементы
         QList<QGraphicsItem* > itemList = scene->collidingItems(top, Qt::IntersectsItemBoundingRect);
         foreach(QGraphicsItem* item, itemList)
-            //РµСЃР»Рё РµСЃС‚СЊ С…РѕС‚СЏ Р±С‹ РѕРґРЅР° РІРµСЂС€РёРЅР°
+            //если есть хотя бы одна вершина
             if (item->type() == QTop::Type){
-                //Р·Р°РїСЂРµС‚РёРј РїРµСЂРµРјРµС‰РµРЅРёРµ
+                //запретим перемещение
                 allowMove = false;
                 break;
             }
 
-        //РІРµСЂРЅРµРј РІСЃРµ РЅР° РјРµСЃС‚Рѕ
+        //вернем все на место
         top->setPos(top->scenePos().x() - vector.dx(), top->scenePos().y() - vector.dy());
         if (allowMove)
             itemMoved(top, vector);
@@ -578,17 +578,17 @@ void TDrawWindow::alignHRight()
         bool allowMove = true;
         top->setPos(top->scenePos().x() + vector.dx(), top->scenePos().y() + vector.dy());
 
-        //РЅР°РґРµРј РїРµСЂРµСЃРµРєР°СЋС‰РёРµСЃСЏ СЌР»РµРјРµРЅС‚С‹
+        //надем пересекающиеся элементы
         QList<QGraphicsItem* > itemList = scene->collidingItems(top, Qt::IntersectsItemBoundingRect);
         foreach(QGraphicsItem* item, itemList)
-            //РµСЃР»Рё РµСЃС‚СЊ С…РѕС‚СЏ Р±С‹ РѕРґРЅР° РІРµСЂС€РёРЅР°
+            //если есть хотя бы одна вершина
             if (item->type() == QTop::Type) {
-                //Р·Р°РїСЂРµС‚РёРј РїРµСЂРµРјРµС‰РµРЅРёРµ
+                //запретим перемещение
                 allowMove = false;
                 break;
             }
 
-        //РІРµСЂРЅРµРј РІСЃРµ РЅР° РјРµСЃС‚Рѕ
+        //вернем все на место
         top->setPos(top->scenePos().x() - vector.dx(), top->scenePos().y() - vector.dy());
         if (allowMove)
             itemMoved(top, vector);
@@ -613,17 +613,17 @@ void TDrawWindow::alignHCenter()
         bool allowMove = true;
         top->setPos(top->scenePos().x() + vector.dx(), top->scenePos().y() + vector.dy());
 
-        //РЅР°РґРµРј РїРµСЂРµСЃРµРєР°СЋС‰РёРµСЃСЏ СЌР»РµРјРµРЅС‚С‹
+        //надем пересекающиеся элементы
         QList<QGraphicsItem* > itemList = scene->collidingItems(top, Qt::IntersectsItemBoundingRect);
         foreach(QGraphicsItem* item, itemList)
-            //РµСЃР»Рё РµСЃС‚СЊ С…РѕС‚СЏ Р±С‹ РѕРґРЅР° РІРµСЂС€РёРЅР°
+            //если есть хотя бы одна вершина
             if (item->type() == QTop::Type){
-                //Р·Р°РїСЂРµС‚РёРј РїРµСЂРµРјРµС‰РµРЅРёРµ
+                //запретим перемещение
                 allowMove = false;
                 break;
             }
 
-        //РІРµСЂРЅРµРј РІСЃРµ РЅР° РјРµСЃС‚Рѕ
+        //вернем все на место
         top->setPos(top->scenePos().x() - vector.dx(), top->scenePos().y() - vector.dy());
         if (allowMove)
             itemMoved(top, vector);
@@ -651,17 +651,17 @@ void TDrawWindow::alignVTop()
         bool allowMove = true;
         top->setPos(top->scenePos().x() + vector.dx(), top->scenePos().y() + vector.dy());
 
-        //РЅР°РґРµРј РїРµСЂРµСЃРµРєР°СЋС‰РёРµСЃСЏ СЌР»РµРјРµРЅС‚С‹
+        //надем пересекающиеся элементы
         QList<QGraphicsItem* > itemList = scene->collidingItems(top, Qt::IntersectsItemBoundingRect);
         foreach(QGraphicsItem* item, itemList)
-            //РµСЃР»Рё РµСЃС‚СЊ С…РѕС‚СЏ Р±С‹ РѕРґРЅР° РІРµСЂС€РёРЅР°
+            //если есть хотя бы одна вершина
             if (item->type() == QTop::Type){
-                //Р·Р°РїСЂРµС‚РёРј РїРµСЂРµРјРµС‰РµРЅРёРµ
+                //запретим перемещение
                 allowMove = false;
                 break;
             }
 
-        //РІРµСЂРЅРµРј РІСЃРµ РЅР° РјРµСЃС‚Рѕ
+        //вернем все на место
         top->setPos(top->scenePos().x() - vector.dx(), top->scenePos().y() - vector.dy());
         if (allowMove)
             itemMoved(top, vector);
@@ -688,17 +688,17 @@ void TDrawWindow::alignVBottom()
         bool allowMove = true;
         top->setPos(top->scenePos().x() + vector.dx(), top->scenePos().y() + vector.dy());
 
-        //РЅР°РґРµРј РїРµСЂРµСЃРµРєР°СЋС‰РёРµСЃСЏ СЌР»РµРјРµРЅС‚С‹
+        //надем пересекающиеся элементы
         QList<QGraphicsItem* > itemList = scene->collidingItems(top, Qt::IntersectsItemBoundingRect);
         foreach(QGraphicsItem* item, itemList)
-            //РµСЃР»Рё РµСЃС‚СЊ С…РѕС‚СЏ Р±С‹ РѕРґРЅР° РІРµСЂС€РёРЅР°
+            //если есть хотя бы одна вершина
             if (item->type() == QTop::Type){
-                //Р·Р°РїСЂРµС‚РёРј РїРµСЂРµРјРµС‰РµРЅРёРµ
+                //запретим перемещение
                 allowMove = false;
                 break;
             }
 
-        //РІРµСЂРЅРµРј РІСЃРµ РЅР° РјРµСЃС‚Рѕ
+        //вернем все на место
         top->setPos(top->scenePos().x() - vector.dx(), top->scenePos().y() - vector.dy());
         if (allowMove)
             itemMoved(top, vector);
@@ -723,17 +723,17 @@ void TDrawWindow::alignVCenter()
         bool allowMove = true;
         top->setPos(top->scenePos().x() + vector.dx(), top->scenePos().y() + vector.dy());
 
-        //РЅР°РґРµРј РїРµСЂРµСЃРµРєР°СЋС‰РёРµСЃСЏ СЌР»РµРјРµРЅС‚С‹
+        //надем пересекающиеся элементы
         QList<QGraphicsItem* > itemList = scene->collidingItems(top, Qt::IntersectsItemBoundingRect);
         foreach(QGraphicsItem* item, itemList)
-            //РµСЃР»Рё РµСЃС‚СЊ С…РѕС‚СЏ Р±С‹ РѕРґРЅР° РІРµСЂС€РёРЅР°
+            //если есть хотя бы одна вершина
             if (item->type() == QTop::Type){
-                //Р·Р°РїСЂРµС‚РёРј РїРµСЂРµРјРµС‰РµРЅРёРµ
+                //запретим перемещение
                 allowMove = false;
                 break;
             }
 
-        //РІРµСЂРЅРµРј РІСЃРµ РЅР° РјРµСЃС‚Рѕ
+        //вернем все на место
         top->setPos(top->scenePos().x() - vector.dx(), top->scenePos().y() - vector.dy());
         if (allowMove)
             itemMoved(top, vector);
@@ -770,10 +770,10 @@ void TDrawWindow::distribHorizontally()
     //else if (item->type() == QArcLine::Type || item->type() == QSerialArcTop::Type)
     //    arcList.append(qgraphicsitem_cast<QArc* >(item->parentItem()));
 
-    //Р•СЃР»Рё РІС‹РґРµР»РµРЅРѕ РЅРµСЃРєРѕР»СЊРєРѕ РІРµСЂС€РёРЅ - СЂР°СЃРїСЂРµРґРµР»СЏРµРј РІРµСЂС€РёРЅС‹
+    //Если выделено несколько вершин - распределяем вершины
     if (topList.count() > 1) {
-        //С…РёС‚СЂС‹Р№ С…РѕРґ!
-        //РЎРѕСЂС‚РёСЂСѓРµРј РІРµСЂС€РёРЅС‹ РІ СЃРїРёСЃРєРµ. РЎР°РјР°СЏ РІРµСЂС…РЅСЏСЏ РІРµСЂС€РёРЅР° - РїРµСЂРІР°СЏ. РќРёР¶РЅСЏСЏ - РїРѕСЃР»РµРґРЅСЏСЏ.
+        //хитрый ход!
+        //Сортируем вершины в списке. Самая верхняя вершина - первая. Нижняя - последняя.
         qSort(topList.begin(), topList.end(), topLeftThan);
 
         float left = topList.first()->mapRectToScene(topList.first()->rect()).left();
@@ -785,7 +785,7 @@ void TDrawWindow::distribHorizontally()
         }
         float dist = (fabs(left - right) - totalWidth) / (topList.count() - 1);
 
-        //РЅРµ РїРѕР»СѓС‡Р°РµС‚СЃСЏ СЂР°СЃРїСЂРµРґРµР»РёС‚СЊ. РјР°Р»Рѕ РјРµСЃС‚Р°.
+        //не получается распределить. мало места.
         if (dist <= 0) return;
 
         foreach (QTop* top, topList){
@@ -793,11 +793,11 @@ void TDrawWindow::distribHorizontally()
             left += top->rect().width() + dist;
         }
     }
-    //Р•СЃР»Рё РѕРґРЅР° РІРµСЂС€РёРЅР° - С‚Рѕ РґСѓРіРё Сѓ СЌС‚РѕР№ РІРµСЂС€РёРЅС‹
+    //Если одна вершина - то дуги у этой вершины
     else if (topList.count() == 1) {
         QTop* top = qgraphicsitem_cast<QTop* >(scene->selectedItems().first());
         QList<QArc *> arcs = top->allArcs();
-        //СЂР°СЃРїСЂРµРґРµР»СЏРµРј РґСѓРіРё СЃРІРµСЂС…Сѓ
+        //распределяем дуги сверху
         QPolygonF myPolygon(top->rect());
         QPointF intersectPoint;
         QLineF topEdge = QLineF(myPolygon.at(0) + top->scenePos(), myPolygon.at(1) + top->scenePos());
@@ -823,7 +823,7 @@ void TDrawWindow::distribHorizontally()
         qSort(inArcs.begin(), inArcs.end(), arcPriorLessThan);
         qSort(outArcs.begin(), outArcs.end(), arcPriorLessThan);
 
-        //Р’С‹С‡РёСЃР»СЏРµРј РїСЂРѕРјРµР¶СѓС‚РѕРє РјРµР¶РґСѓ РґСѓРіР°РјРё
+        //Вычисляем промежуток между дугами
         double dist = top->rect().width()/(inArcs.count() + outArcs.count() + 1);
         foreach (QArc* arc, inArcs) {
             QArcLine *line = arc->lines.last();
@@ -840,7 +840,7 @@ void TDrawWindow::distribHorizontally()
             arc->moveLine(line, vector.dx(), vector.dy());
         }
 
-        //СЂР°СЃРїСЂРµРґРµР»СЏРµРј РґСѓРіРё СЃРЅРёР·Сѓ
+        //распределяем дуги снизу
         inArcs.clear();
         outArcs.clear();
         QLineF rightEdge = QLineF(myPolygon.at(2) + top->scenePos(), myPolygon.at(3) + top->scenePos());
@@ -862,7 +862,7 @@ void TDrawWindow::distribHorizontally()
             }
         }
 
-        //Р’С‹С‡РёСЃР»СЏРµРј РїСЂРѕРјРµР¶СѓС‚РѕРє РјРµР¶РґСѓ РґСѓРіР°РјРё
+        //Вычисляем промежуток между дугами
         dist = top->rect().width()/(inArcs.count() + outArcs.count() + 1);
         foreach (QArc* arc, inArcs) {
             QArcLine *line = arc->lines.last();
@@ -900,7 +900,7 @@ void TDrawWindow::distribVertically()
             totalHeight += top->rect().height();
 
         float dist = (fabs(topEdge - bottom) - totalHeight) / (topList.count() - 1);
-        //РЅРµ РїРѕР»СѓС‡Р°РµС‚СЃСЏ СЂР°СЃРїСЂРµРґРµР»РёС‚СЊ. РјР°Р»Рѕ РјРµСЃС‚Р°.
+        //не получается распределить. мало места.
         if (dist <= 0) return;
 
         foreach (QTop* top, topList){
@@ -908,11 +908,11 @@ void TDrawWindow::distribVertically()
             topEdge += top->rect().height() + dist;
         }
     }
-    //Р•СЃР»Рё РѕРґРЅР° РІРµСЂС€РёРЅР° - С‚Рѕ РґСѓРіРё Сѓ СЌС‚РѕР№ РІРµСЂС€РёРЅС‹
+    //Если одна вершина - то дуги у этой вершины
     else if (topList.count() == 1) {
         QTop* top = qgraphicsitem_cast<QTop* >(scene->selectedItems().first());
         QList<QArc *> arcs = top->allArcs();
-        //СЂР°СЃРїСЂРµРґРµР»СЏРµРј РґСѓРіРё СЃРїСЂР°РІР°
+        //распределяем дуги справа
         QPolygonF myPolygon(top->rect());
         QPointF intersectPoint;
         QLineF leftEdge = QLineF(myPolygon.at(1) + top->scenePos(), myPolygon.at(2) + top->scenePos());
@@ -938,7 +938,7 @@ void TDrawWindow::distribVertically()
         qSort(inArcs.begin(), inArcs.end(), arcPriorLessThan);
         qSort(outArcs.begin(), outArcs.end(), arcPriorLessThan);
 
-        //Р’С‹С‡РёСЃР»СЏРµРј РїСЂРѕРјРµР¶СѓС‚РѕРє РјРµР¶РґСѓ РґСѓРіР°РјРё
+        //Вычисляем промежуток между дугами
         double dist = top->rect().height()/(inArcs.count() + outArcs.count() + 1);
         foreach (QArc* arc, inArcs) {
             QArcLine* line = arc->lines.last();
@@ -955,7 +955,7 @@ void TDrawWindow::distribVertically()
             arc->moveLine(line, vector.dx(), vector.dy());
         }
 
-        //СЂР°СЃРїСЂРµРґРµР»СЏРµРј РґСѓРіРё СЃР»РµРІР°
+        //распределяем дуги слева
         inArcs.clear();
         outArcs.clear();
         QLineF bottomEdge = QLineF(myPolygon.at(3) + top->scenePos(), myPolygon.at(4) + top->scenePos());
@@ -977,7 +977,7 @@ void TDrawWindow::distribVertically()
             }
         }
 
-        //Р’С‹С‡РёСЃР»СЏРµРј РїСЂРѕРјРµР¶СѓС‚РѕРє РјРµР¶РґСѓ РґСѓРіР°РјРё
+        //Вычисляем промежуток между дугами
         dist = top->rect().height()/(inArcs.count() + outArcs.count() + 1);
         foreach (QArc* arc, inArcs) {
             QArcLine* line = arc->lines.last();

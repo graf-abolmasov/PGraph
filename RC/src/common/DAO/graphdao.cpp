@@ -80,6 +80,24 @@ void GraphDAO::persist(const Graph *graph)
 
 QList<Graph> GraphDAO::findAll(bool loadContent)
 {
+    openDb();
+    QSqlQuery query;
+    query.prepare("SELECT NAMEPR, EXTNAME, ICON FROM actor WHERE CLASPR = 'g' AND PROJECT_ID = :PROJECT_ID ORDER BY EXTNAME;");
+    query.bindValue(":PROJECT_ID", globalDBManager->getProjectId());
+    execQuery(query);
+    QList<Graph> result;
+    while(query.next()){
+        if (loadContent) {
+            result.append(findByName(query.value(0).toString()));
+        } else {
+            QPixmap p;
+            p.loadFromData(query.value(2).toByteArray(), "PNG");
+            Graph newGraph(query.value(0).toString(), query.value(1).toString(), QList<Top>(), QList<Arc>(), QList<Comment>(), QList<SyncArc>(), p);
+            result.append(newGraph);
+        }
+    }
+    myDb.close();
+    return result;
 
 }
 
@@ -99,24 +117,24 @@ Graph GraphDAO::findByName(const QString &name)
         const Actor *actor = globalDBManager->getActor(record.value("Actor").toString());
         if (record.value("Type").toString() == "T") {
             topList.append(Top(record.value("X").toFloat(),
-                    record.value("Y").toFloat(),
-                    record.value("SizeX").toFloat(),
-                    record.value("SizeY").toFloat(),
-                    record.value("ntop").toInt(),
-                    -1,
-                    record.value("isRoot").toBool(),
-                    actor,
-                    Top::NormalTop));
+                               record.value("Y").toFloat(),
+                               record.value("SizeX").toFloat(),
+                               record.value("SizeY").toFloat(),
+                               record.value("ntop").toInt(),
+                               -1,
+                               record.value("isRoot").toBool(),
+                               actor,
+                               Top::NormalTop));
         } else if (record.value("Type").toString() == "M") {
             topList.append(Top(record.value("X").toFloat(),
-                    record.value("Y").toFloat(),
-                    -1,
-                    -1,
-                    record.value("ntop").toInt(),
-                    record.value("procCount").toInt(),
-                    false,
-                    actor,
-                    Top::MultiProcTop));
+                               record.value("Y").toFloat(),
+                               -1,
+                               -1,
+                               record.value("ntop").toInt(),
+                               record.value("procCount").toInt(),
+                               false,
+                               actor,
+                               Top::MultiProcTop));
         }
     }
 
@@ -138,11 +156,11 @@ Graph GraphDAO::findByName(const QString &name)
             arcType = Arc::TerminateArc;
         QStringList lines = record.value("Nodes").toString().split(";;");
         arcList.append(Arc(arcType,
-                record.value("Priority").toInt(),
-                record.value("FromTop").toInt(),
-                record.value("ToTop").toInt(),
-                globalDBManager->getPredicate(record.value("Predicate").toString()),
-                lines));
+                           record.value("Priority").toInt(),
+                           record.value("FromTop").toInt(),
+                           record.value("ToTop").toInt(),
+                           globalDBManager->getPredicate(record.value("Predicate").toString()),
+                           lines));
     }
 
     //получаем список комментариев
@@ -171,4 +189,18 @@ Graph GraphDAO::findByName(const QString &name)
     Graph result(record.value("NAMEPR").toString(), record.value("EXTNAME").toString(), topList, arcList, commentList, QList<SyncArc>());
     myDb.close();
     return result;
+}
+
+void GraphDAO::remove(const Graph &graph)
+{
+    remove(graph.name);
+}
+
+void GraphDAO::remove(const QString &name)
+{
+    openDb();
+    QMap<QString, QVariant> where;
+    where["NAMEPR"] = name;
+    QSqlQuery q = prepareDelete(where);
+    execQuery(q);
 }

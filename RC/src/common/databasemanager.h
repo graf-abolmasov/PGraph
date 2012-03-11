@@ -60,7 +60,7 @@ public:
     QList<const Graph *> getGraphList();
 
     Graph getGraphDB(const QString &namepr) throw (QString);
-    void saveGraphDB(const Graph &graph) throw (QString);
+    void saveGraph(const Graph &graph) throw (QString);
     void updateGraphDB(const Graph &graph) throw (QString);
 
     void cloneProjectDB(int srcProjectId, QString projectName, QString author, QString description);
