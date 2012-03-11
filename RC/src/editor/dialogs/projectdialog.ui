@@ -17,90 +17,38 @@
    <iconset resource="../../resources.qrc">
     <normaloff>:/images/G.png</normaloff>:/images/G.png</iconset>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
-    <widget class="QTableWidget" name="projectsTable">
-     <property name="editTriggers">
-      <set>QAbstractItemView::NoEditTriggers</set>
-     </property>
-     <attribute name="horizontalHeaderStretchLastSection">
-      <bool>true</bool>
-     </attribute>
-     <column>
-      <property name="text">
-       <string>Название проекта</string>
-      </property>
-     </column>
-    </widget>
-   </item>
-   <item>
-    <widget class="QTableWidget" name="infoTable">
-     <property name="editTriggers">
-      <set>QAbstractItemView::NoEditTriggers</set>
-     </property>
-     <property name="selectionMode">
-      <enum>QAbstractItemView::SingleSelection</enum>
-     </property>
-     <property name="selectionBehavior">
-      <enum>QAbstractItemView::SelectRows</enum>
-     </property>
-     <property name="showGrid">
-      <bool>true</bool>
-     </property>
-     <property name="gridStyle">
-      <enum>Qt::SolidLine</enum>
-     </property>
-     <attribute name="horizontalHeaderVisible">
-      <bool>false</bool>
-     </attribute>
-     <attribute name="horizontalHeaderStretchLastSection">
-      <bool>true</bool>
-     </attribute>
-     <attribute name="verticalHeaderStretchLastSection">
-      <bool>true</bool>
-     </attribute>
-     <row>
-      <property name="text">
-       <string>Автор</string>
-      </property>
-     </row>
-     <row>
-      <property name="text">
-       <string>Дата создания</string>
-      </property>
-     </row>
-     <row>
-      <property name="text">
-       <string>Версия</string>
-      </property>
-     </row>
-     <row>
-      <property name="text">
-       <string>Описание</string>
-      </property>
-     </row>
-     <column>
-      <property name="text">
-       <string>Value</string>
-      </property>
-     </column>
-    </widget>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout">
+      <widget class="QTableView" name="projectsTable">
+       <property name="selectionMode">
+        <enum>QAbstractItemView::SingleSelection</enum>
+       </property>
+       <property name="selectionBehavior">
+        <enum>QAbstractItemView::SelectRows</enum>
+       </property>
+       <attribute name="horizontalHeaderCascadingSectionResizes">
+        <bool>false</bool>
+       </attribute>
+       <attribute name="horizontalHeaderStretchLastSection">
+        <bool>true</bool>
+       </attribute>
+       <attribute name="verticalHeaderCascadingSectionResizes">
+        <bool>true</bool>
+       </attribute>
+      </widget>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout">
        <item>
         <widget class="QPushButton" name="createProjectBtn">
          <property name="text">
           <string>Создать</string>
          </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="openProjectBtn">
-         <property name="text">
-          <string>Открыть</string>
+         <property name="icon">
+          <iconset resource="../../resources.qrc">
+           <normaloff>:/images/new.png</normaloff>:/images/new.png</iconset>
          </property>
         </widget>
        </item>
@@ -109,16 +57,47 @@
          <property name="text">
           <string>Удалить</string>
          </property>
+         <property name="icon">
+          <iconset resource="../../resources.qrc">
+           <normaloff>:/images/delete.png</normaloff>:/images/delete.png</iconset>
+         </property>
         </widget>
        </item>
        <item>
         <widget class="QPushButton" name="cloneProjectBtn">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="text">
           <string>Клонировать</string>
          </property>
+         <property name="icon">
+          <iconset resource="../../resources.qrc">
+           <normaloff>:/images/copy.png</normaloff>:/images/copy.png</iconset>
+         </property>
         </widget>
        </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
       </layout>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout"/>
      </item>
      <item>
       <widget class="QDialogButtonBox" name="buttonBox">
@@ -136,33 +115,15 @@
  </widget>
  <tabstops>
   <tabstop>projectsTable</tabstop>
-  <tabstop>infoTable</tabstop>
+  <tabstop>buttonBox</tabstop>
   <tabstop>createProjectBtn</tabstop>
-  <tabstop>openProjectBtn</tabstop>
   <tabstop>delProjectBtn</tabstop>
   <tabstop>cloneProjectBtn</tabstop>
-  <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources>
   <include location="../../resources.qrc"/>
  </resources>
  <connections>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>accepted()</signal>
-   <receiver>ProjectDialog</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>157</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>

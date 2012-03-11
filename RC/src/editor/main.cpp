@@ -3,6 +3,7 @@
 #include <time.h>
 #include "../../src/editor/qmywindow.h"
 #include "../../src/editor/qdrawwindow.h"
+#include "../../src/editor/dialogs/projectdialog.h"
 #include "../../src/common/databasemanager.h"
 #include "../../src/common/commonutils.h"
 #include "../../src/common/md5.h"
@@ -27,17 +28,19 @@ int main(int argc, char *argv[])
     logOutput.append(Logger::Console);
     globalLogger = new Logger(Logger::Debug, logOutput);
     globalDBManager = new DataBaseManager();
-//    globalDBManager->openProjectDB(11);
 
     if (globalDBManager->lastError().type() != QSqlError::NoError) {
         QMessageBox::critical(NULL, QObject::tr("Ошибка"), QObject::tr("Ошибка подключения к базе данных.\n") + globalDBManager->lastError().databaseText(), QMessageBox::Ok);
         return -1;
     }
 
-    TMyWindow w;
-    w.showMaximized();
-
-    int result = a.exec();
+    int result = -1;
+    ProjectDialog dlg;
+    if (dlg.exec()) {
+        TMyWindow w;
+        w.showMaximized();
+        result = a.exec();
+    } else QMessageBox::critical(NULL, QObject::tr(ERR_TITLE), QObject::tr("Не выбран проект (aka Предметная область)"));
 
     delete globalDBManager;
     delete globalLogger;

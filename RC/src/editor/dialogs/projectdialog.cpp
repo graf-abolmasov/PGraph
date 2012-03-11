@@ -8,15 +8,16 @@ ProjectDialog::ProjectDialog(QWidget *parent) :
     ui(new Ui::ProjectDialog)
 {
     ui->setupUi(this);
-    QList<Project> projects = globalDBManager->getProjectListDB();
-    ui->projectsTable->setRowCount(projects.length());
-    int i = 0;
-    foreach (Project project, projects) {
-        QTableWidgetItem *newItem = new QTableWidgetItem(project.name);
-        newItem->setData(Qt::UserRole, project.id);
-        ui->projectsTable->setItem(i++, 0, newItem);
-    }
 
+    model = new QSqlTableModel(this);
+    model->setTable("project");
+    model->setEditStrategy(QSqlTableModel::OnFieldChange);
+    model->select();
+
+    model->setHeaderData(1, Qt::Horizontal, tr("Название"));
+
+    ui->projectsTable->setModel(model);
+    ui->projectsTable->hideColumn(0);
 }
 
 ProjectDialog::~ProjectDialog()
@@ -24,21 +25,64 @@ ProjectDialog::~ProjectDialog()
     delete ui;
 }
 
-void ProjectDialog::on_openProjectBtn_clicked()
+void ProjectDialog::on_createProjectBtn_clicked()
 {
-    on_buttonBox_accepted();
+    QSqlRecord newRec;
+    QSqlQuery q("select max(project_id) from project;");
+    q.exec();
+    q.next();
+    const int max = q.value(0).toInt();
+    QSqlField f("PROJECT_NAME", QVariant::String);
+    f.setValue(tr("Новый проект %1").arg(QString::number(max)));
+    newRec.append(f);
+    model->insertRecord(-1, newRec);
+}
+
+void ProjectDialog::on_projectsTable_doubleClicked(const QModelIndex &index)
+{
+//    openProject();
+}
+
+void ProjectDialog::openProject()
+{
+    model->database().transaction();
+    model->database().commit();
+    const int cr = currentRow();
+    if (cr < 0) {
+        QMessageBox::warning(this, tr(ERR_TITLE), tr("Выберите проект"));
+        return;
+    }
+    const int projectId = model->record(cr).value("PROJECT_ID").toInt();
+    globalDBManager->openProjectDB(projectId);
     accept();
 }
 
 void ProjectDialog::on_buttonBox_accepted()
 {
-    int projectId = ui->projectsTable->currentItem()->data(Qt::UserRole).toInt();
-    globalDBManager->openProjectDB(projectId);
+    openProject();
+}
+
+void ProjectDialog::on_delProjectBtn_clicked()
+{
+    model->removeRow(currentRow());
+    ui->projectsTable->selectRow(-1);
+}
+
+int ProjectDialog::currentRow() const
+{
+    return ui->projectsTable->selectionModel()->currentIndex().row();
 }
 
 void ProjectDialog::on_cloneProjectBtn_clicked()
 {
-    int projectId = ui->projectsTable->currentItem()->data(Qt::UserRole).toInt();
-    globalDBManager->cloneProjectDB(projectId, globalDBManager->getProjectName() + tr("_copy"), "", "");
-    QMessageBox::information(NULL, tr("Скопировано"), tr("Проект скопирован"));
+    const int cr = currentRow();
+    if (cr < 0) {
+        QMessageBox::warning(this, tr(ERR_TITLE), tr("Выберите проект"));
+        return;
+    }
+    const int projectId = model->record(cr).value("PROJECT_ID").toInt();
+    const QString projectName = model->record(cr).value("PROJECT_NAME").toString() + tr(" (копия)");
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    globalDBManager->cloneProjectDB(projectId, projectName, QString(), QString());
+    QApplication::restoreOverrideCursor();
 }
