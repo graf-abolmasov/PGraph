@@ -14,7 +14,7 @@
 #include "../../src/common/VO/actor.h"
 #include "../../src/common/VO/predicate.h"
 
-#include "../../src/common/DAO/ActorDAO.h"
+#include "../../src/common/DAO/actordao.h"
 
 QObjectEditor::QObjectEditor(QWidget *parent) :
     QDialog(parent),

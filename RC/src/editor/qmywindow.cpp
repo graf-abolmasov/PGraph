@@ -474,9 +474,9 @@ void TMyWindow::CMGSave()
 void TMyWindow::CMHelpAbout()
 {
     QMessageBox::about(this, tr("O Граф-редакторе"),
-                       tr("<h2>Граф-редатор 2.0</h2>"
+                       tr("<h2>Граф-редактор 2.0</h2>"
                           "<p>Внутренняя версия ") + QApplication::applicationVersion() +
-                       tr("<p>Copyright &copy; 2010 FuzzyLogic Team. All rights reserved.</p>"
+                       tr("<p>Copyright &copy; 2000-2012 FuzzyLogic Team. All rights reserved.</p>"
                           "<p>The program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.</p>"));
 
 }
