@@ -12,9 +12,6 @@
 QCodeEditor::QCodeEditor(QWidget *parent)
 : QPlainTextEdit(parent), c(0)
 {
-    setPlainText(tr("This QCodeEditor provides autocompletions for words that have more than"
-                    " 3 characters. You can trigger autocompletion using ") +
-                    QKeySequence("Ctrl+SPACE").toString(QKeySequence::NativeText));
 }
 
 QCodeEditor::~QCodeEditor()
