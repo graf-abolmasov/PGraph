@@ -236,7 +236,9 @@ void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
     }
     else if (line != NULL && newArc != NULL && myMode == InsertLine) {
         //дуга должна начинаться с вершины!
-        if (newArc->startItem() == NULL){
+        const QTop *startItem = newArc->startItem();
+        const QTop *endItem = newArc->endItem();
+        if (startItem == NULL) {
             QList<QGraphicsItem *> startItems = items(line->line().p1());
             while (startItems.count() > 0 && startItems.first()->type() != QTop::Type)
                 startItems.removeFirst();
@@ -253,7 +255,7 @@ void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
         }
 
         //дуга должна заканчиваться вершиной
-        if ((newArc != NULL) && (newArc->endItem() == NULL) && (newArc->prevLine() != NULL)){
+        if ((endItem == NULL) && (newArc->prevLine() != NULL)){
             QList<QGraphicsItem *> endItems = items(line->line().p2());
             while (endItems.count() > 0 && endItems.first()->type() != QTop::Type)
                 endItems.removeFirst();
@@ -265,15 +267,15 @@ void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
         }
 
         //плохая ситуация, когда начало и конец совпадают, но дуга имеет явно неправилную форму
-        if ((newArc != NULL) && (newArc->endItem() != NULL) && (newArc->startItem() != NULL) &&
-            newArc->startItem()->collidesWithItem(newArc->endItem()) && (newArc->lines.count() == 1)){
+        if ((endItem != NULL) && (startItem != NULL) &&
+            startItem->collidesWithItem(endItem) && (newArc->lines.count() == 1)){
             delete newArc;
             newArc = NULL;
             line = NULL;
         }
 
         //условие выполнится когда у дуги будет начало и конец!
-        if ((newArc != NULL) && (newArc->endItem() != NULL) && (newArc->startItem() != NULL)){
+        if ((endItem != NULL) && (startItem != NULL)){
             newArc->updateBounds();
             line->setSelected(false);
             emit itemInserted(newArc);
@@ -420,9 +422,10 @@ QComment* QDiagramScene::addComment(const QPointF &point)
 int QDiagramScene::getNextTopNumber()
 {
     int maxNumber = -1;
-    for (int i = 0; i < items().count(); i++)
-        if (items().at(i)->type() == QTop::Type) {
-        QTop* top = qgraphicsitem_cast<QTop* >(items().at(i));
+    QList<QGraphicsItem *> allItems = items();
+    for (int i = 0; i < allItems.count(); i++)
+        if (allItems[i]->type() == QTop::Type) {
+            QTop* top = qgraphicsitem_cast<QTop* >(allItems[i]);
         maxNumber = top->number > maxNumber ? top->number : maxNumber;
     }
 

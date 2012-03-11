@@ -6,6 +6,7 @@
 #include "qarcline.h"
 #include "../../src/common/VO/actor.h"
 #include "qarc.h"
+#include "qsyncarc.h"
 #include "../../src/common/globalvariables.h"
 
 QNormalTop::QNormalTop(QMenu *contextMenu, QGraphicsItem *parent, QGraphicsScene *scene)
@@ -180,6 +181,13 @@ void QNormalTop::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
         otherItems.removeAll(arc);
         otherItems.removeAll(arc->startItem());
         otherItems.removeAll(arc->endItem());
+    }
+
+    foreach(QSyncArc *syncArc, sync) {
+        otherItems.removeAll(syncArc);
+        otherItems.removeAll(syncArc->startItem());
+        otherItems.removeAll(syncArc->endItem());
+        otherItems.removeAll(syncArc);
     }
 
     foreach(QGraphicsItem *item, otherItems)

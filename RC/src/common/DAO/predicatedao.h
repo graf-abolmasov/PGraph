@@ -16,7 +16,7 @@ public:
     void persistList(const QList<Predicate> &predicateList);
     void persistList(const QList<const Predicate *> &predicateList);
     QList<Predicate> findAll();
-    QStringList PredicateDAO::findUsage(const QString &name)
+    QStringList findUsage(const QString &name);
 };
 
 #endif // PREDICATEDAO_H
