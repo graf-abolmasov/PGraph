@@ -115,7 +115,7 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
         selectionRect->setRect(newRect.normalized());
     }
     //режим рисования дуги
-    else if (myMode == InsertLine && line != NULL && mouseEvent->buttons() == Qt::LeftButton) {
+    else if (myMode == InsertLine && line != NULL && mouseEvent->buttons() & Qt::LeftButton) {
         QLineF vector(line->line().p1(), mouseEvent->scenePos());
         float dx = vector.dx();
         float dy = vector.dy();
@@ -144,7 +144,7 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
     }
     //режим перетаскивания вершины
     else if ((myMode == MoveItem) &&
-             (mouseEvent->buttons() == Qt::LeftButton) &&
+             (mouseEvent->buttons() & Qt::LeftButton) &&
              mySelectedItems.count() > 0 &&
              (mySelectedItems.first()->type() == QTop::Type)) {
         QLineF vector(mouseEvent->lastScenePos(), mouseEvent->scenePos());
@@ -191,7 +191,7 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
     }
     //режим перетаскивания дуги
     else if ((myMode == MoveItem) &&
-             (mouseEvent->buttons() == Qt::LeftButton) &&
+             (mouseEvent->buttons() & Qt::LeftButton) &&
              (mySelectedItems.count() == 1) &&
              (mySelectedItems.first()->type() == QArcLine::Type)) {
         QArcLine *selectedLine = qgraphicsitem_cast<QArcLine *>(mySelectedItems.first());
@@ -207,7 +207,7 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
     }
     //режим перетаскивания коментария
     else if ((myMode == MoveItem) &&
-             (mouseEvent->buttons() == Qt::LeftButton) &&
+             (mouseEvent->buttons() & Qt::LeftButton) &&
              (mySelectedItems.count() == 1) &&
              (mySelectedItems.first()->type() == QComment::Type)) {
         emit itemMoved(mySelectedItems.first(), QLineF(mouseEvent->lastScenePos(), mouseEvent->scenePos()));
@@ -255,7 +255,7 @@ void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
         }
 
         //дуга должна заканчиваться вершиной
-        if ((endItem == NULL) && (newArc->prevLine() != NULL)){
+        if ((endItem == NULL) && (newArc != NULL) && (newArc->prevLine() != NULL)){
             QList<QGraphicsItem *> endItems = items(line->line().p2());
             while (endItems.count() > 0 && endItems.first()->type() != QTop::Type)
                 endItems.removeFirst();
