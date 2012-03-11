@@ -76,7 +76,7 @@ void DataBaseManager::setVariableList(const QList<const Variable *> &list)
     VariableDAO(db).persistList(myVariableList);
 }
 
-void DataBaseManager::saveGraphDB(const Graph &graph) throw (QString)
+void DataBaseManager::saveGraph(const Graph &graph) throw (QString)
 {
     GraphDAO(db).persist(graph);
 
@@ -94,7 +94,6 @@ void DataBaseManager::saveGraphDB(const Graph &graph) throw (QString)
 
     if (!myGraphList.contains(newGraph))
         myGraphList.append(newGraph);
-    db.close();
 }
 
 /*!
@@ -102,37 +101,13 @@ void DataBaseManager::saveGraphDB(const Graph &graph) throw (QString)
 */
 void DataBaseManager::updateGraphDB(const Graph &graph) throw (QString)
 {
-    openDB();
-    QSqlQuery query;
-    query.prepare("DELETE FROM actor WHERE PROJECT_ID = :PROJECT_ID AND NAMEPR = :NAMEPR;");
-    query.bindValue(":PROJECT_ID", myProjectId);
-    query.bindValue(":NAMEPR", graph.name);
-    execQuery(query);
-    db.close();
-    return saveGraphDB(graph);
+    GraphDAO(db).remove(graph);
+    return saveGraph(graph);
 }
 
 QList<Graph> DataBaseManager::getGraphListDB() throw (QString)
 {
-    openDB();
-    QSqlQuery query;
-    query.prepare("SELECT NAMEPR, EXTNAME, ICON FROM actor WHERE CLASPR = 'g' AND PROJECT_ID = :PROJECT_ID ORDER BY EXTNAME;");
-    query.bindValue(":PROJECT_ID", myProjectId);
-    execQuery(query);
-    QList<Graph> result;
-    while(query.next()){
-        QList<Top> topList;
-        QList<Arc> arcList;
-        QList<Comment> commentList;
-        QList<SyncArc> syncArcList;
-        Graph newGraph(query.value(0).toString(), query.value(1).toString(), topList, arcList, commentList, syncArcList);
-        QPixmap p;
-        p.loadFromData(query.value(2).toByteArray(), "PNG");
-        newGraph.icon = p;
-        result.append(newGraph);
-    }
-    db.close();
-    return result;
+    return GraphDAO(db).findAll();
 }
 
 const DataType *DataBaseManager::getDataType(const QString &name) const
@@ -494,7 +469,7 @@ void DataBaseManager::cloneProjectDB(int srcProjectId, QString projectName, QStr
         myProjectId = srcProjectId;
         const Graph g = getGraphDB(graph->name);
         myProjectId = dstProjectId;
-        saveGraphDB(g);
+        saveGraph(g);
     }
 }
 

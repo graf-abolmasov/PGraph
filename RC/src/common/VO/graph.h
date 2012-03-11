@@ -33,7 +33,7 @@ class Arc
 {
 public:
     enum ArcType { SerialArc, ParallelArc, TerminateArc };
-    Arc(ArcType type, int priority, int startTop, int endTop, const Predicate *predicate, QStringList &lines);
+    Arc(ArcType type, int priority, int startTop, int endTop, const Predicate *predicate, const QStringList &lines);
     ArcType type;
     int priority;
     int startTop;
@@ -75,7 +75,8 @@ public:
 class Graph  : public Actor
 {
 public:
-    Graph(QString name, QString extName, QList<Top> topList, QList<Arc> arcList, QList<Comment> commentList, QList<SyncArc> syncArcList);
+    Graph(const QString &name, const QString &extName, const QList<Top> &topList, const QList<Arc> &arcList, const QList<Comment> &commentList, const QList<SyncArc> &syncArcList);
+    Graph(const QString &name, const QString &extName, const QList<Top> &topList, const QList<Arc> &arcList, const QList<Comment> &commentList, const QList<SyncArc> &syncArcList, const QPixmap &icon);
     QList<Top>           topList;
     QList<Arc>           arcList;
     QList<Comment>       commentList;

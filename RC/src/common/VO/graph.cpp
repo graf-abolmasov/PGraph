@@ -1,8 +1,17 @@
 #include "graph.h"
 #include "actor.h"
 
-Graph::Graph(QString name, QString extName, QList<Top> topList, QList<Arc> arcList, QList<Comment> commentList, QList<SyncArc> syncArcList) :
+Graph::Graph(const QString &name, const QString &extName, const QList<Top> &topList, const QList<Arc> &arcList, const QList<Comment> &commentList, const QList<SyncArc> &syncArcList) :
     Actor(name, extName, Actor::GraphType)
+{
+    this->topList          = topList;
+    this->arcList          = arcList;
+    this->commentList      = commentList;
+    this->syncArcList      = syncArcList;
+}
+
+Graph::Graph(const QString &name, const QString &extName, const QList<Top> &topList, const QList<Arc> &arcList, const QList<Comment> &commentList, const QList<SyncArc> &syncArcList, const QPixmap &icon) :
+    Actor(name, extName, Actor::GraphType, NULL, QList<const Variable *>(), QStringList(), icon)
 {
     this->topList          = topList;
     this->arcList          = arcList;
@@ -93,7 +102,7 @@ SyncArc::SyncArc(QString startGraph, int startTop, QString endGraph, int endTop)
     this->startTop = startTop;
 }
 
-Arc::Arc(ArcType type, int priority, int startTop, int endTop, const Predicate *predicate, QStringList &lines)
+Arc::Arc(ArcType type, int priority, int startTop, int endTop, const Predicate *predicate, const QStringList &lines)
 {
     this->type = type;
     this->priority = priority;
