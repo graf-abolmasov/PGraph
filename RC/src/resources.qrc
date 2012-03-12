@@ -27,5 +27,6 @@
         <file>../images/copy.png</file>
         <file>../images/cut.png</file>
         <file>../images/paste.png</file>
+		<file>../images/data.png</file>
     </qresource>
 </RCC>

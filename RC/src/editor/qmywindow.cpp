@@ -164,7 +164,7 @@ void TMyWindow::createActions()
     dataTypeAct = new QAction(tr("Список типов"), this);
     connect(dataTypeAct, SIGNAL(triggered()), this, SLOT(CMEdtType()));
 
-    compileDataAct = new QAction(tr("Компиляция данных"), this);
+    compileDataAct = new QAction(QIcon(":/images/data.png"), tr("Компиляция данных"), this);
     connect(compileDataAct, SIGNAL(triggered()), this, SLOT(CMCompileData()));
 
     buildAct = new QAction(QIcon(":/images/build.png"), tr("Компилировать с++"), this);
@@ -175,6 +175,7 @@ void TMyWindow::createActions()
     compileAct->setStatusTip(tr("Компилировать"));
     connect(compileAct, SIGNAL(triggered()), this, SLOT(CMCompile()));
     compileAct->setEnabled(false);
+    compileAct->setShortcut(QKeySequence(tr("F5")));
 
     saveStructAct = new QAction(tr("Записать структуру"), this);
     saveStructAct->setStatusTip(tr("Записать структуру графа в базу"));
@@ -316,8 +317,9 @@ void TMyWindow::createToolBar()
     mainToolBar->addSeparator();
     mainToolBar->addAction(openObjectEditorAct);
     mainToolBar->addSeparator();
-    mainToolBar->addAction(buildAct);
+    mainToolBar->addAction(compileDataAct);
     mainToolBar->addAction(compileAct);
+    mainToolBar->addAction(buildAct);
 
     pointerTypeGroup = new QButtonGroup;
     pointerTypeGroup->addButton(addTopButton, int(QDiagramScene::InsertNormalTop));
@@ -385,7 +387,7 @@ void TMyWindow::sceneChanged()
     if (activeDrawWindow())
         pointerTypeGroup->button(int(activeDrawWindow()->mode()))->setChecked(true);
     setWindowTitle(activeDrawWindow()->myGraphName.isEmpty() ?  tr("Untitled* - Граф-редактор") : activeDrawWindow()->myGraphExtName + tr("* - Граф-редактор"));
-    saveGraphAct->setEnabled(activeDrawWindow()->myGraphName != "");
+    saveGraphAct->setEnabled(true);
 }
 
 void TMyWindow::CMGNew()
@@ -464,6 +466,11 @@ void TMyWindow::CMSaveStruct()
 
 void TMyWindow::CMGSave()
 {
+    const TDrawWindow *adw = activeDrawWindow();
+    if (adw->myGraphName.isEmpty()) {
+        CMGSaveAs();
+        return;
+    }
     if (activeDrawWindow()->updateGraph()) {
         setWindowTitle(activeDrawWindow()->myGraphExtName + tr(" - Граф-редактор"));
         saveGraphAct->setEnabled(false);
@@ -704,13 +711,12 @@ void TMyWindow::graphLoaded(QString name, QString extName)
 {
     if (name.isEmpty()){
         buildMenu->setEnabled(false);
-        saveGraphAct->setEnabled(false);
         compileAct->setEnabled(false);
     } else {
         buildMenu->setEnabled(true);
-        saveGraphAct->setEnabled(true);
         compileAct->setEnabled(true);
     }
+    saveGraphAct->setEnabled(true);
     setWindowTitle((extName.isEmpty() ? tr("Untitled") : extName) + tr(" - Граф-редактор"));
 }
 
@@ -730,6 +736,7 @@ void TMyWindow::grafMenuAboutToShow()
 
 void TMyWindow::CMCompile()
 {
+    CMGSave();
     GraphCompiler gc(activeDrawWindow()->getGraph());
     globalLogger->skipLine();
     gc.compile();
