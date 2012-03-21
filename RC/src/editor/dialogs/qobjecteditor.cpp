@@ -118,8 +118,17 @@ void QObjectEditor::newButtonClicked()
         actorEditor = QActorEditor::getCreator(Actor::NormalType);
         if (actorEditor->exec()){
             const Actor *actor = actorEditor->getResult();
-            myActorsList.append(actor);
-            ui->actorList->addItem(QString(actor->extName).replace(QRegExp("(\r+|\n+)"), " "));
+            bool uniq = true;
+            foreach (const Actor *a, myActorsList) {
+                if (actor->name == a->name) {
+                    uniq = false;
+                    break;
+                }
+            }
+            if (uniq) {
+                myActorsList.append(actor);
+                ui->actorList->addItem(QString(actor->extName).replace(QRegExp("(\r+|\n+)"), " "));
+            }
         }
         delete actorEditor;
         break;
@@ -127,8 +136,17 @@ void QObjectEditor::newButtonClicked()
         predEditor = QPredicateEditor::getCreator(Predicate::NormalType);
         if (predEditor->exec()){
             const Predicate *pred = predEditor->getResult();
-            myPredicatesList.append(pred);
-            ui->predicateList->addItem(QString(pred->extName).replace(QRegExp("(\r+|\n+)"), " "));
+            bool uniq = true;
+            foreach (const Predicate *p, myPredicatesList) {
+                if (pred->name == p->name) {
+                    uniq = false;
+                    break;
+                }
+            }
+            if (uniq) {
+                myPredicatesList.append(pred);
+                ui->predicateList->addItem(QString(pred->extName).replace(QRegExp("(\r+|\n+)"), " "));
+            }
         }
         delete predEditor;
         break;
@@ -136,8 +154,17 @@ void QObjectEditor::newButtonClicked()
         actorEditor = QActorEditor::getCreator(Actor::InlineType);
         if (actorEditor->exec()){
             const Actor *actor = actorEditor->getResult();
-            myInlineActorsList.append(actor);
-            ui->inlineActorList->addItem(QString(actor->extName).replace(QRegExp("(\r+|\n+)"), " "));
+            bool uniq = true;
+            foreach (const Actor *a, myInlineActorsList) {
+                if (actor->name == a->name) {
+                    uniq = false;
+                    break;
+                }
+            }
+            if (uniq) {
+                myInlineActorsList.append(actor);
+                ui->inlineActorList->addItem(QString(actor->extName).replace(QRegExp("(\r+|\n+)"), " "));
+            }
         }
         delete actorEditor;
         break;
@@ -145,8 +172,17 @@ void QObjectEditor::newButtonClicked()
         predEditor = QPredicateEditor::getCreator(Predicate::InlineType);
         if (predEditor->exec()){
             const Predicate *pred = predEditor->getResult();
-            myInlinePredicateList.append(pred);
-            ui->inlinePredicateList->addItem(QString(pred->extName).replace(QRegExp("(\r+|\n+)"), " "));
+            bool uniq = true;
+            foreach (const Predicate *p, myInlinePredicateList) {
+                if (pred->name == p->name) {
+                    uniq = false;
+                    break;
+                }
+            }
+            if (uniq) {
+                myInlinePredicateList.append(pred);
+                ui->inlinePredicateList->addItem(QString(pred->extName).replace(QRegExp("(\r+|\n+)"), " "));
+            }
         }
         delete predEditor;
         break;
