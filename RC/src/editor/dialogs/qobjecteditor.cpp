@@ -276,7 +276,7 @@ void QObjectEditor::deleteButtonClicked()
     }
 }
 
-void QObjectEditor::on_buttonBox_accepted()
+void QObjectEditor::save()
 {
     QList<const Actor *> fullActorList;
     fullActorList.append(myActorsList);
@@ -286,5 +286,10 @@ void QObjectEditor::on_buttonBox_accepted()
     fullPredicateList.append(myInlinePredicateList);
     globalDBManager->setActorList(fullActorList);
     globalDBManager->setPredicateList(fullPredicateList);
+}
+
+void QObjectEditor::on_buttonBox_accepted()
+{
+    save();
     accept();
 }
