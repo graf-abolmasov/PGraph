@@ -196,10 +196,11 @@ void QActorEditor::on_inlineModuleTxtEdt_textChanged()
         if (ui->inlineModuleTxtEdt->document()->toPlainText().contains(QRegExp("(\\s|\\b|\\W)" + myVariableList[i]->name + "(\\s|\\b|\\W)", Qt::CaseSensitive))){
             ui->paramsInlineTable->insertRow(p);
             tempActor->variableList.append(myVariableList[i]);
-            tempActor->varAccModeList.append("");
+            tempActor->varAccModeList.append(tr("Модифицируемый"));
             ui->paramsInlineTable->setItem(p, 0, new QTableWidgetItem(myVariableList[i]->name));
             ui->paramsInlineTable->setItem(p, 1, new QTableWidgetItem(myVariableList[i]->type->name));
-            ui->paramsInlineTable->setItem(p, 2, new QTableWidgetItem("N/A"));
+//            ui->paramsInlineTable->setItem(p, 2, new QTableWidgetItem("N/A"));
+            ui->paramsInlineTable->setItem(p, 2, new QTableWidgetItem(tr("Модифицируемый")));
             p++;
         }
     }

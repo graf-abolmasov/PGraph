@@ -10,8 +10,8 @@ VariableDAO::VariableDAO(const QSqlDatabase &db)
 void VariableDAO::persist(const Variable &variable)
 {
     QMap<QString, QVariant> values;
-    values["data"] = variable.name;
-    values["TYPE"] = variable.type;
+    values["DATA"] = variable.name;
+    values["TYPE"] = variable.type->name;
     values["INIT"] = variable.initValue;
     values["COMMENT"] = variable.comment;
 //    values["ISGLOBAL"] = variable.isGlobal;
@@ -41,7 +41,7 @@ QList<Variable> VariableDAO::findAll()
     QList<Variable> result;
     while (query.next()) {
         const QSqlRecord r = query.record();
-        result.append(Variable(r.value("data").toString(),
+        result.append(Variable(r.value("DATA").toString(),
                                r.value("INIT").toString(),
                                r.value("COMMENT").toString(),
                                false,

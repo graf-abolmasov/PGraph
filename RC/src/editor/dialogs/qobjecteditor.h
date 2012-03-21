@@ -42,6 +42,8 @@ private:
     QList<const Actor *> myInlineActorsList;
     QList<const Predicate *> myPredicatesList;
     QList<const Predicate *> myInlinePredicateList;
+
+    void save();
 };
 
 #endif // QOBJECTEDITOR_H
