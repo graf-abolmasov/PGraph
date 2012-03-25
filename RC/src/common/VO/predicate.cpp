@@ -44,7 +44,7 @@ void Predicate::build() const
         Q_ASSERT(currentBaseModule);
         // Генерируем предикат
         foreach (BaseModuleParameter parameter, this->baseModule->parameterList) {
-            signature << QString("const %1 *%2")
+            signature << QString("%1 *%2")
                          .arg(parameter.type)
                          .arg(parameter.name);
         }
@@ -61,7 +61,7 @@ void Predicate::build() const
                               .arg(this->variableList[i]->name).toUtf8());
         }
         // Вызываем прототип
-        outputData.append("\r\n\treturn result = ");
+        outputData.append("\r\n\treturn ");
         outputData.append(this->baseModule->uniqName);
         outputData.append("(");
         for(int i = 0; i < this->variableList.count(); i++) {
@@ -69,7 +69,7 @@ void Predicate::build() const
             params << ((this->variableList[i]->isGlobal ? QObject::tr("&_") : QObject::tr("_")) + parameter.name);
         }
         outputData.append(params.join(", ").toUtf8());
-        outputData.append(");\r\n\r\n");
+        outputData.append(");\r\n\r\n}\r\n");
         break;
     case Predicate::InlineType:
         //генерируем с++ файл
