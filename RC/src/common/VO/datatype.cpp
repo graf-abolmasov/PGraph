@@ -1,5 +1,6 @@
 #include "datatype.h"
 #include "../../src/common/errors.h"
+#include "../../src/common/qgraphsettings.h"
 
 DataType::DataType(QString name, QString typedefStr)
 {
@@ -24,6 +25,9 @@ QString DataType::build() const
         return result;
 
     result.append(typedefStr).append("\r\n");
+
+    if (!QGraphSettings::isParallel())
+        return result;
 
     if (isArray()) {
         //Парсим количество элементов
