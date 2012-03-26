@@ -42,7 +42,7 @@
       <enum>QTabWidget::Rounded</enum>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <property name="elideMode">
       <enum>Qt::ElideNone</enum>
@@ -155,12 +155,76 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
+     <x>325</x>
+     <y>495</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
      <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actorList</sender>
+   <signal>itemDoubleClicked(QListWidgetItem*)</signal>
+   <receiver>QObjectEditor</receiver>
+   <slot>editButtonClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>267</x>
+     <y>246</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>267</x>
+     <y>252</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>inlineActorList</sender>
+   <signal>itemDoubleClicked(QListWidgetItem*)</signal>
+   <receiver>QObjectEditor</receiver>
+   <slot>editButtonClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>60</x>
+     <y>44</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>267</x>
+     <y>252</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>inlinePredicateList</sender>
+   <signal>itemDoubleClicked(QListWidgetItem*)</signal>
+   <receiver>QObjectEditor</receiver>
+   <slot>editButtonClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>60</x>
+     <y>44</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>267</x>
+     <y>252</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>predicateList</sender>
+   <signal>itemDoubleClicked(QListWidgetItem*)</signal>
+   <receiver>QObjectEditor</receiver>
+   <slot>editButtonClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>267</x>
+     <y>246</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>267</x>
+     <y>252</y>
     </hint>
    </hints>
   </connection>
@@ -182,4 +246,7 @@
    <bool>true</bool>
   </property>
  </designerdata>
+ <slots>
+  <slot>editButtonClicked()</slot>
+ </slots>
 </ui>
