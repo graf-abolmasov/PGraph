@@ -30,7 +30,6 @@ private slots:
     void newButtonClicked();
     void editButtonClicked();
     void deleteButtonClicked();
-
 private:
     Ui::QObjectEditor *ui;
     QPointer<QPushButton>  newButton;
