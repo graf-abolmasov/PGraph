@@ -19,7 +19,7 @@ void GraphCompiler::initDirectories()
     myOutputDirectory = QGraphSettings::getOutputDirectory();
     myBaseDirectory = QGraphSettings::getBaseDirectory();
     myTemplateDirectory = QGraphSettings::getTemplateDirectory();
-    myOtherFilesList = getTemplate(myTemplateDirectory + "/otherfiles").split(QRegExp("[\\r\\n]"), QString::SkipEmptyParts);
+    myOtherFilesList = globalDBManager->getOtherFilesDB();
 }
 
 GraphCompiler::GraphCompiler(const Graph &graph, QSet<QString> &skip) :
@@ -91,20 +91,30 @@ void GraphCompiler::copyUsedFiles()
         if (!QFile::exists(f))
             actor->build();
         Q_ASSERT(QFile::exists(f));
-        QFile::copy(f, myOutputDirectory + "/" + actor->name + ".cpp");
+        const QString nf = myOutputDirectory + "/" + actor->name + ".cpp";
+        QFile::remove(nf);
+        QFile::copy(f, nf);
     }
     foreach (const Predicate *predicate, usedPredicateList) {
         const QString f = myBaseDirectory + "/" + predicate->name + ".cpp";
         if (!QFile::exists(f))
             predicate->build();
         Q_ASSERT(QFile::exists(f));
-        QFile::copy(myBaseDirectory + "/" + predicate->name + ".cpp", myOutputDirectory + "/" + predicate->name + ".cpp");
+        const QString nf = myOutputDirectory + "/" + predicate->name + ".cpp";
+        QFile::remove(nf);
+        QFile::copy(f, nf);
     }
     foreach (const BaseModule *baseModule, usedBaseModuleList) {
-        Q_ASSERT(QFile::exists(myBaseDirectory + "/" + baseModule->name + ".c"));
-        Q_ASSERT(QFile::exists(myBaseDirectory + "/" + baseModule->uniqName + ".cpp"));
-        QFile::copy(myBaseDirectory + "/" + baseModule->name + ".c", myOutputDirectory + "/" + baseModule->name + ".c");
-        QFile::copy(myBaseDirectory + "/" + baseModule->uniqName + ".cpp", myOutputDirectory + "/" + baseModule->uniqName + ".cpp");
+        const QString f1 = myBaseDirectory + "/" + baseModule->name + ".c";
+        const QString f2 = myBaseDirectory + "/" + baseModule->uniqName + ".cpp";
+        Q_ASSERT(QFile::exists(f1));
+        Q_ASSERT(QFile::exists(f2));
+        const QString nf1 = myOutputDirectory + "/" + baseModule->name + ".c";
+        const QString nf2 = myOutputDirectory + "/" + baseModule->uniqName + ".cpp";
+        QFile::remove(nf1);
+        QFile::remove(nf2);
+        QFile::copy(f1, nf1);
+        QFile::copy(f2, nf2);
     }
 }
 
@@ -131,8 +141,7 @@ void GraphCompiler::copyStaticTemplates()
     QFile::copy(myTemplateDirectory + "/Makefile.template", myOutputDirectory + "/Makefile");
     QFile::copy(myTemplateDirectory + "/runme.bat.template", myOutputDirectory + "/runme.bat");
     QFile::copy(myTemplateDirectory + "/stype.h.template", myOutputDirectory + "/stype.h");
-    if (!QFile::exists(myOutputDirectory + "/defines.h"))
-        QFile::copy(myTemplateDirectory + "/defines.h.template", myOutputDirectory + "/defines.h");
+    QFile::copy(myTemplateDirectory + "/defines.h.template", myOutputDirectory + "/defines.h");
 
     foreach (const QString  name, myOtherFilesList)
         QFile::copy(myBaseDirectory + "/" + name, myOutputDirectory + "/" + name);

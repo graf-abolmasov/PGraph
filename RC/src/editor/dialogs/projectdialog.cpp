@@ -23,6 +23,7 @@ ProjectDialog::ProjectDialog(QWidget *parent) :
 ProjectDialog::~ProjectDialog()
 {
     delete ui;
+    delete model;
 }
 
 void ProjectDialog::on_createProjectBtn_clicked()

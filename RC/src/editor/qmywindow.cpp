@@ -18,6 +18,7 @@
 #include "../../src/editor/qcomment.h"
 #include "../../src/compiler/datacompiler.h"
 #include "../../src/editor/dialogs/projectdialog.h"
+#include "../../src/editor/dialogs/otherfilesdialog.h"
 #include "../../src/common/qgraphsettings.h"
 
 
@@ -70,6 +71,7 @@ void TMyWindow::createMenus()
     objectMenu = menuBar()->addMenu(tr("Объект"));
     objectMenu->addAction(openObjectEditorAct);
     objectMenu->addAction(registerUnitAct);
+    objectMenu->addAction(viewOtherFilesAct);
     objectMenu->addAction(viewContentAct);
     objectMenu->addAction(viewGarbageAct);
 
@@ -144,6 +146,11 @@ void TMyWindow::createActions()
     viewContentAct->setStatusTip(tr("Дерево объектов"));
     connect(viewContentAct, SIGNAL(triggered()), this, SLOT(CMContent()));
     viewContentAct->setEnabled(false);
+
+    viewOtherFilesAct = new QAction(tr("Другие файлы"), this);
+    viewOtherFilesAct->setStatusTip(tr("Подключить другие файлы к проекту"));
+    connect(viewOtherFilesAct, SIGNAL(triggered()), this, SLOT(CMOtherFiles()));
+    viewOtherFilesAct->setEnabled(true);
 
     viewGarbageAct = new QAction(tr("Неиспользуемые объекты"), this);
     viewGarbageAct->setStatusTip(tr("Неиспользуемые объекты"));
@@ -778,4 +785,10 @@ void TMyWindow::CMBuild()
 {
     globalLogger->skipLine();
     nativeCompiler->compile();
+}
+
+void TMyWindow::CMOtherFiles()
+{
+    OtherFilesDialog dlg;
+    dlg.exec();
 }

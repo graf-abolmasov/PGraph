@@ -50,6 +50,7 @@ private:
     QAction *viewGarbageAct;
     QAction *registerUnitAct;
     QAction *openObjectEditorAct;
+    QAction *viewOtherFilesAct;
 
     //Запуск
     QAction *buildAct;
@@ -139,6 +140,7 @@ private slots:
     void CMIncap(){}		// Граф->Инкапсулировать
     void CMExit();              //+ Граф->Выход
     void CMContent(){}		//+ Объект->Дерево объектов
+    void CMOtherFiles();		//+ Объект->Другие файлы объектов
     void CMShowGarbage(){}	//+ Объект->Неиспользуемые объекты
     void CMNewModule();   	//+ Объект->Зарегистрировать модуль
     void CMObjList();		//+ Объект->Редактор объектов

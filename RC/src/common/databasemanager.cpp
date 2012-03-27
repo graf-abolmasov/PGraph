@@ -545,3 +545,18 @@ QStringList DataBaseManager::findPredicateUsage(const QString &name)
 {
     return PredicateDAO(db).findUsage(name);
 }
+
+QStringList DataBaseManager::getOtherFilesDB()
+{
+    BaseDAO dao(db, "othfls");
+    dao.openDb();
+    QSqlQuery q = dao.prepareSelectAll();
+    dao.execQuery(q);
+    QStringList result;
+    while (q.next()) {
+        QSqlRecord r = q.record();
+        result.append(r.value("name").toString());
+    }
+    db.close();
+    return result;
+}

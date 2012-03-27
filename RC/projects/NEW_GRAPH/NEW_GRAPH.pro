@@ -54,6 +54,7 @@ SOURCES += ../../src/editor/main.cpp \
     ../../src/editor/dialogs/projectdialog.cpp \
     ../../src/editor/dialogs/multiproctoppropertydialog.cpp \
     ../../src/editor/dialogs/arcpropertydialog.cpp \
+    ../../src/editor/dialogs/otherfilesdialog.cpp \
     ../../src/common/DAO/graphdao.cpp
 HEADERS += ../../src/editor/qmywindow.h \
     ../../src/editor/qdrawwindow.h \
@@ -106,6 +107,7 @@ HEADERS += ../../src/editor/qmywindow.h \
     ../../src/editor/dialogs/projectdialog.h \
     ../../src/editor/dialogs/multiproctoppropertydialog.h \
     ../../src/editor/dialogs/arcpropertydialog.h \
+    ../../src/editor/dialogs/otherfilesdialog.h \
     ../../src/common/DAO/graphdao.h
 RESOURCES += ../../src/resources.qrc
 FORMS += ../../src/editor/dialogs/toppropertydialog.ui \
@@ -121,5 +123,6 @@ FORMS += ../../src/editor/dialogs/toppropertydialog.ui \
     ../../src/editor/dialogs/qactoreditor.ui \
     ../../src/editor/dialogs/projectdialog.ui \
     ../../src/editor/dialogs/multiproctoppropertydialog.ui \
-    ../../src/editor/dialogs/arcpropertydialog.ui
+    ../../src/editor/dialogs/arcpropertydialog.ui \
+    ../../src/editor/dialogs/otherfilesdialog.ui
 RC_FILE = ../../images/resources.rc
