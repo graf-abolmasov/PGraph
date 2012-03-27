@@ -38,6 +38,8 @@ public:
     QString getProjectName()
         { return myProjectName; }
 
+    QStringList getOtherFilesDB();
+
     const Actor *getActor(const QString &name) const;
     const Graph *getGraph(const QString &name) const;
     const DataType *getDataType(const QString &type) const;

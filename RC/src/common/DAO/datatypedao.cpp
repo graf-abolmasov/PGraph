@@ -11,7 +11,7 @@ void DataTypeDAO::persist(const DataType &dataType)
 {
     QMap<QString, QVariant> values;
     values["TYPE"]    = dataType.name;
-//    values["SEQNUM"]  = dataType.sequenceNum;
+    values["SEQNUM"]  = dataType.sequenceNum;
     values["TYPEDEF"] = dataType.typedefStr;
     BaseDAO::persist(values);
 }
@@ -37,7 +37,7 @@ void DataTypeDAO::persistList(const QList<const DataType *> &dataTypeList)
 QList<DataType> DataTypeDAO::findAll()
 {
     openDb();
-    QSqlQuery query = prepareSelectAll(/*"SEQNUM"*/);
+    QSqlQuery query = prepareSelectAll("SEQNUM");
     execQuery(query);
     QList<DataType> result;
     while (query.next()) {
