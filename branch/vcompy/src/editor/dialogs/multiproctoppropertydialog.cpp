@@ -4,7 +4,7 @@
 #include "ui_multiproctoppropertydialog.h"
 #include "../../src/editor/qmultiproctop.h"
 #include "../../src/common/databasemanager.h"
-#include "../../src/common/VO/graph.h"
+#include "../../src/common/VO/graphvo.h"
 #include "../../src/common/VO/predicate.h"
 #include "../../src/common/VO/actor.h"
 #include "../../src/editor/qarc.h"

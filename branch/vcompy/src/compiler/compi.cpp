@@ -8,6 +8,8 @@
 #include "../../src/common/commonutils.h"
 #include "../../src/common/qgraphsettings.h"
 
+#include "../../src/compiler/vcompi/vcompiwrapper.h"
+
 GraphCompiler::GraphCompiler(const Graph &graph) :
     myGraph(graph)
 {
@@ -191,49 +193,89 @@ void GraphCompiler::compileStruct() const
         actorStr.append("int " + actor->name + "(TPOData *D);\r\n");
 
     // список _ListP
-    QString _ListP;
-    _ListP.append("static DefinePredicate ListPred[" + QString::number(usedPredicateList.size()) + "] = {\r\n");
-    QStringList list;
+    QString ListPredString;
+    ListPredString.append("static DefinePredicate ListPred[" + QString::number(usedPredicateList.size()) + "] = {\r\n");
+    QStringList _ListP;
     foreach (const Predicate *predicate, usedPredicateList)
-        list << "\tDefinePredicate(\"" + predicate->name + "\", &" + predicate->name + ")";
-    _ListP.append(list.join(",\r\n"));
-    _ListP.append("\r\n};\r\n");
+        _ListP << "\tDefinePredicate(\"" + predicate->name + "\", &" + predicate->name + ")";
+    ListPredString.append(_ListP.join(",\r\n"));
+    ListPredString.append("\r\n};\r\n");
 
-    // Список _ListP и _ListGraph
-    QString _ListT;
-    QString _ListGraph;
-    QStringList listTop;
+    // Список _ListT и _ListGraph
+    QList<DefGrf> _listGraph;
     QStringList listGraph;
     QVector<QString> vec(topList.size());
-    _ListGraph.append("static DefineGraph ListGraf[" + QString::number(arcList.size()) + "] = {\r\n");
+    QVector<CompTop> _vec(topList.size());
+    int index = 0;
     foreach (Top top, topList) {
         QList<Arc> outArcs = myGraph.getOutArcs(top.number);
         qSort(outArcs.begin(), outArcs.end(), orderArcByPriorityAsc);
         const bool isTailTop = outArcs.count() == 0;
         const int first = isTailTop ? -77 : listGraph.count();
         const int last = isTailTop ? -77 : first + outArcs.count()-1;
-        foreach (Arc arc, outArcs)
+        foreach (Arc arc, outArcs) {
             listGraph << "\tDefineGraph(" + QString::number(usedPredicateList.indexOf(arc.predicate)) + ", " + QString::number(arc.endTop) + ")";
+
+            DefGrf lg;
+
+            //Заполняем структуру
+            lg.ArcType_ = arc.type;
+            lg.NambPred = usedPredicateList.indexOf(arc.predicate);
+            lg.NambTop = arc.endTop;
+            lg.NTop = arc.endTop;
+            lg.Fl = 0;
+            lg.F = 0;
+            lg.I = 0;
+            lg.Name = myGraph.name;
+
+            _listGraph.append(lg);
+        }
         if (vec.size() <= top.number)
             vec.resize(top.number + 1);
+
+        if (_vec.size() <= top.number)
+            _vec.resize(top.number + 1);
+
         vec[top.number] = "\tDefineTop(\"" + top.actor->name + "\", " + QString::number(first) + ", " + QString::number(last) + ", &" + top.actor->name + ")";
+
+        _vec[top.number].Name = myGraph.name;
+        _vec[top.number].NameProt = top.actor->name;
+        _vec[top.number].FirstDef = first;
+        _vec[top.number].LastDef = last;
+        _vec[top.number].F = 0;
+        _vec[top.number].Faz = 0;
+        _vec[top.number].back = 0;
+        _vec[top.number].rankT = 0;
+        _vec[top.number].Top = 0;
+
     }
-    _ListT.append("static DefineTop ListTop[" + QString::number(vec.size()) + "] = {\r\n");
+
+    QList<CompTop> _listTop = _vec.toList();
+    vcompi::VcompyWrapper::vcompy(_listTop, _listGraph);
+
+    QStringList listTop;
     foreach (QString deftop, vec)
         listTop.append(deftop.isEmpty() ? "\tDefineTop(\"GHOST TOP\", -77, -77, NULL)" : deftop);
-    _ListT.append(listTop.join(",\r\n"));
-    _ListT.append("\r\n};\r\n");
-    _ListGraph.append(listGraph.join(",\r\n"));
-    _ListGraph.append("\r\n};\r\n");
+
+    QString ListTopString;
+    ListTopString.append("static DefineTop ListTop[" + QString::number(vec.size()) + "] = {\r\n");
+    ListTopString.append(listTop.join(",\r\n"));
+    ListTopString.append("\r\n};\r\n");
+
+    QString ListGrafString;
+    ListGrafString.append("static DefineGraph ListGraf[" + QString::number(arcList.size()) + "] = {\r\n");
+    ListGrafString.append(listGraph.join(",\r\n"));
+    ListGrafString.append("\r\n};\r\n");
 
     QString main;
     main.append("#include \"graph.h\"\r\n");
+    main.append("PROJECT_BEGIN_NAMESPACE\r\n");
     main.append(predicateStr);
     main.append(actorStr);
 
-    main.append(_ListP);
-    main.append(_ListT);
-    main.append(_ListGraph);
+    main.append(ListPredString);
+    main.append(ListTopString);
+    main.append(ListGrafString);
 
     main.append("int " + myGraph.name + "(TPOData *D)\r\n");
     main.append("{\r\n");
@@ -244,6 +286,7 @@ void GraphCompiler::compileStruct() const
     main.append("\tGraphMV(D, rootTop, topCount, ListPred, ListTop, ListGraf);\r\n");
     main.append("\treturn 1;\r\n");
     main.append("}\r\n");
+    main.append("PROJECT_END_NAMESPACE\r\n");
 
     QFile f(myOutputDirectory + "/" + myGraph.name + ".cpp");
     f.open(QFile::WriteOnly);

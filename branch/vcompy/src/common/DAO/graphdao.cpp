@@ -1,5 +1,5 @@
 #include "../../src/common/DAO/graphdao.h"
-#include "../../src/common/VO/graph.h"
+#include "../../src/common/VO/graphvo.h"
 #include "../../src/common/globalvariables.h"
 
 GraphDAO::GraphDAO(const QSqlDatabase &db)
@@ -52,14 +52,14 @@ void GraphDAO::persist(const Graph &graph)
         query.bindValue(":NAMEPR",     graph.name);
         QString arcType;
         switch (arc.type){
-        case Arc::SerialArc:
-            arcType = "S";
-            break;
         case Arc::ParallelArc:
             arcType = "P";
             break;
         case Arc::TerminateArc:
             arcType = "T";
+            break;
+        default:
+            arcType = "S";
             break;
         }
         query.bindValue(":Type",      arcType);

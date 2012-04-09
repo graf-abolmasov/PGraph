@@ -2,19 +2,23 @@
 #define TPODATA_H
 #include "utype.h"
 
+PROJECT_BEGIN_NAMESPACE
 class TPOData
 {
 public:
 
         TPOData(int rank);
         ~TPOData();
-		int myRank;
+	int myRank;
 
-private:
         //Указатели на память с данными
         <#varPtr>
+
+private:
+
 
         //Initialize memory
         void initMemory();
 };
+PROJECT_END_NAMESPACE
 #endif
