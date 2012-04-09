@@ -106,6 +106,9 @@ void VcompyWrapper::makeResult(TPOData *D, QList<CompTop> &tops, QList<DefGrf> &
         graphs.append(newDefGrf);
     }
 
+    free(*ListTop);
+    free(*LstGraf);
+
 }
 
 PROJECT_END_NAMESPACE

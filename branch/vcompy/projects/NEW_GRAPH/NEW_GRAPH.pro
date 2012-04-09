@@ -165,7 +165,8 @@ SOURCES += ../../src/editor/main.cpp \
     ../../src/compiler/vcompi/A1B2378BE.cpp \
     ../../src/common/VO/graphvo.cpp \
     ../../src/compiler/vcompi/A8C95E239.cpp \
-    ../../src/compiler/vcompi/print_struct.cpp
+    ../../src/compiler/vcompi/print_struct.cpp \
+    ../../src/compiler/vcompi/S6CCCAD75.cpp
 HEADERS += ../../src/editor/qmywindow.h \
     ../../src/editor/qdrawwindow.h \
     ../../src/editor/qtop.h \

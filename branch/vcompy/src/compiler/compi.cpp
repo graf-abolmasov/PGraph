@@ -222,11 +222,12 @@ void GraphCompiler::compileStruct() const
             lg.ArcType_ = arc.type;
             lg.NambPred = usedPredicateList.indexOf(arc.predicate);
             lg.NambTop = arc.endTop;
-            lg.NTop = arc.endTop;
-            lg.Fl = 0;
+            lg.NTop = -1;
+            lg.Fl = -1;
             lg.F = 0;
-            lg.I = 0;
+            lg.I = -1;
             lg.Name = myGraph.name;
+            lg.CodeTr = "0.I";
 
             _listGraph.append(lg);
         }
@@ -247,6 +248,7 @@ void GraphCompiler::compileStruct() const
         _vec[top.number].back = 0;
         _vec[top.number].rankT = 0;
         _vec[top.number].Top = 0;
+        _vec[top.number].CodeTr = "0.I";
 
     }
 
