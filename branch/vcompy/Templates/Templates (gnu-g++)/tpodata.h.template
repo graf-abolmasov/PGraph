@@ -2,6 +2,7 @@
 #define TPODATA_H
 #include "utype.h"
 
+PROJECT_BEGIN_NAMESPACE
 class TPOData
 {
 public:
@@ -19,4 +20,5 @@ private:
         //Initialize memory
         void initMemory();
 };
+PROJECT_END_NAMESPACE
 #endif

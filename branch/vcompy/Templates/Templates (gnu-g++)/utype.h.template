@@ -3,8 +3,10 @@
 
 #include "defines.h"
 
+PROJECT_BEGIN_NAMESPACE
 //Пользовательские типы
 <#userTypes>
+PROJECT_END_NAMESPACE
 
 //Часто включаемые файлы
 #include <stdio.h>

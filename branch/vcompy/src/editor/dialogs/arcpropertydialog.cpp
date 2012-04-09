@@ -1,6 +1,7 @@
 #include <QtGui>
 
 #include "../../src/editor/dialogs/arcpropertydialog.h"
+#include "../../src/editor/dialogs/qpredicateeditor.h"
 #include "ui_arcpropertydialog.h"
 #include "../../src/editor/qarc.h"
 #include "../../src/common/databasemanager.h"
@@ -65,8 +66,9 @@ void ArcPropertyDialog::prepareForm(QArc *arc)
     ui->predicateList->addItem(tr("Нет"));
     //Загружаем предикаты из базы данных
     myPredicateList.append(globalDBManager->getPredicateList());
-    for (int i = 1; i < myPredicateList.count(); i++)
+    for (int i = 1; i < myPredicateList.count(); i++) {
         ui->predicateList->addItem(QString(myPredicateList[i]->extName).replace(QRegExp("(\r+|\n+)"), " "));
+    }
 
     const Predicate *arcPredicate = arc->predicate;
     int idx = myPredicateList.indexOf(arcPredicate);
@@ -74,7 +76,6 @@ void ArcPropertyDialog::prepareForm(QArc *arc)
         QMessageBox(QMessageBox::Critical, tr("Ошибка"), tr("Дуга использует несуществующий предикат"), QMessageBox::Ok).exec();
         idx = 0;
         arc->predicate = NULL;
-        //TODO: Cделать констрэйт в базе на удаление предикатов к которым есть привязка.
     }
     ui->predicateList->setCurrentRow(idx);
     ui->predicateList->setFocus(Qt::MouseFocusReason);
@@ -147,4 +148,41 @@ void ArcPropertyDialog::on_predicateList_currentRowChanged(int currentRow)
             info.append(tr("Base module: ") + predicate->baseModule->name + "\r\n");
     }
     ui->descriptionLbl->setText(info);
+}
+
+void ArcPropertyDialog::on_predicateList_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous)
+{
+    if (previous != NULL) {
+        ui->predicateList->setItemWidget(previous, NULL);
+        delete varWidget;
+        varWidget = NULL;
+    }
+
+    if (current == NULL)
+        return;
+
+    varWidget = new QWidget(ui->predicateList);
+    varLayout = new QHBoxLayout(varWidget);
+    varEditBtn = new QToolButton(varWidget);
+    varLayout->setContentsMargins(0, 0, 0, 0);
+    varLayout->addStretch();
+    varLayout->addWidget(varEditBtn);
+    varEditBtn->setText("...");
+    connect(varEditBtn, SIGNAL(clicked()), this, SLOT(showPredicateEditor()));
+
+    ui->predicateList->setItemWidget(current, varWidget);
+}
+
+void ArcPropertyDialog::showPredicateEditor()
+{
+    const Predicate *currPred = myPredicateList[ui->predicateList->currentRow()];
+    QPredicateEditor *dialog = NULL;
+    if (currPred == NULL)
+        dialog = QPredicateEditor::getCreator(Predicate::InlineType);
+    else
+        dialog = QPredicateEditor::getEditor(currPred);
+    if (dialog->exec()) {
+        myPredicateList[ui->predicateList->currentRow()] = dialog->getResult();
+        ui->predicateList->currentItem()->setText(QString(myPredicateList[ui->predicateList->currentRow()]->extName).replace(QRegExp("(\r+|\n+)"), " "));
+    }
 }

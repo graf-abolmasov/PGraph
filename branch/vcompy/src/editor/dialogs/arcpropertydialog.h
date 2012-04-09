@@ -1,7 +1,7 @@
 #ifndef ARCPROPERTYDIALOG_H
 #define ARCPROPERTYDIALOG_H
 
-#include <QtGui/QDialog>
+#include <QtGui>
 
 namespace Ui {
     class ArcPropertyDialog;
@@ -32,10 +32,17 @@ private:
     QArc                    *myArc;
     Ui::ArcPropertyDialog   *ui;
     QList<const Predicate *> myPredicateList;
+
+    QPointer<QWidget>     varWidget;
+    QPointer<QHBoxLayout> varLayout;
+    QPointer<QToolButton> varEditBtn;
 private slots:
     void on_buttonBox_accepted();
     void on_predicateList_itemDoubleClicked(QListWidgetItem* item);
     void on_predicateList_currentRowChanged(int currentRow);
+    void on_predicateList_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous);
+
+    void showPredicateEditor();
 };
 
 #endif // ARCPROPERTYDIALOG_H

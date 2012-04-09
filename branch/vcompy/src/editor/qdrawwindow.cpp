@@ -16,7 +16,7 @@
 #include "../../src/common/globalvariables.h"
 #include "../../src/common/commonutils.h"
 #include "../../src/common/databasemanager.h"
-#include "../../src/common/VO/graph.h"
+#include "../../src/common/VO/graphvo.h"
 #include "../../src/editor/qarc.h"
 #include "../../src/editor/dialogs/arcpropertydialog.h"
 #include "../../src/editor/dialogs/multiproctoppropertydialog.h"
@@ -61,7 +61,7 @@ TDrawWindow::TDrawWindow(ShowRole role, QWidget *parent)
 
     view->setScene(scene);
     view->setAlignment(Qt::AlignCenter);
-    //Рисуем сетку
+    //� исуем сетку
     QBrush myBackgroundBrush = view->backgroundBrush();
     myBackgroundBrush.setColor(Qt::lightGray);
     myBackgroundBrush.setStyle(Qt::Dense7Pattern);
@@ -77,7 +77,7 @@ TDrawWindow::TDrawWindow(ShowRole role, QWidget *parent)
 
 void TDrawWindow::createMenus()
 {
-    //Режим только чтения
+    //� ежим только чтения
     if (myRole == ReadOnly) {
         topMenu = NULL;
         arcMenu = NULL;
@@ -143,7 +143,7 @@ void TDrawWindow::createActions()
         viewSubGraphAct->setStatusTip(tr("Открывает подграф для просмотра"));
         connect(viewSubGraphAct, SIGNAL(triggered()), this, SLOT(viewSubGraph()));
 
-        editSubGraphAct = new QAction(tr("Редактировать подграф"), this);
+        editSubGraphAct = new QAction(tr("� едактировать подграф"), this);
         editSubGraphAct->setStatusTip(tr("Открывает подграф для редактирования"));
         connect(editSubGraphAct, SIGNAL(triggered()), this, SLOT(editSubGraph()));
 
@@ -220,7 +220,7 @@ void TDrawWindow::setMode(QDiagramScene::Mode mode)
 }
 
 /*!
-  Реакция на нажатие пункта меню: Загрузить иконку
+  � еакция на нажатие пункта меню: Загрузить иконку
 */
 void TDrawWindow::setItemIcon()
 {
@@ -235,13 +235,13 @@ void TDrawWindow::setItemIcon()
     if (!img.isNull() && QFileInfo(fileName).size() < 10000) {
         top->setIcon(img);
         scene->invalidate(top->mapRectToScene(top->boundingRect()));
-    } else QMessageBox::critical(NULL, tr("Ошибка"), tr("Размер картинки не должен превышать 10 кб"));
+    } else QMessageBox::critical(NULL, tr("Ошибка"), tr("� азмер картинки не должен превышать 10 кб"));
 
     emit sceneChanged();
 }
 
 /*!
-  Реакция на нажатие пункта меню: Свойства вершины
+  � еакция на нажатие пункта меню: Свойства вершины
 */
 void TDrawWindow::showTopPropDialog(){
     TopPropertyDialog dlg;
@@ -256,7 +256,7 @@ void TDrawWindow::showTopPropDialog(){
 
 
 /*!
-  Реакция на нажатие пункта меню: Сохранить как картинку
+  � еакция на нажатие пункта меню: Сохранить как картинку
 */
 void TDrawWindow::saveAsImage(QString filename)
 {
@@ -271,7 +271,7 @@ void TDrawWindow::saveAsImage(QString filename)
 }
 
 /*!
-  Реакция на нажатие пункта меню: Свойства дуги
+  � еакция на нажатие пункта меню: Свойства дуги
 */
 void TDrawWindow::showArcPropDialog()
 {
@@ -286,7 +286,7 @@ void TDrawWindow::showArcPropDialog()
 }
 
 /*!
-  Реакция на нажатие пункта меню: Сделать корневой
+  � еакция на нажатие пункта меню: Сделать корневой
 */
 void TDrawWindow::makeAsRoot()
 {
