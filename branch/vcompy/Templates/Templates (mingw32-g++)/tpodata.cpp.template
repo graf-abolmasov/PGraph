@@ -1,0 +1,18 @@
+#include "tpodata.h"
+#include <string.h>
+
+TPOData::TPOData(int rank)
+{
+myRank = rank;
+initMemory(); 
+}
+
+TPOData::~TPOData()
+{
+<#delete>}
+
+void TPOData::initMemory()
+{
+<#initMemory>}
+
+

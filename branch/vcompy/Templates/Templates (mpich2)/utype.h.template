@@ -1,0 +1,26 @@
+#ifndef UTYPE_H
+#define UTYPE_H
+#define PARALLEL
+#ifdef PARALLEL
+#include "mpi.h"
+#include "stype.h"
+#endif
+
+#include "defines.h"
+
+
+//Пользовательские типы
+<#userTypes>
+
+//Типы MPI
+#ifdef PARALLEL
+<#mpiTypes>
+#endif
+
+//Часто включаемые файлы
+#include <stdio.h>
+//#include <conio.h>
+#include <strings.h>
+#include <memory.h>
+
+#endif
