@@ -16,7 +16,7 @@
 #include "../../src/common/globalvariables.h"
 #include "../../src/common/commonutils.h"
 #include "../../src/common/databasemanager.h"
-#include "../../src/common/VO/graph.h"
+#include "../../src/common/VO/graphvo.h"
 #include "../../src/editor/qarc.h"
 #include "../../src/editor/dialogs/arcpropertydialog.h"
 #include "../../src/editor/dialogs/multiproctoppropertydialog.h"

@@ -228,6 +228,7 @@ void GraphCompiler::compileStruct() const
 
     QString main;
     main.append("#include \"graph.h\"\r\n");
+    main.append("PROJECT_BEGIN_NAMESPACE\r\n");
     main.append(predicateStr);
     main.append(actorStr);
 
@@ -244,6 +245,7 @@ void GraphCompiler::compileStruct() const
     main.append("\tGraphMV(D, rootTop, topCount, ListPred, ListTop, ListGraf);\r\n");
     main.append("\treturn 1;\r\n");
     main.append("}\r\n");
+    main.append("PROJECT_END_NAMESPACE\r\n");
 
     QFile f(myOutputDirectory + "/" + myGraph.name + ".cpp");
     f.open(QFile::WriteOnly);
