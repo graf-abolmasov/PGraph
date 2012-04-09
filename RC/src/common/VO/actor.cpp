@@ -64,6 +64,7 @@ void Actor::build() const
     QStringList signature;
     // Создаем сpp файл
     outputData.append("#include \"tpodata.h\"\r\n");
+    outputData.append("PROJECT_BEGIN_NAMESPACE\r\n");
     switch(this->type) {
     case Actor::NormalType:
         Q_ASSERT(currentBaseModule);
@@ -124,6 +125,7 @@ void Actor::build() const
         outputData.append("}\r\n");
         break;
     }
+    outputData.append("PROJECT_END_NAMESPACE\r\n");
 
     output.setFileName(myBaseDirectory + "/" + this->name + ".cpp");
     output.open(QFile::WriteOnly);

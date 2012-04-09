@@ -2,7 +2,7 @@
 #define QARC_H
 
 #include <QtGui/QGraphicsLineItem>
-#include "../../src/common/VO/graph.h"
+#include "../../src/common/VO/graphvo.h"
 
 #define ARC_TYPE      UserType+4
 
@@ -15,7 +15,7 @@ class QArc : public QGraphicsLineItem
 {
 public:
     enum { Type = ARC_TYPE };
-    enum ArcType { SerialArc, ParallelArc, TerminateArc };
+    enum ArcType { SerialArc = 1, ParallelArc = 2, TerminateArc = 3 };
 
     QList<QArcLine *> lines;
     QGraphicsItem *arcTop;
