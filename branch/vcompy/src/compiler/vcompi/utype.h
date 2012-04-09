@@ -30,6 +30,7 @@ typedef struct _ListGraf
     int Fl;
     char CodeTr[200];
 } DEFGRF;
+
 typedef struct {
 int TekErr;
 int MaxErr;
