@@ -3,7 +3,7 @@
 
 #include <QtGui/QGraphicsRectItem>
 #include "../../src/common/VO/actor.h"
-#include "../../src/common/VO/graph.h"
+#include "../../src/common/VO/graphvo.h"
 
 class QArc;
 class QSyncArc;

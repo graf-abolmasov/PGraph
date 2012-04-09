@@ -163,6 +163,7 @@ void QModuleRegister::on_buttonBox_accepted()
         pos += rx.matchedLength();
     }
     outputData.append(includes.join("\r\n").toUtf8());
+    outputData.append("PROJECT_BEGIN_NAMESPACE\r\n");
     outputData.append("\r\nextern \"C\" int ");
     outputData.append(function + "(" + signature + ");\r\n");
     outputData.append("int " + uniqName + "(" + signature + ")\r\n{\r\n");
@@ -174,6 +175,7 @@ void QModuleRegister::on_buttonBox_accepted()
     outputData.append(params.join(", ").toUtf8());
     outputData.append(");\r\n");
     outputData.append("}\r\n");
+    outputData.append("PROJECT_END_NAMESPACE\r\n");
 
     QFile output(myBaseDirectory + "/" + uniqName + ".cpp");
     output.open(QFile::WriteOnly);
