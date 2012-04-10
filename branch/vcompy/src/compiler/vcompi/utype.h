@@ -31,6 +31,8 @@ typedef struct _ListGraf
     char CodeTr[200];
 } DEFGRF;
 
+
+
 typedef struct {
 int TekErr;
 int MaxErr;
@@ -52,6 +54,7 @@ typedef struct _ListT {
     int rankT;
     int back;
 } COMPTOP;
+
 typedef char Char200[200];
 typedef char GRFTEXT[30][80];
 typedef COMPTOP* COMPTOPs;

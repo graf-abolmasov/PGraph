@@ -14,9 +14,7 @@ class TPOData
     //Указатели на память с данными
     int *ArcType;
     Char200 *CodPU;
-    Char200 *CodT;
     int *F1go;
-    int *FL;
     int *FLH;
     int *Faza;
     int *FistD;
@@ -25,13 +23,11 @@ class TPOData
     int *FromTop;
     COMPTOPs *GPcomp;
     DEFGRAFs *GPgraf;
-    int *HeadTop;
     int *I;
     int *KurC;
     int *LastD;
     int *MaxGf;
     int *MaxLT;
-    int *NPred;
     int *NTop;
     NAMAGR *NameGr;
     int *Nobj;
@@ -45,16 +41,12 @@ class TPOData
     char *cR;
     char *cV;
     char *cW;
-    Char200 *final_graph;
-    Char200 *initial_graph;
     int *rank;
     int *root;
     int *root0;
 
 
     private:
-
-
     //Initialize memory
     void initMemory();
 };

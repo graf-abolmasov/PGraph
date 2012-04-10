@@ -38,10 +38,10 @@ class TPOData;
 class VcompyWrapper
 {
 private:
-    static void init(TPOData *D, QList<CompTop> &tops, QList<DefGrf> &graphs);
+    static void init(TPOData *D, QList<CompTop> &tops, QList<DefGrf> &graphs, int maxLT, int maxGf);
     static void makeResult(TPOData *D, QList<CompTop> &tops, QList<DefGrf> &graphs);
 public:
-    static int vcompy(QList<CompTop> &tops, QList<DefGrf> &graphs);
+    static int vcompy(QList<CompTop> &tops, QList<DefGrf> &graphs, int maxLT, int maxGf);
 };
 }
 
