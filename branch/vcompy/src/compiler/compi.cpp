@@ -256,7 +256,8 @@ void GraphCompiler::compileStruct() const
         _vec[top.number].CodeTr = "0.I";
 
         maxLT++;
-        if (isV) maxLT++;
+        if (isV)
+            maxLT++;
     }
 
     QList<CompTop> _listTop = _vec.toList();

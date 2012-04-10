@@ -1,15 +1,15 @@
 #ifndef TPODATA_H
 #define TPODATA_H
 #include "utype.h"
+#include "QSharedPointer"
 
 PROJECT_BEGIN_NAMESPACE
 class TPOData
 {
     public:
 
-    TPOData(int rank);
+    TPOData();
     ~TPOData();
-    int myRank;
 
     //Указатели на память с данными
     int *ArcType;
@@ -44,7 +44,6 @@ class TPOData
     int *rank;
     int *root;
     int *root0;
-
 
     private:
     //Initialize memory
