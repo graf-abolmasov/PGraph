@@ -7,10 +7,11 @@
 #include <time.h>
 
 PROJECT_BEGIN_NAMESPACE
+
 int GB4995CC8(TPOData *D);
 int VcompyWrapper::vcompy(QList<CompTop> &tops, QList<DefGrf> &graphs, int maxLT, int maxGf)
 {
-    TPOData D(1);
+    TPOData D;
 
     init(&D, tops, graphs, maxLT, maxGf);
 
@@ -21,15 +22,12 @@ int VcompyWrapper::vcompy(QList<CompTop> &tops, QList<DefGrf> &graphs, int maxLT
 
 void VcompyWrapper::init(TPOData *D, QList<CompTop> &tops, QList<DefGrf> &graphs, int maxLT, int maxGf)
 {
-    COMPTOPs *ListTop = D->GPcomp;
-    DEFGRAFs *LstGraf = D->GPgraf;
-
-    (*ListTop) = (COMPTOP *)calloc(maxLT,sizeof(COMPTOP));
-    (*LstGraf) = (DEFGRF *)calloc(maxGf,sizeof(DEFGRF));
+    COMPTOPs ListTop = (COMPTOP *)calloc(maxLT,sizeof(COMPTOP));
+    DEFGRAFs LstGraf = (DEFGRF *)calloc(maxGf,sizeof(DEFGRF));
 
     int i = 0;
     foreach (CompTop ct, tops) {
-        COMPTOP *it = (*ListTop+i);
+        COMPTOP *it  = ListTop+i;
         it->Top      = -1;
         it->FirstDef = ct.FirstDef;
         it->LastDef  = ct.LastDef ;
@@ -44,21 +42,26 @@ void VcompyWrapper::init(TPOData *D, QList<CompTop> &tops, QList<DefGrf> &graphs
 
     i = 0;
     foreach (DefGrf dg, graphs) {
-        (*(*LstGraf+i)).I        = -1;
-        (*(*LstGraf+i)).Fl       = 0;
-        (*(*LstGraf+i)).NTop     = -1;
-        (*(*LstGraf+i)).F        = dg.F;
-        (*(*LstGraf+i)).NambPred = dg.NambPred;
-        (*(*LstGraf+i)).NambTop  = dg.NambTop;
-        (*(*LstGraf+i)).ArcType_ = dg.ArcType_;
+        DEFGRF *it = LstGraf+i;
+        it->I        = -1;
+        it->Fl       = 0;
+        it->NTop     = -1;
+        it->F        = dg.F;
+        it->NambPred = dg.NambPred;
+        it->NambTop  = dg.NambTop;
+        it->ArcType_ = dg.ArcType_;
 
-        strncpy((*(*LstGraf + i)).Name,dg.Name.toStdString().c_str(),8);
-        strncpy((*(*LstGraf + i)).CodeTr,dg.CodeTr.toStdString().c_str(),8);
+        strncpy(it->Name,dg.Name.toStdString().c_str(),8);
+        strncpy(it->CodeTr,dg.CodeTr.toStdString().c_str(),8);
         i++;
     }
 
     (*(D->MaxLT)) = maxLT;
+    (*(D->NumTop)) = maxLT;
     (*(D->MaxGf)) = maxGf;
+
+    (*(D->GPcomp)) = ListTop;
+    (*(D->GPgraf)) = LstGraf;
 }
 
 void VcompyWrapper::makeResult(TPOData *D, QList<CompTop> &tops, QList<DefGrf> &graphs)
@@ -69,47 +72,48 @@ void VcompyWrapper::makeResult(TPOData *D, QList<CompTop> &tops, QList<DefGrf> &
     int NTtop  = (*(D->MaxLT));
     int NTgraf = (*(D->MaxGf));
 
-    COMPTOPs *ListTop = D->GPcomp;
-    DEFGRAFs *LstGraf = D->GPgraf;
+    COMPTOPs ListTop = (*(D->GPcomp));
+    DEFGRAFs LstGraf = (*(D->GPgraf));
 
     for(int i=0; i < NTtop; i++) {
         CompTop newCompTop;
-        newCompTop.back = (*(*ListTop+i)).back;
-        newCompTop.F = (*(*ListTop+i)).F;
-        newCompTop.Faz = (*(*ListTop+i)).Faz;
-        newCompTop.FirstDef = (*(*ListTop+i)).FirstDef;
-        newCompTop.LastDef = (*(*ListTop+i)).LastDef;
-        newCompTop.rankT = (*(*ListTop+i)).rankT;
-        newCompTop.Top = (*(*ListTop+i)).Top;
+        COMPTOP *it = ListTop + i;
+        newCompTop.back = it->back;
+        newCompTop.F = it->F;
+        newCompTop.Faz = it->Faz;
+        newCompTop.FirstDef = it->FirstDef;
+        newCompTop.LastDef = it->LastDef;
+        newCompTop.rankT = it->rankT;
+        newCompTop.Top = it->Top;
 
-        newCompTop.Name = QString::fromAscii((*(*ListTop+i)).Name,8);
-        newCompTop.CodeTr = QString::fromAscii((*(*ListTop+i)).CodeTr,8);
-        newCompTop.SMName = QString::fromAscii((*(*ListTop+i)).SMName,8);
-        newCompTop.SPName = QString::fromAscii((*(*ListTop+i)).SPName,8);
-        newCompTop.NameProt = QString::fromAscii((*(*ListTop+i)).NameProt,8);
+        newCompTop.Name = QString::fromAscii(it->Name);
+        newCompTop.CodeTr = QString::fromAscii(it->CodeTr);
+        newCompTop.SMName = QString::fromAscii(it->SMName);
+        newCompTop.SPName = QString::fromAscii(it->SPName);
+        newCompTop.NameProt = QString::fromAscii(it->NameProt);
 
         tops.append(newCompTop);
     }
 
     for(int i=0; i < NTgraf; i++) {
         DefGrf newDefGrf;
-        newDefGrf.ArcType_ = (*(*LstGraf+i)).ArcType_;
-        newDefGrf.F = (*(*LstGraf+i)).F;
-        newDefGrf.Fl = (*(*LstGraf+i)).Fl;
-        newDefGrf.NambPred = (*(*LstGraf+i)).NambPred;
-        newDefGrf.NambTop = (*(*LstGraf+i)).NambTop;
-        newDefGrf.I = (*(*LstGraf+i)).I;
-        newDefGrf.NTop = (*(*LstGraf+i)).NTop;
+        DEFGRF *it = LstGraf+i;
+        newDefGrf.ArcType_ = it->ArcType_;
+        newDefGrf.F = it->F;
+        newDefGrf.Fl = it->Fl;
+        newDefGrf.NambPred = it->NambPred;
+        newDefGrf.NambTop = it->NambTop;
+        newDefGrf.I = it->I;
+        newDefGrf.NTop = it->NTop;
 
-        newDefGrf.Name = QString::fromAscii((*(*LstGraf + i)).Name,8);
-        newDefGrf.CodeTr = QString::fromAscii((*(*LstGraf + i)).CodeTr,8);
+        newDefGrf.Name = QString::fromAscii(it->Name);
+        newDefGrf.CodeTr = QString::fromAscii(it->CodeTr);
 
         graphs.append(newDefGrf);
     }
 
-    free((*ListTop));
-    free((*LstGraf));
-
+    free(ListTop);
+    free(LstGraf);
 }
 
 PROJECT_END_NAMESPACE

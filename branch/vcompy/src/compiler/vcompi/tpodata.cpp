@@ -2,79 +2,77 @@
 #include <string.h>
 
 PROJECT_BEGIN_NAMESPACE
-TPOData::TPOData(int rank)
+TPOData::TPOData()
 {
-    myRank = rank;
     initMemory();
 }
 
 TPOData::~TPOData()
 {
     if (ArcType != NULL)
-	delete ArcType;
+        delete ArcType;
     if (CodPU != NULL)
-	delete CodPU;
+        delete CodPU;
     if (F1go != NULL)
-	delete F1go;
+        delete F1go;
     if (FLH != NULL)
-	delete FLH;
+        delete FLH;
     if (Faza != NULL)
-	delete Faza;
+        delete Faza;
     if (FistD != NULL)
-	delete FistD;
+        delete FistD;
     if (FlGr != NULL)
-	delete FlGr;
+        delete FlGr;
     if (FromLst != NULL)
-	delete FromLst;
+        delete FromLst;
     if (FromTop != NULL)
-	delete FromTop;
+        delete FromTop;
     if (GPcomp != NULL)
-	delete GPcomp;
+        delete GPcomp;
     if (GPgraf != NULL)
-	delete GPgraf;
+        delete GPgraf;
     if (I != NULL)
-	delete I;
+        delete I;
     if (KurC != NULL)
-	delete KurC;
+        delete KurC;
     if (LastD != NULL)
-	delete LastD;
+        delete LastD;
     if (MaxGf != NULL)
-	delete MaxGf;
+        delete MaxGf;
     if (MaxLT != NULL)
-	delete MaxLT;
+        delete MaxLT;
     if (NTop != NULL)
-	delete NTop;
+        delete NTop;
     if (NameGr != NULL)
-	delete NameGr;
+        delete NameGr;
     if (Nobj != NULL)
-	delete Nobj;
+        delete Nobj;
     if (NumTop != NULL)
-	delete NumTop;
+        delete NumTop;
     if (NurC != NULL)
-	delete NurC;
+        delete NurC;
     if (ToTop != NULL)
-	delete ToTop;
+        delete ToTop;
     if (TurC != NULL)
-	delete TurC;
+        delete TurC;
     if (WSP != NULL)
-	delete WSP;
+        delete WSP;
     if (cE != NULL)
-	delete cE;
+        delete cE;
     if (cH != NULL)
-	delete cH;
+        delete cH;
     if (cR != NULL)
-	delete cR;
+        delete cR;
     if (cV != NULL)
-	delete cV;
+        delete cV;
     if (cW != NULL)
-	delete cW;
+        delete cW;
     if (rank != NULL)
-	delete rank;
+        delete rank;
     if (root != NULL)
-	delete root;
+        delete root;
     if (root0 != NULL)
-	delete root0;
-
+        delete root0;
 }
 
 void TPOData::initMemory()

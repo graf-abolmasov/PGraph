@@ -20,6 +20,5 @@ int A1B2378BE(TPOData *D)
 	D->Faza = _Faza;
 	D->MaxLT = _MaxLT;
 
-
 	return result;
 }PROJECT_END_NAMESPACE
