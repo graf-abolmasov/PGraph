@@ -56,9 +56,9 @@ void VcompyWrapper::init(TPOData *D, QList<CompTop> &tops, QList<DefGrf> &graphs
         i++;
     }
 
-    (*(D->MaxLT)) = maxLT;
-    (*(D->NumTop)) = maxLT;
-    (*(D->MaxGf)) = maxGf;
+    (*(D->MaxLT)) = tops.size();
+    (*(D->NumTop)) = tops.size();
+    (*(D->MaxGf)) = graphs.size();
 
     (*(D->GPcomp)) = ListTop;
     (*(D->GPgraf)) = LstGraf;
@@ -86,11 +86,11 @@ void VcompyWrapper::makeResult(TPOData *D, QList<CompTop> &tops, QList<DefGrf> &
         newCompTop.rankT = it->rankT;
         newCompTop.Top = it->Top;
 
-        newCompTop.Name = QString::fromAscii(it->Name);
-        newCompTop.CodeTr = QString::fromAscii(it->CodeTr);
-        newCompTop.SMName = QString::fromAscii(it->SMName);
-        newCompTop.SPName = QString::fromAscii(it->SPName);
-        newCompTop.NameProt = QString::fromAscii(it->NameProt);
+        newCompTop.Name = QString::fromAscii(it->Name, 8);
+        newCompTop.CodeTr = QString::fromAscii(it->CodeTr, 8);
+        newCompTop.SMName = QString::fromAscii(it->SMName, 8);
+        newCompTop.SPName = QString::fromAscii(it->SPName, 8);
+        newCompTop.NameProt = QString::fromAscii(it->NameProt, 8);
 
         tops.append(newCompTop);
     }
@@ -106,8 +106,8 @@ void VcompyWrapper::makeResult(TPOData *D, QList<CompTop> &tops, QList<DefGrf> &
         newDefGrf.I = it->I;
         newDefGrf.NTop = it->NTop;
 
-        newDefGrf.Name = QString::fromAscii(it->Name);
-        newDefGrf.CodeTr = QString::fromAscii(it->CodeTr);
+        newDefGrf.Name = QString::fromAscii(it->Name, 8);
+        newDefGrf.CodeTr = QString::fromAscii(it->CodeTr, 8);
 
         graphs.append(newDefGrf);
     }
