@@ -206,8 +206,8 @@ void GraphCompiler::compileStruct() const
     QStringList listGraph;
     QVector<QString> vec(topList.size());
     QVector<CompTop> _vec(topList.size());
-    int index = 0;
     int maxLT = 0;
+    int maxGf = 0;
     foreach (Top top, topList) {
         QList<Arc> outArcs = myGraph.getOutArcs(top.number);
         qSort(outArcs.begin(), outArcs.end(), orderArcByPriorityAsc);
@@ -235,6 +235,8 @@ void GraphCompiler::compileStruct() const
 
             if (arc.type == Arc::ParallelArc)
                 isV = true;
+
+            maxGf++;
         }
         if (vec.size() <= top.number)
             vec.resize(top.number + 1);
@@ -256,12 +258,14 @@ void GraphCompiler::compileStruct() const
         _vec[top.number].CodeTr = "0.I";
 
         maxLT++;
-        if (isV)
+        if (isV) {
             maxLT++;
+            maxGf++;
+        }
     }
 
     QList<CompTop> _listTop = _vec.toList();
-    vcompi::VcompyWrapper::vcompy(_listTop, _listGraph, maxLT, _listGraph.size());
+    vcompi::VcompyWrapper::vcompy(_listTop, _listGraph, maxLT, maxGf);
 
     QStringList listTop;
     foreach (QString deftop, vec)
