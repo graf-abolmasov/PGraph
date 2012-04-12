@@ -2,10 +2,7 @@
 #define TPODATA_H
 #include "utype.h"
 #include "property.h"
-#ifdef PARALLEL
-#include "mpi.h"
-#endif
-
+PROJECT_BEGIN_NAMESPACE
 class TPOData
 {
 public:
@@ -34,8 +31,6 @@ public:
         //Свойства для доступа к данным
         <#varProperty>
 
-
-
         //Указатели на память с данными
         <#varPtr>
 
@@ -49,4 +44,5 @@ private:
         //Initialize iD's
         void initId();
 };
+PROJECT_END_NAMESPACE
 #endif
