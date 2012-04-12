@@ -213,7 +213,7 @@ void GraphCompiler::compileStruct() const
         const int first = isTailTop ? -77 : listGraph.count();
         const int last = isTailTop ? -77 : first + outArcs.count()-1;
         foreach (Arc arc, outArcs)
-            listGraph << "\tDefineGraph(" + QString::number(usedPredicateList.indexOf(arc.predicate)) + ", " + QString::number(arc.endTop) + ")";
+            listGraph << "\tDefineGraph(" + QString::number(usedPredicateList.indexOf(arc.predicate)) + ", " + QString::number(arc.endTop) + ", " + QString::number(arc.type) + ")";
         if (vec.size() <= top.number)
             vec.resize(top.number + 1);
         vec[top.number] = "\tDefineTop(\"" + top.actor->name + "\", " + QString::number(first) + ", " + QString::number(last) + ", &" + top.actor->name + ")";
