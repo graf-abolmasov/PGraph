@@ -1,8 +1,24 @@
 #ifndef STYPE_H
 #define STYPE_H
 
-#include "mpi.h"
+#include "defines.h"
 
+#ifdef PARALLEL
+#include "mpi.h"
+#endif
+
+#ifndef PROJECT_NAMESPACE
+	# define PROJECT_BEGIN_NAMESPACE
+	# define PROJECT_END_NAMESPACE
+#else 
+	# define PROJECT_BEGIN_NAMESPACE namespace PROJECT_NAMESPACE {
+	# define PROJECT_END_NAMESPACE }
+#endif
+
+
+#ifdef PARALLEL
+
+PROJECT_BEGIN_NAMESPACE
 //Структура для общения с диспетчетом памяти
 typedef struct {
     int   id;
@@ -29,5 +45,7 @@ extern int myProcNum, totalProc;
 #define MPI_TAG_ACTUALDATA       MPI_TAG_BASE + 5
 #define MPI_TAG_COMPLETED        MPI_TAG_BASE + 6
 
+PROJECT_END_NAMESPACE
 
-#endif
+#endif //PARALLEL
+#endif //STYPE_H

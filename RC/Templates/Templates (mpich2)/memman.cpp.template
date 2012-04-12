@@ -1,7 +1,6 @@
 #include "tpodata.h"
 #ifdef PARALLEL
-#include <mpi.h>
-
+PROJECT_BEGIN_NAMESPACE
 int memman(TPOData *D)
 {
     int Terminate = 0;
@@ -23,4 +22,5 @@ int memman(TPOData *D)
     printf("memmanager: terminated\n");
     return 1;
 }
+PROJECT_END_NAMESPACE
 #endif

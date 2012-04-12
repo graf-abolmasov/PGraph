@@ -1,9 +1,6 @@
 #include "tpodata.h"
-#include <string.h>
-#ifdef PARALLEL
-#include "mpi.h"
-#endif
 
+PROJECT_BEGIN_NAMESPACE
 #ifdef PARALLEL
 MPI_Datatype memoryPacketDatatype;
 
@@ -68,5 +65,4 @@ void TPOData::setData(int id, int offset, int count, const void *value)
 
 <#setGet>
 
-
-
+PROJECT_END_NAMESPACE

@@ -1,13 +1,9 @@
 #ifndef UTYPE_H
 #define UTYPE_H
-#define PARALLEL
-#ifdef PARALLEL
-#include "mpi.h"
+
 #include "stype.h"
-#endif
 
-#include "defines.h"
-
+PROJECT_BEGIN_NAMESPACE
 
 //Пользовательские типы
 <#userTypes>
@@ -17,9 +13,10 @@
 <#mpiTypes>
 #endif
 
+PROJECT_END_NAMESPACE
+
 //Часто включаемые файлы
 #include <stdio.h>
-//#include <conio.h>
 #include <strings.h>
 #include <memory.h>
 
