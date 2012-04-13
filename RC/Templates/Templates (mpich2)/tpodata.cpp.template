@@ -5,7 +5,7 @@ PROJECT_BEGIN_NAMESPACE
 MPI_Datatype memoryPacketDatatype;
 
 MPI_Status status;
-int myProcNum, totalProc;
+int myProcNum, totalProc, parentProcNum;
 #endif
 
 TPOData::TPOData(int rank)
