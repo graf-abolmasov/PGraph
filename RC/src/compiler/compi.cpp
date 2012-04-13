@@ -200,11 +200,15 @@ void GraphCompiler::compileStruct() const
     _ListP.append("\r\n};\r\n");
 
     // Список _ListP и _ListGraph
-    QString _ListT;
     QString _ListGraph;
-    QStringList listTop;
     QStringList listGraph;
-    QVector<QString> vec(topList.size());
+    int maxTopNum = 0;
+    foreach (Top top, topList)
+        maxTopNum = top.number > maxTopNum ? top.number : maxTopNum;
+
+    QVector<QString> vec(maxTopNum+1);
+    QStringList virtualTops;
+    QStringList virtualGraphs;
     _ListGraph.append("static DefineGraph ListGraf[" + QString::number(arcList.size()) + "] = {\r\n");
     foreach (Top top, topList) {
         QList<Arc> outArcs = myGraph.getOutArcs(top.number);
@@ -212,19 +216,33 @@ void GraphCompiler::compileStruct() const
         const bool isTailTop = outArcs.count() == 0;
         const int first = isTailTop ? -77 : listGraph.count();
         const int last = isTailTop ? -77 : first + outArcs.count()-1;
-        foreach (Arc arc, outArcs)
-            listGraph << "\tDefineGraph(" + QString::number(usedPredicateList.indexOf(arc.predicate)) + ", " + QString::number(arc.endTop) + ", " + QString::number(arc.type) + ")";
-        if (vec.size() <= top.number)
-            vec.resize(top.number + 1);
+
+        foreach (Arc arc, outArcs) {
+            int endTop = arc.endTop;
+            if (arc.type == Arc::ParallelArc) {
+                const QString virtualGraphName = "V" + myGraph.name + "_" + QString::number(arc.endTop);
+                const QString virtualGraphExtName = QString("Virtual graph for %1 top").arg(QString::number(arc.endTop));
+                virtualTops << "\tDefineTop(\"" + virtualGraphName + "\", " + QString::number(-77) + ", " + QString::number(-77) + ", &" + virtualGraphName + ")";
+                virtualGraphs << buildGraph(virtualGraphName, virtualGraphExtName, arc.endTop);
+                actorStr.append("int " + virtualGraphName + "(TPOData *D);\r\n");
+                endTop = maxTopNum+virtualTops.size();
+            }
+            listGraph << "\tDefineGraph(" + QString::number(usedPredicateList.indexOf(arc.predicate)) + ", " + QString::number(endTop) + ", " + QString::number(arc.type) + ")";
+        }
         vec[top.number] = "\tDefineTop(\"" + top.actor->name + "\", " + QString::number(first) + ", " + QString::number(last) + ", &" + top.actor->name + ")";
     }
-    _ListT.append("static DefineTop ListTop[" + QString::number(vec.size()) + "] = {\r\n");
-    foreach (QString deftop, vec)
-        listTop.append(deftop.isEmpty() ? "\tDefineTop(\"GHOST TOP\", -77, -77, NULL)" : deftop);
-    _ListT.append(listTop.join(",\r\n"));
-    _ListT.append("\r\n};\r\n");
     _ListGraph.append(listGraph.join(",\r\n"));
     _ListGraph.append("\r\n};\r\n");
+
+    QStringList listTop;
+    foreach (QString virtualTop, virtualTops)
+        vec.append(virtualTop);
+    foreach (QString deftop, vec)
+        listTop.append(deftop.isEmpty() ? "\tDefineTop(\"GHOST TOP\", -77, -77, NULL)" : deftop);
+    QString _ListT;
+    _ListT.append("static DefineTop ListTop[" + QString::number(vec.size()) + "] = {\r\n");
+    _ListT.append(listTop.join(",\r\n"));
+    _ListT.append("\r\n};\r\n");
 
     QString main;
     main.append("#include \"graph.h\"\r\n");
@@ -236,21 +254,29 @@ void GraphCompiler::compileStruct() const
     main.append(_ListT);
     main.append(_ListGraph);
 
-    main.append("int " + myGraph.name + "(TPOData *D)\r\n");
-    main.append("{\r\n");
-    main.append("\t//" + myGraph.extName + "\r\n");
-    main.append("\t//printf(\"" + myGraph.extName + "\\r\\n\");\r\n");
-    main.append("\tint topCount = " + QString::number(myGraph.topList.count()) + ";\r\n");
-    main.append("\tint rootTop = " + QString::number(myGraph.getRootTop()) + ";\r\n");
-    main.append("\tGraphMV(D, rootTop, topCount, ListPred, ListTop, ListGraf);\r\n");
-    main.append("\treturn 1;\r\n");
-    main.append("}\r\n");
+    main.append(buildGraph(myGraph.name, myGraph.extName, myGraph.getRootTop()));
+    main.append(virtualGraphs.join("\r\n"));
     main.append("PROJECT_END_NAMESPACE\r\n");
 
     QFile f(myOutputDirectory + "/" + myGraph.name + ".cpp");
     f.open(QFile::WriteOnly);
     f.write(main.toUtf8());
     f.close();
+}
+
+QString GraphCompiler::buildGraph(const QString &name, const QString &extName, int root) const
+{
+    QString result;
+    result.append("int " + name + "(TPOData *D)\r\n");
+    result.append("{\r\n");
+    result.append("\t//" + extName + "\r\n");
+    result.append("\t//printf(\"" + extName + "\\r\\n\");\r\n");
+    result.append("\tint topCount = " + QString::number(0) + "; //never used parameter\r\n");
+    result.append("\tint rootTop = " + QString::number(root) + ";\r\n");
+    result.append("\tGraphMV(D, rootTop, topCount, ListPred, ListTop, ListGraf);\r\n");
+    result.append("\treturn 1;\r\n");
+    result.append("}\r\n");
+    return result;
 }
 
 void GraphCompiler::compileMakefile(QString target) const
