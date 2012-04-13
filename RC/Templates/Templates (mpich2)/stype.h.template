@@ -19,6 +19,9 @@
 #ifdef PARALLEL
 
 PROJECT_BEGIN_NAMESPACE
+class TPOData;
+typedef int (ActorFunc)(TPOData *D);
+
 //Структура для общения с диспетчетом памяти
 typedef struct {
     int   id;
@@ -30,7 +33,7 @@ extern MPI_Datatype memoryPacketDatatype;
 
 //Служебные типы и переменные
 extern MPI_Status status;
-extern int myProcNum, totalProc;
+extern int myProcNum, totalProc, parentProcNum;
 
 //Идентификаторы сообщений отсчитываются от этого значения
 #define MPI_TAG_BASE             32740
@@ -44,6 +47,8 @@ extern int myProcNum, totalProc;
 #define MPI_TAG_PUTDATA          MPI_TAG_BASE + 4
 #define MPI_TAG_ACTUALDATA       MPI_TAG_BASE + 5
 #define MPI_TAG_COMPLETED        MPI_TAG_BASE + 6
+#define MPI_TAG_LOCKPROC         MPI_TAG_BASE + 7
+#define MPI_TAG_FREEPROC         MPI_TAG_BASE + 8
 
 PROJECT_END_NAMESPACE
 
