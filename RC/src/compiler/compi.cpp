@@ -8,6 +8,8 @@
 #include "../../src/common/commonutils.h"
 #include "../../src/common/qgraphsettings.h"
 
+QSet<QString> allVirtualGraphs;
+
 GraphCompiler::GraphCompiler(const Graph &graph) :
     myGraph(graph)
 {
@@ -221,6 +223,7 @@ void GraphCompiler::compileStruct() const
             int endTop = arc.endTop;
             if (arc.type == Arc::ParallelArc) {
                 const QString virtualGraphName = "V" + myGraph.name + "_" + QString::number(arc.endTop);
+                allVirtualGraphs.insert(virtualGraphName);
                 const QString virtualGraphExtName = QString("Virtual graph for %1 top").arg(QString::number(arc.endTop));
                 virtualTops << "\tDefineTop(\"" + virtualGraphName + "\", " + QString::number(-77) + ", " + QString::number(-77) + ", &" + virtualGraphName + ")";
                 virtualGraphs << buildGraph(virtualGraphName, virtualGraphExtName, arc.endTop);
@@ -340,6 +343,20 @@ void GraphCompiler::compileMain() const
     QString result = getTemplate(myTemplateDirectory + "/" + "main.cpp.template");
     if (result.isEmpty())
         globalLogger->log(QObject::tr(ERR_GRAPHCOMPI_EMPTY_TEMPL).arg("main.cpp"), Logger::Warning);
+    QStringList allActors;
+    QStringList getFuncAddrByName;
+    foreach (const Actor *actor, usedActorList) {
+        allActors.append("int " + actor->name + "(TPOData *D);");
+        getFuncAddrByName.append(QString("if (strcmp(\"%1\", name) == 0) return &%1;").arg(actor->name));
+    }
+
+    foreach (QString virtualGraphName, allVirtualGraphs) {
+        allActors.append("int " + virtualGraphName + "(TPOData *D);");
+        getFuncAddrByName.append(QString("if (strcmp(\"%1\", name) == 0) return &%1;").arg(virtualGraphName));
+    }
+
+    result.replace("<#getFuncAddrByName>", getFuncAddrByName.join("\r\n"));
+    result.replace("<#allActors>", allActors.join("\r\n"));
     result.replace("<#graphname>", myGraph.name);
 
     QFile f(myOutputDirectory + "/" + "main.cpp");
