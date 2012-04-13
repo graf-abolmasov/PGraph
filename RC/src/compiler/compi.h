@@ -32,6 +32,7 @@ private:
     void copyStaticTemplates();
     void copyUsedFiles();
     void unpackGraph(const Graph &graph, QSet<const Predicate *> &predicates, QSet<const Actor *> &actors, QSet<QString> &exrtractedGraphs);
+    QString buildGraph(const QString &name, const QString &extName, int root) const;
 
     void compileMain() const;
     void compileStruct() const;
