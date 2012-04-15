@@ -18,6 +18,7 @@ int VcompyWrapper::vcompy(QList<CompTop> &tops, QList<DefGrf> &graphs, int maxLT
     GB4995CC8(&D);
 
     makeResult(&D, tops, graphs);
+
 }
 
 void VcompyWrapper::init(TPOData *D, QList<CompTop> &tops, QList<DefGrf> &graphs, int maxLT, int maxGf)

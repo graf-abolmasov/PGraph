@@ -7,6 +7,13 @@ DefineGraph::DefineGraph(int NambPred, int NambTop)
     this->NambTop = NambTop;
 }
 
+DefineGraph::DefineGraph(int NambPred, int NambTop, int Type)
+{
+    this->NambPred = NambPred;
+    this->NambTop = NambTop;
+	this->Type = Type;
+}
+
 DefineTop::DefineTop(const char *NameTop, int FirstDef, int LastDef, int (*top)(TPOData *))
 {
     this->NameTop = NameTop;
