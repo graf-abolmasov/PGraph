@@ -97,6 +97,9 @@ private:
     QAction *copyAct;
     QAction *pasteAct;
 
+    QAction *undoAct;
+    QAction *redoAct;
+
     QToolBar *mainToolBar;
     QToolBar *leftToolBar;
     QToolBar *layoutToolBar;
@@ -170,6 +173,9 @@ private slots:
     void CMECut();              // Правка->Вырезать
     void CMECopy();             // Правка->Скопировать
     void CMEPaste();            // Правка->Вставить
+
+    void CMEUndo();             // Правка->Отменить
+    void CMERedo();             // Правка->Вернуть
 
     void grafMenuAboutToShow(); // Вызывается перед показом меню Граф
 

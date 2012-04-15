@@ -47,3 +47,18 @@ QList<DataType> DataTypeDAO::findAll()
     myDb.close();
     return result;
 }
+
+QStringList DataTypeDAO::findUsage(const QString &name)
+{
+    openDb();
+    QSqlQuery query;
+    query.prepare("select DISTINCT data from data d JOIN typsys t ON d.type=t.type where t.type=:type and t.project_id=:project_id;");
+    query.bindValue(":type", name);
+    query.bindValue(":project_id", globalDBManager->getProjectId());
+    execQuery(query);
+    QStringList result;
+    while (query.next())
+        result.append(query.record().value("data").toString());
+    myDb.close();
+    return result;
+}

@@ -96,17 +96,20 @@ void TMyWindow::createActions()
 
     newGraphAct = new QAction(QIcon(":images/new.png"), tr("Создать"), this);
     newGraphAct->setShortcuts(QKeySequence::New);
-    newGraphAct->setStatusTip(tr("Создать граф"));
+    const QString newShortCut = QKeySequence::keyBindings(QKeySequence::New).first().toString();
+    newGraphAct->setStatusTip(tr("Создать граф") + (newShortCut.isEmpty() ? "" : " (" + newShortCut + ")"));
     connect(newGraphAct, SIGNAL(triggered()), this, SLOT(CMGNew()));
 
     openGraphAct = new QAction(QIcon(":/images/open.png"), tr("Открыть"), this);
     openGraphAct->setShortcuts(QKeySequence::Open);
-    openGraphAct->setStatusTip(tr("Открыть граф"));
+    const QString openShortCut = QKeySequence::keyBindings(QKeySequence::Open).first().toString();
+    openGraphAct->setStatusTip(tr("Открыть граф") + (openShortCut.isEmpty() ? "" : " (" + openShortCut + ")"));
     connect(openGraphAct, SIGNAL(triggered()), this, SLOT(CMGOpen()));
 
     saveGraphAct = new QAction(QIcon(":/images/save.png"), tr("Сохранить"), this);
     saveGraphAct->setShortcuts(QKeySequence::Save);
-    saveGraphAct->setStatusTip(tr("Сохранить граф"));
+    const QString saveShortCut = QKeySequence::keyBindings(QKeySequence::Save).first().toString();
+    saveGraphAct->setStatusTip(tr("Сохранить граф") + (saveShortCut.isEmpty() ? "" : " (" + saveShortCut + ")"));
     connect(saveGraphAct, SIGNAL(triggered()), this, SLOT(CMGSave()));
 
     saveAsGraphAct = new QAction(tr("Cохранить как"), this);
@@ -128,6 +131,22 @@ void TMyWindow::createActions()
     pasteAct->setShortcut(QKeySequence::Copy);
     pasteAct->setStatusTip(tr("Вставить из буфера"));
     connect(pasteAct, SIGNAL(triggered()), this, SLOT(CMEPaste()));
+
+    undoAct = new QAction(QIcon(":/images/undo.png"), tr("Отменить"), this);
+    undoAct->setShortcut(QKeySequence::Undo);
+    const QString undoShortCut = QKeySequence::keyBindings(QKeySequence::Undo).first().toString();
+    undoAct->setStatusTip(tr("Отменить последнее действие") + (undoShortCut.isEmpty() ? "" : " (" + undoShortCut + ")"));
+    undoAct->setEnabled(false);
+    connect(undoAct, SIGNAL(triggered()), this, SLOT(CMEUndo()));
+
+
+    redoAct = new QAction(QIcon(":/images/redo.png"), tr("Вернуть"), this);
+    redoAct->setShortcut(QKeySequence::Redo);
+    const QString redoShortCut = QKeySequence::keyBindings(QKeySequence::Redo).first().toString();
+    redoAct->setStatusTip(tr("Вернуть отмененное действие") + (redoShortCut.isEmpty() ? "" : " (" + redoShortCut + ")"));
+    redoAct->setEnabled(false);
+    connect(redoAct, SIGNAL(triggered()), this, SLOT(CMERedo()));
+
 
     cutAct->setEnabled(false);
     copyAct->setEnabled(false);
@@ -158,41 +177,53 @@ void TMyWindow::createActions()
     viewGarbageAct->setEnabled(false);
 
     registerUnitAct = new QAction(tr("Зарегистрировать модуль"), this);
-    registerUnitAct->setStatusTip(tr("Зарегистрировать модуль"));
+    registerUnitAct->setShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_R));
+    registerUnitAct->setStatusTip(tr("Зарегистрировать модуль (Ctrl+Alt+R)"));
     connect(registerUnitAct, SIGNAL(triggered()), this, SLOT(CMNewModule()));
 
     openObjectEditorAct = new QAction(QIcon(":/images/objectEditor.png"), tr("Редактор объектов"), this);
-    openObjectEditorAct->setStatusTip(tr("Редактор объектов"));
+    openObjectEditorAct->setShortcut(QKeySequence(Qt::Key_F4));
+    openObjectEditorAct->setStatusTip(tr("Открыть справочник объектов (F4)"));
     connect(openObjectEditorAct, SIGNAL(triggered()), this, SLOT(CMObjList()));
 
     variablesAct = new QAction(tr("Словарь данных"), this);
+    variablesAct->setShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_V));
+    variablesAct->setStatusTip(tr("Открыть справочник данных (Ctrl+Alt+V)"));
     connect(variablesAct, SIGNAL(triggered()), this, SLOT(CMEdtVar()));
 
     dataTypeAct = new QAction(tr("Список типов"), this);
+    dataTypeAct->setShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_T));
+    dataTypeAct->setStatusTip(tr("Открыть справочник типов данных (Ctrl+Alt+T)"));
     connect(dataTypeAct, SIGNAL(triggered()), this, SLOT(CMEdtType()));
 
     compileDataAct = new QAction(QIcon(":/images/data.png"), tr("Компиляция данных"), this);
+    compileDataAct->setStatusTip(tr("Компилировать данные (F5)"));
+    compileDataAct->setShortcut(QKeySequence(Qt::Key_F5));
     connect(compileDataAct, SIGNAL(triggered()), this, SLOT(CMCompileData()));
 
     buildAct = new QAction(QIcon(":/images/build.png"), tr("Компилировать с++"), this);
-    buildAct->setStatusTip(tr("Компиляция"));
+    buildAct->setShortcut(QKeySequence(Qt::Key_F8));
+    buildAct->setStatusTip(tr("Компилировать в exe (F8)"));
     connect(buildAct, SIGNAL(triggered()), this, SLOT(CMBuild()));
 
-    compileAct = new QAction(QIcon(":/images/compile.png"), tr("Компилировать Граф-модель"), this);
-    compileAct->setStatusTip(tr("Компилировать"));
+    compileAct = new QAction(QIcon(":/images/compile.png"), tr("Компилировать граф-модель"), this);
+    compileAct->setStatusTip(tr("Компилировать граф-модель (F6)"));
+    compileAct->setShortcut(QKeySequence(Qt::Key_F6));
     connect(compileAct, SIGNAL(triggered()), this, SLOT(CMCompile()));
     compileAct->setEnabled(false);
-    compileAct->setShortcut(QKeySequence(tr("F5")));
 
     saveStructAct = new QAction(tr("Записать структуру"), this);
     saveStructAct->setStatusTip(tr("Записать структуру графа в базу"));
     connect(saveStructAct, SIGNAL(triggered()), this, SLOT(CMSaveStruct()));
+    saveStructAct->setEnabled(false);
 
     manualInputAct = new QAction(tr("Ручной ввод данных"), this);
     connect(manualInputAct, SIGNAL(triggered()), this, SLOT(CMDoUserDialog()));
     manualInputAct->setEnabled(false);
 
     aboutEditorAct = new QAction(tr("О редакторе"), this);
+    aboutEditorAct->setStatusTip(tr("Об авторе (F1)"));
+    aboutEditorAct->setShortcut(QKeySequence(Qt::Key_F1));
     connect(aboutEditorAct, SIGNAL(triggered()), this, SLOT(CMHelpAbout()));
 
     //LeftToolBar
@@ -204,14 +235,20 @@ void TMyWindow::createActions()
     addTopButton = new QToolButton;
     addTopButton->setCheckable(true);
     addTopButton->setIcon(QIcon(":/images/top.png"));
+    addTopButton->setStatusTip(tr("Добавить вершину (Ctrl+Shift+T)"));
+    addTopButton->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_T));
 
     addCommentButton = new QToolButton;
     addCommentButton->setCheckable(true);
     addCommentButton->setIcon(QIcon(":/images/textpointer.png"));
+    addCommentButton->setStatusTip(tr("Добавить комментарий (Ctrl+Shift+C)"));
+    addCommentButton->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_C));
 
     addArcButton = new QToolButton;
     addArcButton->setCheckable(true);
     addArcButton->setIcon(QIcon(":/images/linepointer.png"));
+    addArcButton->setStatusTip(tr("Рисовать дугу (Ctrl+Shift+A)"));
+    addArcButton->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_A));
 
     addSyncArcButton = NULL;
     addMultiProcTopButton = NULL;
@@ -294,6 +331,8 @@ TDrawWindow* TMyWindow::createDrawWindow()
     connect(newDrawWindow, SIGNAL(graphLoaded(QString,QString)), this,
             SLOT(graphLoaded(QString,QString)));
     connect(newDrawWindow, SIGNAL(mouseScrollScaleChanged(float)), this, SLOT(updateScaleSlider(float)));
+    connect(newDrawWindow->undoStack, SIGNAL(canRedoChanged(bool)), redoAct, SLOT(setEnabled(bool)));
+    connect(newDrawWindow->undoStack, SIGNAL(canUndoChanged(bool)), undoAct, SLOT(setEnabled(bool)));
 
     undoView->setStack(activeDrawWindow()->undoStack);
 
@@ -318,6 +357,8 @@ void TMyWindow::createToolBar()
     mainToolBar->addAction(openGraphAct);
     mainToolBar->addAction(saveGraphAct);
     mainToolBar->addSeparator();
+    mainToolBar->addAction(undoAct);
+    mainToolBar->addAction(redoAct);
     mainToolBar->addAction(cutAct);
     mainToolBar->addAction(copyAct);
     mainToolBar->addAction(pasteAct);
@@ -591,7 +632,6 @@ void TMyWindow::getInfo(QGraphicsItem *item)
             info.append(tr("Конечная вершина: ") + QString::number(arc->endItem()->number) + "\n");
         info.append(tr("Приоритет: ") + QString::number(arc->priority()) + "\n" +
                     tr("Ширина пера ") + QString::number(arc->pen().width()) + "\n");
-        info.append(tr("Число изломов: ") + QString::number(arc->lines.count()) + "\n");
         if (arc->predicate != NULL) {
             info.append(tr("\nО предикате\n"));
             info.append(tr("Тип: ") + predicateTypeToString(arc->predicate) + "\n");
@@ -601,16 +641,14 @@ void TMyWindow::getInfo(QGraphicsItem *item)
                 info.append(tr("Базовый модуль: ") + arc->predicate->baseModule->name + "\n");
         }
         break;
-    case QTop::Type:
+    case QTop::Type: {
         top = qgraphicsitem_cast<QTop* >(item);
         info.append(tr("Номер вершины ") + QString::number(top->number) + "\n");
-        info.append(tr("Число дуг: ") + QString::number(top->allArcs().count()) + "\n");
-        info.append(tr("Число исход. дуг: ") + QString::number(top->outArcs().count()) + "\n");
-        info.append(tr("Число вход. дуг: ") + QString::number(top->inArcs().count()) + "\n");
-        info.append(tr("Left: ") + QString::number(top->mapRectToScene(top->rect()).left()) + "\n");
-        info.append(tr("Top: ") + QString::number(top->mapRectToScene(top->rect()).top()) + "\n");
-        info.append(tr("Right: ") + QString::number(top->mapRectToScene(top->rect()).right()) + "\n");
-        info.append(tr("Bottom: ") + QString::number(top->mapRectToScene(top->rect()).bottom()) + "\n");
+        const QRectF topRect = top->mapRectToScene(top->rect());
+        info.append(tr("Left: ") + QString::number(topRect.left()) + "\n");
+        info.append(tr("Top: ") + QString::number(topRect.top()) + "\n");
+        info.append(tr("Right: ") + QString::number(topRect.right()) + "\n");
+        info.append(tr("Bottom: ") + QString::number(topRect.bottom()) + "\n");
         if (top->actor != NULL) {
             info.append(tr("\nОб акторе\n"));
             info.append(tr("Тип: ") + actorTypeToString(top->actor) + "\n");
@@ -620,6 +658,7 @@ void TMyWindow::getInfo(QGraphicsItem *item)
                 info.append(tr("Базовый модуль: ") + top->actor->baseModule->name + "\n");
         }
         break;
+    }
     case QSyncArc::Type:
         syncArc = qgraphicsitem_cast<QSyncArc* >(item);
         break;
@@ -791,4 +830,14 @@ void TMyWindow::CMOtherFiles()
 {
     OtherFilesDialog dlg;
     dlg.exec();
+}
+
+void TMyWindow::CMERedo()
+{
+    activeDrawWindow()->undoStack->redo();
+}
+
+void TMyWindow::CMEUndo()
+{
+    activeDrawWindow()->undoStack->undo();
 }

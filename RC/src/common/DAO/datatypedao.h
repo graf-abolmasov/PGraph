@@ -14,6 +14,8 @@ public:
     void persistList(const QList<DataType> &dataTypeList);
     void persistList(const QList<const DataType *> &dataTypeList);
     QList<DataType> findAll();
+
+    QStringList findUsage(const QString &name);
 };
 
 #endif // DATATYPEDAO_H
