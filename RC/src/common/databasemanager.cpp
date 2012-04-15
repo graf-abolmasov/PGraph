@@ -541,6 +541,12 @@ QStringList DataBaseManager::findActorUsage(const QString &name)
     return ActorDAO(db).findUsage(name);
 }
 
+
+QStringList DataBaseManager::findDataTypeUsage(const QString &name)
+{
+    return DataTypeDAO(db).findUsage(name);
+}
+
 QStringList DataBaseManager::findPredicateUsage(const QString &name)
 {
     return PredicateDAO(db).findUsage(name);

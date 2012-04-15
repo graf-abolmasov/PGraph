@@ -49,6 +49,7 @@ public:
 
     QStringList findActorUsage(const QString &name);
     QStringList findPredicateUsage(const QString &name);
+    QStringList findDataTypeUsage(const QString &name);
 
     QList<const DataType *> getDataTypeList() const;
     void setDatatypeList(const QList<const DataType *> &list);

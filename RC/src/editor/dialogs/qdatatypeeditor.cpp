@@ -132,6 +132,12 @@ QDataTypeEditor::QDataTypeEditor(const DataType *type, QWidget *parent) :
         ui->simpTypeNameEdt->setFocus();
     }
 
+    const bool readOnly = !globalDBManager->findDataTypeUsage(type->name).isEmpty();
+
+    ui->arrTypeNameEdt->setReadOnly(readOnly);
+    ui->structTypeNameEdt->setReadOnly(readOnly);
+    ui->simpTypeNameEdt->setReadOnly(readOnly);
+
     ui->ArrType->setVisible(myMode == Array);
     ui->StructType->setVisible(myMode == Struct);
     ui->SimpleType->setVisible(myMode == Simple);
