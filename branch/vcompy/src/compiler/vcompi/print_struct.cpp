@@ -9,25 +9,31 @@ int print_struct(COMPTOPs *ListTop,DEFGRAFs *LstGraf, int *MaxLT, int *MaxGf)
 {
     int i,NTgraf=*MaxGf,NTtop=*MaxLT;
 
-    printf("ListTop=\r\n");
+
+    printf("ListTop\r\n");
+    printf("Name\tTop\tFirstDef\tLastDef\tNameProt\t\F\tCodeTr\tFazr\n");
 
 
     for(i=0; i < NTtop; i++)
     {
-        printf( "%s, %d, %d, %d, %s, %d, %s, %d\r\n",
-               (*(*ListTop+i)).Name,
+        printf("%s\t%d\t%d\t%d\t%s\t%d\t%s\t%d\t%d\t%s\r\n",
+               (*(*ListTop + i)).Name,
                (*(*ListTop+i)).Top,
                (*(*ListTop+i)).FirstDef,
                (*(*ListTop+i)).LastDef,
                (*(*ListTop+i)).NameProt,
                (*(*ListTop+i)).F,
                (*(*ListTop+i)).CodeTr,
-               (*(*ListTop+i)).Faz);
+               (*(*ListTop+i)).Faz,
+               (*(*ListTop + i)).rankT,
+               (*(*ListTop + i)).SPName);
     }
-    printf("ListTop=\r\n");
+
+    printf("ListGraf\r\n");
+    printf("Name\tNambPred\tNambTop\tArcType_\tF\tI\tFl\tNTop\tCodeTr\r\n");
     for(i=0; i < NTgraf; i++)
     {
-        printf( "%s, %d, %d, %d, %d, %d, %d, %d, %s\r\n",
+        printf("%s\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%s\r\n",
                (*(*LstGraf + i)).Name,
                (*(*LstGraf+i)).NambPred,
                (*(*LstGraf+i)).NambTop,
@@ -38,8 +44,6 @@ int print_struct(COMPTOPs *ListTop,DEFGRAFs *LstGraf, int *MaxLT, int *MaxGf)
                (*(*LstGraf+i)).NTop,
                (*(*LstGraf + i)).CodeTr);
     }
-
-
 }
 
 PROJECT_END_NAMESPACE
