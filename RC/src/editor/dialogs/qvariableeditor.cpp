@@ -55,6 +55,7 @@ QVariableEditor::QVariableEditor(const Variable *var, QWidget *parent) :
     ui->commentTxtEdt->setPlainText(var->comment);
     ui->initValueEdt->setText(var->initValue);
     ui->typeCmbBox->setCurrentIndex(myTypeList.indexOf(var->type));
+    ui->isGlobalChkBOx->setChecked(var->isGlobal);
     enableOkButton();
 }
 
@@ -81,7 +82,7 @@ void QVariableEditor::makeResult()
         result = new Variable(ui->nameEdt->text(),
                                   ui->initValueEdt->text(),
                                   ui->commentTxtEdt->document()->toPlainText(),
-                                  false,
+                                  ui->isGlobalChkBOx->isChecked(),
                                   myTypeList[ui->typeCmbBox->currentIndex()]);
     else {
         result = const_cast<Variable *>(myVariable);
@@ -89,7 +90,7 @@ void QVariableEditor::makeResult()
         result->initValue = ui->initValueEdt->text();
         result->type = myTypeList[ui->typeCmbBox->currentIndex()];
         result->comment = ui->commentTxtEdt->document()->toPlainText();
-        result->isGlobal = false;
+        result->isGlobal = ui->isGlobalChkBOx->isChecked();
     }
 }
 

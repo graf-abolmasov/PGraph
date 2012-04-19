@@ -784,6 +784,7 @@ void TMyWindow::CMCompile()
 {
     CMGSave();
     GraphCompiler gc(activeDrawWindow()->getGraph());
+    globalVirtualGraphs.clear();
     globalLogger->skipLine();
     gc.compile();
 }

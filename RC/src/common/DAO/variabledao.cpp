@@ -14,7 +14,7 @@ void VariableDAO::persist(const Variable &variable)
     values["TYPE"] = variable.type->name;
     values["INIT"] = variable.initValue;
     values["COMMENT"] = variable.comment;
-//    values["ISGLOBAL"] = variable.isGlobal;
+    values["ISGLOBAL"] = variable.isGlobal;
     BaseDAO::persist(values);
 }
 
@@ -44,7 +44,7 @@ QList<Variable> VariableDAO::findAll()
         result.append(Variable(r.value("DATA").toString(),
                                r.value("INIT").toString(),
                                r.value("COMMENT").toString(),
-                               false,
+                               r.value("ISGLOBAL").toBool(),
                                globalDBManager->getDataType(r.value("TYPE").toString())));
     }
     myDb.close();
