@@ -1,4 +1,7 @@
 #include "tpodata.h"
+#include <stdlib.h>
+#include <stdio.h>
+
 #ifdef PARALLEL
 PROJECT_BEGIN_NAMESPACE
 int memman(TPOData *D)
@@ -23,8 +26,12 @@ int memman(TPOData *D)
                 MPI_Recv((char *)D->getDataAddr(p.id)+(p.offset*D->getDataSize(p.id)), p.count, D->getMpiType(p.id), status.MPI_SOURCE, MPI_TAG_ACTUALDATA, MPI_COMM_WORLD, &status);
             } else if (status.MPI_TAG == MPI_TAG_LOCKPROC) {
                 int i = 2;
-                while (proc_loading[i])
+                while (i < totalProc && proc_loading[i])
                     i++;
+		if (i==totalProc) {
+		   printf("memmanaer: WARNING! No free process. Reserve one more.\r\n");
+		   exit(-1);
+		}
                 proc_loading[i] = true;
                 MPI_Send(&i, 1, MPI_INT, status.MPI_SOURCE, MPI_TAG_LOCKPROC, MPI_COMM_WORLD);
             } else if (status.MPI_TAG == MPI_TAG_FREEPROC) {

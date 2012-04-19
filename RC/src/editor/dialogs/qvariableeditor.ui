@@ -118,6 +118,13 @@
       </widget>
      </item>
      <item>
+      <widget class="QCheckBox" name="isGlobalChkBOx">
+       <property name="text">
+        <string>глобальное</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QFrame" name="frame_3">
        <property name="frameShape">
         <enum>QFrame::WinPanel</enum>

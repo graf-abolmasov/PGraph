@@ -8,7 +8,7 @@
 #include "../../src/common/commonutils.h"
 #include "../../src/common/qgraphsettings.h"
 
-QSet<QString> allVirtualGraphs;
+QSet<QString> globalVirtualGraphs;
 
 GraphCompiler::GraphCompiler(const Graph &graph) :
     myGraph(graph)
@@ -90,8 +90,8 @@ void GraphCompiler::copyUsedFiles()
         if (actor->type == Actor::GraphType)
             continue;
         const QString f = myBaseDirectory + "/" + actor->name + ".cpp";
-        if (!QFile::exists(f))
-            actor->build();
+//        if (!QFile::exists(f))
+        actor->build();
         Q_ASSERT(QFile::exists(f));
         const QString nf = myOutputDirectory + "/" + actor->name + ".cpp";
         QFile::remove(nf);
@@ -99,7 +99,7 @@ void GraphCompiler::copyUsedFiles()
     }
     foreach (const Predicate *predicate, usedPredicateList) {
         const QString f = myBaseDirectory + "/" + predicate->name + ".cpp";
-        if (!QFile::exists(f))
+//        if (!QFile::exists(f))
             predicate->build();
         Q_ASSERT(QFile::exists(f));
         const QString nf = myOutputDirectory + "/" + predicate->name + ".cpp";
@@ -223,7 +223,7 @@ void GraphCompiler::compileStruct() const
             int endTop = arc.endTop;
             if (arc.type == Arc::ParallelArc) {
                 const QString virtualGraphName = "V" + myGraph.name + "_" + QString::number(arc.endTop);
-                allVirtualGraphs.insert(virtualGraphName);
+                globalVirtualGraphs.insert(virtualGraphName);
                 const QString virtualGraphExtName = QString("Virtual graph for %1 top").arg(QString::number(arc.endTop));
                 virtualTops << "\tDefineTop(\"" + virtualGraphName + "\", " + QString::number(-77) + ", " + QString::number(-77) + ", &" + virtualGraphName + ")";
                 virtualGraphs << buildGraph(virtualGraphName, virtualGraphExtName, arc.endTop);
@@ -350,7 +350,7 @@ void GraphCompiler::compileMain() const
         getFuncAddrByName.append(QString("if (strcmp(\"%1\", name) == 0) return &%1;").arg(actor->name));
     }
 
-    foreach (QString virtualGraphName, allVirtualGraphs) {
+    foreach (QString virtualGraphName, globalVirtualGraphs) {
         allActors.append("int " + virtualGraphName + "(TPOData *D);");
         getFuncAddrByName.append(QString("if (strcmp(\"%1\", name) == 0) return &%1;").arg(virtualGraphName));
     }

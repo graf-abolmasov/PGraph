@@ -14,5 +14,6 @@ extern Logger           *globalLogger;
 extern QLabel           *globalInfoLabel;
 extern QStringList      globalPredicateList;
 extern DataBaseManager  *globalDBManager;
+extern QSet<QString>    globalVirtualGraphs;
 
 #endif // GLOBALVARIABLES_H
