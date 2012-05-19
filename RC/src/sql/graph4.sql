@@ -16,7 +16,7 @@ CREATE  TABLE IF NOT EXISTS `graph4`.`project` (
   `PROJECT_NAME` VARCHAR(200) NOT NULL ,
   PRIMARY KEY (`PROJECT_ID`) )
 ENGINE = InnoDB
-AUTO_INCREMENT = 11
+AUTO_INCREMENT = 14
 DEFAULT CHARACTER SET = utf8;
 
 
@@ -95,7 +95,7 @@ DROP TABLE IF EXISTS `graph4`.`bazmod` ;
 CREATE  TABLE IF NOT EXISTS `graph4`.`bazmod` (
   `PROJECT_ID` INT(11) UNSIGNED NOT NULL ,
   `PROTOTIP` VARCHAR(9) NOT NULL ,
-  `NAMEPR` VARCHAR(64) NOT NULL ,
+  `NAMEPR` VARCHAR(9) NOT NULL ,
   `CLASS` VARCHAR(1) NULL DEFAULT NULL ,
   `LANGUAGE` VARCHAR(1) NULL DEFAULT NULL ,
   `COMMENT` VARCHAR(254) NULL DEFAULT NULL ,
@@ -146,6 +146,7 @@ CREATE  TABLE IF NOT EXISTS `graph4`.`data` (
   `TYPE` VARCHAR(64) NULL DEFAULT NULL ,
   `INIT` VARCHAR(256) NULL DEFAULT NULL ,
   `COMMENT` VARCHAR(256) NULL DEFAULT NULL ,
+  `ISGLOBAL` TINYINT(1)  NULL ,
   PRIMARY KEY (`PROJECT_ID`, `data`) ,
   INDEX `data_FK1` USING BTREE (`TYPE` ASC) ,
   INDEX `fk_data_project1` (`PROJECT_ID` ASC) ,
@@ -281,25 +282,6 @@ DEFAULT CHARACTER SET = cp1251;
 
 
 -- -----------------------------------------------------
--- Table `graph4`.`othfls`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `graph4`.`othfls` ;
-
-CREATE  TABLE IF NOT EXISTS `graph4`.`othfls` (
-  `name` VARCHAR(64) NOT NULL ,
-  `PROJECT_ID` INT(11) UNSIGNED NOT NULL ,
-  PRIMARY KEY (`name`, `PROJECT_ID`) ,
-  INDEX `fk_table1_project1` (`PROJECT_ID` ASC) ,
-  CONSTRAINT `fk_table1_project1`
-    FOREIGN KEY (`PROJECT_ID` )
-    REFERENCES `graph4`.`project` (`PROJECT_ID` )
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8;
-
-
--- -----------------------------------------------------
 -- Table `graph4`.`pasport`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `graph4`.`pasport` ;
@@ -381,7 +363,7 @@ CREATE  TABLE IF NOT EXISTS `graph4`.`typsys` (
   `PROJECT_ID` INT(11) UNSIGNED NOT NULL ,
   `TYPE` VARCHAR(64) NOT NULL ,
   `TYPEDEF` VARCHAR(512) NULL DEFAULT NULL ,
-  `seqnum` INT(11) NULL DEFAULT NULL ,
+  `SEQNUM` INT(11) NULL DEFAULT NULL ,
   PRIMARY KEY (`TYPE`, `PROJECT_ID`) ,
   INDEX `fk_typsys_project1` (`PROJECT_ID` ASC) ,
   CONSTRAINT `fk_typsys_project1`
@@ -391,6 +373,26 @@ CREATE  TABLE IF NOT EXISTS `graph4`.`typsys` (
     ON UPDATE CASCADE)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `graph4`.`othfls`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `graph4`.`othfls` ;
+
+CREATE  TABLE IF NOT EXISTS `graph4`.`othfls` (
+  `name` VARCHAR(64) NOT NULL ,
+  `PROJECT_ID` INT(11) UNSIGNED NOT NULL ,
+  PRIMARY KEY (`name`, `PROJECT_ID`) ,
+  INDEX `fk_table1_project1` (`PROJECT_ID` ASC) ,
+  CONSTRAINT `fk_table1_project1`
+    FOREIGN KEY (`PROJECT_ID` )
+    REFERENCES `graph4`.`project` (`PROJECT_ID` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB
+COMMENT = 'CREATE  TABLE IF NOT EXISTS `graph4`.`othfls` (\n  `name` VAR' /* comment truncated */ 
+PACK_KEYS = DEFAULT;
 
 
 
