@@ -19,5 +19,9 @@ PROJECT_END_NAMESPACE
 #include <stdio.h>
 #include <strings.h>
 #include <memory.h>
+#include <math.h>
+#include <stdlib.h>
+#include <limits.h>
+#include <time.h>
 
 #endif

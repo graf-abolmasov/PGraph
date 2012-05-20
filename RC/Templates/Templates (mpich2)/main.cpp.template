@@ -8,6 +8,9 @@
 <#allActors>
 
 #ifdef PARALLEL
+class TPOData;
+typedef int (ActorFunc)(TPOData *D);
+
 ActorFunc *getFuncAddrByName(const char *name) {
 <#getFuncAddrByName>
 return NULL;
