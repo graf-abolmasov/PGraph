@@ -19,8 +19,6 @@
 #ifdef PARALLEL
 
 PROJECT_BEGIN_NAMESPACE
-class TPOData;
-typedef int (ActorFunc)(TPOData *D);
 
 //Структура для общения с диспетчетом памяти
 typedef struct {
