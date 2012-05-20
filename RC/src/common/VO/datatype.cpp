@@ -37,9 +37,10 @@ QString DataType::build() const
         result.append("#define ").append(name).append("_LENGTH ").append(r.cap(2)).append("\r\n");
 
         //Парсим тип элемента
-        r.setPattern("(typedef\\s+(\\b.+\\b))");
-        Q_ASSERT(r.indexIn(typedefStr) != -1);
-        result.append("typedef ").append(r.cap(2)).append("* ptr").append(name).append(";\r\n");
+        QRegExp r2("(typedef\\s+(\\b.+\\b))");
+        r2.setMinimal(true);
+        Q_ASSERT(r2.indexIn(typedefStr) != -1);
+        result.append("typedef ").append(r2.cap(2)).append("* ptr").append(name).append(";\r\n");
     }
 
     return result;
