@@ -1,0 +1,27 @@
+#ifndef UTYPE_H
+#define UTYPE_H
+
+#include "stype.h"
+
+PROJECT_BEGIN_NAMESPACE
+
+//Пользовательские типы
+<#userTypes>
+
+//Типы MPI
+#ifdef PARALLEL
+<#mpiTypes>
+#endif
+
+PROJECT_END_NAMESPACE
+
+//Часто включаемые файлы
+#include <stdio.h>
+#include <strings.h>
+#include <memory.h>
+#include <math.h>
+#include <stdlib.h>
+#include <limits.h>
+#include <time.h>
+
+#endif
