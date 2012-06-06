@@ -63,8 +63,9 @@ void Actor::build() const
     QStringList params;
     QStringList signature;
     // Создаем сpp файл
-    outputData.append("#include \"tpodata.h\"\r\n");
+
     outputData.append("PROJECT_BEGIN_NAMESPACE\r\n");
+    outputData.append("#include \"tpodata.h\"\r\n");
     switch(this->type) {
     case Actor::NormalType:
         Q_ASSERT(currentBaseModule);

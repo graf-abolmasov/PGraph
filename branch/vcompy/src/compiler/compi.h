@@ -6,6 +6,11 @@
 #include "../../src/common/VO/graphvo.h"
 #include "../../src/compiler/compiler.h"
 
+typedef struct {
+    int from;
+    int to;
+} TFromStruct;
+
 class GraphCompiler : public ICompiler
 {
 public:

@@ -11,12 +11,12 @@ int print_struct(COMPTOPs *ListTop,DEFGRAFs *LstGraf, int *MaxLT, int *MaxGf)
 
 
     printf("ListTop\r\n");
-    printf("Name\tTop\tFirstDef\tLastDef\tNameProt\t\F\tCodeTr\tFazr\n");
+    printf("Name\tTop\tFirstDef\tLastDef\tNameProt\tF\tCodeTr\tFaz\trankT\tSMName\tSPName\n");
 
 
     for(i=0; i < NTtop; i++)
     {
-        printf("%s\t%d\t%d\t%d\t%s\t%d\t%s\t%d\t%d\t%s\r\n",
+        printf("%s\t%d\t%d\t%d\t%s\t%d\t%s\t%d\t%d\t%s\t%s\n",
                (*(*ListTop + i)).Name,
                (*(*ListTop+i)).Top,
                (*(*ListTop+i)).FirstDef,
@@ -26,12 +26,13 @@ int print_struct(COMPTOPs *ListTop,DEFGRAFs *LstGraf, int *MaxLT, int *MaxGf)
                (*(*ListTop+i)).CodeTr,
                (*(*ListTop+i)).Faz,
                (*(*ListTop + i)).rankT,
+               (*(*ListTop + i)).SMName,
                (*(*ListTop + i)).SPName);
     }
 
     printf("ListGraf\r\n");
     printf("Name\tNambPred\tNambTop\tArcType_\tF\tI\tFl\tNTop\tCodeTr\r\n");
-    for(i=0; i < NTgraf; i++)
+    for(i=0; i <= NTgraf; i++)
     {
         printf("%s\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%s\r\n",
                (*(*LstGraf + i)).Name,

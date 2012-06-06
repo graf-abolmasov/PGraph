@@ -1,11 +1,11 @@
 #include "graph.h"
 
 PROJECT_BEGIN_NAMESPACE
-DefineGraph::DefineGraph(int NambPred, int NambTop)
-{
-    this->NambPred = NambPred;
-    this->NambTop = NambTop;
-}
+//DefineGraph::DefineGraph(int NambPred, int NambTop)
+//{
+//    this->NambPred = NambPred;
+//    this->NambTop = NambTop;
+//}
 
 DefineGraph::DefineGraph(int NambPred, int NambTop, int Type)
 {

@@ -133,6 +133,19 @@ void GraphCompiler::copyStaticTemplates()
     Q_ASSERT(QFile::exists(myTemplateDirectory + "/runme.bat.template"));
     Q_ASSERT(QFile::exists(myTemplateDirectory + "/stype.h.template"));
     Q_ASSERT(QFile::exists(myTemplateDirectory + "/defines.h.template"));
+    Q_ASSERT(QFile::exists(myTemplateDirectory + "/msgs.h.template"));
+
+    QFile::remove(myOutputDirectory + "/graph.h");
+    QFile::remove(myOutputDirectory + "/memman.h");
+    QFile::remove(myOutputDirectory + "/graph.cpp");
+    QFile::remove(myOutputDirectory + "/property.h");
+    QFile::remove(myOutputDirectory + "/memman.cpp");
+    QFile::remove(myOutputDirectory + "/graphmv.cpp");
+    QFile::remove(myOutputDirectory + "/Makefile");
+    QFile::remove(myOutputDirectory + "/runme.bat");
+    QFile::remove(myOutputDirectory + "/stype.h");
+    QFile::remove(myOutputDirectory + "/defines.h");
+    QFile::remove(myOutputDirectory + "/msgs.h");
 
     QFile::copy(myTemplateDirectory + "/graph.h.template", myOutputDirectory + "/graph.h");
     QFile::copy(myTemplateDirectory + "/memman.h.template", myOutputDirectory + "/memman.h");
@@ -144,6 +157,7 @@ void GraphCompiler::copyStaticTemplates()
     QFile::copy(myTemplateDirectory + "/runme.bat.template", myOutputDirectory + "/runme.bat");
     QFile::copy(myTemplateDirectory + "/stype.h.template", myOutputDirectory + "/stype.h");
     QFile::copy(myTemplateDirectory + "/defines.h.template", myOutputDirectory + "/defines.h");
+    QFile::copy(myTemplateDirectory + "/msgs.h.template", myOutputDirectory + "/msgs.h");
 
     foreach (const QString  name, myOtherFilesList)
         QFile::copy(myBaseDirectory + "/" + name, myOutputDirectory + "/" + name);
@@ -165,13 +179,15 @@ bool GraphCompiler::compile()
         return true;
     mySkipList.insert(myGraph.name);
 
+    copyUsedFiles();
+    copyStaticTemplates();
+
     collectUsedData();
     compileStruct();
     compileMakefile("debug");
     compileMakefile("release");
     compileMain();
-    copyUsedFiles();
-    copyStaticTemplates();
+
     globalLogger->log(QObject::tr("Компиляция завершена без ошибок за %1 с").arg(QString::number(qRound(t.elapsed()/1000))), Logger::Compile);
     return true;
 }
@@ -187,7 +203,7 @@ void GraphCompiler::compileStruct() const
     foreach (const Predicate *predicate, usedPredicateList)
         predicateStr.append("int " + predicate->name + "(TPOData *D);\r\n");
 
-    // делаем заголовки файл для акторов
+    // делаем заголовки файлов для акторов
     QString actorStr;
     foreach (const Actor *actor, usedActorList)
         actorStr.append("int " + actor->name + "(TPOData *D);\r\n");
@@ -228,7 +244,7 @@ void GraphCompiler::compileStruct() const
             lg.Fl = -1;
             lg.F = 0;
             lg.I = -1;
-            lg.Name = myGraph.name;
+            lg.Name = arc.predicate->name; //// myGraph.name;
             lg.CodeTr = "0.I";
 
             _listGraph.append(lg);
@@ -244,9 +260,9 @@ void GraphCompiler::compileStruct() const
         if (_vec.size() <= top.number)
             _vec.resize(top.number + 1);
 
-        vec[top.number] = "\tDefineTop(\"" + top.actor->name + "\", " + QString::number(first) + ", " + QString::number(last) + ", &" + top.actor->name + ")";
+        vec[top.number] = "\tDefineTop(\"" + top.actor->name + "\", " + QString::number(first) + ", " + QString::number(last) + ", &" + top.actor->name + ", NULL, NULL)";
 
-        _vec[top.number].Name = myGraph.name;
+        _vec[top.number].Name = top.actor->name; //// myGraph.name;
         _vec[top.number].NameProt = top.actor->name;
         _vec[top.number].FirstDef = first;
         _vec[top.number].LastDef = last;
@@ -264,22 +280,167 @@ void GraphCompiler::compileStruct() const
         }
     }
 
-    QList<CompTop> _listTop = _vec.toList();
+    // QList<CompTop> _listTop = _vec.toList();
+    // QList<CompTop> _listTop =  QList<CompTop>::fromVector(_vec);
+
+    QList<CompTop> _listTop;
+    foreach (CompTop sometop, _vec)   {
+        if (sometop.Name.isEmpty())  {
+            sometop.back = 0;
+            sometop.CodeTr = "0.I";
+            sometop.F = 0;
+            sometop.Faz = -1;
+            sometop.FirstDef = -77;
+            sometop.LastDef = -77;
+            sometop.Name = "GHOST TOP";
+            sometop.NameProt = "";
+            sometop.rankT = 0;
+            sometop.SMName = "";
+            sometop.SPName = "";
+            sometop.Top = -1;
+        }
+        _listTop.append(sometop);
+    }
+
+
     vcompi::VcompyWrapper::vcompy(_listTop, _listGraph, maxLT, maxGf);
+
+
 
     QStringList listTop;
     foreach (QString deftop, vec)
         listTop.append(deftop.isEmpty() ? "\tDefineTop(\"GHOST TOP\", -77, -77, NULL)" : deftop);
 
-    QString ListTopString;
-    ListTopString.append("static DefineTop ListTop[" + QString::number(vec.size()) + "] = {\r\n");
-    ListTopString.append(listTop.join(",\r\n"));
-    ListTopString.append("\r\n};\r\n");
+//    QString ListTopString;
+//    ListTopString.append("static DefineTop ListTop[" + QString::number(vec.size()) + "] = {\r\n");
+//    ListTopString.append(listTop.join(",\r\n"));
+//    ListTopString.append("\r\n};\r\n");
 
-    QString ListGrafString;
-    ListGrafString.append("static DefineGraph ListGraf[" + QString::number(arcList.size()) + "] = {\r\n");
-    ListGrafString.append(listGraph.join(",\r\n"));
-    ListGrafString.append("\r\n};\r\n");
+    //
+    // Заполняем структуру DefineTop, а заодно и список сообщений
+    //
+        QList<TFromStruct> GlobalFromList;
+        QString qs_tpodata_h_messages;
+        QString qs_msgs_cpp = "#include \"msgs.h\"\n\n";
+        QString ListTopString;
+
+        ListTopString.append("static DefineTop ListTop[" + QString::number(_listTop.size()) + "] = {\r\n");
+
+        int curIndex = 0;
+        foreach (CompTop ltop, _listTop) {
+            //
+            // заполнение списка сообщений
+            //
+
+            // для каждой вершины типа "H":
+            QString qs_RecvMsg;
+            QList<int> FromList;
+            int toTop = -1;
+            if (ltop.CodeTr.contains("H")) {
+
+                // ищем вершину, в которую идет "фиктивная" дуга типа 4
+                // все остальные инцидентные "параллельные" вершины добавляем в список FromList
+                if (ltop.FirstDef != -77) {
+                    for ( int i = ltop.FirstDef; i<=ltop.LastDef; i++ ) {
+                        Q_ASSERT( i>=0 && i< _listGraph.size() );
+                        if (_listGraph.at(i).ArcType_ == 4) {
+                            Q_ASSERT( toTop == -1 );
+                            toTop = _listGraph.at(i).NambTop;
+                        }
+                        else {
+                            FromList.append(_listGraph.at(i).NambTop);
+                        }
+                    }
+                }
+
+                // формируем список сообщений
+                qs_RecvMsg.append("int RecvMsg_" + myGraph.name + "__" + QString::number(toTop) + "__");
+                foreach (int ntop, FromList) {
+
+                    QString qs_msg_header = "int SendMsg_" + myGraph.name + "_" +
+                                            QString::number(ntop) + "_" +
+                                            QString::number(toTop) + "_(TPOData *D);\n";
+
+                    qs_tpodata_h_messages.append(qs_msg_header);
+                    // накапливаем список параллельных вершин - отправителей сообщений
+                    qs_RecvMsg.append( QString::number(ntop) + "_" );
+
+                    // добавляем тело ф-ции отправки сообщения в msgs.cpp
+                    qs_msgs_cpp.append(qs_msg_header);  qs_msgs_cpp.chop(2);
+                    qs_msgs_cpp.append("{\n\tD->SendMsg(" +
+                                       QString::number(ntop) + ", " +
+                                       QString::number(toTop)+ ", \"Top " +
+                                       QString::number(ntop) + " completed\");\n" +
+                                       "\treturn 1;\n}\n\n");
+
+                }
+                qs_tpodata_h_messages.append(qs_RecvMsg + "(TPOData *D);\n");
+
+                // добавляем тело функции приема сообщений
+                qs_msgs_cpp.append(qs_RecvMsg + "(TPOData *D)\n{\n");
+                foreach (int ntop, FromList) {
+                    qs_msgs_cpp.append("\tchar *s" + QString::number(ntop) + " = NULL;");
+                }
+                qs_msgs_cpp.append("\n");
+                qs_msgs_cpp.append("\tint MKind = 1;\n\n\tif ( ");
+                foreach (int ntop, FromList) {
+                    qs_msgs_cpp.append("D->RecvMsg(" + QString::number(ntop) + ", &MKind, s" + QString::number(ntop) +
+                                       ") && ");
+                }
+                qs_msgs_cpp.chop(3);
+                qs_msgs_cpp.append(") {\n\t\treturn 1;\n\t}\n\telse return 0;\n}\n");
+            }
+
+            foreach (int ntop, FromList) {
+                TFromStruct l_from_struct = {ntop, toTop};
+                GlobalFromList.append(l_from_struct);
+            }
+
+            QString qs = (ltop.Name.at(0)=='\0') ? "NULL" : ltop.Name;
+            ListTopString.append("\tDefineTop(\"" + qs + "\", " + QString::number(ltop.FirstDef) +
+                                 ", " + QString::number(ltop.LastDef) + ", " +
+                                 ( (qs == "NULL") ? "NULL" : qs.prepend("&") ) + ", " +
+                                 ( (qs_RecvMsg.isNull()) ? "NULL" : qs_RecvMsg.mid(4).prepend("&") ) + ", " +
+                                 "<#insert_SendMsg_from_" + QString::number(curIndex) + "_here>" +
+                                 ((ltop.rankT > 0) ? (", " + QString::number(ltop.rankT)) : "") +
+                                 "),\n");
+            if ( curIndex == _listTop.size()-1 )    {
+                ListTopString.chop(2);
+            }
+
+            curIndex++;
+        }
+        ListTopString.append("\r\n};\r\n");
+
+
+        // добавляем имена ф-ций отправки сообщений
+
+        foreach (TFromStruct l_from_struct, GlobalFromList) {
+            ListTopString.replace("<#insert_SendMsg_from_" + QString::number(l_from_struct.from) + "_here>",
+                                  "&SendMsg_" + myGraph.name + "_" +
+                                  QString::number(l_from_struct.from) + "_" + QString::number(l_from_struct.to) + "_");
+        }
+        ListTopString.replace(QRegExp("<#insert_SendMsg_from_\\d+_here>"),"NULL");
+
+//    QString ListGrafString;
+//    ListGrafString.append("static DefineGraph ListGraf[" + QString::number(arcList.size()) + "] = {\r\n");
+//    ListGrafString.append(listGraph.join(",\r\n"));
+//    ListGrafString.append("\r\n};\r\n");
+
+    // Заполняем структуру DefineGraph
+        QString ListGrafString;
+        ListGrafString.append("static DefineGraph ListGraf[" + QString::number(_listGraph.size()) + "] = {\r\n");
+        curIndex = 0;
+        foreach (DefGrf larc, _listGraph)   {
+            ListGrafString.append("\tDefineGraph(" + QString::number(larc.NambPred) + ", " +
+                                  QString::number(larc.NambTop) + ", " +
+                                 QString::number(larc.ArcType_) + "),\n");
+            if ( curIndex == _listGraph.size()-1 )    {
+                ListGrafString.chop(2);
+            }
+            curIndex++;
+        }
+        ListGrafString.append("\r\n};\r\n");
 
     QString main;
     main.append("#include \"graph.h\"\r\n");
@@ -296,7 +457,8 @@ void GraphCompiler::compileStruct() const
     main.append("\t//" + myGraph.extName + "\r\n");
     main.append("\t//printf(\"" + myGraph.extName + "\\r\\n\");\r\n");
     main.append("\tint topCount = " + QString::number(myGraph.topList.count()) + ";\r\n");
-    main.append("\tint rootTop = " + QString::number(myGraph.getRootTop()) + ";\r\n");
+    //// main.append("\tint rootTop = " + QString::number(myGraph.getRootTop()) + ";\r\n");
+    main.append("\tint rootTop = D->D_internal_rootTop__;\r\n");
     main.append("\tGraphMV(D, rootTop, topCount, ListPred, ListTop, ListGraf);\r\n");
     main.append("\treturn 1;\r\n");
     main.append("}\r\n");
@@ -306,6 +468,58 @@ void GraphCompiler::compileStruct() const
     f.open(QFile::WriteOnly);
     f.write(main.toUtf8());
     f.close();
+
+    // Формируем часть main с запуском паралл. ветвей
+    QString qs_start_of_parallel_graphs;
+    curIndex = 0;
+    foreach (CompTop ltop, _listTop) {
+        if ( ltop.rankT > 0 ) {
+            qs_start_of_parallel_graphs.append("\tif (myProcNum == " +
+                                               QString::number(ltop.rankT+1) + ") {\r\n");
+            qs_start_of_parallel_graphs.append("\t\tMPI_Recv(&Msg, 1, MPI_INT, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);\r\n");
+            qs_start_of_parallel_graphs.append("\t\tif ( status.MPI_TAG != MPI_TAG_TERMINATE ) {\r\n");
+            qs_start_of_parallel_graphs.append("\t\t\tif ( status.MPI_TAG == MPI_TAG_RUN ) {\r\n");
+            qs_start_of_parallel_graphs.append("\t\t\t\tprintf(\"Running process %d.\\n\", myProcNum); //// fflush(D.stream);\r\n");
+
+//            if (ltop.Name.at(0)=="G") {
+                qs_start_of_parallel_graphs.append("\t\t\t\tD.D_internal_rootTop__ = " +
+                                                   QString::number(curIndex) + ";\r\n");
+                qs_start_of_parallel_graphs.append("\t\t\t\t" + myGraph.name + "(&D);\r\n");
+//            }
+//            else {
+//                if (ltop.Name.at(0)=="A") {
+
+//                }
+//                else {
+//                    // Ошибка: в качестве начала || ветви указан не актор и не предикат
+//                }
+//            }
+
+
+
+            qs_start_of_parallel_graphs.append("\t\t\tMPI_Send(&Msg, 1, MPI_INT, 1, 3, MPI_COMM_WORLD);\r\n");
+            qs_start_of_parallel_graphs.append("\t\t\t}\r\n\t\t}\r\n");
+            qs_start_of_parallel_graphs.append("\t\tprintf(\"Process %d completed.\\n\", myProcNum);\r\n\t}\r\n\n");
+        }
+        curIndex++;
+    }
+    QFile f1(myOutputDirectory + "/" + myGraph.name + "_start_of_parallel_graphs.tmp");
+    f1.open(QFile::WriteOnly);
+    f1.write(qs_start_of_parallel_graphs.toUtf8());
+    f1.close();
+
+    // Сохраняем список сообщений
+    QFile f2(myOutputDirectory + "//tpodata_h_messages.tmp");
+    f2.open(QFile::WriteOnly);
+    f2.write(qs_tpodata_h_messages.toUtf8());
+    f2.close();
+
+    // Сохраняем MSGS.CPP
+    QFile f3(myOutputDirectory + "//msgs.cpp");
+    f3.open(QFile::WriteOnly);
+    f3.write(qs_msgs_cpp.toUtf8());
+    f3.close();
+
 }
 
 void GraphCompiler::compileMakefile(QString target) const
@@ -366,10 +580,26 @@ void GraphCompiler::compileMakefile(QString target) const
 
 void GraphCompiler::compileMain() const
 {
+    // Считываем содержимое файла <GraphName>_start_of_parallel_graphs.tmp
+    QFile f1(myOutputDirectory + "/" + myGraph.name + "_start_of_parallel_graphs.tmp");
+    f1.open(QIODevice::ReadOnly);
+    QTextStream ts(&f1);
+    ts.setCodec("UTF-8");
+    QString qs_start_of_parallel_graphs = ts.readAll();
+    f1.close();
+
+
     QString result = getTemplate(myTemplateDirectory + "/" + "main.cpp.template");
     if (result.isEmpty())
         globalLogger->log(QObject::tr(ERR_GRAPHCOMPI_EMPTY_TEMPL).arg("main.cpp"), Logger::Warning);
-    result.replace("<#graphname>", myGraph.name);
+    result.replace("<#init_D_internal_rootTop__>",
+                   "\tD.D_internal_rootTop__ = " + QString::number(myGraph.getRootTop()) + ";");
+    result.replace("<#maingraphname>", myGraph.name);
+    result.replace("<#main_graph_rootTop>", QString::number(myGraph.getRootTop()));
+
+//    QString qs_start_of_parallel_graphs;
+//    foreach
+    result.replace("<#start_of_parallel_graphs>", qs_start_of_parallel_graphs);
 
     QFile f(myOutputDirectory + "/" + "main.cpp");
     f.open(QFile::WriteOnly);

@@ -17,8 +17,13 @@ int VcompyWrapper::vcompy(QList<CompTop> &tops, QList<DefGrf> &graphs, int maxLT
 
     GB4995CC8(&D);
 
+    // qDeleteAll(tops.begin(), tops.end());
+    tops.clear();
+    graphs.clear();
+
     makeResult(&D, tops, graphs);
 
+    return 0;
 }
 
 void VcompyWrapper::init(TPOData *D, QList<CompTop> &tops, QList<DefGrf> &graphs, int maxLT, int maxGf)
@@ -35,10 +40,26 @@ void VcompyWrapper::init(TPOData *D, QList<CompTop> &tops, QList<DefGrf> &graphs
         it->F        = ct.F;
         it->Faz      = ct.Faz;
 
-        strncpy(it->NameProt,ct.NameProt.toStdString().c_str(),8);
-        strncpy(it->Name,ct.Name.toStdString().c_str(),8);
+        strncpy(it->NameProt,ct.NameProt.toStdString().c_str(),NAMEPR_SIZE);
+        strncpy(it->Name,ct.Name.toStdString().c_str(),NAMEPR_SIZE);
         strncpy(it->CodeTr,ct.CodeTr.toStdString().c_str(),3);
         i++;
+    }
+
+    if (maxLT > tops.size())    {
+        for( i = tops.size(); i < maxLT; i++ )  {
+            COMPTOP *it  = ListTop+i;
+            it->Top      = -1;
+            it->FirstDef = -77;
+            it->LastDef  = -77;
+            it->F        = -1;
+            it->Faz      = -1;
+
+            it->NameProt[0] = '\0';
+            it->Name[0] = '\0';
+            strcpy(it->CodeTr, "0.I");
+
+        }
     }
 
     i = 0;
@@ -52,14 +73,32 @@ void VcompyWrapper::init(TPOData *D, QList<CompTop> &tops, QList<DefGrf> &graphs
         it->NambTop  = dg.NambTop;
         it->ArcType_ = dg.ArcType_;
 
-        strncpy(it->Name,dg.Name.toStdString().c_str(),8);
-        strncpy(it->CodeTr,dg.CodeTr.toStdString().c_str(),8);
+        strncpy(it->Name,dg.Name.toStdString().c_str(),NAMEPR_SIZE);
+        strncpy(it->CodeTr,dg.CodeTr.toStdString().c_str(),NAMEPR_SIZE);
         i++;
     }
 
-    (*(D->MaxLT)) = tops.size();
+    if ( maxGf > graphs.size() )    {
+        for( i = graphs.size(); i < maxGf; i++ )  {
+            DEFGRF *it = LstGraf+i;
+            it->I        = -1;
+            it->Fl       = 0;
+            it->NTop     = -1;
+            it->F        = -1;
+            it->NambPred = -1;
+            it->NambTop  = -1;
+            it->ArcType_ = -1;
+
+            it->Name[0] = '\0';
+            strcpy(it->CodeTr, "0.I");
+        }
+    }
+
+    ////(*(D->MaxLT)) = tops.size();
+    (*(D->MaxLT)) = maxLT;
     (*(D->NumTop)) = tops.size();
-    (*(D->MaxGf)) = graphs.size();
+    ////(*(D->MaxGf)) = graphs.size();
+    (*(D->MaxGf)) = maxGf;
 
     (*(D->GPcomp)) = ListTop;
     (*(D->GPgraf)) = LstGraf;
@@ -67,8 +106,8 @@ void VcompyWrapper::init(TPOData *D, QList<CompTop> &tops, QList<DefGrf> &graphs
 
 void VcompyWrapper::makeResult(TPOData *D, QList<CompTop> &tops, QList<DefGrf> &graphs)
 {
-    tops.clear();
-    graphs.clear();
+//    tops.clear();
+//    graphs.clear();
 
     int NTtop  = (*(D->MaxLT));
     int NTgraf = (*(D->MaxGf));
@@ -87,11 +126,12 @@ void VcompyWrapper::makeResult(TPOData *D, QList<CompTop> &tops, QList<DefGrf> &
         newCompTop.rankT = it->rankT;
         newCompTop.Top = it->Top;
 
-        newCompTop.Name = QString::fromAscii(it->Name, 8);
-        newCompTop.CodeTr = QString::fromAscii(it->CodeTr, 8);
-        newCompTop.SMName = QString::fromAscii(it->SMName, 8);
-        newCompTop.SPName = QString::fromAscii(it->SPName, 8);
-        newCompTop.NameProt = QString::fromAscii(it->NameProt, 8);
+        // newCompTop.Name = ( it->Name[0]=='\0' ) ? "": QString::fromAscii(it->Name, 8);
+        newCompTop.Name = QString::fromAscii(it->Name, NAMEPR_SIZE);
+        newCompTop.CodeTr = QString::fromAscii(it->CodeTr, NAMEPR_SIZE);
+        newCompTop.SMName = QString::fromAscii(it->SMName, NAMEPR_SIZE);
+        newCompTop.SPName = QString::fromAscii(it->SPName, NAMEPR_SIZE);
+        newCompTop.NameProt = QString::fromAscii(it->NameProt, NAMEPR_SIZE);
 
         tops.append(newCompTop);
     }
@@ -107,14 +147,14 @@ void VcompyWrapper::makeResult(TPOData *D, QList<CompTop> &tops, QList<DefGrf> &
         newDefGrf.I = it->I;
         newDefGrf.NTop = it->NTop;
 
-        newDefGrf.Name = QString::fromAscii(it->Name, 8);
-        newDefGrf.CodeTr = QString::fromAscii(it->CodeTr, 8);
+        newDefGrf.Name = QString::fromAscii(it->Name, NAMEPR_SIZE);
+        newDefGrf.CodeTr = QString::fromAscii(it->CodeTr, NAMEPR_SIZE);
 
         graphs.append(newDefGrf);
     }
 
-    free(ListTop);
-    free(LstGraf);
+//     free(ListTop);
+//     free(LstGraf);
 }
 
 PROJECT_END_NAMESPACE

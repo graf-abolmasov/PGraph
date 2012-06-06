@@ -7,7 +7,7 @@ PROJECT_BEGIN_NAMESPACE
 class DefineGraph
 {
 public:
-    DefineGraph(int NambPred, int NambTop);
+    // DefineGraph(int NambPred, int NambTop);
     DefineGraph(int NambPred, int NambTop, int Type);
     int NambPred;
     int NambTop;
