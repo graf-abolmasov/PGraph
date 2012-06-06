@@ -5,6 +5,9 @@
 #include "stype.h"
 
 PROJECT_BEGIN_NAMESPACE
+
+#define NAMEPR_SIZE 9
+
 //Пользовательские типы
 typedef struct _Graph
 {int FromTop;
@@ -16,11 +19,11 @@ typedef char* CharS;
 typedef COMPH* COMPHs;
 typedef struct _ListP
 {int Pred;
-    char Name[9];
-    char NameProt[9];
+    char Name[NAMEPR_SIZE+1];
+    char NameProt[NAMEPR_SIZE+1];
 } COMPRE;
 typedef struct _ListGraf
-{char Name[9];
+{char Name[NAMEPR_SIZE+1];
     int NambPred;
     int NambTop;
     int ArcType_;
@@ -42,12 +45,12 @@ typedef char NAMAGR[20];
 typedef COMPRE* COMPREs;
 typedef struct _ListT {
     int Top;
-    char Name[9];
+    char Name[NAMEPR_SIZE+1];
     int FirstDef;
     int LastDef;
-    char NameProt[9];
-    char SPName[9];
-    char SMName[9];
+    char NameProt[NAMEPR_SIZE+1];
+    char SPName[NAMEPR_SIZE+1];
+    char SMName[NAMEPR_SIZE+1];
     int F;
     char CodeTr[200];
     int Faz;

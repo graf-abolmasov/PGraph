@@ -132,6 +132,16 @@ void DataCompiler::compileTpoData()
     poDataText.replace("<#setGet>", setGetBlock);
     poDataText.replace("<#varProperty>", varPropertyBlock);
 
+    // Заполняем блок сообщений - #messages_in_TPOData
+    // Считываем содержимое файла tpodata_h_messages.tmp
+    QFile f1(myOutputDirectory + "//tpodata_h_messages.tmp");
+    f1.open(QIODevice::ReadOnly);
+    QTextStream ts(&f1);
+    ts.setCodec("UTF-8");
+    QString messagesBlock = ts.readAll();
+    f1.close();
+    poDataText.replace("<#messages_in_TPOData>", messagesBlock);
+
     //Сохраняем файл
     QFile poDataH(myOutputDirectory + "/" + PODATA_FILE_NAME + ".h");
     poDataH.open(QFile::WriteOnly);

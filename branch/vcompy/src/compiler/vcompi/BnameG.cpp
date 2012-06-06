@@ -11,7 +11,7 @@ int BnameG(NAMAGR *NameGr,int *Nobj)
     strncpy((char*)C,"Wg",3);
     sprintf(Np,"%d",(*Nobj));
     strcat(C,Np);
-    strncpy((char*)(*NameGr),(char*)C,8);
+    strncpy((char*)(*NameGr),(char*)C,NAMEPR_SIZE);
     (*Nobj)++;
     return 1;
 }

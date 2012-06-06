@@ -8,7 +8,7 @@ int Girland(COMPTOPs *ListTop,DEFGRAFs *LstGraf,int *NumTop,int *MaxLT,int *MaxL
 { 
 
     int I,J,Iroot,K,FistD,LastD,ITop,Ind;
-    char Name[9]="true_one";
+    char Name[NAMEPR_SIZE+1]="true_one\0";
     DEFGRF GRF;
 
 
@@ -60,11 +60,11 @@ int Girland(COMPTOPs *ListTop,DEFGRAFs *LstGraf,int *NumTop,int *MaxLT,int *MaxL
                     }
                     (*(*ListTop + Iroot)).LastDef=LastD+1;
                     //Добавление новой дуги - связки корневой и концевой вершин (для синхропредиката
-                    strncpy((*(*LstGraf + Ind)).Name,Name,8);
+                    strncpy((*(*LstGraf + Ind)).Name,Name,NAMEPR_SIZE);
                     (*(*LstGraf+Ind)).NambPred=0;
                     //забить 0 номер предиката за тождественно-истинным предикатом!!!!!
                     (*(*LstGraf+Ind)).NambTop =ITop;
-                    (*(*LstGraf+Ind)).ArcType_ =1;
+                    (*(*LstGraf+Ind)).ArcType_ =4;
                     break;
                 }
 

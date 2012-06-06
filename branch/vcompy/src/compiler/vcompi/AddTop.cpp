@@ -11,11 +11,11 @@ int AddTop(COMPTOPs *GPcomp,DEFGRAFs *GPgraf,int *I,NAMAGR *WSP,NAMAGR *NameGr,i
 
     n1=((*(GPgraf))+(*I))->NambTop;//Вершина преемник FromTop
 //    strncpy(SPWSP,WSP,8);
-    strncpy(((*(GPcomp))+n1)->SPName,(const char *)WSP,8);
+    strncpy(((*(GPcomp))+n1)->SPName,(const char *)WSP,NAMEPR_SIZE);
     ((*(GPgraf))+(*I))->NambTop=(*MaxLT);
-    strncpy(((*(GPcomp))+(*MaxLT))->Name,(const char *)WSP,8);
-    strncpy(((*(GPcomp))+(*MaxLT))->SPName,(const char *)NameGr,8);
-    strncpy(((*(GPcomp))+(*MaxLT))->CodeTr,"0.W",8);
+    strncpy(((*(GPcomp))+(*MaxLT))->Name,(const char *)WSP,NAMEPR_SIZE);
+    strncpy(((*(GPcomp))+(*MaxLT))->SPName,(const char *)NameGr,NAMEPR_SIZE);
+    strncpy(((*(GPcomp))+(*MaxLT))->CodeTr,"0.W",NAMEPR_SIZE);
     //((*(GPcomp))+n1)->rankT=0;
     ((*(GPcomp))+(*MaxLT))->back=(*FromTop);
 
