@@ -4,7 +4,7 @@
 QString QGraphSettings::getOutputDirectory()
 {
     QSettings c("graph.ini", QSettings::IniFormat);
-    const QString outputDirectory = c.value("Location/OutputDir", "./Out").toString() + "/" + globalDBManager->getProjectName();
+    const QString outputDirectory = "projects/" + globalDBManager->getProjectName() + "/" + c.value("Location/OutputDir", "./Out").toString();
     if (!QDir(outputDirectory).exists())
         QDir().mkpath(outputDirectory);
     return QFileInfo(outputDirectory).canonicalFilePath();
@@ -13,7 +13,7 @@ QString QGraphSettings::getOutputDirectory()
 QString QGraphSettings::getBaseDirectory()
 {
     QSettings c("graph.ini", QSettings::IniFormat);
-    const QString baseDirectory = c.value("Location/BaseDir", "./BaseDir").toString() + "/" + globalDBManager->getProjectName();
+    const QString baseDirectory = "projects/" + globalDBManager->getProjectName() + "/" + c.value("Location/BaseDir", "./C").toString();
     if (!QDir(baseDirectory).exists())
         QDir().mkpath(baseDirectory);
     return QFileInfo(baseDirectory).canonicalFilePath();

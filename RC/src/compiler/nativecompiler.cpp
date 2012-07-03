@@ -37,7 +37,6 @@ void NativeCompiler::finished(int exitCode, QProcess::ExitStatus exitStatus)
 void NativeCompiler::readyRead()
 {
     QTextStream ts(buildScript);
-    ts.setCodec("UTF-8");
     globalLogger->log(ts.readAll(), Logger::Compile);
 }
 

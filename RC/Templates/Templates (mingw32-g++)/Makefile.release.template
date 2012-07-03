@@ -9,11 +9,11 @@
 CC            = gcc
 CXX           = g++
 DEFINES       = 
-CFLAGS        = -m32 -pipe -Wall -W -D_REENTRANT $(DEFINES)
-CXXFLAGS      = -m32 -pipe -O2 -Wall -W -D_REENTRANT $(DEFINES)
+CFLAGS        = -pipe $(DEFINES)
+CXXFLAGS      = -pipe -O2 $(DEFINES)
 INCPATH       = -I"release"
 LINK          = g++
-LFLAGS        = -m32
+LFLAGS        = 
 LIBS          = $(SUBLIBS) -lmingw32
 
 ####### Output directory

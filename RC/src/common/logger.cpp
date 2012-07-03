@@ -32,6 +32,12 @@ void Logger::skipLine()
     emit newMessage("");
 }
 
+void Logger::log(QStringList messages, LogLevel level)
+{
+    foreach (QString error, messages)
+        log(error, level);
+}
+
 void Logger::log(QString message, LogLevel level)
 {
     if (myLogLevel < level)

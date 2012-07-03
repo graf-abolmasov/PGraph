@@ -15,6 +15,8 @@ private:
     Graph myGraph;
 
     GraphCompiler(const Graph &graph, QSet<QString> &skip);
+
+    QStringList compileRecursively(const Graph &graph);
     void initDirectories();
 
     QSet<QString> mySkipList;
@@ -23,19 +25,19 @@ private:
     QString myBaseDirectory;
     QString myTemplateDirectory;
 
-    QList<const Predicate *> usedPredicateList;
-    QList<const Actor *> usedActorList;
-    QList<const BaseModule *> usedBaseModuleList;
     QStringList myOtherFilesList;
 
-    void collectUsedData();
+    QSet<const Predicate *> predicates;
+    QSet<const Actor *> actors;
+    QSet<const BaseModule *> baseModules;
+    QSet<QString> compiledGraphs;
+
     void copyStaticTemplates();
     void copyUsedFiles();
-    void unpackGraph(const Graph &graph, QSet<const Predicate *> &predicates, QSet<const Actor *> &actors, QSet<QString> &exrtractedGraphs);
     QString buildGraph(const QString &name, const QString &extName, int root) const;
 
     void compileMain() const;
-    void compileStruct() const;
+    void compileStruct(const Graph &graph);
     void compileMakefile(QString buildType) const;
 
 };

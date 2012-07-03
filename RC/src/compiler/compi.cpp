@@ -30,83 +30,55 @@ GraphCompiler::GraphCompiler(const Graph &graph, QSet<QString> &skip) :
     initDirectories();
 }
 
-/*!
-  Рекурсивный подъем и компиляция всех используемых графов.
-  */
-void GraphCompiler::unpackGraph(const Graph &graph, QSet<const Predicate *> &predicates, QSet<const Actor *> &actors, QSet<QString> &exrtractedGraphs)
+QStringList GraphCompiler::compileRecursively(const Graph &graph)
 {
-    QList<Top> topList = graph.topList;
-    QList<Arc> arcList = graph.arcList;
-    exrtractedGraphs.insert(graph.name);
-    actors.insert(globalDBManager->getGraph(graph.name));
-    foreach (Arc arc, arcList) {
-        Q_ASSERT(arc.predicate != NULL);
-        predicates.insert(arc.predicate);
+    QStringList res;
+    if (compiledGraphs.contains(graph.name))
+        return res;
+
+    globalLogger->log(QObject::tr("Компиляция агрегата %1:%2.....").arg(graph.name).arg(graph.extName), Logger::Compile);
+    QStringList errors = graph.validate();
+    if (!errors.isEmpty()) {
+        res.append(errors);
+        return res;
     }
-    // только используемые акторы
+
+    compileStruct(graph);
+    compiledGraphs.insert(graph.name);
+    actors.insert(globalDBManager->getGraph(graph.name));
+
+    QList<Top> topList = graph.topList;
     foreach (Top top, topList) {
         Q_ASSERT(top.actor != NULL);
-        actors.insert(top.actor);
+        if (top.actor->type == Actor::GraphType)
+            res.append(compileRecursively(globalDBManager->getGraphDB(top.actor->name)));
     }
-    foreach (const Actor *actor, actors) {
-        if (actor->type == Actor::GraphType && !exrtractedGraphs.contains(actor->name)) {
-            Graph newGraph = globalDBManager->getGraphDB(actor->name);
-            GraphCompiler c(newGraph, mySkipList);
-            if (c.compile())
-                unpackGraph(newGraph, predicates, actors, exrtractedGraphs);
-        }
-    }
+    return res;
 }
 
-void GraphCompiler::collectUsedData()
-{
-    QSet<const Predicate *> predicates;
-    QSet<const Actor *> actors;
-    QSet<QString> exrtractedGraphs;
-    unpackGraph(myGraph, predicates, actors, exrtractedGraphs);
-    usedPredicateList = predicates.toList();
-    usedActorList = actors.toList();
-    foreach (const Predicate *predicate, usedPredicateList) {
-        Q_ASSERT(predicate != NULL);
-        if (predicate->type == Predicate::InlineType)
-            continue;
-        if (!usedBaseModuleList.contains(predicate->baseModule))
-            usedBaseModuleList.append(predicate->baseModule);
-    }
-    foreach (const Actor *actor, usedActorList) {
-        Q_ASSERT(actor != NULL);
-        if (actor->type == Actor::InlineType || actor->type == Actor::GraphType)
-            continue;
-        Q_ASSERT(actor->baseModule != NULL);
-        if (!usedBaseModuleList.contains(actor->baseModule))
-            usedBaseModuleList.append(actor->baseModule);
-    }
-}
 
 void GraphCompiler::copyUsedFiles()
 {
     // копируем файлы используемых акторов и предикатов в выходной каталог
-    foreach (const Actor *actor, usedActorList) {
+    foreach (const Actor *actor, actors) {
         if (actor->type == Actor::GraphType)
             continue;
-        const QString f = myBaseDirectory + "/" + actor->name + ".cpp";
-//        if (!QFile::exists(f))
         actor->build();
+        const QString f = myBaseDirectory + "/" + actor->name + ".cpp";
         Q_ASSERT(QFile::exists(f));
         const QString nf = myOutputDirectory + "/" + actor->name + ".cpp";
         QFile::remove(nf);
         QFile::copy(f, nf);
     }
-    foreach (const Predicate *predicate, usedPredicateList) {
+    foreach (const Predicate *predicate, predicates) {
+        predicate->build();
         const QString f = myBaseDirectory + "/" + predicate->name + ".cpp";
-//        if (!QFile::exists(f))
-            predicate->build();
         Q_ASSERT(QFile::exists(f));
         const QString nf = myOutputDirectory + "/" + predicate->name + ".cpp";
         QFile::remove(nf);
         QFile::copy(f, nf);
     }
-    foreach (const BaseModule *baseModule, usedBaseModuleList) {
+    foreach (const BaseModule *baseModule, baseModules) {
         const QString f1 = myBaseDirectory + "/" + baseModule->name + ".c";
         const QString f2 = myBaseDirectory + "/" + baseModule->uniqName + ".cpp";
         Q_ASSERT(QFile::exists(f1));
@@ -134,6 +106,15 @@ void GraphCompiler::copyStaticTemplates()
     Q_ASSERT(QFile::exists(myTemplateDirectory + "/stype.h.template"));
     Q_ASSERT(QFile::exists(myTemplateDirectory + "/defines.h.template"));
 
+    QFile::remove(myOutputDirectory + "/graph.h");
+    QFile::remove(myOutputDirectory + "/memman.h");
+    QFile::remove(myOutputDirectory + "/graph.cpp");
+    QFile::remove(myOutputDirectory + "/property.h");
+    QFile::remove(myOutputDirectory + "/memman.cpp");
+    QFile::remove(myOutputDirectory + "/graphmv.cpp");
+    QFile::remove(myOutputDirectory + "/Makefile");
+    QFile::remove(myOutputDirectory + "/runme.bat");
+    QFile::remove(myOutputDirectory + "/stype.h");
     QFile::copy(myTemplateDirectory + "/graph.h.template", myOutputDirectory + "/graph.h");
     QFile::copy(myTemplateDirectory + "/memman.h.template", myOutputDirectory + "/memman.h");
     QFile::copy(myTemplateDirectory + "/graph.cpp.template", myOutputDirectory + "/graph.cpp");
@@ -153,20 +134,12 @@ bool GraphCompiler::compile()
 {
     QTime t;
     t.start();
-    globalLogger->log(QObject::tr("Компиляция агрегата %1:%2.....").arg(myGraph.name).arg(myGraph.extName), Logger::Compile);
-    QStringList errors = myGraph.validate();
+    QStringList errors = compileRecursively(myGraph);
     if (!errors.isEmpty()) {
-        foreach (QString error, errors)
-            globalLogger->log(error, Logger::Warning);
+        globalLogger->log(errors, Logger::Warning);
         globalLogger->log(QObject::tr("Компиляция провалилась. Всего %1 ошибок.").arg(QString::number(errors.count())), Logger::Warning);
         return false;
     }
-    if (mySkipList.contains(myGraph.name))
-        return true;
-    mySkipList.insert(myGraph.name);
-
-    collectUsedData();
-    compileStruct();
     compileMakefile("debug");
     compileMakefile("release");
     compileMain();
@@ -176,27 +149,55 @@ bool GraphCompiler::compile()
     return true;
 }
 
-void GraphCompiler::compileStruct() const
+void GraphCompiler::compileStruct(const Graph &graph)
 {
     // Делаем <#graphname>.cpp
-    QList<Top> topList = myGraph.topList;
-    QList<Arc> arcList = myGraph.arcList;
+    QList<Top> topList = graph.topList;
+    QList<Arc> arcList = graph.arcList;
 
-    // делаем заголовки для предикатов
+    //Только мои предикаты
+    QSet<const Predicate *> myPredicatesSet;
+    foreach (Arc arc, arcList) {
+        Q_ASSERT(arc.predicate != NULL);
+        myPredicatesSet.insert(arc.predicate);
+        if (arc.predicate->type == Predicate::NormalType) {
+            Q_ASSERT(arc.predicate->baseModule != NULL);
+            baseModules.insert(arc.predicate->baseModule);
+        }
+    }
+    const QList<const Predicate *> myPredicatesList = myPredicatesSet.toList();
+    //добавим мои ко всем
+    predicates.unite(myPredicatesSet);
+
+    //Только мои акторы
+    QSet<const Actor *> myActorsSet;
+    foreach (Top top, topList) {
+        Q_ASSERT(top.actor != NULL);
+        myActorsSet.insert(top.actor);
+        if (top.actor->type == Actor::NormalType) {
+            Q_ASSERT(top.actor->baseModule != NULL);
+            baseModules.insert(top.actor->baseModule);
+        }
+    }
+    const QList<const Actor *> myActorsList = myActorsSet.toList();
+    //добавим мои ко всем
+    actors.unite(myActorsSet);
+
+    //делаем заголовки для предикатов
     QString predicateStr;
-    foreach (const Predicate *predicate, usedPredicateList)
+    foreach (const Predicate *predicate, myPredicatesList)
         predicateStr.append("int " + predicate->name + "(TPOData *D);\r\n");
 
     // делаем заголовки файл для акторов
     QString actorStr;
-    foreach (const Actor *actor, usedActorList)
+    foreach (const Actor *actor, myActorsList)
         actorStr.append("int " + actor->name + "(TPOData *D);\r\n");
 
     // список _ListP
     QString _ListP;
-    _ListP.append("static DefinePredicate ListPred[" + QString::number(usedPredicateList.size()) + "] = {\r\n");
+    _ListP.append("static DefinePredicate ListPred[" + QString::number(myPredicatesList.size()) + "] = {\r\n");
     QStringList list;
-    foreach (const Predicate *predicate, usedPredicateList)
+    foreach (const Predicate *predicate, myPredicatesList)
         list << "\tDefinePredicate(\"" + predicate->name + "\", &" + predicate->name + ")";
     _ListP.append(list.join(",\r\n"));
     _ListP.append("\r\n};\r\n");
@@ -213,7 +214,7 @@ void GraphCompiler::compileStruct() const
     QStringList virtualGraphs;
     _ListGraph.append("static DefineGraph ListGraf[" + QString::number(arcList.size()) + "] = {\r\n");
     foreach (Top top, topList) {
-        QList<Arc> outArcs = myGraph.getOutArcs(top.number);
+        QList<Arc> outArcs = graph.getOutArcs(top.number);
         qSort(outArcs.begin(), outArcs.end(), orderArcByPriorityAsc);
         const bool isTailTop = outArcs.count() == 0;
         const int first = isTailTop ? -77 : listGraph.count();
@@ -222,7 +223,7 @@ void GraphCompiler::compileStruct() const
         foreach (Arc arc, outArcs) {
             int endTop = arc.endTop;
             if (arc.type == Arc::ParallelArc) {
-                const QString virtualGraphName = "V" + myGraph.name + "_" + QString::number(arc.endTop);
+                const QString virtualGraphName = "V" + graph.name + "_" + QString::number(arc.endTop);
                 globalVirtualGraphs.insert(virtualGraphName);
                 const QString virtualGraphExtName = QString("Virtual graph for %1 top").arg(QString::number(arc.endTop));
                 virtualTops << "\tDefineTop(\"" + virtualGraphName + "\", " + QString::number(-77) + ", " + QString::number(-77) + ", &" + virtualGraphName + ")";
@@ -230,7 +231,7 @@ void GraphCompiler::compileStruct() const
                 actorStr.append("int " + virtualGraphName + "(TPOData *D);\r\n");
                 endTop = maxTopNum+virtualTops.size();
             }
-            listGraph << "\tDefineGraph(" + QString::number(usedPredicateList.indexOf(arc.predicate)) + ", " + QString::number(endTop) + ", " + QString::number(arc.type) + ")";
+            listGraph << "\tDefineGraph(" + QString::number(myPredicatesList.indexOf(arc.predicate)) + ", " + QString::number(endTop) + ", " + QString::number(arc.type) + ")";
         }
         vec[top.number] = "\tDefineTop(\"" + top.actor->name + "\", " + QString::number(first) + ", " + QString::number(last) + ", &" + top.actor->name + ")";
     }
@@ -257,11 +258,11 @@ void GraphCompiler::compileStruct() const
     main.append(_ListT);
     main.append(_ListGraph);
 
-    main.append(buildGraph(myGraph.name, myGraph.extName, myGraph.getRootTop()));
+    main.append(buildGraph(graph.name, graph.extName, graph.getRootTop()));
     main.append(virtualGraphs.join("\r\n"));
     main.append("PROJECT_END_NAMESPACE\r\n");
 
-    QFile f(myOutputDirectory + "/" + myGraph.name + ".cpp");
+    QFile f(myOutputDirectory + "/" + graph.name + ".cpp");
     f.open(QFile::WriteOnly);
     f.write(main.toUtf8());
     f.close();
@@ -291,18 +292,18 @@ void GraphCompiler::compileMakefile(QString target) const
 
     QStringList names;
     names << "main" << "graphmv" << "tpodata" << "graph" << "memman";
-    foreach (const Predicate *predicate, usedPredicateList)
+    foreach (const Predicate *predicate, predicates)
         names.append(predicate->name);
-    foreach (const Actor *actor, usedActorList)
+    foreach (const Actor *actor, actors)
         names.append(actor->name);
-    foreach (const BaseModule *baseModule, usedBaseModuleList)
+    foreach (const BaseModule *baseModule, baseModules)
         names.append(baseModule->uniqName);
     foreach (QString name, names) {
         objects.append(target + "/" + name + ".o");
         sources.append(name + ".cpp");
         targets.append(target + "/" + name + ".o:\r\n\t$(CXX) -c $(CXXFLAGS) $(INCPATH) -o " + target + QDir::separator() + name + ".o " + name + ".cpp" );
     }
-    foreach (const BaseModule *baseModule, usedBaseModuleList) {
+    foreach (const BaseModule *baseModule, baseModules) {
         objects.append(target + "/" + baseModule->name + ".o");
         sources.append(baseModule->name + ".c");
         targets.append(target + "/" + baseModule->name + ".o:\r\n\t$(CC) -c $(CFLAGS) $(INCPATH) -o " + target + QDir::separator() + baseModule->name + ".o " + baseModule->name + ".c" );
@@ -345,7 +346,7 @@ void GraphCompiler::compileMain() const
         globalLogger->log(QObject::tr(ERR_GRAPHCOMPI_EMPTY_TEMPL).arg("main.cpp"), Logger::Warning);
     QStringList allActors;
     QStringList getFuncAddrByName;
-    foreach (const Actor *actor, usedActorList) {
+    foreach (const Actor *actor, actors) {
         allActors.append("int " + actor->name + "(TPOData *D);");
         getFuncAddrByName.append(QString("if (strcmp(\"%1\", name) == 0) return &%1;").arg(actor->name));
     }

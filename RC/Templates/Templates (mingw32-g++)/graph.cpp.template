@@ -1,13 +1,20 @@
 #include "graph.h"
-
 PROJECT_BEGIN_NAMESPACE
 DefineGraph::DefineGraph(int NambPred, int NambTop)
 {
     this->NambPred = NambPred;
     this->NambTop = NambTop;
+    this->Type = 1;
 }
 
-DefineTop::DefineTop(const char *NameTop, int FirstDef, int LastDef, int (*top)(TPOData *))
+DefineGraph::DefineGraph(int NambPred, int NambTop, int Type)
+{
+    this->NambPred = NambPred;
+    this->NambTop = NambTop;
+    this->Type = Type;
+}
+
+DefineTop::DefineTop(char *NameTop, int FirstDef, int LastDef, int (*top)(TPOData *))
 {
     this->NameTop = NameTop;
     this->FirstDef = FirstDef;
@@ -15,7 +22,7 @@ DefineTop::DefineTop(const char *NameTop, int FirstDef, int LastDef, int (*top)(
     this->top = top;
 }
 
-DefinePredicate::DefinePredicate(const char *name, int (*predicate)(TPOData *))
+DefinePredicate::DefinePredicate(char *name, int (*predicate)(TPOData *))
 {
     this->name = name;
     this->predicate = predicate;
