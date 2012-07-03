@@ -9,11 +9,11 @@
 CC            = gcc
 CXX           = g++
 DEFINES       = 
-CFLAGS        = -m32 -pipe -g -Wall -W -D_REENTRANT $(DEFINES)
-CXXFLAGS      = -m32 -pipe -g -Wall -W -D_REENTRANT $(DEFINES)
+CFLAGS        = -pipe -g $(DEFINES)
+CXXFLAGS      = -pipe -g $(DEFINES)
 INCPATH       = -I"debug"
 LINK          = g++
-LFLAGS        = -m32
+LFLAGS        = 
 LIBS          = $(SUBLIBS) -lmingw32
 
 ####### Output directory

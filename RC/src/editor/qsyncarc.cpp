@@ -10,6 +10,7 @@ QSyncArc::QSyncArc(QTop *startItem, QTop *endItem, QMenu *contextMenu, QGraphics
     myStartTop = startItem;
     myEndTop = endItem;
     setFlag(QGraphicsItem::ItemIsSelectable, true);
+    QGraphicsDropShadowEffect *eff = new QGraphicsDropShadowEffect();
     eff->setOffset(2);
     eff->setBlurRadius(15);
     setGraphicsEffect(eff);
