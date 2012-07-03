@@ -7,6 +7,10 @@
 void QSerialArcTop::contextMenuEvent(QGraphicsSceneContextMenuEvent *event){
     scene()->clearSelection();
     setSelected(true);
+    QGraphicsDropShadowEffect *eff = new QGraphicsDropShadowEffect();
+    eff->setOffset(3);
+    eff->setBlurRadius(15);
+    setGraphicsEffect(eff);
     if (myContextMenu != NULL)
         myContextMenu->exec(event->screenPos());
 }

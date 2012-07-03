@@ -24,6 +24,10 @@ QTop::QTop(QMenu *contextMenu,
     setFlag(QGraphicsItem::ItemIsSelectable, true);
     setFlag(QGraphicsItem::ItemSendsGeometryChanges, true);
     setAcceptHoverEvents(true);
+    QGraphicsDropShadowEffect *eff = new QGraphicsDropShadowEffect();
+    eff->setOffset(3);
+    eff->setBlurRadius(15);
+    setGraphicsEffect(eff);
 
     actor   = NULL;
     number  = -1;

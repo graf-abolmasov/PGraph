@@ -10,6 +10,9 @@ QSyncArc::QSyncArc(QTop *startItem, QTop *endItem, QMenu *contextMenu, QGraphics
     myStartTop = startItem;
     myEndTop = endItem;
     setFlag(QGraphicsItem::ItemIsSelectable, true);
+    eff->setOffset(2);
+    eff->setBlurRadius(15);
+    setGraphicsEffect(eff);
 
     //делаем нужный пунктир
     QPen myPen(Qt::red, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);

@@ -7,8 +7,11 @@
 QArcLine::QArcLine(QLineF line, QGraphicsItem *parent, QGraphicsScene *scene)
     : QGraphicsLineItem(line, parent, scene)
 {
-
-};
+    QGraphicsDropShadowEffect *eff = new QGraphicsDropShadowEffect();
+    eff->setOffset(2);
+    eff->setBlurRadius(15);
+    setGraphicsEffect(eff);
+}
 
 QPainterPath QArcLine::shape() const {
     QPainterPath path;
