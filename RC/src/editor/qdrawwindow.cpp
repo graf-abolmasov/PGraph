@@ -262,12 +262,12 @@ void TDrawWindow::saveAsImage(QString filename)
 {
     if (scene == NULL)
         return;
-    QSizeF size = scene->sceneRect().size();
-    QImage Image(size.toSize(), QImage::Format_ARGB32_Premultiplied);
-    Image.fill(0);
-    QPainter painter(&Image);
-    view->render(&painter, scene->sceneRect(), scene->sceneRect().toRect(), Qt::KeepAspectRatio);
-    Image.save(filename);
+    QImage image(scene->sceneRect().size().toSize(), QImage::Format_ARGB32_Premultiplied);
+    image.fill(0);
+    QPainter painter(&image);
+    scene->render(&painter);
+    image.save(filename);
+
 }
 
 /*!
