@@ -262,7 +262,7 @@ void TDrawWindow::saveAsImage(QString filename)
 {
     if (scene == NULL)
         return;
-    QImage image(scene->sceneRect().size().toSize(), QImage::Format_ARGB32_Premultiplied);
+    QImage image(scene->itemsBoundingRect().size().toSize(), QImage::Format_ARGB32_Premultiplied);
     image.fill(0);
     QPainter painter(&image);
     scene->render(&painter);
