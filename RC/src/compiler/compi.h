@@ -39,6 +39,7 @@ private:
     void compileMain() const;
     void compileStruct(const Graph &graph);
     void compileMakefile(QString buildType) const;
+    void compileEnvironment() const;
 
 };
 

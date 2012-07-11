@@ -18,7 +18,7 @@ bool NativeCompiler::compile()
     globalLogger->log(QObject::tr("Компиляция проекта %1.....").arg(globalDBManager->getProjectName()), Logger::Compile);
     t.start();
     buildScript->setWorkingDirectory(QGraphSettings::getOutputDirectory());
-    buildScript->start(sh + " runme.bat", QProcess::ReadOnly);
+    buildScript->start(sh + " runlocal.bat", QProcess::ReadOnly);
     connect(buildScript, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(finished(int,QProcess::ExitStatus)));
     connect(buildScript, SIGNAL(readyRead()), this, SLOT(readyRead()));
 }

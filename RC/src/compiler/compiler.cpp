@@ -3,6 +3,7 @@
 QString ICompiler::getTemplate(const QString &fileName) const
 {
     QString name = fileName;
+    Q_ASSERT(QFile::exists(fileName));
     QFile f(name);
     f.open(QIODevice::ReadOnly);
     QTextStream ts(&f);

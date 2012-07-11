@@ -25,6 +25,7 @@ SOURCES += ../../src/editor/main.cpp \
     ../../src/editor/undocommand.cpp \
     ../../src/compiler/compi.cpp \
     ../../src/compiler/datacompiler.cpp \
+    ../../src/compiler/graphdebugger.cpp \
     ../../src/editor/qcodeeditor.cpp \
     ../../src/compiler/compiler.cpp \
     ../../src/common/qgraphsettings.cpp \
@@ -79,6 +80,7 @@ HEADERS += ../../src/editor/qmywindow.h \
     ../../src/common/errors.h \
     ../../src/common/qgraphsettings.h \
     ../../src/compiler/nativecompiler.h \
+    ../../src/compiler/graphdebugger.h \
     ../../src/common/DAO/datatypedao.h \
     ../../src/common/DAO/basedao.h \
     ../../src/common/DAO/variabledao.h \

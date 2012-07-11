@@ -102,7 +102,6 @@ void GraphCompiler::copyStaticTemplates()
     Q_ASSERT(QFile::exists(myTemplateDirectory + "/memman.cpp.template"));
     Q_ASSERT(QFile::exists(myTemplateDirectory + "/graphmv.cpp.template"));
     Q_ASSERT(QFile::exists(myTemplateDirectory + "/Makefile.template"));
-    Q_ASSERT(QFile::exists(myTemplateDirectory + "/runme.bat.template"));
     Q_ASSERT(QFile::exists(myTemplateDirectory + "/stype.h.template"));
     Q_ASSERT(QFile::exists(myTemplateDirectory + "/defines.h.template"));
 
@@ -113,7 +112,6 @@ void GraphCompiler::copyStaticTemplates()
     QFile::remove(myOutputDirectory + "/memman.cpp");
     QFile::remove(myOutputDirectory + "/graphmv.cpp");
     QFile::remove(myOutputDirectory + "/Makefile");
-    QFile::remove(myOutputDirectory + "/runme.bat");
     QFile::remove(myOutputDirectory + "/stype.h");
     QFile::copy(myTemplateDirectory + "/graph.h.template", myOutputDirectory + "/graph.h");
     QFile::copy(myTemplateDirectory + "/memman.h.template", myOutputDirectory + "/memman.h");
@@ -122,12 +120,55 @@ void GraphCompiler::copyStaticTemplates()
     QFile::copy(myTemplateDirectory + "/memman.cpp.template", myOutputDirectory + "/memman.cpp");
     QFile::copy(myTemplateDirectory + "/graphmv.cpp.template", myOutputDirectory + "/graphmv.cpp");
     QFile::copy(myTemplateDirectory + "/Makefile.template", myOutputDirectory + "/Makefile");
-    QFile::copy(myTemplateDirectory + "/runme.bat.template", myOutputDirectory + "/runme.bat");
     QFile::copy(myTemplateDirectory + "/stype.h.template", myOutputDirectory + "/stype.h");
     QFile::copy(myTemplateDirectory + "/defines.h.template", myOutputDirectory + "/defines.h");
 
     foreach (const QString  name, myOtherFilesList)
         QFile::copy(myBaseDirectory + "/" + name, myOutputDirectory + "/" + name);
+}
+
+void GraphCompiler::compileEnvironment() const
+{
+    QString runme = getTemplate(myTemplateDirectory + "/runme.bat.template");
+    runme.replace("<#projectName>", globalDBManager->getProjectName());
+    QFile runme_f(myOutputDirectory + "/runme.bat");
+    runme_f.open(QFile::WriteOnly);
+    runme_f.write(runme.toUtf8());
+    runme_f.close();
+
+    QSettings c("graph.ini", QSettings::IniFormat);
+    QString root = c.value("SK/root", "/home").toString();
+    QString host = c.value("SK/host", "sk.ssau.ru").toString();
+    QString port = c.value("SK/port", "22").toString();
+    QString user = c.value("SK/user", "user").toString();
+    QString plink = c.value("Compiler/plink", "plink.exe").toString();
+    QString pscp = c.value("Compiler/pscp", "pscp.exe").toString();
+    QString password = c.value("SK/password", "****").toString();
+
+    QString runlocal = getTemplate(myTemplateDirectory + "/runlocal.bat.template");
+    runlocal.replace("<#projectName>", globalDBManager->getProjectName());
+    runlocal.replace("<#user>", user);
+    runlocal.replace("<#host>", host);
+    runlocal.replace("<#port>", port);
+    runlocal.replace("<#root>", root);
+    runlocal.replace("<#password>", password);
+    runlocal.replace("<#plink>", plink);
+    runlocal.replace("<#pscp>", pscp);
+
+    QFile runlocal_f(myOutputDirectory + "/runlocal.bat");
+    runlocal_f.open(QFile::WriteOnly);
+    runlocal_f.write(runlocal.toUtf8());
+    runlocal_f.close();
+
+    QString runmpi = getTemplate(myTemplateDirectory + "/runmpi.pbs.template");
+    runmpi.replace("<#nodes>", "2");
+    runmpi.replace("<#procsPerNode>", "8");
+    runmpi.replace("<#projectName>", globalDBManager->getProjectName());
+
+    QFile runmpi_f(myOutputDirectory + "/runmpi.pbs");
+    runmpi_f.open(QFile::WriteOnly);
+    runmpi_f.write(runmpi.toUtf8());
+    runmpi_f.close();
 }
 
 bool GraphCompiler::compile()
@@ -145,6 +186,7 @@ bool GraphCompiler::compile()
     compileMain();
     copyUsedFiles();
     copyStaticTemplates();
+    compileEnvironment();
     globalLogger->log(QObject::tr("Компиляция завершена без ошибок за %1 с").arg(QString::number(qRound(t.elapsed()/1000))), Logger::Compile);
     return true;
 }
@@ -301,25 +343,29 @@ void GraphCompiler::compileMakefile(QString target) const
     foreach (QString name, names) {
         objects.append(target + "/" + name + ".o");
         sources.append(name + ".cpp");
-        targets.append(target + "/" + name + ".o:\r\n\t$(CXX) -c $(CXXFLAGS) $(INCPATH) -o " + target + QDir::separator() + name + ".o " + name + ".cpp" );
+//        targets.append(target + "/" + name + ".o:\r\n\t$(CXX) -c $(CXXFLAGS) $(INCPATH) -o " + target + QDir::separator() + name + ".o " + name + ".cpp" );
+        targets.append(target + "/" + name + ".o:\r\n\t$(CXX) -c $(CXXFLAGS) $(INCPATH) -o " + target + "/" + name + ".o " + name + ".cpp" );
     }
     foreach (const BaseModule *baseModule, baseModules) {
         objects.append(target + "/" + baseModule->name + ".o");
         sources.append(baseModule->name + ".c");
-        targets.append(target + "/" + baseModule->name + ".o:\r\n\t$(CC) -c $(CFLAGS) $(INCPATH) -o " + target + QDir::separator() + baseModule->name + ".o " + baseModule->name + ".c" );
+//        targets.append(target + "/" + baseModule->name + ".o:\r\n\t$(CC) -c $(CFLAGS) $(INCPATH) -o " + target + QDir::separator() + baseModule->name + ".o " + baseModule->name + ".c" );
+        targets.append(target + "/" + baseModule->name + ".o:\r\n\t$(CC) -c $(CFLAGS) $(INCPATH) -o " + target + "/" + baseModule->name + ".o " + baseModule->name + ".c" );
     }
 
     foreach (QString  name, myOtherFilesList) {
         if (name.endsWith(".c")) {
             name = name.left(name.lastIndexOf(".c"));
             objects.append(target + "/" + name + ".o");
-            targets.append(target + "/" + name + ".o:\r\n\t$(CC) -c $(CFLAGS) $(INCPATH) -o " + target + QDir::separator() + name + ".o " + name + ".c" );
+//            targets.append(target + "/" + name + ".o:\r\n\t$(CC) -c $(CFLAGS) $(INCPATH) -o " + target + QDir::separator() + name + ".o " + name + ".c" );
+            targets.append(target + "/" + name + ".o:\r\n\t$(CC) -c $(CFLAGS) $(INCPATH) -o " + target + "/" + name + ".o " + name + ".c" );
             continue;
         }
         if (name.endsWith(".cpp")) {
             name = name.left(name.lastIndexOf(".cpp"));
             objects.append(target + "/" + name + ".o");
-            targets.append(target + "/" + name + ".o:\r\n\t$(CXX) -c $(CXXFLAGS) $(INCPATH) -o " + target + QDir::separator() + name + ".o " + name + ".cpp" );
+//            targets.append(target + "/" + name + ".o:\r\n\t$(CXX) -c $(CXXFLAGS) $(INCPATH) -o " + target + QDir::separator() + name + ".o " + name + ".cpp" );
+            targets.append(target + "/" + name + ".o:\r\n\t$(CXX) -c $(CXXFLAGS) $(INCPATH) -o " + target + "/" + name + ".o " + name + ".cpp" );
             continue;
         }
     }
