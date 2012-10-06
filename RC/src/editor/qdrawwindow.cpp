@@ -751,7 +751,7 @@ void TDrawWindow::showFontDialog()
         comment->setFont(dlg.selectedFont());
 }
 
-void TDrawWindow::showDataLayer(bool show)
+void TDrawWindow::showDataLayer(bool )
 {
 
 }

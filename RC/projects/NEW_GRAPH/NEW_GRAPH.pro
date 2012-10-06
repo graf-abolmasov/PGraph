@@ -23,11 +23,8 @@ SOURCES += ../../src/editor/main.cpp \
     ../../src/editor/qnormaltop.cpp \
     ../../src/common/logger.cpp \
     ../../src/editor/undocommand.cpp \
-    ../../src/compiler/compi.cpp \
-    ../../src/compiler/datacompiler.cpp \
     ../../src/compiler/graphdebugger.cpp \
     ../../src/editor/qcodeeditor.cpp \
-    ../../src/compiler/compiler.cpp \
     ../../src/common/qgraphsettings.cpp \
     ../../src/compiler/nativecompiler.cpp \
     ../../src/common/DAO/datatypedao.cpp \
@@ -56,7 +53,11 @@ SOURCES += ../../src/editor/main.cpp \
     ../../src/editor/dialogs/arcpropertydialog.cpp \
     ../../src/editor/dialogs/otherfilesdialog.cpp \
     ../../src/common/DAO/graphdao.cpp \
-    ../../src/common/VO/graphvo.cpp
+    ../../src/common/VO/graphvo.cpp \
+    ../../src/compiler/graphcompiler.cpp \
+    ../../src/compiler/abstractcompiler.cpp \
+    ../../src/compiler/compiler.cpp \
+    ../../src/compiler/sourcecompiler.cpp
 HEADERS += ../../src/editor/qmywindow.h \
     ../../src/editor/qdrawwindow.h \
     ../../src/editor/qtop.h \
@@ -91,9 +92,6 @@ HEADERS += ../../src/editor/qmywindow.h \
     ../../src/common/VO/datatype.h \
     ../../src/common/VO/basemodule.h \
     ../../src/common/VO/actor.h \
-    ../../src/compiler/compi.h \
-    ../../src/compiler/compiler.h \
-    ../../src/compiler/datacompiler.h \
     ../../src/editor/dialogs/toppropertydialog.h \
     ../../src/editor/dialogs/qvariableeditor.h \
     ../../src/editor/dialogs/qvariabledialog.h \
@@ -110,7 +108,11 @@ HEADERS += ../../src/editor/qmywindow.h \
     ../../src/editor/dialogs/arcpropertydialog.h \
     ../../src/editor/dialogs/otherfilesdialog.h \
     ../../src/common/DAO/graphdao.h \
-    ../../src/common/VO/graphvo.h
+    ../../src/common/VO/graphvo.h \
+    ../../src/compiler/graphcompiler.h \
+    ../../src/compiler/abstractcompiler.h \
+    ../../src/compiler/compiler.h \
+    ../../src/compiler/sourcecompiler.h
 RESOURCES += ../../src/resources.qrc
 FORMS += ../../src/editor/dialogs/toppropertydialog.ui \
     ../../src/editor/dialogs/qvariableeditor.ui \

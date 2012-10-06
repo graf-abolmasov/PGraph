@@ -1,14 +1,42 @@
 #include "compiler.h"
+#include "../../src/common/globalvariables.h"
 
-QString ICompiler::getTemplate(const QString &fileName) const
+Compiler::Compiler()
 {
-    QString name = fileName;
-    Q_ASSERT(QFile::exists(fileName));
-    QFile f(name);
-    f.open(QIODevice::ReadOnly);
-    QTextStream ts(&f);
-    ts.setCodec("UTF-8");
-    QString result = ts.readAll();
-    f.close();
-    return result;
+    nativeCompiler = new NativeCompiler(NULL);
+    sourceCompiler = new SourceCompiler();
+    graphCompiler = NULL;
+}
+
+Compiler *Compiler::getCompiler()
+{
+    return new Compiler();
+}
+
+Compiler::~Compiler() {
+    if (graphCompiler != NULL)
+        delete graphCompiler;
+    delete nativeCompiler;
+    delete sourceCompiler;
+}
+
+QStringList Compiler::compile(const QString &graph)
+{
+    QStringList errors;
+    graphCompiler = new GraphCompiler();
+
+    try {
+        const QList<GraphStruct> graphStructs = graphCompiler->compile(globalDBManager->getGraphDB(graph));
+        if (graphStructs.size() > 0) {
+            errors.append(sourceCompiler->compileCode(graphStructs));
+            if (errors.isEmpty())
+                errors.append(sourceCompiler->compileData(globalDBManager->getVariableList()));
+        }
+    } catch (...) {
+
+    }
+
+    delete graphCompiler;
+    graphCompiler = NULL;
+    return errors;
 }

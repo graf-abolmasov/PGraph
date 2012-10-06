@@ -5,7 +5,7 @@
 #include <QSqlError>
 
 #include "../../src/common/VO/graphvo.h"
-#include "../../src/compiler/compi.h"
+#include "../../src/compiler/graphcompiler.h"
 
 
 class DataBaseManager
@@ -70,7 +70,7 @@ public:
     QList<Project> getProjectListDB();
     void openProjectDB(int projectId);
     void removeProjectDB(int projectId);
-    int createProjectDB(QString projectName, QString author, QString description);
+    int createProjectDB(QString projectName, QString , QString );
 
     void saveStructDB(const Graph &graph) throw (QString);
 

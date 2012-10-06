@@ -32,16 +32,18 @@ void Logger::skipLine()
     emit newMessage("");
 }
 
-void Logger::log(QStringList messages, LogLevel level)
+QStringList Logger::log(QStringList messages, LogLevel level)
 {
+    QStringList errors = QStringList();
     foreach (QString error, messages)
-        log(error, level);
+        error.append(log(error, level));
+    return errors;
 }
 
-void Logger::log(QString message, LogLevel level)
+QString Logger::log(QString message, LogLevel level)
 {
     if (myLogLevel < level)
-        return;
+        return "";
 
     const QStringList lines = message.split(QRegExp("[\\n\\r]"), QString::SkipEmptyParts);
     const QString prefix = QDateTime::currentDateTime().toUTC().toString() + ": ";
@@ -79,4 +81,5 @@ void Logger::log(QString message, LogLevel level)
         break;
     }
     emit newMessage(message);
+    return message;
 }

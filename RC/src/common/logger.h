@@ -14,8 +14,8 @@ public:
 
     Logger(LogLevel level, QList<Output> output);
     ~Logger();
-    void log(QString message, LogLevel level = All);
-    void log(QStringList messages, LogLevel level = All);
+    QString log(QString message, LogLevel level = All);
+    QStringList log(QStringList messages, LogLevel level = All);
     void skipLine();
 
 signals:
