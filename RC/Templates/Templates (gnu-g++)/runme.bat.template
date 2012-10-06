@@ -1,4 +1,5 @@
 #!/bin/sh
+cd ~/graph_uploads/<#projectName>
 rm -r debug
 rm -r release
 mkdir debug

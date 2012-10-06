@@ -10,13 +10,13 @@
 #include "../../src/editor/dialogs/qopengraphdialog.h"
 #include "../../src/common/commonutils.h"
 #include "../../src/common/globalvariables.h"
-#include "../../src/compiler/compi.h"
+#include "../../src/compiler/graphcompiler.h"
+#include "../../src/compiler/compiler.h"
 #include "../../src/editor/qarcline.h"
 #include "../../src/editor/qserialarctop.h"
 #include "../../src/editor/qsyncarc.h"
 #include "../../src/editor/qarc.h"
 #include "../../src/editor/qcomment.h"
-#include "../../src/compiler/datacompiler.h"
 #include "../../src/editor/dialogs/projectdialog.h"
 #include "../../src/editor/dialogs/otherfilesdialog.h"
 #include "../../src/common/qgraphsettings.h"
@@ -783,10 +783,12 @@ void TMyWindow::grafMenuAboutToShow()
 void TMyWindow::CMCompile()
 {
     CMGSave();
-    GraphCompiler gc(activeDrawWindow()->getGraph());
-    globalVirtualGraphs.clear();
-    globalLogger->skipLine();
-    gc.compile();
+    Compiler *c = Compiler::getCompiler();
+    c->compile(activeDrawWindow()->myGraphName);
+    delete c;
+//    GraphCompiler gc;
+//    globalLogger->skipLine();
+//    gc.compile(activeDrawWindow()->getGraph());
 }
 
 void TMyWindow::showDataLayerClicked(bool )
@@ -811,9 +813,7 @@ void TMyWindow::CMEPaste()
 
 void TMyWindow::CMCompileData()
 {
-    DataCompiler c;
-    globalLogger->skipLine();
-    c.compile();
+    QMessageBox::warning(NULL, "Depracated", "Use Compile All instead");
 }
 
 void TMyWindow::updateScaleSlider(const float scale)

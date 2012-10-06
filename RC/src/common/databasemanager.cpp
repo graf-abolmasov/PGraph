@@ -473,7 +473,7 @@ void DataBaseManager::cloneProjectDB(int srcProjectId, QString projectName, QStr
     }
 }
 
-int DataBaseManager::createProjectDB(QString projectName, QString author, QString description)
+int DataBaseManager::createProjectDB(QString projectName, QString, QString)
 {
     openDB();
     QSqlQuery query;

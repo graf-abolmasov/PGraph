@@ -1,20 +1,26 @@
 #ifndef COMPILER_H
 #define COMPILER_H
 
-#include <QString>
-#include <QFile>
-#include <QTextStream>
+#include <QtCore>
+#include "../../src/compiler/nativecompiler.h"
+#include "../../src/compiler/abstractcompiler.h"
+#include "../../src/compiler/sourcecompiler.h"
+#include "../../src/compiler/graphcompiler.h"
 
 
-class ICompiler
+class Compiler
 {
+private:
+    SourceCompiler *sourceCompiler;
+    NativeCompiler *nativeCompiler;
+    GraphCompiler *graphCompiler;
+    Compiler();
+
 public:
-    virtual bool compile() = 0;
+    ~Compiler();
+    static Compiler *getCompiler();
+    QStringList compile(const QString &graph);
 
-protected:
-    QString getTemplate(const QString &fileName) const;
 };
-
-
 
 #endif // COMPILER_H

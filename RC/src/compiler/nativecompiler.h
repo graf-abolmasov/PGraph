@@ -1,10 +1,10 @@
-#ifndef NATIVECOMPILER_H
-#define NATIVECOMPILER_H
+#ifndef NATIVEABSTRACTCOMPILER_H
+#define NATIVEABSTRACTCOMPILER_H
 
 #include <QtCore>
-#include "compiler.h"
+#include "abstractcompiler.h"
 
-class NativeCompiler: public QObject, ICompiler
+class NativeCompiler: public QObject, AbstractCompiler
 {
     Q_OBJECT
 
@@ -23,4 +23,4 @@ private slots:
     void readyRead();
 };
 
-#endif // NATIVECOMPILER_H
+#endif // NATIVEABSTRACTCOMPILER_H
