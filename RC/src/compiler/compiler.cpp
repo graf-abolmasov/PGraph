@@ -5,7 +5,7 @@ Compiler::Compiler()
 {
     nativeCompiler = new NativeCompiler(NULL);
     sourceCompiler = new SourceCompiler();
-    graphCompiler = NULL;
+    graphCompiler = new GraphCompiler();
 }
 
 Compiler *Compiler::getCompiler()
@@ -14,8 +14,7 @@ Compiler *Compiler::getCompiler()
 }
 
 Compiler::~Compiler() {
-    if (graphCompiler != NULL)
-        delete graphCompiler;
+    delete graphCompiler;
     delete nativeCompiler;
     delete sourceCompiler;
 }
@@ -23,7 +22,6 @@ Compiler::~Compiler() {
 QStringList Compiler::compile(const QString &graph)
 {
     QStringList errors;
-    graphCompiler = new GraphCompiler();
 
     try {
         const QList<GraphStruct> graphStructs = graphCompiler->compile(globalDBManager->getGraphDB(graph));
@@ -36,7 +34,5 @@ QStringList Compiler::compile(const QString &graph)
 
     }
 
-    delete graphCompiler;
-    graphCompiler = NULL;
     return errors;
 }

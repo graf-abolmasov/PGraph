@@ -39,6 +39,11 @@ QStringList GraphCompiler::compileRecursively(const Graph &graph)
 
 QList<GraphStruct> GraphCompiler::compile(const Graph &graph)
 {
+    mySkipList.clear();
+    result.clear();
+    compiledGraphs.clear();
+    procsMax = QGraphSettings::isParallel() ?  2 : 1;
+    procsCounter = procsMax;
     QTime t;
     t.start();
     QStringList errors = compileRecursively(graph);
@@ -49,6 +54,7 @@ QList<GraphStruct> GraphCompiler::compile(const Graph &graph)
     }
     globalLogger->log(QObject::tr("Компиляция завершена без ошибок за %1 с").arg(QString::number(qRound(t.elapsed()/1000))), Logger::Compile);
     result[0].usedActors.append(new Actor(graph));
+    globalLogger->log(QObject::tr("Нужно %1 процов").arg(QString::number(procsMax)), Logger::Compile);
     return result;
 }
 
