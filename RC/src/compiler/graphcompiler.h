@@ -52,8 +52,9 @@ public:
 private:
     QSet<QString> mySkipList;
     QSet<QString> compiledGraphs;
-
     QList<GraphStruct> result;
+    int procsMax;
+    int procsCounter;
 
     QStringList compileRecursively(const Graph &graph);
     void compileStruct(const Graph &graph);
