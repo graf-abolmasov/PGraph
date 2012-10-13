@@ -48,6 +48,7 @@ class Top
 {
 public:
     enum TopType { NormalTop, MultiProcTop };
+    Top();
     Top(float x, float y, float sizeX, float sizeY, int number, int procCount, bool isRoot, const Actor *actor, TopType type);
     float x;
     float y;
@@ -58,6 +59,8 @@ public:
     bool isRoot;
     const Actor *actor;
     TopType type;
+    int level;
+    bool terminated;
 
     QStringList validate() const;
 };
