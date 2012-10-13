@@ -4,19 +4,31 @@
 Graph::Graph(const QString &name, const QString &extName, const QList<Top> &topList, const QList<Arc> &arcList, const QList<Comment> &commentList, const QList<SyncArc> &syncArcList) :
     Actor(name, extName, Actor::GraphType)
 {
-    this->topList          = topList;
     this->arcList          = arcList;
     this->commentList      = commentList;
     this->syncArcList      = syncArcList;
+
+    QMap<int, Top> topMap;
+    foreach (Top top, topList)
+        topMap[top.number] = top;
+    foreach (Arc arc, arcList)
+        topMap[arc.startTop].terminated = arc.type == Arc::TerminateArc;
+    this->topList = topMap.values();
 }
 
 Graph::Graph(const QString &name, const QString &extName, const QList<Top> &topList, const QList<Arc> &arcList, const QList<Comment> &commentList, const QList<SyncArc> &syncArcList, const QPixmap &icon) :
     Actor(name, extName, Actor::GraphType, NULL, QList<const Variable *>(), QStringList(), icon)
 {
-    this->topList          = topList;
     this->arcList          = arcList;
     this->commentList      = commentList;
     this->syncArcList      = syncArcList;
+
+    QMap<int, Top> topMap;
+    foreach (Top top, topList)
+        topMap[top.number] = top;
+    foreach (Arc arc, arcList)
+        topMap[arc.startTop].terminated = arc.type == Arc::TerminateArc;
+    this->topList = topMap.values();
 }
 
 QList<Arc> Graph::getOutArcs(int topNumber) const
@@ -67,6 +79,11 @@ Project::Project(int id, QString name)
     this->name = name;
 }
 
+Top::Top()
+{
+
+}
+
 Top::Top(float x, float y, float sizeX, float sizeY, int number, int procCount, bool isRoot, const Actor *actor, TopType type)
 {
     this->x = x;
@@ -78,6 +95,8 @@ Top::Top(float x, float y, float sizeX, float sizeY, int number, int procCount, 
     this->sizeY = sizeY;
     this->type = type;
     this->procCount = procCount;
+    this->level = 0;
+    this->terminated = false;
 }
 
 QStringList Top::validate() const

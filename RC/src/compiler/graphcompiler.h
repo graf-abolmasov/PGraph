@@ -35,6 +35,7 @@ public:
 class GraphStruct {
 public:
     QString namepr;
+    int procsMax;
     QMap<QString, int> entries;
     QList<DefineTop> topsTable;
     QList<DefinePredicate> predicatesTable;
@@ -53,8 +54,8 @@ private:
     QSet<QString> mySkipList;
     QSet<QString> compiledGraphs;
     QList<GraphStruct> result;
-    int procsMax;
-    int procsCounter;
+    QMap<QString, int> procsMax;
+    QMap<QString, int> procsCounter;
 
     QStringList compileRecursively(const Graph &graph);
     void compileStruct(const Graph &graph);

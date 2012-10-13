@@ -25,7 +25,6 @@ QStringList GraphCompiler::compileRecursively(const Graph &graph)
         return res;
     }
 
-    compileStruct(graph);
     compiledGraphs.insert(graph.name);
 
     QList<Top> topList = graph.topList;
@@ -34,6 +33,7 @@ QStringList GraphCompiler::compileRecursively(const Graph &graph)
         if (top.actor->type == Actor::GraphType)
             res.append(compileRecursively(globalDBManager->getGraphDB(top.actor->name)));
     }
+    compileStruct(graph);
     return res;
 }
 
@@ -42,8 +42,6 @@ QList<GraphStruct> GraphCompiler::compile(const Graph &graph)
     mySkipList.clear();
     result.clear();
     compiledGraphs.clear();
-    procsMax = QGraphSettings::isParallel() ?  2 : 1;
-    procsCounter = procsMax;
     QTime t;
     t.start();
     QStringList errors = compileRecursively(graph);
@@ -54,26 +52,71 @@ QList<GraphStruct> GraphCompiler::compile(const Graph &graph)
     }
     globalLogger->log(QObject::tr("Компиляция завершена без ошибок за %1 с").arg(QString::number(qRound(t.elapsed()/1000))), Logger::Compile);
     result[0].usedActors.append(new Actor(graph));
-    globalLogger->log(QObject::tr("Нужно %1 процов").arg(QString::number(procsMax)), Logger::Compile);
+    globalLogger->log(QObject::tr("Нужно %1 процов").arg(QString::number(procsMax[graph.name]+2)), Logger::Compile);
     return result;
 }
 
 void GraphCompiler::compileStruct(const Graph &graph)
 {
-    GraphStruct graphStruct;
+    procsMax[graph.name] = 0;
+    procsCounter[graph.name] = 0;
 
-    // Делаем <#graphname>.cpp
-    QList<Top> topList = graph.topList;
-    QList<Arc> arcList = graph.arcList;
+
+    //reorder tops: terminated tops always after all tops of one level
+    QList<Top> topList;
+    QMap<int, Top> topMap;
+    QQueue<Top> topQueue;
+
+    int maxTopNum = 0;
+    foreach (Top top, graph.topList) {
+        topMap[top.number] = top;
+        maxTopNum = top.number > maxTopNum ? top.number : maxTopNum;
+    }
+
+    const Top rootTop = topMap[graph.getRootTop()];
+    topQueue.append(rootTop);
+    while(!topMap.isEmpty()) {
+        const Top currTop = topQueue.dequeue();
+        bool skip = false;
+        foreach (Top top, topQueue) {
+            if (currTop.terminated && ((top.level > currTop.level) || (top.level == currTop.level && !top.terminated))) {
+                skip = true;
+                break;
+            }
+        }
+        if (skip) {
+            topQueue.enqueue(currTop);
+            continue;
+        }
+
+        if (!topMap.contains(currTop.number))
+            continue;
+        topList.append(currTop);
+        topMap.remove(currTop.number);
+        QList<Arc> arcs = graph.getOutArcs(currTop.number);
+        foreach (Arc arc, arcs) {
+            if (topMap.contains(arc.endTop)) {
+                Top newTop = topMap[arc.endTop];
+                if (arc.type == Arc::SerialArc)
+                    newTop.level = currTop.level;
+                else if (arc.type == Arc::ParallelArc)
+                    newTop.level = currTop.level+1;
+                else if (arc.type == Arc::TerminateArc)
+                    newTop.level = currTop.level-1;
+                topQueue.enqueue(newTop);
+            }
+        }
+    }
 
     QSet<const Actor *> myActorsSet;
     QSet<const Predicate *> myPredicatesSet;
     QSet<const BaseModule *> myBasemodulesSet;
 
-    foreach (Top top, topList) {
-        Q_ASSERT(top.actor != NULL);
+    //all used actors
+    foreach (Top top, topList)
         myActorsSet.insert(top.actor);
-    }
+
+    GraphStruct graphStruct;
     graphStruct.usedActors = myActorsSet.toList();
     foreach (const Actor *actor, graphStruct.usedActors) {
         if (actor->type == Actor::NormalType) {
@@ -97,12 +140,6 @@ void GraphCompiler::compileStruct(const Graph &graph)
 
     graphStruct.usedBasemodules = myBasemodulesSet.toList();
 
-    int maxTopNum = 0;
-    foreach (Top top, graph.topList) {
-        Q_ASSERT(top.actor != NULL);
-        maxTopNum = top.number > maxTopNum ? top.number : maxTopNum;
-    }
-
     QVector<DefineTop> vecTopsDefine(maxTopNum+1);
     QList<DefineTop> virtualTopsDefine;
     foreach (Top top, topList) {
@@ -112,6 +149,9 @@ void GraphCompiler::compileStruct(const Graph &graph)
         const int first = isTailTop ? -77 : graphStruct.graphsTable.count();
         const int last = isTailTop ? -77 : first + outArcs.count()-1;
 
+        if (top.actor->type == Actor::GraphType)
+            procsMax[graph.name]+=procsMax[top.actor->name];
+
         foreach (Arc arc, outArcs) {
             int endTop = arc.endTop;
             if (arc.type == Arc::ParallelArc) {
@@ -119,7 +159,12 @@ void GraphCompiler::compileStruct(const Graph &graph)
                 graphStruct.entries[virtualGraphName] = arc.endTop;
                 virtualTopsDefine.append(DefineTop(virtualGraphName, -77, -77));
                 endTop = maxTopNum+virtualTopsDefine.size();
+                procsCounter[graph.name]++;
             }
+            if (procsCounter[graph.name] > procsMax[graph.name])
+                procsMax[graph.name] = procsCounter[graph.name];
+            if (arc.type == Arc::TerminateArc)
+                procsCounter[graph.name]--;
             int predicateIndex = graphStruct.usedPredicates.indexOf(arc.predicate);
             graphStruct.graphsTable.append(DefineGraph(predicateIndex, endTop, arc.type));
         }
@@ -132,6 +177,7 @@ void GraphCompiler::compileStruct(const Graph &graph)
     graphStruct.topsTable = vecTopsDefine.toList();
     graphStruct.entries[graph.name] = graph.getRootTop();
     graphStruct.namepr = graph.name;
+    graphStruct.procsMax = procsMax[graph.name];
     result.append(graphStruct);
 }
 
