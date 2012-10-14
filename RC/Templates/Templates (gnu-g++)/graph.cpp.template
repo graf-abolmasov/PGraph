@@ -14,7 +14,7 @@ DefineGraph::DefineGraph(int NambPred, int NambTop, int Type)
     this->Type = Type;
 }
 
-DefineTop::DefineTop(char *NameTop, int FirstDef, int LastDef, int (*top)(TPOData *))
+DefineTop::DefineTop(const char *NameTop, int FirstDef, int LastDef, int (*top)(TPOData *))
 {
     this->NameTop = NameTop;
     this->FirstDef = FirstDef;
@@ -22,7 +22,7 @@ DefineTop::DefineTop(char *NameTop, int FirstDef, int LastDef, int (*top)(TPODat
     this->top = top;
 }
 
-DefinePredicate::DefinePredicate(char *name, int (*predicate)(TPOData *))
+DefinePredicate::DefinePredicate(const char *name, int (*predicate)(TPOData *))
 {
     this->name = name;
     this->predicate = predicate;
