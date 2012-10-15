@@ -515,8 +515,6 @@ void SourceCompiler::compileMain(const QString graphName, const QStringList &act
 
 QStringList SourceCompiler::compileCode(const QList<GraphStruct> &graphStructs) {
     QStringList errors;
-    copyStaticTemplates();
-    compileEnvironment();
     QSet<QString> allActorNames;
     QSet<const Actor *> allActors;
     QSet<const Predicate *> allPredicates;
@@ -529,7 +527,7 @@ QStringList SourceCompiler::compileCode(const QList<GraphStruct> &graphStructs) 
         allBasemodules.unite(QSet<const BaseModule *>::fromList(gs.usedBasemodules));
     }
 
-    compileMain(graphStructs.at(0).namepr, QStringList::fromSet(allActorNames));
+    compileMain(graphStructs.last().namepr, QStringList::fromSet(allActorNames));
 
     const QList<const Actor *> allActorsList = allActors.toList();
     const QList<const Predicate *> allPredicatesList = allPredicates.toList();
@@ -537,6 +535,8 @@ QStringList SourceCompiler::compileCode(const QList<GraphStruct> &graphStructs) 
     compileMakefile("debug", allActorsList, allPredicatesList, allBasemoduleList);
     compileMakefile("release", allActorsList, allPredicatesList, allBasemoduleList);
     copyUsedFiles(allActorsList, allPredicatesList, allBasemoduleList);
+    compileEnvironment();
+    copyStaticTemplates();
     return errors;
 }
 

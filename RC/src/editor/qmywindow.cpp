@@ -813,7 +813,9 @@ void TMyWindow::CMEPaste()
 
 void TMyWindow::CMCompileData()
 {
-    QMessageBox::warning(NULL, "Depracated", "Use Compile All instead");
+    SourceCompiler *c = new SourceCompiler();
+    c->compileData(globalDBManager->getVariableList());
+    delete c;
 }
 
 void TMyWindow::updateScaleSlider(const float scale)

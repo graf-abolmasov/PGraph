@@ -154,7 +154,7 @@ void QModuleRegister::on_buttonBox_accepted()
     rx.indexIn(buff, 0);
     QString signature = rx.cap(1).simplified();
     QByteArray outputData;
-    //outputData.append("#include \"graph.h\"\r\n");
+    outputData.append("#include \"utype.h\"\r\n");
     rx.setPattern("(#include\\s*[\"<].*[\">])");
     QStringList includes;
     int pos = 0;
