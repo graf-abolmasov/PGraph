@@ -21,7 +21,6 @@ private:
     QString myBaseDirectory;
 
     QStringList myOtherFilesList;
-
     QMap<QString, QString> mpiTypes;
 
     QStringList compileUserTypes(QList<const DataType *> dataTypes);
@@ -34,6 +33,9 @@ private:
     void initDirectories();
     QString buildGraph(const QString &name, const QString &extName, int root) const;
     QStringList compileStruct(const GraphStruct &graphStruct);
+    QStringList compileActor(const Actor *actor) const;
+    QStringList compilePredicate(const Predicate *predicate) const;
+    QString compileDataType(const DataType *dataType) const;
 
 public:
     SourceCompiler();

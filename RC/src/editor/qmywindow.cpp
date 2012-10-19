@@ -111,6 +111,7 @@ void TMyWindow::createActions()
     const QString saveShortCut = QKeySequence::keyBindings(QKeySequence::Save).first().toString();
     saveGraphAct->setStatusTip(tr("Сохранить граф") + (saveShortCut.isEmpty() ? "" : " (" + saveShortCut + ")"));
     connect(saveGraphAct, SIGNAL(triggered()), this, SLOT(CMGSave()));
+    saveGraphAct->setEnabled(false);
 
     saveAsGraphAct = new QAction(tr("Cохранить как"), this);
     saveAsGraphAct->setShortcuts(QKeySequence::SaveAs);
@@ -320,7 +321,6 @@ TDrawWindow* TMyWindow::createDrawWindow()
 {
     TDrawWindow *newDrawWindow = new TDrawWindow;
     setCentralWidget(newDrawWindow);
-    graphLoaded("", "");
 
     connect(newDrawWindow, SIGNAL(sceneChanged()),
             this, SLOT(sceneChanged()));
@@ -440,9 +440,13 @@ void TMyWindow::sceneChanged()
 
 void TMyWindow::CMGNew()
 {
+    if (askForSaveBeforeClose() == false)
+        return;
     TDrawWindow *newDrawWindow = createDrawWindow();
     newDrawWindow->showMaximized();
-    graphLoaded("", "");
+    buildMenu->setEnabled(false);
+    compileAct->setEnabled(false);
+    setWindowTitle(tr("Untitled - Граф-редактор"));
     globalPredicateList.clear();
 }
 
@@ -460,8 +464,7 @@ void TMyWindow::CMGSaveAs()
         const QString extName = dialog.getResult();
         if (extName.isEmpty())
             return;
-        QString name = "G" + getCRC(extName.toUtf8());
-        if (activeDrawWindow()->saveGraph(name, extName)) {
+        if (activeDrawWindow()->saveGraphAs(extName)) {
             setWindowTitle(activeDrawWindow()->myGraphExtName + tr(" - Граф-редактор"));
             saveGraphAct->setEnabled(false);
             statusBar()->showMessage(tr("Сохранено как ") + activeDrawWindow()->myGraphName, 3000);
@@ -519,7 +522,7 @@ void TMyWindow::CMGSave()
         CMGSaveAs();
         return;
     }
-    if (activeDrawWindow()->updateGraph()) {
+    if (activeDrawWindow()->saveGraph()) {
         setWindowTitle(activeDrawWindow()->myGraphExtName + tr(" - Граф-редактор"));
         saveGraphAct->setEnabled(false);
         statusBar()->showMessage(tr("Сохранено как ") + activeDrawWindow()->myGraphName, 3000);
@@ -755,24 +758,35 @@ void TMyWindow::writeSettings()
 
 void TMyWindow::graphLoaded(QString name, QString extName)
 {
-    if (name.isEmpty()){
-        buildMenu->setEnabled(false);
-        compileAct->setEnabled(false);
-    } else {
-        buildMenu->setEnabled(true);
-        compileAct->setEnabled(true);
+    buildMenu->setEnabled(true);
+    compileAct->setEnabled(true);
+    setWindowTitle(extName + tr(" - Граф-редактор"));
+}
+
+bool TMyWindow::askForSaveBeforeClose() {
+    if (saveGraphAct != NULL && saveGraphAct->isEnabled()) {
+        int dialodResult = QMessageBox::question(this, tr("Сохранить"),
+                                          tr("Сохранить изменения в ") + activeDrawWindow()->myGraphExtName + tr("?"),
+                                          QMessageBox::Yes, QMessageBox::No, QMessageBox::Cancel);
+        if ( dialodResult == QMessageBox::Yes) {
+            CMGSave();
+            return true;
+        } else if (dialodResult == QMessageBox::No) {
+            return true;
+        } else if (dialodResult == QMessageBox::Cancel) {
+            return false;
+        }
     }
-    saveGraphAct->setEnabled(true);
-    setWindowTitle((extName.isEmpty() ? tr("Untitled") : extName) + tr(" - Граф-редактор"));
+    return true;
 }
 
 void TMyWindow::closeEvent(QCloseEvent *event)
 {
     writeSettings();
-    if (saveGraphAct != NULL && saveGraphAct->isEnabled())
-        if (QMessageBox::question(this, tr("Сохранить"), tr("Сохранить изменения в ") + activeDrawWindow()->myGraphExtName + tr("?"), QMessageBox::Yes, QMessageBox::No, QMessageBox::NoButton) == QMessageBox::Yes)
-            CMGSave();
-    event->accept();
+    if (askForSaveBeforeClose())
+        event->accept();
+    else
+        event->ignore();
 }
 
 void TMyWindow::grafMenuAboutToShow()
@@ -783,12 +797,12 @@ void TMyWindow::grafMenuAboutToShow()
 void TMyWindow::CMCompile()
 {
     CMGSave();
+    const TDrawWindow *adw = activeDrawWindow();
+    if (adw->myGraphName.isEmpty())
+        return;
     Compiler *c = Compiler::getCompiler();
     c->compile(activeDrawWindow()->myGraphName);
     delete c;
-//    GraphCompiler gc;
-//    globalLogger->skipLine();
-//    gc.compile(activeDrawWindow()->getGraph());
 }
 
 void TMyWindow::showDataLayerClicked(bool )

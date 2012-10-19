@@ -262,7 +262,6 @@ bool QActorEditor::makeResult()
         return false;
     }
 
-    tempActor->build();
     result = const_cast<Actor *>(myActor);
     result->name = tempActor->name;
     result->extName = tempActor->extName;

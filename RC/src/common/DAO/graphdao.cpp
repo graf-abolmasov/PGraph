@@ -148,12 +148,11 @@ Graph GraphDAO::findByName(const QString &name)
     while (query.next()) {
         QSqlRecord record = query.record();
         Arc::ArcType arcType;
-        if (record.value("Type").toString() == QObject::tr("S"))
-            arcType = Arc::SerialArc;
+        if (record.value("Type").toString() == QObject::tr("T"))
+            arcType = Arc::TerminateArc;
         else if (record.value("Type").toString() == QObject::tr("P"))
             arcType = Arc::ParallelArc;
-        else if (record.value("Type").toString() == QObject::tr("T"))
-            arcType = Arc::TerminateArc;
+        else arcType = Arc::SerialArc;
         QStringList lines = record.value("Nodes").toString().split(";;");
         arcList.append(Arc(arcType,
                            record.value("Priority").toInt(),

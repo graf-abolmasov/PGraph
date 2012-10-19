@@ -203,7 +203,6 @@ bool QPredicateEditor::makeResult()
         return false;
     }
 
-    tempPre->build();
     result = const_cast<Predicate *>(myPredicate);
     result->name = tempPre->name;
     result->extName = tempPre->extName;

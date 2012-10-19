@@ -7,6 +7,18 @@
 
 class QGraphSettings
 {
+private:
+    static bool myIsParallel;
+    static bool myIsParallelSet;
+
+    static bool myOutputDirectorySet;
+    static QString myOutputDirectory;
+
+    static bool myBaseDirectorySet;
+    static QString myBaseDirectory;
+
+    static bool myTemplateDirectorySet;
+    static QString myTemplateDirectory;
 public:
     static QString getOutputDirectory();
     static QString getBaseDirectory();

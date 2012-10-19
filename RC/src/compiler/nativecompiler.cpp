@@ -21,11 +21,12 @@ bool NativeCompiler::compile()
     buildScript->start(sh + " runlocal.bat", QProcess::ReadOnly);
     connect(buildScript, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(finished(int,QProcess::ExitStatus)));
     connect(buildScript, SIGNAL(readyRead()), this, SLOT(readyRead()));
+    return true;
 }
 
 void NativeCompiler::finished(int exitCode, QProcess::ExitStatus exitStatus)
 {
-    if (exitCode == 0)
+    if (exitCode == 0 && exitStatus != QProcess::CrashExit)
         globalLogger->log(QObject::tr("Компиляция завершена без ошибок за %1 с.").arg(QString::number(qRound(t.elapsed()/1000))), Logger::Compile);
     else
         globalLogger->log(QObject::tr("Компиляция провалилась.").arg(QString::number(qRound(t.elapsed()/1000))), Logger::Compile);

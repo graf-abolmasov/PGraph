@@ -245,7 +245,7 @@ QStringList SourceCompiler::compileUserTypes(QList<const DataType *> dataTypes)
     //Создаем типы
     QString userTypesBlock;
     foreach (const DataType *type, dataTypes)
-        userTypesBlock.append(type->build());
+        userTypesBlock.append(compileDataType(type));
     utypeText.replace("<#userTypes>", userTypesBlock);
 
     //Создаем типы MPI
@@ -362,46 +362,195 @@ void SourceCompiler::initDirectories()
     myOtherFilesList = globalDBManager->getOtherFilesDB();
 }
 
-//bool SourceCompiler::compileCode()
-//{
-//    QTime t;
-//    t.start();
-//    QStringList errors = QStringList();
-//    if (!errors.isEmpty()) {
-//        globalLogger->log(errors, Logger::Warning);
-//        globalLogger->log(QObject::tr("Компиляция провалилась. Всего %1 ошибок.").arg(QString::number(errors.count())), Logger::Warning);
-//        return false;
-//    }
-//    compileMakefile("debug");
-//    compileMakefile("release");
-//    compileMain();
-//    copyUsedFiles();
-//    compileEnvironment();
-//    globalLogger->log(QObject::tr("Компиляция завершена без ошибок за %1 с").arg(QString::number(qRound(t.elapsed()/1000))), Logger::Compile);
-//    return true;
-//}
+QStringList SourceCompiler::compilePredicate(const Predicate *predicate) const
+{
+    QStringList errors = predicate->validate();
+    if (!errors.isEmpty())
+        return errors;
+
+    QString outputData;
+    QFile output;
+
+    const BaseModule *currentBaseModule = predicate->baseModule;
+    QStringList params;
+    QStringList signature;
+    // Создаем сpp файл
+    outputData.append("#include \"tpodata.h\"\r\n");
+    outputData.append("PROJECT_BEGIN_NAMESPACE\r\n");
+    switch(predicate->type) {
+    case Predicate::NormalType:
+        Q_ASSERT(currentBaseModule);
+        // Генерируем предикат
+        foreach (BaseModuleParameter parameter, predicate->baseModule->parameterList) {
+            signature << QString("%1 *%2")
+                         .arg(parameter.type)
+                         .arg(parameter.name);
+        }
+        outputData.append("extern int " + predicate->baseModule->uniqName + "(" + signature.join(", ") + ");\r\n");
+        outputData.append("int " + predicate->name + "(TPOData *D)\r\n");
+        outputData.append("{\r\n");
+        outputData.append("//" + predicate->extName + "\r\n");
+        // Инициализуем данные
+        for (int i = 0; i < predicate->variableList.count(); i++) {
+            BaseModuleParameter parameter = currentBaseModule->parameterList[i];
+            outputData.append(predicate->variableList[i]->isGlobal ? QString("\t%1%2 _%3 = D->%4;\r\n") : QObject::tr("\tconst %1 *_%2 = D->%3;\r\n")
+                              .arg(parameter.type)
+                              .arg(parameter.name)
+                              .arg(predicate->variableList[i]->name).toUtf8());
+        }
+        // Вызываем прототип
+        outputData.append("\r\n\treturn ");
+        outputData.append(predicate->baseModule->uniqName);
+        outputData.append("(");
+        for(int i = 0; i < predicate->variableList.count(); i++) {
+            BaseModuleParameter parameter = currentBaseModule->parameterList[i];
+            params << ((predicate->variableList[i]->isGlobal ? QObject::tr("&_") : QObject::tr("_")) + parameter.name);
+        }
+        outputData.append(params.join(", ").toUtf8());
+        outputData.append(");\r\n\r\n}\r\n");
+        break;
+    case Predicate::InlineType:
+        //генерируем с++ файл
+        outputData.append("int " + predicate->name + "(TPOData *D)\r\n");
+        outputData.append("{\r\n");
+        QString code(predicate->extName);
+        foreach (const Variable *variable, predicate->variableList) {
+            QRegExp r("\\b" + variable->name + "\\b", Qt::CaseSensitive);
+            r.setMinimal(true);
+            code.replace(r, variable->isGlobal ? "D->" + variable->name : "(*(D->" + variable->name + "))");
+        }
+        outputData.append("  return (" + code + ");\r\n");
+        outputData.append("}\r\n");
+        break;
+    }
+    outputData.append("PROJECT_END_NAMESPACE\r\n");
+
+    output.setFileName(myOutputDirectory + "/" + predicate->name + ".cpp");
+    output.open(QFile::WriteOnly);
+    output.write(outputData.toUtf8());
+    output.close();
+}
+
+QStringList SourceCompiler::compileActor(const Actor *actor) const
+{
+    QStringList errors = actor->validate();
+    if (!errors.isEmpty())
+        return errors;
+
+    QString outputData;
+    QFile output;
+
+    const BaseModule *currentBaseModule = actor->baseModule;
+    QStringList params;
+    QStringList signature;
+    // Создаем сpp файл
+    outputData.append("#include \"tpodata.h\"\r\n");
+    outputData.append("PROJECT_BEGIN_NAMESPACE\r\n");
+    switch(actor->type) {
+    case Actor::NormalType:
+        Q_ASSERT(currentBaseModule);
+        // Генерируем актор
+        foreach (BaseModuleParameter parameter, actor->baseModule->parameterList) {
+            const QString constStr = parameter.accessMode == QObject::tr("Исходный") ? QObject::tr("const ") : "";
+            signature << QString("%1%2 *%3").arg(constStr)
+                         .arg(parameter.type)
+                         .arg(parameter.name);
+        }
+        outputData.append("extern int " + actor->baseModule->uniqName + "(" + signature.join(", ") + ");\r\n");
+        outputData.append("int " + actor->name + "(TPOData *D)\r\n");
+        outputData.append("{\r\n");
+        outputData.append("//" + actor->extName + "\r\n");
+        // Инициализуем данные
+        for (int i = 0; i < actor->variableList.count(); i++) {
+            BaseModuleParameter parameter = currentBaseModule->parameterList[i];
+            const QString constStr = parameter.accessMode == QObject::tr("Исходный") ? QObject::tr("const ") : "";
+            outputData.append(actor->variableList[i]->isGlobal ? QObject::tr("\t%1%2 _%3 = D->%4;\r\n") : QObject::tr("\t%1%2 *_%3 = D->%4;\r\n")
+                                                                .arg(constStr)
+                                                                .arg(parameter.type)
+                                                                .arg(parameter.name)
+                                                                .arg(actor->variableList[i]->name).toUtf8());
+        }
+        // Вызываем прототип
+        outputData.append("\r\n\tint result = ");
+        outputData.append(actor->baseModule->uniqName);
+        outputData.append("(");
+        for(int i = 0; i < actor->variableList.count(); i++) {
+            BaseModuleParameter parameter = currentBaseModule->parameterList[i];
+            params << ((actor->variableList[i]->isGlobal ? QObject::tr("&_") : QObject::tr("_")) + parameter.name);
+        }
+        outputData.append(params.join(", ").toUtf8());
+        outputData.append(");\r\n\r\n");
+        // сохраняем данные
+        for(int i = 0; i < actor->variableList.count(); i++) {
+            BaseModuleParameter parameter = currentBaseModule->parameterList[i];
+            if (parameter.accessMode != QObject::tr("Исходный"))
+                outputData.append(QString(QObject::tr("\tD->%1 = _%2;\n"))
+                                  .arg(actor->variableList[i]->name)
+                                  .arg(parameter.name).toUtf8());
+        }
+        // выход
+        outputData.append("\r\n\r\n\treturn result;\r\n}");
+        break;
+    case Actor::InlineType:
+        //генерируем с++ файл
+        outputData.append("int " + actor->name + "(TPOData *D)\r\n");
+        outputData.append("{\r\n");
+        QString code(actor->extName);
+        foreach (const Variable *variable, actor->variableList) {
+            QRegExp r("\\b" + variable->name + "\\b", Qt::CaseSensitive);
+            r.setMinimal(true);
+            code.replace(r, variable->isGlobal ? "D->" + variable->name : "(*(D->" + variable->name + "))");
+        }
+        outputData.append("  " + code + "\r\n");
+        outputData.append("  return 1;\r\n");
+        outputData.append("}\r\n");
+        break;
+    }
+    outputData.append("PROJECT_END_NAMESPACE\r\n");
+
+    output.setFileName(myOutputDirectory + "/" + actor->name + ".cpp");
+    output.open(QFile::WriteOnly);
+    output.write(outputData.toUtf8());
+    output.close();
+
+}
+
+QString SourceCompiler::compileDataType(const DataType *dataType) const
+{
+    QString result;
+    if (dataType->typedefStr.isEmpty())
+        return result;
+
+    result.append(dataType->typedefStr).append("\r\n");
+
+    if (!QGraphSettings::isParallel())
+        return result;
+
+    if (dataType->isArray()) {
+        //Парсим количество элементов
+        QRegExp r("(\\[(.+)\\])");
+        r.setMinimal(true);
+        Q_ASSERT(r.indexIn(dataType->typedefStr) != -1);
+        result.append("#define ").append(dataType->name).append("_LENGTH ").append(r.cap(2)).append("\r\n");
+
+        //Парсим тип элемента
+        QRegExp r2("(typedef\\s+(\\b.+\\b))");
+        r2.setMinimal(true);
+        Q_ASSERT(r2.indexIn(dataType->typedefStr) != -1);
+        result.append("typedef ").append(r2.cap(2)).append("* ptr").append(dataType->name).append(";\r\n");
+    }
+
+    return result;
+}
 
 void SourceCompiler::copyUsedFiles(const QList<const Actor *> &actors, const QList<const Predicate *> &predicates, const QList<const BaseModule *> &baseModules)
 {
     // копируем файлы используемых акторов и предикатов в выходной каталог
-    foreach (const Actor *actor, actors) {
-        if (actor->type == Actor::GraphType)
-            continue;
-        actor->build();
-        const QString f = myBaseDirectory + "/" + actor->name + ".cpp";
-        Q_ASSERT(QFile::exists(f));
-        const QString nf = myOutputDirectory + "/" + actor->name + ".cpp";
-        QFile::remove(nf);
-        QFile::copy(f, nf);
-    }
-    foreach (const Predicate *predicate, predicates) {
-        predicate->build();
-        const QString f = myBaseDirectory + "/" + predicate->name + ".cpp";
-        Q_ASSERT(QFile::exists(f));
-        const QString nf = myOutputDirectory + "/" + predicate->name + ".cpp";
-        QFile::remove(nf);
-        QFile::copy(f, nf);
-    }
+    foreach (const Actor *actor, actors)
+        if (actor->type != Actor::GraphType)
+            compileActor(actor);
+    foreach (const Predicate *predicate, predicates)
+        compilePredicate(predicate);
     foreach (const BaseModule *baseModule, baseModules) {
         const QString f1 = myBaseDirectory + "/" + baseModule->name + ".c";
         const QString f2 = myBaseDirectory + "/" + baseModule->uniqName + ".cpp";
@@ -437,6 +586,8 @@ void SourceCompiler::compileMakefile(QString target, const QList<const Actor *> 
     QStringList objects;
     QStringList sources;
     QStringList targets;
+    QSet<QString> cFiles;
+    QSet<QString> cppFiles;
 
     QStringList names;
     names << "main" << "graphmv" << "tpodata" << "graph" << "memman";
@@ -447,32 +598,39 @@ void SourceCompiler::compileMakefile(QString target, const QList<const Actor *> 
     foreach (const BaseModule *baseModule, baseModules)
         names.append(baseModule->uniqName);
     foreach (QString name, names) {
+        if (cppFiles.contains(name) || cFiles.contains(name))
+            continue;
         objects.append(target + "/" + name + ".o");
         sources.append(name + ".cpp");
 //        targets.append(target + "/" + name + ".o:\r\n\t$(CXX) -c $(CXXFLAGS) $(INCPATH) -o " + target + QDir::separator() + name + ".o " + name + ".cpp" );
         targets.append(target + "/" + name + ".o:\r\n\t$(CXX) -c $(CXXFLAGS) $(INCPATH) -o " + target + "/" + name + ".o " + name + ".cpp" );
+        cppFiles.insert(name);
     }
     foreach (const BaseModule *baseModule, baseModules) {
+        if (cFiles.contains(baseModule->name))
+            continue;
         objects.append(target + "/" + baseModule->name + ".o");
         sources.append(baseModule->name + ".c");
 //        targets.append(target + "/" + baseModule->name + ".o:\r\n\t$(CC) -c $(CFLAGS) $(INCPATH) -o " + target + QDir::separator() + baseModule->name + ".o " + baseModule->name + ".c" );
         targets.append(target + "/" + baseModule->name + ".o:\r\n\t$(CC) -c $(CFLAGS) $(INCPATH) -o " + target + "/" + baseModule->name + ".o " + baseModule->name + ".c" );
+        cFiles.insert(baseModule->name);
     }
 
     foreach (QString  name, myOtherFilesList) {
+        if (cppFiles.contains(name) || cFiles.contains(name))
+            continue;
         if (name.endsWith(".c")) {
             name = name.left(name.lastIndexOf(".c"));
             objects.append(target + "/" + name + ".o");
 //            targets.append(target + "/" + name + ".o:\r\n\t$(CC) -c $(CFLAGS) $(INCPATH) -o " + target + QDir::separator() + name + ".o " + name + ".c" );
             targets.append(target + "/" + name + ".o:\r\n\t$(CC) -c $(CFLAGS) $(INCPATH) -o " + target + "/" + name + ".o " + name + ".c" );
-            continue;
-        }
-        if (name.endsWith(".cpp")) {
+            cFiles.insert(name);
+        } else if (name.endsWith(".cpp")) {
             name = name.left(name.lastIndexOf(".cpp"));
             objects.append(target + "/" + name + ".o");
 //            targets.append(target + "/" + name + ".o:\r\n\t$(CXX) -c $(CXXFLAGS) $(INCPATH) -o " + target + QDir::separator() + name + ".o " + name + ".cpp" );
             targets.append(target + "/" + name + ".o:\r\n\t$(CXX) -c $(CXXFLAGS) $(INCPATH) -o " + target + "/" + name + ".o " + name + ".cpp" );
-            continue;
+            cppFiles.insert(name);
         }
     }
 

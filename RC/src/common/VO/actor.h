@@ -24,7 +24,6 @@ public:
     const BaseModule *baseModule;
     QList<const Variable *> variableList;
     QStringList validate() const;
-    void build() const;
     QPixmap icon;
 };
 

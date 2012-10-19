@@ -128,6 +128,8 @@ private:
 
     QListWidget *globalOutput;
     QLabel *globalInfoLabel;
+private:
+    bool askForSaveBeforeClose();
 
 protected:
     void closeEvent(QCloseEvent *); // реакция на закрытие окна
