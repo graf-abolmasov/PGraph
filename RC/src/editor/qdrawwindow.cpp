@@ -465,12 +465,13 @@ void TDrawWindow::loadGraph(const QString &name)
     emit graphLoaded(myGraphName, myGraphExtName);
 }
 
-bool TDrawWindow::saveGraph(QString name, QString extName)
+bool TDrawWindow::saveGraphAs(QString extName)
 {
-    if (name.isEmpty() || extName.isEmpty()) {
+    if (extName.isEmpty()) {
         QMessageBox::critical(this, tr("Ошибка"), tr("Нельзя сохранить граф без имени."), QMessageBox::Ok);
         return false;
     }
+    const QString name = "G" + getCRC(extName.toUtf8());
     myGraphExtName = extName;
     myGraphName = name;
     Graph graph = getGraph();
@@ -484,7 +485,7 @@ bool TDrawWindow::saveGraph(QString name, QString extName)
     return true;
 }
 
-bool TDrawWindow::updateGraph()
+bool TDrawWindow::saveGraph()
 {
     Graph graph = getGraph();
     if (graph.extName != "") {

@@ -56,8 +56,8 @@ void TopPropertyDialog::prepareForm(QNormalTop* top){
     ui->spnBoxHeight->setProperty("value", top->rect().height());
     ui->spnBoxWidth->setProperty("value", top->rect().width());
 
-    float minHeight = top->getMinHeight() > 10 ? top->getMinHeight() : 10;
-    float minWidth = top->getMinWidth() > 10 ? top->getMinWidth() : 10;
+//    float minHeight = top->getMinHeight() > 10 ? top->getMinHeight() : 10;
+//    float minWidth = top->getMinWidth() > 10 ? top->getMinWidth() : 10;
 
 //    ui->spnBoxHeight->setProperty("minimum", minHeight);
 //    ui->spnBoxWidth->setProperty("minimum", minWidth);

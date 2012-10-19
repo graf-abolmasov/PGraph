@@ -360,14 +360,15 @@ void DataBaseManager::saveStructDB(const Graph &graph) throw (QString)
         query.bindValue(":PRIOR", arc.priority);
         int arcType;
         switch (arc.type){
-        case Arc::SerialArc:
-            arcType = 1;
-            break;
         case Arc::ParallelArc:
             arcType = 2;
             break;
         case Arc::TerminateArc:
             arcType = 3;
+            break;
+        case Arc::SerialArc:
+        default:
+            arcType = 1;
         }
         query.bindValue(":ARCTYPE", arcType);
         if (!query.exec()) {

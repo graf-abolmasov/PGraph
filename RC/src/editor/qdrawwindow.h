@@ -74,8 +74,8 @@ public:
     Graph getGraph() const;
 
     void loadGraph(const QString &name);
-    bool saveGraph(QString name, QString extName);
-    bool updateGraph();
+    bool saveGraphAs(QString extName);
+    bool saveGraph();
     bool saveStruct();
 
     void alignHLeft();
