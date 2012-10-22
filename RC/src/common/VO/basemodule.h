@@ -22,11 +22,12 @@ public:
 class BaseModule
 {
 public:
-    BaseModule(QString name, QString uniqName, QString comment, QList<BaseModuleParameter> parameterList);
+    BaseModule(QString name, QString uniqName, QString comment, QList<BaseModuleParameter> parameterList, QString sourceCode = QString());
     QString name;
     QString uniqName;
     QList<BaseModuleParameter> parameterList;
     QString comment;
+    QString sourceCode;
 };
 
 #endif // BASEMODULE_H

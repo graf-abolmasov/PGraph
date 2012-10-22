@@ -26,17 +26,14 @@ protected:
 
 private:
     Ui::QModuleRegister *ui;
-    QFileInfoList fileList;
+    QFileInfo myFileInfo;
     QComboBox *paramTypeCmbBox;
     QTextEdit *paramCommentEdt;
 
-    QString myBaseDirectory;
-
-    void prepareForm();
 private slots:
-    void on_fileList_currentRowChanged(int currentRow);
     void on_buttonBox_accepted();
     void on_parametersTable_currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn);
+    void on_selectFileButton_clicked();
 };
 
 #endif // QMODULEREGISTER_H
