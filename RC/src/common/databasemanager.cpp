@@ -204,11 +204,8 @@ void DataBaseManager::registerModuleDB(const BaseModule *baseModule) throw (QStr
 {
     openDB();
     QSqlQuery query;
-    query.prepare("INSERT INTO bazmod (PROJECT_ID, PROTOTIP, NAMEPR, COMMENT)"
-                  "VALUES (:PROJECT_ID, :PROTOTIP, :NAMEPR, :COMMENT);");
-    query.bindValue(":NAMEPR",   baseModule->name);
-    query.bindValue(":COMMENT",  baseModule->comment);
-    query.bindValue(":PROTOTIP", baseModule->uniqName);
+    query.prepare("DELETE FROM bazmod WHERE PROJECT_ID=:PROJECT_ID and PROTOTIP=:PROTOTIP");
+    query.bindValue(":PROTOTIP",   baseModule->uniqName);
     query.bindValue(":PROJECT_ID", myProjectId);
     if (!query.exec()) {
         globalLogger->log(db.lastError().text(), Logger::Critical);
@@ -216,7 +213,20 @@ void DataBaseManager::registerModuleDB(const BaseModule *baseModule) throw (QStr
         throw QObject::tr("Не удалось сохранить базовый модуль.\n") + db.lastError().text();
     }
 
-    for (int i = 0; i < baseModule->parameterList.count(); i++){
+    query.prepare("INSERT INTO bazmod (PROJECT_ID, PROTOTIP, NAMEPR, COMMENT, SOURCE_CODE)"
+                  "VALUES (:PROJECT_ID, :PROTOTIP, :NAMEPR, :COMMENT, :SOURCE_CODE);");
+    query.bindValue(":NAMEPR",     baseModule->name);
+    query.bindValue(":COMMENT",    baseModule->comment);
+    query.bindValue(":PROTOTIP",   baseModule->uniqName);
+    query.bindValue(":SOURCE_CODE",   baseModule->sourceCode);
+    query.bindValue(":PROJECT_ID", myProjectId);
+    if (!query.exec()) {
+        globalLogger->log(db.lastError().text(), Logger::Critical);
+        db.close();
+        throw QObject::tr("Не удалось сохранить базовый модуль.\n") + db.lastError().text();
+    }
+
+    for (int i = 0; i < baseModule->parameterList.count(); i++) {
         query.clear();
         query.prepare("INSERT INTO databaz (PROJECT_ID, PROTOTIP, DATA, TYPE, MODE, NEV, COMMENT)"
                       "VALUES (:PROJECT_ID, :PROTOTIP, :DATA, :TYPE, :MODE, :NEV, :COMMENT);");
@@ -250,7 +260,7 @@ QList<BaseModule> DataBaseManager::getBaseModuleListDB() throw (QString)
     openDB();
     QSqlQuery query1;
     QSqlQuery query2;
-    query1.prepare("SELECT PROTOTIP, NAMEPR, COMMENT FROM bazmod WHERE PROJECT_ID = :PROJECT_ID;");
+    query1.prepare("SELECT PROTOTIP, NAMEPR, COMMENT, SOURCE_CODE FROM bazmod WHERE PROJECT_ID = :PROJECT_ID;");
     query1.bindValue(":PROJECT_ID", myProjectId);
     if (!query1.exec()) {
         globalLogger->log(db.lastError().text(), Logger::Critical);
@@ -281,7 +291,7 @@ QList<BaseModule> DataBaseManager::getBaseModuleListDB() throw (QString)
             parameterList.append(BaseModuleParameter(vaMode,  query2.value(1).toString(), query2.value(0).toString(), query2.value(3).toString()));
         }
         query2.clear();
-        result.append(BaseModule(query1.value(1).toString(), query1.value(0).toString(), query1.value(2).toString(), parameterList));
+        result.append(BaseModule(query1.value(1).toString(), query1.value(0).toString(), query1.value(2).toString(), parameterList, query1.value(3).toString()));
     }
     db.close();
     return result;

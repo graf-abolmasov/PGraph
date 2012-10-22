@@ -551,18 +551,8 @@ void SourceCompiler::copyUsedFiles(const QList<const Actor *> &actors, const QLi
             compileActor(actor);
     foreach (const Predicate *predicate, predicates)
         compilePredicate(predicate);
-    foreach (const BaseModule *baseModule, baseModules) {
-        const QString f1 = myBaseDirectory + "/" + baseModule->name + ".c";
-        const QString f2 = myBaseDirectory + "/" + baseModule->uniqName + ".cpp";
-        Q_ASSERT(QFile::exists(f1));
-        Q_ASSERT(QFile::exists(f2));
-        const QString nf1 = myOutputDirectory + "/" + baseModule->name + ".c";
-        const QString nf2 = myOutputDirectory + "/" + baseModule->uniqName + ".cpp";
-        QFile::remove(nf1);
-        QFile::remove(nf2);
-        QFile::copy(f1, nf1);
-        QFile::copy(f2, nf2);
-    }
+    foreach (const BaseModule *baseModule, baseModules)
+        compileBasemodule(baseModule);
 }
 
 QString SourceCompiler::buildGraph(const QString &name, const QString &extName, int root) const
@@ -760,4 +750,49 @@ QStringList SourceCompiler::compileStruct(const GraphStruct &graphStruct)
     f.close();
 
     return errors;
+}
+
+
+QStringList SourceCompiler::compileBasemodule(const BaseModule *baseModule) const
+{
+    // Читаем файл
+    QString buff(baseModule->sourceCode);
+
+    QRegExp rx(baseModule->name + "\\((.*)\\)");
+    rx.setMinimal(true);
+    rx.indexIn(buff, 0);
+    QString signature = rx.cap(1).simplified();
+    QByteArray outputData;
+    outputData.append("#include \"utype.h\"\r\n");
+    rx.setPattern("(#include\\s*[\"<].*[\">])");
+    QStringList includes;
+    int pos = 0;
+    while ((pos = rx.indexIn(buff, pos)) != -1) {
+        includes << rx.cap(1);
+        pos += rx.matchedLength();
+    }
+    outputData.append(includes.join("\r\n").toUtf8());
+    outputData.append("PROJECT_BEGIN_NAMESPACE\r\n");
+    outputData.append("\r\nextern \"C\" int ");
+    outputData.append(baseModule->name + "(" + signature + ");\r\n");
+    outputData.append("int " + baseModule->uniqName + "(" + signature + ")\r\n{\r\n");
+
+    outputData.append("\treturn " + baseModule->name + "(");
+    QStringList params;
+    foreach (BaseModuleParameter p, baseModule->parameterList)
+        params << p.name;
+    outputData.append(params.join(", ").toUtf8());
+    outputData.append(");\r\n");
+    outputData.append("}\r\n");
+    outputData.append("PROJECT_END_NAMESPACE\r\n");
+
+    QFile output(myOutputDirectory + "/" + baseModule->uniqName + ".cpp");
+    output.open(QFile::WriteOnly);
+    output.write(outputData);
+    output.close();
+
+    QFile source(myOutputDirectory + "/" + baseModule->name + ".c");
+    source.open(QFile::WriteOnly);
+    source.write(baseModule->sourceCode.toUtf8());
+    source.close();
 }
