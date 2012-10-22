@@ -1,6 +1,6 @@
 #include "utype.h"
 
-int printf_bar(TBar *bar, TString *name) {
+int printf_ba(TBar *bar, TString *name) {
 	int idx;
 
 	printf("%s = ", (*name));

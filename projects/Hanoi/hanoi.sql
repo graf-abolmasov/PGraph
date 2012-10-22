@@ -135,7 +135,7 @@ CREATE TABLE `bazmod` (
 
 LOCK TABLES `bazmod` WRITE;
 /*!40000 ALTER TABLE `bazmod` DISABLE KEYS */;
-INSERT INTO `bazmod` VALUES (15,'S5F96A33C','printf_ba',NULL,NULL,'Печатает содержимое стержня',NULL,'#include \"utype.h\"\n\nint printf_bar(TBar *bar, TString *name) {\n	int idx;\n\n	printf(\"%s = \", (*name));\n	for (idx = 0; idx < RINGS_MAX; idx++) {\n		printf(\"%d \", (*bar)[idx]);\n	}\n	printf(\"\\r\\n\");\n\n	return 0;\n}'),(15,'SA4263A50','move2',NULL,NULL,'Двигает шайбу и читает вес последней',NULL,'#include \"utype.h\"\n\nint move2(TBar *from, TBar *to, int *from_top, int *to_top) {\n	int from_idx = RINGS_MAX-1;\n	int to_idx = RINGS_MAX-1;\n\n	while ((*from)[from_idx] == 0 && from_idx >= 0)\n		from_idx--;\n\n	while ((*to)[to_idx] == 0 && to_idx >= 0)\n		to_idx--;	\n\n	if (from_idx == -1) {\n		return -1;\n	}\n\n	if (to_idx == RINGS_MAX-1) {\n		return -2;\n	}\n\n	if (to_idx > -1 && ((*from)[from_idx] < (*to)[to_idx])) {\n		return -3;\n	}\n\n	(*to)[to_idx+1] = (*from)[from_idx];\n	(*from)[from_idx] = 0;\n	if (from_idx == 0)\n		(*from_top) = 0;\n	else\n		(*from_top) = (*from)[from_idx-1];\n\n	if (to_idx == RINGS_MAX-1)\n		(*to_top) = (*to)[RINGS_MAX-1];\n	else\n		(*to_top) = (*to)[to_idx+1];\n\n	return 0;\n}');
+INSERT INTO `bazmod` VALUES (15,'S5F96A33C','printf_ba',NULL,NULL,'Печатает содержимое стержня',NULL,'#include \"utype.h\"\n\nint printf_ba(TBar *bar, TString *name) {\n	int idx;\n\n	printf(\"%s = \", (*name));\n	for (idx = 0; idx < RINGS_MAX; idx++) {\n		printf(\"%d \", (*bar)[idx]);\n	}\n	printf(\"\\r\\n\");\n\n	return 0;\n}'),(15,'SA4263A50','move2',NULL,NULL,'Двигает шайбу и читает вес последней',NULL,'#include \"utype.h\"\n\nint move2(TBar *from, TBar *to, int *from_top, int *to_top) {\n	int from_idx = RINGS_MAX-1;\n	int to_idx = RINGS_MAX-1;\n\n	while ((*from)[from_idx] == 0 && from_idx >= 0)\n		from_idx--;\n\n	while ((*to)[to_idx] == 0 && to_idx >= 0)\n		to_idx--;	\n\n	if (from_idx == -1) {\n		return -1;\n	}\n\n	if (to_idx == RINGS_MAX-1) {\n		return -2;\n	}\n\n	if (to_idx > -1 && ((*from)[from_idx] < (*to)[to_idx])) {\n		return -3;\n	}\n\n	(*to)[to_idx+1] = (*from)[from_idx];\n	(*from)[from_idx] = 0;\n	if (from_idx == 0)\n		(*from_top) = 0;\n	else\n		(*from_top) = (*from)[from_idx-1];\n\n	if (to_idx == RINGS_MAX-1)\n		(*to_top) = (*to)[RINGS_MAX-1];\n	else\n		(*to_top) = (*to)[to_idx+1];\n\n	return 0;\n}');
 /*!40000 ALTER TABLE `bazmod` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -546,4 +546,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2012-10-22 21:41:13
+-- Dump completed on 2012-10-22 21:47:55
