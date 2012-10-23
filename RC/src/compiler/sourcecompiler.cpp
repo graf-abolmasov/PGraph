@@ -795,4 +795,5 @@ QStringList SourceCompiler::compileBasemodule(const BaseModule *baseModule) cons
     source.open(QFile::WriteOnly);
     source.write(baseModule->sourceCode.toUtf8());
     source.close();
+    return QStringList();
 }
