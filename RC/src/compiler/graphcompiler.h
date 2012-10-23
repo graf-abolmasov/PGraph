@@ -17,19 +17,11 @@ public:
 
 class DefineGraph {
 public:
-    DefineGraph(int predicateIndex, int topIndex);
-    DefineGraph(int predicateIndex, int topIndex, int type);
-    int predicateIndex;
+    DefineGraph(QString predicate, int topIndex);
+    DefineGraph(QString predicate, int topIndex, int type);
+    QString predicate;
     int topIndex;
     int type;
-};
-
-class DefinePredicate
-{
-public:
-    DefinePredicate(QString namepr);
-    QString namepr;
-    QString toString() const { return "DefinePredicate(\"" + namepr + "\", &" + namepr + ")"; }
 };
 
 class GraphStruct {
@@ -38,11 +30,10 @@ public:
     int procsMax;
     QMap<QString, int> entries;
     QList<DefineTop> topsTable;
-    QList<DefinePredicate> predicatesTable;
     QList<DefineGraph> graphsTable;
-    QList<const Predicate *> usedPredicates;
-    QList<const Actor *> usedActors;
-    QList<const BaseModule *> usedBasemodules;
+    QSet<const Predicate *> usedPredicates;
+    QSet<const Actor *> usedActors;
+    QSet<const BaseModule *> usedBasemodules;
 };
 
 class GraphCompiler : public AbstractCompiler
