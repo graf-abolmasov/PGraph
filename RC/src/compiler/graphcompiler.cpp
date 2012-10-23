@@ -51,7 +51,7 @@ QList<GraphStruct> GraphCompiler::compile(const Graph &graph)
         return QList<GraphStruct>();
     }
     globalLogger->log(QObject::tr("Компиляция завершена без ошибок за %1 с").arg(QString::number(qRound(t.elapsed()/1000))), Logger::Compile);
-    result[0].usedActors.append(new Actor(graph));
+    result[0].usedActors.insert(new Actor(graph));
     if (QGraphSettings::isParallel())
         globalLogger->log(QObject::tr("Нужно %1 процов").arg(QString::number(procsMax[graph.name]+2)), Logger::Compile);
     return result;
@@ -109,37 +109,28 @@ void GraphCompiler::compileStruct(const Graph &graph)
         }
     }
 
-    QSet<const Actor *> myActorsSet;
-    QSet<const Predicate *> myPredicatesSet;
-    QSet<const BaseModule *> myBasemodulesSet;
-
-    //all used actors
-    foreach (Top top, topList)
-        myActorsSet.insert(top.actor);
-
     GraphStruct graphStruct;
-    graphStruct.usedActors = myActorsSet.toList();
+
+    foreach (Top top, topList)
+        graphStruct.usedActors.insert(top.actor);
+
     foreach (const Actor *actor, graphStruct.usedActors) {
         if (actor->type == Actor::NormalType) {
             Q_ASSERT(actor->baseModule != NULL);
-            myBasemodulesSet.insert(actor->baseModule);
+            graphStruct.usedBasemodules.insert(actor->baseModule);
         }
     }
 
     foreach (Arc arc, graph.arcList) {
         Q_ASSERT(arc.predicate != NULL);
-        myPredicatesSet.insert(arc.predicate);
+        graphStruct.usedPredicates.insert(arc.predicate);
     }
-    graphStruct.usedPredicates = myPredicatesSet.toList();
     foreach (const Predicate *predicate, graphStruct.usedPredicates) {
-        graphStruct.predicatesTable.append(DefinePredicate(predicate->name));
         if (predicate->type == Predicate::NormalType) {
             Q_ASSERT(predicate->baseModule != NULL);
-            myBasemodulesSet.insert(predicate->baseModule);
+            graphStruct.usedBasemodules.insert(predicate->baseModule);
         }
     }
-
-    graphStruct.usedBasemodules = myBasemodulesSet.toList();
 
     QVector<DefineTop> vecTopsDefine(maxTopNum+1);
     QList<DefineTop> virtualTopsDefine;
@@ -166,8 +157,7 @@ void GraphCompiler::compileStruct(const Graph &graph)
                 procsMax[graph.name] = procsCounter[graph.name];
             if (arc.type == Arc::TerminateArc)
                 procsCounter[graph.name]--;
-            int predicateIndex = graphStruct.usedPredicates.indexOf(arc.predicate);
-            graphStruct.graphsTable.append(DefineGraph(predicateIndex, endTop, arc.type));
+            graphStruct.graphsTable.append(DefineGraph(arc.predicate->name, endTop, arc.type));
         }
         vecTopsDefine[top.number] = DefineTop(top.actor->name, first, last);
     }
@@ -182,16 +172,16 @@ void GraphCompiler::compileStruct(const Graph &graph)
     result.append(graphStruct);
 }
 
-DefineGraph::DefineGraph(int predicateIndex, int topIndex)
+DefineGraph::DefineGraph(QString predicate, int topIndex)
 {
-    this->predicateIndex = predicateIndex;
+    this->predicate = predicate;
     this->topIndex = topIndex;
-    this->type = 1;
+    this->type = Arc::SerialArc;
 }
 
-DefineGraph::DefineGraph(int predicateIndex, int topIndex, int type)
+DefineGraph::DefineGraph(QString predicate, int topIndex, int type)
 {
-    this->predicateIndex = predicateIndex;
+    this->predicate = predicate;
     this->topIndex = topIndex;
     this->type = type;
 }
@@ -201,9 +191,4 @@ DefineTop::DefineTop(QString actor, int firstIndex, int lastIndex)
     this->actor = actor;
     this->firstIndex = firstIndex;
     this->lastIndex = lastIndex;
-}
-
-DefinePredicate::DefinePredicate(QString namepr)
-{
-    this->namepr = namepr;
 }

@@ -564,7 +564,7 @@ QString SourceCompiler::buildGraph(const QString &name, const QString &extName, 
     result.append("\t//printf(\"" + extName + "\\r\\n\");\r\n");
     result.append("\tint topCount = " + QString::number(0) + "; //never used parameter\r\n");
     result.append("\tint rootTop = " + QString::number(root) + ";\r\n");
-    result.append("\tGraphMV(D, rootTop, topCount, ListPred, ListTop, ListGraf);\r\n");
+    result.append("\tGraphMV(D, rootTop, topCount, ListTop, ListGraf);\r\n");
     result.append("\treturn 1;\r\n");
     result.append("}\r\n");
     return result;
@@ -670,9 +670,9 @@ QStringList SourceCompiler::compileCode(const QList<GraphStruct> &graphStructs) 
     foreach (GraphStruct gs, graphStructs) {
         errors.append(compileStruct(gs));
         allActorNames.unite(QSet<QString>::fromList(gs.entries.keys()));
-        allActors.unite(QSet<const Actor *>::fromList(gs.usedActors));
-        allPredicates.unite(QSet<const Predicate *>::fromList(gs.usedPredicates));
-        allBasemodules.unite(QSet<const BaseModule *>::fromList(gs.usedBasemodules));
+        allActors.unite(gs.usedActors);
+        allPredicates.unite(gs.usedPredicates);
+        allBasemodules.unite(gs.usedBasemodules);
     }
 
     compileMain(graphStructs.last().namepr, QStringList::fromSet(allActorNames));
@@ -702,20 +702,11 @@ QStringList SourceCompiler::compileStruct(const GraphStruct &graphStruct)
     foreach (const Actor *actor, graphStruct.usedActors)
         actorStr.append("int " + actor->name + "(TPOData *D);\r\n");
 
-    // список _ListP
-    QString _ListP;
-    _ListP.append("static DefinePredicate ListPred[" + QString::number(graphStruct.predicatesTable.size()) + "] = {\r\n");
-    QStringList list;
-    foreach (const DefinePredicate dp, graphStruct.predicatesTable)
-        list << "\tDefinePredicate(\"" + dp.namepr + "\", &" + dp.namepr + ")";
-    _ListP.append(list.join(",\r\n"));
-    _ListP.append("\r\n};\r\n");
-
     QString _ListGraph;
     _ListGraph.append("static DefineGraph ListGraf[" + QString::number(graphStruct.graphsTable.size()) + "] = {\r\n");
     QStringList listGraph;
     foreach (const DefineGraph dg, graphStruct.graphsTable)
-        listGraph <<"\tDefineGraph(" + QString::number(dg.predicateIndex) + ", " + QString::number(dg.topIndex) + ", " + QString::number(dg.type) + ")";
+        listGraph <<"\tDefineGraph(\"" + dg.predicate + "\", &" + dg.predicate + ", " + QString::number(dg.topIndex) + ", " + QString::number(dg.type) + ")";
     _ListGraph.append(listGraph.join(",\r\n"));
     _ListGraph.append("\r\n};\r\n");
 
@@ -735,7 +726,6 @@ QStringList SourceCompiler::compileStruct(const GraphStruct &graphStruct)
     main.append(predicateStr);
     main.append(actorStr);
 
-    main.append(_ListP);
     main.append(_ListT);
     main.append(_ListGraph);
 
@@ -755,19 +745,16 @@ QStringList SourceCompiler::compileStruct(const GraphStruct &graphStruct)
 
 QStringList SourceCompiler::compileBasemodule(const BaseModule *baseModule) const
 {
-    // Читаем файл
-    QString buff(baseModule->sourceCode);
-
     QRegExp rx(baseModule->name + "\\((.*)\\)");
     rx.setMinimal(true);
-    rx.indexIn(buff, 0);
+    rx.indexIn(baseModule->sourceCode, 0);
     QString signature = rx.cap(1).simplified();
     QByteArray outputData;
     outputData.append("#include \"utype.h\"\r\n");
     rx.setPattern("(#include\\s*[\"<].*[\">])");
     QStringList includes;
     int pos = 0;
-    while ((pos = rx.indexIn(buff, pos)) != -1) {
+    while ((pos = rx.indexIn(baseModule->sourceCode, pos)) != -1) {
         includes << rx.cap(1);
         pos += rx.matchedLength();
     }
