@@ -49,7 +49,7 @@ private:
     QMap<QString, int> procsCounter;
 
     QStringList compileRecursively(const Graph &graph);
-    void compileStruct(const Graph &graph);
+    GraphStruct compileStruct(const Graph &graph);
 };
 
 #endif // COMPI_H

@@ -7,6 +7,7 @@
 #define ERR_TOP_NULL_ACTOR "Вершина %1: Нет актора."
 #define ERR_TOP_WRONG_NUMBER "Вершина %1: Недопустимый номер."
 #define ERR_TOP_WRONG_PROCNUM "Вершина %1: Недопустимое количество параллельных процессов. (%2)"
+#define ERR_TOP_DIFFERENT_OUT_ARCS "Вершина %1: Из вершины могут выходить дуги только одного типа."
 
 #define ERR_ARC_UNDEF_STARTOP "Дуга %1->%2: Нет начальной вершины."
 #define ERR_ARC_UNDEF_ENDTOP "Дуга %1->%2: Нет конечной вершины."

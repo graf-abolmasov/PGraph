@@ -26,7 +26,7 @@ private:
     QStringList compileUserTypes(QList<const DataType *> dataTypes);
     QStringList compileTpoData(QList<const Variable *> variables);
     void copyStaticTemplates();
-    void compileEnvironment() const;
+    void compileEnvironment(int procsMax) const;
     void copyUsedFiles(const QList<const Actor *> &actors, const QList<const Predicate *> &predicates, const QList<const BaseModule *> &baseModules);
     void compileMain(const QString graphName, const QStringList &actors) const;
     void compileMakefile(QString buildType, const QList<const Actor *> &actors, const QList<const Predicate *> &predicates, const QList<const BaseModule *> &baseModules) const;

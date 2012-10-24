@@ -3,28 +3,31 @@
 
 #include <QSettings>
 #include <QString>
-#include "globalvariables.h"
 
 class QGraphSettings
 {
 private:
-    static bool myIsParallel;
-    static bool myIsParallelSet;
+    bool myIsParallel;
+    bool myIsParallelSet;
 
-    static bool myOutputDirectorySet;
-    static QString myOutputDirectory;
+    bool myOutputDirectorySet;
+    QString myOutputDirectory;
 
-    static bool myBaseDirectorySet;
-    static QString myBaseDirectory;
+    bool myBaseDirectorySet;
+    QString myBaseDirectory;
 
-    static bool myTemplateDirectorySet;
-    static QString myTemplateDirectory;
+    bool myTemplateDirectorySet;
+    QString myTemplateDirectory;
+
+    QString myConfigPath;
 public:
-    static QString getOutputDirectory();
-    static QString getBaseDirectory();
-    static QString getTemplateDirectory();
+    QString getOutputDirectory();
+    QString getBaseDirectory();
+    QString getTemplateDirectory();
 
-    static bool isParallel();
+    bool isParallel();
+    QString getConfigPath() { return myConfigPath; }
+    QGraphSettings(const QString &configPath);
 };
 
 #endif // QGRAPHSETTINGS_H

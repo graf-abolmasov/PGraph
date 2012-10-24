@@ -310,7 +310,7 @@ void SourceCompiler::copyStaticTemplates()
     }
 }
 
-void SourceCompiler::compileEnvironment() const
+void SourceCompiler::compileEnvironment(int procsMax) const
 {
     QString runme = getTemplate(myTemplateDirectory + "/runme.bat.template");
     runme.replace("<#projectName>", globalDBManager->getProjectName());
@@ -319,7 +319,7 @@ void SourceCompiler::compileEnvironment() const
     runme_f.write(runme.toUtf8());
     runme_f.close();
 
-    QSettings c("graph.ini", QSettings::IniFormat);
+    QSettings c(globalSettings->getConfigPath(), QSettings::IniFormat);
     QString root = c.value("SK/root", "/home").toString();
     QString host = c.value("SK/host", "sk.ssau.ru").toString();
     QString port = c.value("SK/port", "22").toString();
@@ -344,7 +344,9 @@ void SourceCompiler::compileEnvironment() const
     runlocal_f.close();
 
     QString runmpi = getTemplate(myTemplateDirectory + "/runmpi.pbs.template");
-    runmpi.replace("<#nodes>", "2");
+    int remainder = procsMax % 8;
+    int nodes = procsMax/8 + (remainder == 0 ? 0 : 1);
+    runmpi.replace("<#nodes>", QString::number(nodes));
     runmpi.replace("<#procsPerNode>", "8");
     runmpi.replace("<#projectName>", globalDBManager->getProjectName());
 
@@ -356,9 +358,9 @@ void SourceCompiler::compileEnvironment() const
 
 void SourceCompiler::initDirectories()
 {
-    myOutputDirectory = QGraphSettings::getOutputDirectory();
-    myBaseDirectory = QGraphSettings::getBaseDirectory();
-    myTemplateDirectory = QGraphSettings::getTemplateDirectory();
+    myOutputDirectory = globalSettings->getOutputDirectory();
+    myBaseDirectory = globalSettings->getBaseDirectory();
+    myTemplateDirectory = globalSettings->getTemplateDirectory();
     myOtherFilesList = globalDBManager->getOtherFilesDB();
 }
 
@@ -429,6 +431,7 @@ QStringList SourceCompiler::compilePredicate(const Predicate *predicate) const
     output.open(QFile::WriteOnly);
     output.write(outputData.toUtf8());
     output.close();
+    return errors;
 }
 
 QStringList SourceCompiler::compileActor(const Actor *actor) const
@@ -491,6 +494,9 @@ QStringList SourceCompiler::compileActor(const Actor *actor) const
         // выход
         outputData.append("\r\n\r\n\treturn result;\r\n}");
         break;
+    case Actor::GraphType:
+        globalLogger->log("We don't have to come here.", Logger::Error);
+        break;
     case Actor::InlineType:
         //генерируем с++ файл
         outputData.append("int " + actor->name + "(TPOData *D)\r\n");
@@ -512,7 +518,7 @@ QStringList SourceCompiler::compileActor(const Actor *actor) const
     output.open(QFile::WriteOnly);
     output.write(outputData.toUtf8());
     output.close();
-
+    return errors;
 }
 
 QString SourceCompiler::compileDataType(const DataType *dataType) const
@@ -523,7 +529,7 @@ QString SourceCompiler::compileDataType(const DataType *dataType) const
 
     result.append(dataType->typedefStr).append("\r\n");
 
-    if (!QGraphSettings::isParallel())
+    if (!globalSettings->isParallel())
         return result;
 
     if (dataType->isArray()) {
@@ -683,7 +689,7 @@ QStringList SourceCompiler::compileCode(const QList<GraphStruct> &graphStructs) 
     compileMakefile("debug", allActorsList, allPredicatesList, allBasemoduleList);
     compileMakefile("release", allActorsList, allPredicatesList, allBasemoduleList);
     copyUsedFiles(allActorsList, allPredicatesList, allBasemoduleList);
-    compileEnvironment();
+    compileEnvironment(graphStructs.last().procsMax);
     copyStaticTemplates();
     return errors;
 }
@@ -759,7 +765,7 @@ QStringList SourceCompiler::compileBasemodule(const BaseModule *baseModule) cons
         pos += rx.matchedLength();
     }
     outputData.append(includes.join("\r\n").toUtf8());
-    outputData.append("PROJECT_BEGIN_NAMESPACE\r\n");
+    outputData.append("\r\nPROJECT_BEGIN_NAMESPACE\r\n");
     outputData.append("\r\nextern \"C\" int ");
     outputData.append(baseModule->name + "(" + signature + ");\r\n");
     outputData.append("int " + baseModule->uniqName + "(" + signature + ")\r\n{\r\n");

@@ -1,11 +1,12 @@
 #include "nativecompiler.h"
 #include "../../src/common/qgraphsettings.h"
+#include "../../src/common/globalvariables.h"
 
 NativeCompiler::NativeCompiler(QObject *parent)
     : QObject(parent)
 {
     buildScript = NULL;
-    QSettings c("graph.ini", QSettings::IniFormat);
+    QSettings c(globalSettings->getConfigPath(), QSettings::IniFormat);
     sh = c.value("Compiler/ShCmd", "sh").toString();
 }
 
@@ -17,7 +18,7 @@ bool NativeCompiler::compile()
     buildScript->setProcessChannelMode(QProcess::MergedChannels);
     globalLogger->log(QObject::tr("Компиляция проекта %1.....").arg(globalDBManager->getProjectName()), Logger::Compile);
     t.start();
-    buildScript->setWorkingDirectory(QGraphSettings::getOutputDirectory());
+    buildScript->setWorkingDirectory(globalSettings->getOutputDirectory());
     buildScript->start(sh + " runlocal.bat", QProcess::ReadOnly);
     connect(buildScript, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(finished(int,QProcess::ExitStatus)));
     connect(buildScript, SIGNAL(readyRead()), this, SLOT(readyRead()));
