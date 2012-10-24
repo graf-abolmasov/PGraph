@@ -1,0 +1,11 @@
+#!/bin/bash
+#PBS -N parallel_go
+#PBS -l nodes=<#nodes>:ppn=<#procsPerNode>
+#PBS -l walltime=23:59:59
+#PBS -j oe
+cd $PBS_O_WORKDIR
+export PATH=$PBS_O_PATH
+export I_MPI_DEVICE=rdma
+export I_MPI_DEBUG=0
+export I_MPI_FALLBACK_DEVICE=disable
+mpirun --rsh=ssh --l -machinefile $PBS_NODEFILE -np `cat $PBS_NODEFILE|wc -l` ./release/result
