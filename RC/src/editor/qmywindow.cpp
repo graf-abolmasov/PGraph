@@ -28,7 +28,7 @@ TMyWindow::TMyWindow()
 
     saveGraphAct = NULL;
     nativeCompiler = new NativeCompiler(this);
-    isParallel = QGraphSettings::isParallel();
+    isParallel = globalSettings->isParallel();
     globalOutput = new QListWidget();
     connect(globalLogger, SIGNAL(newMessage(QString)), this, SLOT(write2globalOutput(QString)));
 

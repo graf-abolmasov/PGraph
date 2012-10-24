@@ -33,7 +33,7 @@ DataBaseManager::DataBaseManager()
     db = QSqlDatabase::addDatabase("QMYSQL");
     if (db.lastError().type() != QSqlError::NoError)
         globalLogger->log(db.lastError().driverText(), Logger::Critical);
-    QSettings myDBSettings("graph.ini", QSettings::IniFormat);
+    QSettings myDBSettings(globalSettings->getConfigPath(), QSettings::IniFormat);
     db.setHostName(myDBSettings.value("DB/hostname", "localhost").toString());
     db.setPort(myDBSettings.value("DB/port", 3306).toInt());
     db.setDatabaseName(myDBSettings.value("DB/dbname", "graph4").toString());

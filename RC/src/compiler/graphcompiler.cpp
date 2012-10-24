@@ -33,7 +33,7 @@ QStringList GraphCompiler::compileRecursively(const Graph &graph)
         if (top.actor->type == Actor::GraphType)
             res.append(compileRecursively(globalDBManager->getGraphDB(top.actor->name)));
     }
-    compileStruct(graph);
+    result.append(compileStruct(graph));
     return res;
 }
 
@@ -52,12 +52,14 @@ QList<GraphStruct> GraphCompiler::compile(const Graph &graph)
     }
     globalLogger->log(QObject::tr("Компиляция завершена без ошибок за %1 с").arg(QString::number(qRound(t.elapsed()/1000))), Logger::Compile);
     result[0].usedActors.insert(new Actor(graph));
-    if (QGraphSettings::isParallel())
-        globalLogger->log(QObject::tr("Нужно %1 процов").arg(QString::number(procsMax[graph.name]+2)), Logger::Compile);
+    if (globalSettings->isParallel()) {
+        result.last().procsMax += 2;
+        globalLogger->log(QObject::tr("Нужно %1 процов").arg(QString::number(result.last().procsMax)), Logger::Compile);
+    }
     return result;
 }
 
-void GraphCompiler::compileStruct(const Graph &graph)
+GraphStruct GraphCompiler::compileStruct(const Graph &graph)
 {
     procsMax[graph.name] = 0;
     procsCounter[graph.name] = 0;
@@ -169,7 +171,7 @@ void GraphCompiler::compileStruct(const Graph &graph)
     graphStruct.entries[graph.name] = graph.getRootTop();
     graphStruct.namepr = graph.name;
     graphStruct.procsMax = procsMax[graph.name];
-    result.append(graphStruct);
+    return graphStruct;
 }
 
 DefineGraph::DefineGraph(QString predicate, int topIndex)

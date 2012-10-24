@@ -24,6 +24,8 @@ int main(int argc, char *argv[])
 
     a.installTranslator(&qtTranslator);
 
+    const QStringList args = QApplication::arguments();
+    globalSettings = new QGraphSettings(args.isEmpty() ? "graph.ini" : args[1]);
     QList<Logger::Output> logOutput;
     logOutput.append(Logger::Console);
     globalLogger = new Logger(Logger::Debug, logOutput);
@@ -44,5 +46,6 @@ int main(int argc, char *argv[])
 
     delete globalDBManager;
     delete globalLogger;
+    delete globalSettings;
     return result;
 }

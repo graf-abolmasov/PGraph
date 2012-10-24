@@ -391,6 +391,7 @@ void TDrawWindow::loadGraph(const QString &name)
     try {
         Graph graph = globalDBManager->getGraphDB(name);
 
+        QList<QTop* > topList;
         foreach (Top top, graph.topList) {
             QTop *qtop = NULL;
             if (top.type == Top::NormalTop) {
@@ -408,18 +409,20 @@ void TDrawWindow::loadGraph(const QString &name)
             qtop->number = top.number;
             qtop->setPos(top.x, top.y);
             qtop->actor = top.actor;
+            topList.append(qtop);
         }
 
         QList<QPair<QArc *, int> > qarcList;
         foreach (Arc arc, graph.arcList) {
             QTop *startTop = NULL;
             QTop *endTop = NULL;
-            QList<QTop* > topList = allTops();
-            for (int i = 0; i < topList.count(); i++){
-                if (topList[i]->number == arc.startTop)
-                    startTop = topList[i];
-                if (topList[i]->number == arc.endTop)
-                    endTop = topList[i];
+            foreach(QTop *qtop, topList) {
+                if (startTop != NULL && endTop != NULL)
+                    break;
+                if (qtop->number == arc.startTop)
+                    startTop = qtop;
+                if (qtop->number == arc.endTop)
+                    endTop = qtop;
             }
 
             QArc *qarc = new QArc(startTop, endTop, arcMenu, NULL, scene);
@@ -443,7 +446,7 @@ void TDrawWindow::loadGraph(const QString &name)
 
         //расставляем приоритеты дуг
         for (int i = 0; i < qarcList.count(); i++) {
-            qarcList.at(i).first->setPriority(qarcList.at(i).second);
+            qarcList[i].first->setPriority(qarcList[i].second);
         }
 
         foreach (Comment comment, graph.commentList) {

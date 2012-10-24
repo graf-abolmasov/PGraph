@@ -64,8 +64,23 @@ QStringList Graph::validate() const
     msgs.append(Actor::validate());
     foreach (Arc arc, arcList)
         msgs.append(arc.validate());
-    foreach (Top top, topList)
+    foreach (Top top, topList) {
         msgs.append(top.validate());
+        QList<Arc> outArcs = getOutArcs(top.number);
+        if (outArcs.isEmpty())
+            continue;
+        bool outArcsCorrect = true;
+        const int outArcType = outArcs.first().type;
+        foreach (Arc arc, outArcs) {
+            if (outArcType != arc.type) {
+                outArcsCorrect = false;
+                break;
+            }
+        }
+        if (!outArcsCorrect) {
+            msgs << QObject::tr(ERR_TOP_DIFFERENT_OUT_ARCS).arg(QString::number(top.number));
+        }
+    }
     foreach (SyncArc sync, syncArcList)
         msgs.append(sync.validate());
     if (getRootTop() == -1)

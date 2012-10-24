@@ -4,6 +4,6 @@ rm -r debug
 rm -r release
 mkdir debug
 mkdir release
-module load impi/4
+module load impi/4.0.3
 make debug
 make release

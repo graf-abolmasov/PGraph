@@ -53,7 +53,7 @@ void ArcPropertyDialog::prepareForm(QArc *arc)
         ui->terminateRadioBtn->setChecked(true);
         break;
     }
-    bool isParallel = QGraphSettings::isParallel();
+    bool isParallel = globalSettings->isParallel();
     ui->terminateRadioBtn->setEnabled(isParallel);
     ui->parallelRadioBtn->setEnabled(isParallel);
 
