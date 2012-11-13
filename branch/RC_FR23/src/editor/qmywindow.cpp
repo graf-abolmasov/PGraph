@@ -257,7 +257,7 @@ void TMyWindow::createActions()
         addSyncArcButton = new QToolButton;
         addSyncArcButton->setCheckable(true);
         addSyncArcButton->setIcon(QIcon(":/images/syncarc.png"));
-        addSyncArcButton->setEnabled(false);
+        addSyncArcButton->setEnabled(true);
 
         addMultiProcTopButton = new QToolButton;
         addMultiProcTopButton->setCheckable(true);

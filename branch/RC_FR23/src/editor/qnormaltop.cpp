@@ -153,13 +153,17 @@ void QNormalTop::setAsRoot(bool flag)
     }
 }
 
-void QNormalTop::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *)
+void QNormalTop::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
     TopPropertyDialog dlg;
-    QNormalTop* top = qgraphicsitem_cast<QNormalTop *>(scene()->selectedItems().first());
+    const QList<QGraphicsItem *>selectedItems = scene()->selectedItems();
+    if (selectedItems.isEmpty())
+        return;
+    QNormalTop* top = qgraphicsitem_cast<QNormalTop *>(selectedItems.first());
     dlg.prepareForm(top);
     if (dlg.exec())
         top = dlg.getResult();
+    event->accept();
 }
 
 void QNormalTop::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
@@ -191,7 +195,7 @@ void QNormalTop::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
     }
 
     foreach(QGraphicsItem *item, otherItems)
-        item->setOpacity(0.3);
+        item->setOpacity(0.55);
 
     event->accept();
 }

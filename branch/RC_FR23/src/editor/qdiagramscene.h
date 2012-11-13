@@ -16,6 +16,7 @@ QT_END_NAMESPACE
 class QTop;
 class QArc;
 class QSyncArc;
+class QArcLine;
 class QNormalTop;
 class QComment;
 
@@ -67,7 +68,7 @@ private:
     QNormalTop* myRootTop;
 
     QArc *newArc;
-    QGraphicsLineItem *line;
+    QArcLine *newArcLine;
     QGraphicsRectItem *selectionRect;
     QLineF displacementVector;
 
@@ -82,6 +83,10 @@ private:
     QComment* addComment(const QPointF &point);
 
     int getNextTopNumber();
+
+    void moveItemMouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent);
+    void insertLineMouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent);
+    void insertSyncMouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent);
 };
 
 #endif

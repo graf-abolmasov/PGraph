@@ -15,7 +15,6 @@ class QArc : public QGraphicsLineItem
 {
 public:
     enum { Type = ARC_TYPE };
-    enum ArcType { SerialArc = 1, ParallelArc = 2, TerminateArc = 3 };
 
     QList<QArcLine *> lines;
     QGraphicsItem *arcTop;
@@ -41,9 +40,9 @@ public:
         { return myStartTop; }
     QTop *endItem() const
         { return myEndTop; }
-    ArcType arcType() const
+    Arc::ArcType arcType() const
         { return myArcType; }
-    void setArcType(ArcType type);
+    void setArcType(Arc::ArcType type);
     QArcLine *prevLine(){
         if (lines.count() > 0)
             return lines.last();
@@ -51,7 +50,7 @@ public:
     }
     void setPen(const QPen &pen);
 
-    Arc toArc();
+    Arc toArc() const;
     bool autoBuild(QTop* top, float dx, float dy);
     bool remake(QTop *, float dx, float dy);
     bool moveLine(QArcLine* line, float dx, float dy);
@@ -64,12 +63,12 @@ protected:
 
 private:
     bool freezed;
-    ArcType myArcType;
+    Arc::ArcType myArcType;
     QTop *myStartTop;
     QTop *myEndTop;
     QMenu *myContextMenu;
     QPolygonF arcHead;
-    int myPriority;  //приоритет
+    int myPriority;
 };
 
 #endif
