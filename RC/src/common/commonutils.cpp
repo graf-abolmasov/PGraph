@@ -168,13 +168,13 @@ QString arcTypeToString(const QArc *arc)
 {
     QString result;
     switch (arc->arcType()) {
-    case QArc::SerialArc:
+    case Arc::SerialArc:
         result = QObject::tr("Последовательная");
         break;
-    case QArc::ParallelArc:
+    case Arc::ParallelArc:
         result = QObject::tr("Параллельная");
         break;
-    case QArc::TerminateArc:
+    case Arc::TerminateArc:
         result = QObject::tr("Терминирующая");
         break;
     }

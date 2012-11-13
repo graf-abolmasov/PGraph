@@ -49,10 +49,8 @@ bool QArc::autoBuild(QTop* top, float dx, float dy){
     /*высчитываем главный вектор дуги*/
     QLineF centerLine(startPoint, endPoint);
 
-    QPointF startIntersectPoint;
     QLineF polyLineStart;
     polyLineStart = startItem()->getIntersectBound(centerLine);
-    QPointF endIntersectPoint;
     QLineF polyLineEnd;
     polyLineEnd = endItem()->getIntersectBound(centerLine);
 
@@ -446,7 +444,7 @@ QArc::QArc(QTop *startItem, QTop *endItem, QMenu *contextMenu,
 
     setPen(QPen(Qt::black, 2, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
 
-    setArcType(QArc::SerialArc);
+    setArcType(Arc::SerialArc);
     myPriority = 0;
     arcTop->hide();
 }
@@ -467,7 +465,7 @@ QArc::~QArc()
 */
 QRectF QArc::boundingRect() const
 {
-    QRectF rect;
+    QRectF rect = QGraphicsLineItem::boundingRect();
     foreach (QArcLine* line, lines)
         rect = rect.united(line->boundingRect());
     rect.united(arcHead.boundingRect());
@@ -491,7 +489,8 @@ QPainterPath QArc::shape() const
 
 void QArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
-    if (lines.count() == 0) return;
+    if (lines.count() == 0)
+        return;
 
     if ((myStartTop == NULL) || (myEndTop == NULL)) {
         //пока рисуем(создаем) дугу
@@ -532,18 +531,19 @@ void QArc::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 bool QArc::addLine(QArcLine *line)
 {
     Q_ASSERT(line);
-    if ((prevLine() != NULL) &&
-            (prevLine()->line().p2() == line->line().p1()) &&
-            (prevLine() != line) &&
-            ((prevLine()->line().angleTo(line->line()) == 0) ||
-             (prevLine()->line().angleTo(line->line()) == 180))) {
-        line->setLine(QLineF(prevLine()->line().p1(), line->line().p2()));
-        delete prevLine();
-        lines.removeLast();
+    QArcLine *prevLine = this->prevLine();
+    if (prevLine != NULL && (prevLine->line().p2() == line->line().p1()) && (prevLine != line)) {
+        const qreal angle = prevLine->line().angleTo(line->line());
+        //Новая линия совпадает со старой
+        if ((angle == 0) || (angle == 180)) {
+            line->setLine(QLineF(prevLine->line().p1(), line->line().p2()));
+            delete prevLine;
+            lines.removeLast();
+        }
     }
     if (!lines.contains(line))
         lines.append(line);
-    return lines.contains(line);
+    return true;
 }
 
 /*!
@@ -559,7 +559,7 @@ QArcLine* QArc::newLine(QPointF p1, QPointF p2)
     else {
         addLine(currentLine);
 
-        //выщитываем направление линии
+        //высчитываем направление линии
         QLineF vector(prevLine()->line().p2(), p2);
         float dx = vector.dx();
         float dy = vector.dy();
@@ -613,10 +613,10 @@ void QArc::updateBounds() {
   Установка приоритета
   @param w - приоритет
 */
-void QArc::setPriority(int w){
+void QArc::setPriority(int w) {
     myPriority = w;
     QPen myPen = pen();
-    if (myArcType == SerialArc)
+    if (myArcType == Arc::SerialArc)
         myPen.setWidth(myStartTop->outArcs().count() - myPriority + 2);
     setPen(myPen);
 }
@@ -627,7 +627,7 @@ void QArc::setPen(const QPen &pen){
     QGraphicsLineItem::setPen(pen);
 }
 
-void QArc::setArcType(ArcType type)
+void QArc::setArcType(Arc::ArcType type)
 {
     myArcType = type;
     if (arcTop != NULL){
@@ -635,13 +635,13 @@ void QArc::setArcType(ArcType type)
         arcTop = NULL;
     }
     switch (myArcType) {
-    case QArc::SerialArc:
+    case Arc::SerialArc:
         arcTop = new QSerialArcTop(myContextMenu, this, scene());
         break;
-    case QArc::ParallelArc:
+    case Arc::ParallelArc:
         arcTop = new QParallelArcTop(myContextMenu, this, scene());
         break;
-    case QArc::TerminateArc:
+    case Arc::TerminateArc:
         arcTop = new QTerminateArcTop(myContextMenu, this, scene());
         break;
     }
@@ -650,15 +650,14 @@ void QArc::setArcType(ArcType type)
 /*!
   Преобразует в простой формат дуги для сохранения в базу данных.
 */
-Arc QArc::toArc()
+Arc QArc::toArc() const
 {
     QStringList nodes;
-    foreach(QArcLine* line, lines){
+    foreach(QArcLine* line, lines)
         nodes.append(QString::number(line->line().x1()) + " " + QString::number(line->line().y1()) + " " +
                      QString::number(line->line().x2()) + " " + QString::number(line->line().y2()));
-    }
-    return Arc(Arc::ArcType(arcType()),
-               priority(),
+    return Arc(myArcType,
+               myPriority,
                myStartTop->number,
                myEndTop->number,
                predicate,
@@ -674,76 +673,52 @@ Arc QArc::toArc()
 */
 bool QArc::moveLine(QArcLine *line, float dx, float dy)
 {
-    if (!lines.contains(line)) return false;
+    if (!lines.contains(line))
+        return false;
     QArcLine *selectedLine = line;
     QArcLine *prevLine = NULL;
     QArcLine *nextLine = NULL;
-    if (lines.count() == 1){
-        prevLine = NULL;
-        nextLine = NULL;
-        if (!(myEndTop->sceneBoundingRect().adjusted(8, 8, -8, -8).contains(line->line().p2() + QPointF(dx, dy)) &&
-              myStartTop->sceneBoundingRect().adjusted(8, 8, -8, -8).contains(line->line().p1() + QPointF(dx, dy))))
-            return false;
+    const QPointF offset(dx, dy);
+
+    //Определяем, не вышли ли за границы какой либо вершины
+    bool moveAllowed = true;
+    if (lines.count() == 1) {
+        moveAllowed = myEndTop->sceneBoundingRect().adjusted(8, 8, -8, -8).contains(line->line().p2() + offset) &&
+                myStartTop->sceneBoundingRect().adjusted(8, 8, -8, -8).contains(line->line().p1() + offset);
     } else {
         if (selectedLine == lines.first()){
-            nextLine = lines.at(1);
             prevLine = NULL;
-            if (!myStartTop->sceneBoundingRect().adjusted(8, 8, -8, -8).contains(line->line().p1() + QPointF(dx, dy)))
-                return false;
+            nextLine = lines[1];
+            moveAllowed = myStartTop->sceneBoundingRect().adjusted(8, 8, -8, -8).contains(line->line().p1() + offset);
         } else if (selectedLine == lines.last()){
-            prevLine = lines.at(lines.indexOf(selectedLine) - 1);
+            prevLine = lines[lines.indexOf(selectedLine) - 1];
             nextLine = NULL;
-            if (!myEndTop->sceneBoundingRect().adjusted(8, 8, -8, -8).contains(line->line().p2() + QPointF(dx, dy)))
-                return false;
+            moveAllowed = myEndTop->sceneBoundingRect().adjusted(8, 8, -8, -8).contains(line->line().p2() + offset);
         } else {
-            prevLine = lines.at(lines.indexOf(selectedLine) - 1);
-            nextLine = lines.at(lines.indexOf(selectedLine) + 1);
+            prevLine = lines[lines.indexOf(selectedLine) - 1];
+            nextLine = lines[lines.indexOf(selectedLine) + 1];
         }
     }
 
-    //вправо-влево можно двигать только вертикальные линии (пока)
-    if (selectedLine->line().p1().x() == selectedLine->line().p2().x()){
-        if (prevLine != NULL)
-            prevLine->setLine(QLineF(prevLine->line().p1(),
-                                     QPointF(prevLine->line().p2().x() + dx,
-                                             prevLine->line().p1().y())
-                                     )
-                              );
-        if (nextLine != NULL)
-            nextLine->setLine(QLineF(QPointF(nextLine->line().p1().x() + dx,
-                                             nextLine->line().p1().y()
-                                             ),
-                                     nextLine->line().p2())
-                              );
-        selectedLine->setLine(QLineF(QPointF(selectedLine->line().p1().x() + dx,
-                                             selectedLine->line().p1().y()),
-                                     QPointF(selectedLine->line().p2().x() + dx,
-                                             selectedLine->line().p2().y())
-                                     )
-                              );
-    }
+    if (!moveAllowed)
+        return false;
 
-    //вверх-вниз можно двигать только горизонтальные линии (пока)
-    if (selectedLine->line().p1().y() == selectedLine->line().p2().y()){
-        if (prevLine != NULL)
-            prevLine->setLine(QLineF(prevLine->line().p1(),
-                                     QPointF(prevLine->line().p2().x(),
-                                             prevLine->line().p2().y() + dy)
-                                     )
-                              );
-        if (nextLine != NULL)
-            nextLine->setLine(QLineF(QPointF(nextLine->line().p1().x(),
-                                             nextLine->line().p1().y() + dy),
-                                     nextLine->line().p2()
-                                     )
-                              );
-        selectedLine->setLine(QLineF(QPointF(selectedLine->line().p1().x(),
-                                             selectedLine->line().p1().y() + dy),
-                                     QPointF(selectedLine->line().p2().x(),
-                                             selectedLine->line().p2().y() + dy)
-                                     )
-                              );
-    }
+    //вправо-влево можно двигать только вертикальные линии
+    if (selectedLine->line().p1().x() == selectedLine->line().p2().x())
+        dy = 0;
+    //вверх-вниз можно двигать только горизонтальные линии
+    else if (selectedLine->line().p1().y() == selectedLine->line().p2().y())
+        dx = 0;
+
+    const QPointF newP1(selectedLine->line().p1().x() + dx, selectedLine->line().p1().y() + dy);
+    const QPointF newP2(selectedLine->line().p2().x() + dx, selectedLine->line().p2().y() + dy);
+    if (prevLine != NULL)
+        prevLine->setLine(QLineF(prevLine->line().p1(), newP1));
+    if (nextLine != NULL)
+        nextLine->setLine(QLineF(newP2, nextLine->line().p2()));
+
+    selectedLine->setLine(QLineF(newP1, newP2));
+
     updateBounds();
     return true;
 }
