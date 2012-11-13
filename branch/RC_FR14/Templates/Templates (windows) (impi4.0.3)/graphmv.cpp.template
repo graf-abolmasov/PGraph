@@ -1,0 +1,69 @@
+#include "graph.h"
+PROJECT_BEGIN_NAMESPACE
+int GraphMV(TPOData *D, int jroot, int Ntop, DefineTop *ListTop, DefineGraph *ListGraf)
+{
+    int jfirst, jlast, j, jTop, Fpred;
+    int (*Tp)(TPOData *);
+    Tp =  ListTop[jroot].top;
+    (*Tp)(D); //Do actor
+
+    jfirst = ListTop[jroot].FirstDef;
+    jlast  = ListTop[jroot].LastDef;
+
+    int *locked_procs = NULL;
+BEGIN:
+    for(j = jfirst; j <= jlast; j++) {
+
+        const DefineGraph currArc = ListGraf[j];
+        jTop = currArc.NambTop; //Следующая вершина
+        const DefineTop nextTop = ListTop[jTop];
+
+        if (currArc.Type == 2) {
+            if (locked_procs == NULL)
+                locked_procs = new int[jlast-jfirst+1];
+            MPI_Ssend(NULL, 0, MPI_INT, 0, MPI_TAG_LOCKPROC, MPI_COMM_WORLD);
+            MPI_Recv(locked_procs+j-jfirst, 1, MPI_INT, 0, MPI_TAG_LOCKPROC, MPI_COMM_WORLD, &status);
+            MPI_Ssend(nextTop.NameTop, strlen(nextTop.NameTop)+1, MPI_CHAR, locked_procs[j-jfirst], MPI_TAG_RUN, MPI_COMM_WORLD);
+        }
+
+        if (currArc.Type == 3) {
+            MPI_Ssend(&jTop, 1, MPI_INT, parentProcNum, MPI_TAG_COMPLETED, MPI_COMM_WORLD);
+        }
+
+
+        if (currArc.Type == 1) {
+            jPred = currArc.NambPred;
+
+            Tp =  currArc.predicate;
+            Fpred = (*Tp)(D);
+
+            if(Fpred == 1) {
+                Tp  =  nextTop.top;
+                (*Tp)(D);
+                
+                jfirst = nextTop.FirstDef;
+                jlast  = nextTop.LastDef;
+
+                if(jlast == -77)
+                    goto ENDGRAF;
+                goto BEGIN;
+            }
+        }
+    }
+ENDGRAF:
+    if (locked_procs != NULL) {
+        for (int i = 0; i <= jlast-jfirst; i++) {
+            MPI_Recv(&jTop, 1, MPI_INT, locked_procs[i], MPI_TAG_COMPLETED, MPI_COMM_WORLD, &status);
+            MemoryPacket p = { locked_procs[i], 0, 0 };
+            MPI_Ssend(&p, 1, memoryPacketDatatype, 0, MPI_TAG_FREEPROC, MPI_COMM_WORLD);
+        }
+        jfirst = ListTop[jTop].FirstDef;
+        jlast  = ListTop[jTop].LastDef;
+        delete locked_procs;
+        locked_procs = NULL;
+        if (jlast != -77)
+            goto BEGIN;
+    }
+    return 1;
+}
+PROJECT_END_NAMESPACE

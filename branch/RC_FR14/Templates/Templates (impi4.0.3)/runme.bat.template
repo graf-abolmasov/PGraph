@@ -1,0 +1,9 @@
+#!/bin/sh -login
+cd ~/graph_uploads/<#projectName>
+rm -r debug
+rm -r release
+mkdir debug
+mkdir release
+module load impi/4
+make debug
+make release
