@@ -22,7 +22,7 @@ QPainterPath QArcLine::shape() const {
 
 QRectF QArcLine::boundingRect() const
 {
-    return QRectF(line().p1(), line().p2()).normalized().adjusted(-10, -10, 10, 10);
+    return QGraphicsLineItem::boundingRect().adjusted(-10, -10, 10, 10);
 }
 
 void QArcLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
@@ -30,7 +30,7 @@ void QArcLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidge
     QPen myPen = pen();
     painter->setPen(myPen);
     painter->drawLine(line());
-    if (isSelected()){
+    if (isSelected()) {
         painter->setBrush(Qt::green);
         int lineWidth = myPen.width();
         myPen.setWidth(1);
@@ -45,7 +45,7 @@ void QArcLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidge
 QVariant QArcLine::itemChange(GraphicsItemChange change, const QVariant &value)
 {
     if (change == QGraphicsItem::ItemSelectedHasChanged)
-        isSelected() ? setZValue(1) : setZValue(0);
+        setZValue(value.toBool());
 
     return value;
 }

@@ -434,7 +434,7 @@ void TDrawWindow::loadGraph(const QString &name)
             }
             qarc->addLine(qarc->currentLine);
             qarc->currentLine = NULL;
-            qarc->setArcType(QArc::ArcType(arc.type));
+            qarc->setArcType(arc.type);
             qarc->predicate = arc.predicate;
 
             if (qarc->predicate != NULL && !globalPredicateList.contains(qarc->predicate->name))

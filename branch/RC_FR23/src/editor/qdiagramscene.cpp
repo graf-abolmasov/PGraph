@@ -12,14 +12,13 @@
 #include "../../src/editor/qsyncarc.h"
 #include "../../src/editor/qmultiproctop.h"
 #include "../../src/editor/qnormaltop.h"
-#include "../../src/editor/qdataitem.h"
 
 QDiagramScene::QDiagramScene(QObject *parent)
     : QGraphicsScene(parent)
 {
     myMode = MoveItem;
     setItemIndexMethod(NoIndex);
-    line = NULL;
+    newArcLine = NULL;
     newArc = NULL;
     selectionRect = NULL;
     myRootTop = NULL;
@@ -75,14 +74,14 @@ void QDiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
     case InsertLine:
         if (newArc == NULL)
             newArc = new QArc(NULL, NULL, myArcMenu, 0, this);
-        line = newArc->newLine(mouseEvent->scenePos(), mouseEvent->scenePos());
+        newArcLine = newArc->newLine(mouseEvent->scenePos(), mouseEvent->scenePos());
         break;
     case InsertText:
         addComment(mouseEvent->scenePos());
     case InsertSync:
-        line = new QGraphicsLineItem(QLineF(mouseEvent->scenePos(), mouseEvent->scenePos()));
-        line->setPen(QPen(Qt::red, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-        addItem(line);
+        newArcLine = new QArcLine(QLineF(mouseEvent->scenePos(), mouseEvent->scenePos()));
+        newArcLine->setPen(QPen(Qt::red, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+        addItem(newArcLine);
         break;
     case MoveItem:
         if (itemAt(mouseEvent->scenePos()) == NULL) {
@@ -115,8 +114,8 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
         selectionRect->setRect(newRect.normalized());
     }
     //режим рисования дуги
-    else if (myMode == InsertLine && line != NULL && mouseEvent->buttons() & Qt::LeftButton) {
-        QLineF vector(line->line().p1(), mouseEvent->scenePos());
+    else if (myMode == InsertLine && newArcLine != NULL && mouseEvent->buttons() & Qt::LeftButton) {
+        QLineF vector(newArcLine->line().p1(), mouseEvent->scenePos());
         float dx = vector.dx();
         float dy = vector.dy();
         int sector = int(vector.angle() / 45.0);
@@ -139,13 +138,13 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
         default:
             ;
         }
-        line->setLine(newLine);
-        line->setSelected(true);
+        newArcLine->setLine(newLine);
+        newArcLine->setSelected(true);
     }
     //режим перетаскивания вершины
     else if ((myMode == MoveItem) &&
              (mouseEvent->buttons() & Qt::LeftButton) &&
-             mySelectedItems.count() > 0 &&
+             !mySelectedItems.isEmpty() &&
              (mySelectedItems.first()->type() == QTop::Type)) {
         QLineF vector(mouseEvent->lastScenePos(), mouseEvent->scenePos());
         bool allowMove = false;
@@ -201,9 +200,9 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
         if (selectedLine->contains(selectedLine->mapFromScene(mouseEvent->lastScenePos())))
             arc->moveLine(selectedLine, vector.dx(), vector.dy());
     }
-    else if (myMode == InsertSync && line != NULL) {
-        QLineF newLine(line->line().p1(), mouseEvent->scenePos());
-        line->setLine(newLine);
+    else if (myMode == InsertSync && newArcLine != NULL) {
+        QLineF newLine(newArcLine->line().p1(), mouseEvent->scenePos());
+        newArcLine->setLine(newLine);
     }
     //режим перетаскивания коментария
     else if ((myMode == MoveItem) &&
@@ -217,120 +216,138 @@ void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
     }
 }
 
-void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
+void QDiagramScene::moveItemMouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
-    if (myMode == ReadOnly)
+    if (selectionRect == NULL)
         return;
+    QPainterPath selectedPath;
+    selectedPath.addPolygon(selectionRect->mapToScene(selectionRect->rect()));
+    QList<QGraphicsItem* > itemsInRect = items(selectedPath, Qt::ContainsItemShape);
+    clearSelection();
+    foreach (QGraphicsItem* item, itemsInRect)
+        if (item->type() == QTop::Type)
+            item->setSelected(true);
+    delete selectionRect;
+    selectionRect = NULL;
+}
 
-    if (myMode == MoveItem && selectionRect != NULL) {
-        QPainterPath selectedPath;
-        selectedPath.addPolygon(selectionRect->mapToScene(selectionRect->rect()));
-        QList<QGraphicsItem* > itemsInRect = items(selectedPath, Qt::ContainsItemShape);
-        clearSelection();
-        foreach (QGraphicsItem* item, itemsInRect){
-            if (item->type() == QTop::Type)
-                item->setSelected(true);
-        }
-        delete selectionRect;
-        selectionRect = NULL;
-    }
-    else if (line != NULL && newArc != NULL && myMode == InsertLine) {
-        //дуга должна начинаться с вершины!
-        QTop *startItem = newArc->startItem();
-        QTop *endItem = newArc->endItem();
-        if (startItem == NULL) {
-            QList<QGraphicsItem *> startItems = items(line->line().p1());
-            while (startItems.count() > 0 && startItems.first()->type() != QTop::Type)
-                startItems.removeFirst();
-            if ((startItems.count() > 0) && (startItems.first()->type() == QTop::Type)) {
-                startItem = qgraphicsitem_cast<QTop *>(startItems.first());
-                newArc->setStartTop(startItem);
-                newArc->addLine(qgraphicsitem_cast<QArcLine *>(line));
-            } else {
-                delete line;
-                delete newArc;
-                newArc = NULL;
-                line = NULL;
-            }
-        }
-
-        //дуга должна заканчиваться вершиной
-        if ((endItem == NULL) && (newArc != NULL) && (newArc->prevLine() != NULL)){
-            QList<QGraphicsItem *> endItems = items(line->line().p2());
-            while (endItems.count() > 0 && endItems.first()->type() != QTop::Type)
-                endItems.removeFirst();
-            if ((endItems.count() > 0) && (endItems.first()->type() == QTop::Type)){
-                endItem = qgraphicsitem_cast<QTop *>(endItems.first());
-                newArc->setEndTop(endItem);              
-                newArc->addLine(qgraphicsitem_cast<QArcLine *>(line));
-            }
-        }
-
-        //плохая ситуация, когда начало и конец совпадают, но дуга имеет явно неправилную форму
-        if ((endItem != NULL) && (startItem != NULL) && (newArc != NULL) &&
-            startItem->collidesWithItem(endItem) && (newArc->lines.count() == 1)){
+void QDiagramScene::insertLineMouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
+{
+    if (newArcLine == NULL || newArc == NULL)
+        return;
+    //дуга должна начинаться с вершины!
+    QTop *startItem = newArc->startItem();
+    QTop *endItem = newArc->endItem();
+    if (startItem == NULL) {
+        QList<QGraphicsItem *> startItems = items(newArcLine->line().p1());
+        while (!startItems.isEmpty() && startItems.first()->type() != QTop::Type)
+            startItems.removeFirst();
+        if ((!startItems.isEmpty()) && (startItems.first()->type() == QTop::Type)) {
+            startItem = qgraphicsitem_cast<QTop *>(startItems.first());
+            newArc->setStartTop(startItem);
+            newArc->addLine(qgraphicsitem_cast<QArcLine *>(newArcLine));
+        } else {
+            delete newArcLine;
             delete newArc;
             newArc = NULL;
-            line = NULL;
+            newArcLine = NULL;
         }
+    }
 
-        //условие выполнится когда у дуги будет начало и конец!
-        if ((endItem != NULL) && (startItem != NULL) && (newArc != NULL)) {
-            newArc->updateBounds();
-            line->setSelected(false);
-            emit itemInserted(newArc);
-            newArc->currentLine = NULL;
-            newArc = NULL;
-            line = NULL;
-        }
-    } else if (line != NULL && myMode == InsertSync) {
-        QList<QGraphicsItem *> startItems = items(line->line().p1());
-        if (startItems.count() && startItems.first() == line)
-            startItems.removeFirst();
-        QList<QGraphicsItem *> endItems = items(line->line().p2());
-        if (endItems.count() && endItems.first() == line)
+    //дуга должна заканчиваться вершиной
+    if ((endItem == NULL) && (newArc != NULL) && (newArc->prevLine() != NULL)){
+        QList<QGraphicsItem *> endItems = items(newArcLine->line().p2());
+        while (!endItems.isEmpty() && endItems.first()->type() != QTop::Type)
             endItems.removeFirst();
-
-        if (startItems.count() > 0 && endItems.count() > 0 &&
-            startItems.first()->type() == QTop::Type &&
-            endItems.first()->type() == QTop::Type &&
-            startItems.first() != endItems.first()) {
-            QTop *startItem =
-                    qgraphicsitem_cast<QTop *>(startItems.first());
-            QTop *endItem =
-                    qgraphicsitem_cast<QTop *>(endItems.first());
-            QSyncArc *newSyncArc = new QSyncArc(startItem, endItem, mySyncArcMenu);
-            newSyncArc->setLine(line->line());
-            newSyncArc->setZValue(1);
-            emit itemInserted(newSyncArc);
+        if (!endItems.isEmpty() && endItems.first()->type() == QTop::Type){
+            endItem = qgraphicsitem_cast<QTop *>(endItems.first());
+            newArc->setEndTop(endItem);
+            newArc->addLine(newArcLine);
         }
-        removeItem(line);
-        delete line;
-        line = 0;
+    }
+
+    //плохая ситуация, когда начало и конец совпадают, но дуга имеет явно неправилную форму
+    if ((endItem != NULL) && (startItem != NULL) && (newArc != NULL) &&
+        startItem->collidesWithItem(endItem) && (newArc->lines.count() == 1)) {
+        delete newArc;
+        newArc = NULL;
+        newArcLine = NULL;
+    }
+
+    //условие выполнится когда у дуги будет начало и конец!
+    if ((endItem != NULL) && (startItem != NULL) && (newArc != NULL)) {
+        newArc->updateBounds();
+        newArcLine->setSelected(false);
+        emit itemInserted(newArc);
+        newArc->currentLine = NULL;
+        newArc = NULL;
+        newArcLine = NULL;
+    }
+}
+
+void QDiagramScene::insertSyncMouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
+{
+    if (newArcLine == NULL)
+        return;
+    QList<QGraphicsItem *> startItems = items(newArcLine->line().p1());
+    if (startItems.count() && startItems.first() == newArcLine)
+        startItems.removeFirst();
+    QList<QGraphicsItem *> endItems = items(newArcLine->line().p2());
+    if (endItems.count() && endItems.first() == newArcLine)
+        endItems.removeFirst();
+
+    if (!startItems.isEmpty() && !endItems.isEmpty() &&
+        startItems.first()->type() == QTop::Type &&
+        endItems.first()->type() == QTop::Type &&
+        startItems.first() != endItems.first()) {
+        QTop *startItem = qgraphicsitem_cast<QTop *>(startItems.first());
+        QTop *endItem = qgraphicsitem_cast<QTop *>(endItems.first());
+        QSyncArc *newSyncArc = new QSyncArc(startItem, endItem, mySyncArcMenu);
+        newSyncArc->setLine(newArcLine->line());
+        newSyncArc->setZValue(1);
+        emit itemInserted(newSyncArc);
+    }
+    removeItem(newArcLine);
+    delete newArcLine;
+    newArcLine = 0;
+}
+
+void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
+{
+    switch (myMode) {
+    case MoveItem:
+        moveItemMouseReleaseEvent(mouseEvent);
+        break;
+    case InsertSync:
+        insertSyncMouseReleaseEvent(mouseEvent);
+        break;
+    case InsertLine:
+        insertLineMouseReleaseEvent(mouseEvent);
+        break;
+    case ReadOnly:;
     }
 
     QGraphicsScene::mouseReleaseEvent(mouseEvent);
 }
 
-void QDiagramScene::keyReleaseEvent (QKeyEvent *keyEvent){
+void QDiagramScene::keyReleaseEvent(QKeyEvent *keyEvent){
     if (myMode == ReadOnly)
         return;
 
     if ((newArc != NULL) && (keyEvent->key() == Qt::Key_Escape)) {
-        delete line;
-        if (newArc->lines.count() > 1){
-            foreach (QArcLine *line, newArc->lines){
-                delete line;
-            }
+        if (newArc->lines.size() > 0) {
+            qDeleteAll(newArc->lines);
+            newArc->lines.clear();
         }
-        newArc->lines.clear();
+        delete newArcLine;
         delete newArc;
         newArc = NULL;
-        line = NULL;
+        newArcLine = NULL;
     }
 
-    if (selectedItems().count() > 0 && (keyEvent->key() == Qt::Key_Delete)) {
-        QGraphicsItem *item = selectedItems().first();
+    const QList<QGraphicsItem *> selectedItems = this->selectedItems();
+    if (selectedItems.size() > 0 && keyEvent->key() == Qt::Key_Delete) {
+        QGraphicsItem *item = selectedItems.first();
         switch (item->type()){
         case QTop::Type:
         case QArc::Type:
