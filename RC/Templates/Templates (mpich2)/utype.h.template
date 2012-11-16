@@ -5,17 +5,17 @@
 
 PROJECT_BEGIN_NAMESPACE
 
-//РџРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёРµ С‚РёРїС‹
+//Пользовательские типы
 <#userTypes>
 
-//РўРёРїС‹ MPI
+//Типы MPI
 #ifdef PARALLEL
 <#mpiTypes>
 #endif
 
 PROJECT_END_NAMESPACE
 
-//Р§Р°СЃС‚Рѕ РІРєР»СЋС‡Р°РµРјС‹Рµ С„Р°Р№Р»С‹
+//Часто включаемые файлы
 #include <stdio.h>
 #include <strings.h>
 #include <memory.h>

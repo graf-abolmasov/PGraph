@@ -49,11 +49,14 @@ int main(int argc, char *argv[])
 #ifndef PARALLEL
 	TPOData D(0);
 #endif
-
+#ifdef PARALLEL
     if (myProcNum == 1) {
+#endif
         <#graphname>(&D);
+#ifdef PARALLEL
         for (int i = 2; i < totalProc; i++)
             MPI_Send(NULL, 0, MPI_INT, i, MPI_TAG_TERMINATE, MPI_COMM_WORLD);
+        MPI_Send(NULL, 0, MPI_INT, 0, MPI_TAG_TERMINATE, MPI_COMM_WORLD);
     } else if (myProcNum > 1) {
         //«апускаем параллельные ветки, которые будут ждать команду на запуск
         //Ќазвание агрегата передаетс€ вместе с сообщением
@@ -74,6 +77,8 @@ int main(int argc, char *argv[])
             }
         }
     }
+    MPI_Finalize();
+#endif
 
     return 0;
 }

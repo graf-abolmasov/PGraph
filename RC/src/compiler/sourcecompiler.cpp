@@ -707,6 +707,9 @@ QStringList SourceCompiler::compileStruct(const GraphStruct &graphStruct)
     QString actorStr;
     foreach (const Actor *actor, graphStruct.usedActors)
         actorStr.append("int " + actor->name + "(TPOData *D);\r\n");
+    QList<QString> keys = graphStruct.entries.keys();
+    foreach (QString key, keys)
+        actorStr.append("int " + key + "(TPOData *D);\r\n");
 
     QString _ListGraph;
     _ListGraph.append("static DefineGraph ListGraf[" + QString::number(graphStruct.graphsTable.size()) + "] = {\r\n");
@@ -735,7 +738,6 @@ QStringList SourceCompiler::compileStruct(const GraphStruct &graphStruct)
     main.append(_ListT);
     main.append(_ListGraph);
 
-    QList<QString> keys = graphStruct.entries.keys();
     foreach (QString key, keys)
         main.append(buildGraph(key, "", graphStruct.entries[key]));
     main.append("PROJECT_END_NAMESPACE\r\n");
