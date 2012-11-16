@@ -11,14 +11,14 @@ public:
         ~TPOData();
 		int myRank;
 		
-        //Р Р°Р·РјРµСЂ РІС‹РґРµР»РµРЅРЅРѕР№ РїР°РјСЏС‚Рё РѕС‚ id
+        //Размер выделенной памяти от id
         int getDataSize(int id);
 #ifdef PARALLEL
-        //РўРёРї MPI РѕС‚ id
+        //Тип MPI от id
         MPI_Datatype getMpiType(int id);
 #endif
 
-        //РЈРєР°Р·Р°С‚РµР»СЊ РЅР° РѕР±Р»Р°СЃС‚СЊ РїР°РјСЏС‚Рё СЃ РґР°РЅРЅС‹РјРё
+        //Указатель на область памяти с данными
         void* getDataAddr(int id);
 
         //Common setter/getter
@@ -28,14 +28,14 @@ public:
         //Personal setter/getter
         <#setGet>
 
-        //РЎРІРѕР№СЃС‚РІР° РґР»СЏ РґРѕСЃС‚СѓРїР° Рє РґР°РЅРЅС‹Рј
+        //Свойства для доступа к данным
         <#varProperty>
 
-        //РЈРєР°Р·Р°С‚РµР»Рё РЅР° РїР°РјСЏС‚СЊ СЃ РґР°РЅРЅС‹РјРё
+        //Указатели на память с данными
         <#varPtr>
 
 private:
-        //Р‘Р»РѕРє iD's
+        //Блок iD's
         <#varId>
 
         //Initialize memory

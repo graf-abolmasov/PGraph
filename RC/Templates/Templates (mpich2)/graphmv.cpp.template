@@ -23,7 +23,9 @@ BEGIN:
                 locked_procs = new int[jlast-jfirst+1];
             MPI_Ssend(NULL, 0, MPI_INT, 0, MPI_TAG_LOCKPROC, MPI_COMM_WORLD);
             MPI_Recv(locked_procs+j-jfirst, 1, MPI_INT, 0, MPI_TAG_LOCKPROC, MPI_COMM_WORLD, &status);
-            MPI_Ssend(nextTop.NameTop, strlen(nextTop.NameTop)+1, MPI_CHAR, locked_procs[j-jfirst], MPI_TAG_RUN, MPI_COMM_WORLD);
+	    char buff[15];
+	    memcpy(&buff, nextTop.NameTop, 15);
+            MPI_Ssend(&buff, strlen(nextTop.NameTop)+1, MPI_CHAR, locked_procs[j-jfirst], MPI_TAG_RUN, MPI_COMM_WORLD);
         }
 
         if (currArc.Type == 3) {

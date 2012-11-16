@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
 	MPI_Comm_size(MPI_COMM_WORLD, &totalProc);
 	//printf("totalProc = %d\n", totalProc);
 	
-	//Р”Р»СЏ РѕР±С‰РµРЅРёСЏ СЃ РјРµРЅРµР¶РґРµСЂРѕРј РїР°РјСЏС‚Рё
+	//Для общения с менеждером памяти
     int          len[4] = { 1, 1, 1, 1 };
     MPI_Aint     pos[4] = { offsetof(MemoryPacket,id), offsetof(MemoryPacket,offset),
                         offsetof(MemoryPacket,count), sizeof(MemoryPacket) };
@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
 	
 	MPI_Barrier (MPI_COMM_WORLD);
 	
-	//Р—Р°РїСѓСЃРєР°РµРј РґРёСЃРїРµС‚С‡РµСЂ РїР°РјСЏС‚Рё	
+	//Запускаем диспетчер памяти	
 	if (myProcNum == 0) 
 		memman(&D);
 		
@@ -49,14 +49,17 @@ int main(int argc, char *argv[])
 #ifndef PARALLEL
 	TPOData D(0);
 #endif
-
+#ifdef PARALLEL
     if (myProcNum == 1) {
+#endif
         <#graphname>(&D);
+#ifdef PARALLEL
         for (int i = 2; i < totalProc; i++)
             MPI_Send(NULL, 0, MPI_INT, i, MPI_TAG_TERMINATE, MPI_COMM_WORLD);
+        MPI_Send(NULL, 0, MPI_INT, 0, MPI_TAG_TERMINATE, MPI_COMM_WORLD);
     } else if (myProcNum > 1) {
-        //Р—Р°РїСѓСЃРєР°РµРј РїР°СЂР°Р»Р»РµР»СЊРЅС‹Рµ РІРµС‚РєРё, РєРѕС‚РѕСЂС‹Рµ Р±СѓРґСѓС‚ Р¶РґР°С‚СЊ РєРѕРјР°РЅРґСѓ РЅР° Р·Р°РїСѓСЃРє
-        //РќР°Р·РІР°РЅРёРµ Р°РіСЂРµРіР°С‚Р° РїРµСЂРµРґР°РµС‚СЃСЏ РІРјРµСЃС‚Рµ СЃ СЃРѕРѕР±С‰РµРЅРёРµРј
+        //Запускаем параллельные ветки, которые будут ждать команду на запуск
+        //Название агрегата передается вместе с сообщением
         bool Terminate = false;
         while (!Terminate) {
             char actorName[64];
@@ -74,6 +77,8 @@ int main(int argc, char *argv[])
             }
         }
     }
+    MPI_Finalize();
+#endif
 
     return 0;
 }
