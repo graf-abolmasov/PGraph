@@ -12,7 +12,6 @@ class Compiler
 {
 private:
     SourceCompiler *sourceCompiler;
-    NativeCompiler *nativeCompiler;
     GraphCompiler *graphCompiler;
     Compiler();
 
