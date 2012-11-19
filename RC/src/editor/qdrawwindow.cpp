@@ -444,6 +444,7 @@ bool TDrawWindow::saveGraphAs()
         Graph graph = getGraph();
         try {
             globalDBManager->saveGraphDB(graph);
+            setWindowModified(false);
             return true;
         } catch (const QString s) {
             QMessageBox::critical(this, tr("Ошибка"), s, QMessageBox::Ok);
@@ -459,6 +460,7 @@ bool TDrawWindow::saveGraph()
     }
     try {
         globalDBManager->updateGraphDB(getGraph());
+        setWindowModified(false);
         return true;
     } catch (const QString s) {
         QMessageBox::critical(this, tr("Ошибка"), s, QMessageBox::Ok);
