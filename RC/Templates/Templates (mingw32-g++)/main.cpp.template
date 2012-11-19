@@ -8,7 +8,7 @@
 int <#graphname>(TPOData *D);
 int main(int argc, char *argv[])
 {
-	TPOData D(0);
+	TPOData D(1);
 
     <#graphname>(&D);
 
