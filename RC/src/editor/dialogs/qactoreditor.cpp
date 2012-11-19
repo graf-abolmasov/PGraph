@@ -107,17 +107,18 @@ void QActorEditor::prepareForm(const Actor *actor)
     case Actor::InlineType:
         ui->inlineModuleTxtEdt->blockSignals(true);
         ui->inlineModuleTxtEdt->setPlainText(tempActor->extName);
-        QList<const Variable *> actorVariables = tempActor->variableList;
-        for (int i = 0; i < actorVariables.count(); i++){
+        for (int i = 0; i < tempActor->variableList.count(); i++){
             ui->paramsInlineTable->insertRow(i);
-            ui->paramsInlineTable->setItem(i, 0, new QTableWidgetItem(actorVariables[i]->name));
-            ui->paramsInlineTable->setItem(i, 1, new QTableWidgetItem(actorVariables[i]->type->name));
+            ui->paramsInlineTable->setItem(i, 0, new QTableWidgetItem(tempActor->variableList[i]->name));
+            ui->paramsInlineTable->setItem(i, 1, new QTableWidgetItem(tempActor->variableList[i]->type->name));
             ui->paramsInlineTable->setItem(i, 2, new QTableWidgetItem(tempActor->varAccModeList[i]));
         }
         //Получаем список перемерных
         ui->inlineModuleTxtEdt->blockSignals(false);
         ui->inlineModuleTxtEdt->setFocus();
         ui->normalWidget->setVisible(false);
+        break;
+    case Actor::GraphType:
         break;
     }
     QRegExp regExp(tr("[A-Za-z1-9А-Яа-я ]{1,255}"));
@@ -253,6 +254,7 @@ bool QActorEditor::makeResult()
     case Actor::InlineType:
         tempActor->extName = ui->inlineModuleTxtEdt->document()->toPlainText();
         break;
+    case Actor::GraphType:;
     }
     tempActor->name = "A" + getCRC(tempActor->extName.toUtf8());
 

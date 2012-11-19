@@ -76,6 +76,7 @@ QString Logger::log(QString message, LogLevel level)
     case Compile:
         emit compile(message);
         break;
+    case Debug:
     case All:
         emit info(message);
         break;
