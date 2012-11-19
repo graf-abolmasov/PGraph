@@ -19,11 +19,15 @@ private:
     bool myTemplateDirectorySet;
     QString myTemplateDirectory;
 
+    bool myProjectsDirectorySet;
+    QString myProjectsDirectory;
+
     QString myConfigPath;
 public:
     QString getOutputDirectory();
     QString getBaseDirectory();
     QString getTemplateDirectory();
+    QString getProjectsDirectory();
 
     bool isParallel();
     QString getConfigPath() { return myConfigPath; }

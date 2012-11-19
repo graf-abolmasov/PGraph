@@ -36,7 +36,7 @@ private:
     QStringList compileActor(const Actor *actor) const;
     QStringList compilePredicate(const Predicate *predicate) const;
     QStringList compileBasemodule(const BaseModule *baseModule) const;
-    QString compileDataType(const DataType *dataType) const;
+    QString buildDataType(const DataType *dataType) const;
 
 public:
     SourceCompiler();
