@@ -76,7 +76,7 @@ void DataBaseManager::setVariableList(const QList<const Variable *> &list)
     VariableDAO(db).persistList(myVariableList);
 }
 
-void DataBaseManager::saveGraph(const Graph &graph) throw (QString)
+void DataBaseManager::saveGraphDB(const Graph &graph) throw (QString)
 {
     GraphDAO(db).persist(graph);
 
@@ -102,7 +102,7 @@ void DataBaseManager::saveGraph(const Graph &graph) throw (QString)
 void DataBaseManager::updateGraphDB(const Graph &graph) throw (QString)
 {
     GraphDAO(db).remove(graph);
-    return saveGraph(graph);
+    return saveGraphDB(graph);
 }
 
 QList<Graph> DataBaseManager::getGraphListDB() throw (QString)
@@ -480,7 +480,7 @@ void DataBaseManager::cloneProjectDB(int srcProjectId, QString projectName, QStr
         myProjectId = srcProjectId;
         const Graph g = getGraphDB(graph->name);
         myProjectId = dstProjectId;
-        saveGraph(g);
+        saveGraphDB(g);
     }
 }
 

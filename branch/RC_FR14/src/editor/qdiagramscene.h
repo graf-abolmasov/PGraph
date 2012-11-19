@@ -25,7 +25,7 @@ class QDiagramScene : public QGraphicsScene
     Q_OBJECT
 
 public:
-    enum Mode { InsertNormalTop, InsertLine, InsertText, InsertSync, InsertMultiProcTop, InsertDataItem, MoveItem, ReadOnly};
+    enum Mode { InsertNormalTop, InsertLine, InsertText, InsertSync, InsertMultiProcTop, InsertDataItem, MoveItem };
 
     QDiagramScene(QObject *parent = 0);
     void setArcMenu(QMenu *menu);

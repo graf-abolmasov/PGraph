@@ -26,8 +26,6 @@ QDiagramScene::QDiagramScene(QObject *parent)
 
 void QDiagramScene::setMode(Mode mode)
 {
-    if (myMode == ReadOnly)
-        return;
     myMode = mode;
 }
 
@@ -49,9 +47,6 @@ void QDiagramScene::editorLostFocus(QComment *item)
 void QDiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
     if (mouseEvent->button() != Qt::LeftButton)
-        return;
-
-    if (myMode == ReadOnly)
         return;
 
     bool allowAddTop = true;
@@ -78,6 +73,7 @@ void QDiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
         break;
     case InsertText:
         addComment(mouseEvent->scenePos());
+        break;
     case InsertSync:
         newArcLine = new QArcLine(QLineF(mouseEvent->scenePos(), mouseEvent->scenePos()));
         newArcLine->setPen(QPen(Qt::red, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
@@ -91,8 +87,6 @@ void QDiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
             selectionRect->setPen(Qt::DashLine);
         }
         break;
-    case ReadOnly:
-        break;
     case InsertDataItem:
         //QDataItem *item = new QDataItem(NULL, NULL, this);
         //item->setPos(mouseEvent->scenePos());
@@ -103,9 +97,6 @@ void QDiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
 void QDiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
-    if (myMode == ReadOnly)
-        return;
-
     QList<QGraphicsItem* > mySelectedItems = selectedItems();
 
     //режим выделения области
@@ -309,7 +300,7 @@ void QDiagramScene::insertSyncMouseReleaseEvent(QGraphicsSceneMouseEvent *mouseE
     }
     removeItem(newArcLine);
     delete newArcLine;
-    newArcLine = 0;
+    newArcLine = NULL;
 }
 
 void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
@@ -324,7 +315,6 @@ void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
     case InsertLine:
         insertLineMouseReleaseEvent(mouseEvent);
         break;
-    case ReadOnly:;
     case InsertMultiProcTop:;
     case InsertNormalTop:;
     }
@@ -333,15 +323,11 @@ void QDiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
 }
 
 void QDiagramScene::keyReleaseEvent(QKeyEvent *keyEvent){
-    if (myMode == ReadOnly)
-        return;
-
     if ((newArc != NULL) && (keyEvent->key() == Qt::Key_Escape)) {
         if (newArc->lines.size() > 0) {
             qDeleteAll(newArc->lines);
             newArc->lines.clear();
         }
-        delete newArcLine;
         delete newArc;
         newArc = NULL;
         newArcLine = NULL;
@@ -368,36 +354,26 @@ void QDiagramScene::keyReleaseEvent(QKeyEvent *keyEvent){
 
 void QDiagramScene::setTopMenu(QMenu *menu)
 {
-    if (myMode == ReadOnly)
-        return;
     myTopMenu = menu;
 }
 
 void QDiagramScene::setArcMenu(QMenu *menu)
 {
-    if (myMode == ReadOnly)
-        return;
     myArcMenu = menu;
 }
 
 void QDiagramScene::setCommentMenu(QMenu *menu)
 {
-    if (myMode == ReadOnly)
-        return;
     myCommentMenu = menu;
 }
 
 void QDiagramScene::setSyncArcMenu(QMenu *menu)
 {
-    if (myMode == ReadOnly)
-        return;
     mySyncArcMenu = menu;
 }
 
 void QDiagramScene::setMultiProcTopMenu(QMenu *menu)
 {
-    if (myMode == ReadOnly)
-        return;
     myMultiProcTopMenu = menu;
 }
 
@@ -454,7 +430,7 @@ int QDiagramScene::getNextTopNumber()
 void QDiagramScene::wheelEvent(QGraphicsSceneWheelEvent *wheelEvent)
 {
     if (wheelEvent->modifiers() & Qt::ControlModifier) {
-        emit mouseScrollScaleChanged(wheelEvent->delta()/8);
+        emit mouseScrollScaleChanged(wheelEvent->delta()/8.0);
         wheelEvent->accept();
     }
 }

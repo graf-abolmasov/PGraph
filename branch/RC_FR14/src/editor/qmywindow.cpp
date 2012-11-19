@@ -24,31 +24,41 @@
 
 TMyWindow::TMyWindow()
 {
-    setWindowIcon(QIcon(":/images/G.png"));
+    myCurrentDrawWindow = NULL;
+    mdiArea = new QMdiArea;
+    mdiArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    mdiArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    setCentralWidget(mdiArea);
+    connect(mdiArea, SIGNAL(subWindowActivated(QMdiSubWindow*)),
+            this, SLOT(activeSubWindowChanged(QMdiSubWindow*)));
+    windowMapper = new QSignalMapper(this);
+    connect(windowMapper, SIGNAL(mapped(QWidget*)),
+            this, SLOT(setActiveSubWindow(QWidget*)));
 
-    saveGraphAct = NULL;
+    setWindowIcon(QIcon(":/images/G.png"));
+    setUnifiedTitleAndToolBarOnMac(true);
+
     nativeCompiler = new NativeCompiler(this);
     isParallel = globalSettings->isParallel();
-    globalOutput = new QListWidget();
+    outputPanelList = new QListWidget();
     connect(globalLogger, SIGNAL(newMessage(QString)), this, SLOT(write2globalOutput(QString)));
 
-    if (globalDBManager->getProjectId() != -1) {
-        setStatusBar(new QStatusBar(this));
-        createActions();
-        createMenus();
-        createToolBar();
-        createUndoView();
-        createDockWindows();
-        createDrawWindow();
-        createOutputWindow();
-        readSettings();
-    }
+    setWindowTitle(tr("PGraph"));
+    setStatusBar(new QStatusBar(this));
+    createActions();
+    createMenus();
+    createToolBars();
+    createUndoView();
+    createDockWindows();
+    createOutputWindow();
+    readSettings();
+    CMGNew();
 }
 
 void TMyWindow::write2globalOutput(const QString &msg)
 {
-    globalOutput->addItem(msg);
-    globalOutput->scrollToBottom();
+    outputPanelList->addItem(msg);
+    outputPanelList->scrollToBottom();
 }
 
 TMyWindow::~TMyWindow()
@@ -59,7 +69,6 @@ TMyWindow::~TMyWindow()
 void TMyWindow::createMenus()
 {
     grafMenu = menuBar()->addMenu(tr("Граф"));
-    connect(grafMenu, SIGNAL(aboutToShow()), this, SLOT(grafMenuAboutToShow()));
     grafMenu->addAction(newGraphAct);
     grafMenu->addAction(openGraphAct);
     grafMenu->addAction(saveGraphAct);
@@ -83,9 +92,11 @@ void TMyWindow::createMenus()
 
     buildMenu = menuBar()->addMenu(tr("Запуск"));
     buildMenu->addAction(buildAct);
-    buildMenu->addAction(saveStructAct);
     buildMenu->addAction(compileAct);
-    buildMenu->addAction(manualInputAct);
+
+    windowMenu = menuBar()->addMenu(tr("&Window"));
+    updateWindowMenu();
+    connect(windowMenu, SIGNAL(aboutToShow()), this, SLOT(updateWindowMenu()));
 
     helpMenu = menuBar()->addMenu(tr("Помощь"));
     helpMenu->addAction(aboutEditorAct);
@@ -111,7 +122,6 @@ void TMyWindow::createActions()
     const QString saveShortCut = QKeySequence::keyBindings(QKeySequence::Save).first().toString();
     saveGraphAct->setStatusTip(tr("Сохранить граф") + (saveShortCut.isEmpty() ? "" : " (" + saveShortCut + ")"));
     connect(saveGraphAct, SIGNAL(triggered()), this, SLOT(CMGSave()));
-    saveGraphAct->setEnabled(false);
 
     saveAsGraphAct = new QAction(tr("Cохранить как"), this);
     saveAsGraphAct->setShortcuts(QKeySequence::SaveAs);
@@ -147,7 +157,6 @@ void TMyWindow::createActions()
     redoAct->setStatusTip(tr("Вернуть отмененное действие") + (redoShortCut.isEmpty() ? "" : " (" + redoShortCut + ")"));
     redoAct->setEnabled(false);
     connect(redoAct, SIGNAL(triggered()), this, SLOT(CMERedo()));
-
 
     cutAct->setEnabled(false);
     copyAct->setEnabled(false);
@@ -211,21 +220,40 @@ void TMyWindow::createActions()
     compileAct->setStatusTip(tr("Компилировать граф-модель (F6)"));
     compileAct->setShortcut(QKeySequence(Qt::Key_F6));
     connect(compileAct, SIGNAL(triggered()), this, SLOT(CMCompile()));
-    compileAct->setEnabled(false);
-
-    saveStructAct = new QAction(tr("Записать структуру"), this);
-    saveStructAct->setStatusTip(tr("Записать структуру графа в базу"));
-    connect(saveStructAct, SIGNAL(triggered()), this, SLOT(CMSaveStruct()));
-    saveStructAct->setEnabled(false);
-
-    manualInputAct = new QAction(tr("Ручной ввод данных"), this);
-    connect(manualInputAct, SIGNAL(triggered()), this, SLOT(CMDoUserDialog()));
-    manualInputAct->setEnabled(false);
 
     aboutEditorAct = new QAction(tr("О редакторе"), this);
     aboutEditorAct->setStatusTip(tr("Об авторе (F1)"));
     aboutEditorAct->setShortcut(QKeySequence(Qt::Key_F1));
     connect(aboutEditorAct, SIGNAL(triggered()), this, SLOT(CMHelpAbout()));
+
+    closeAct = new QAction(tr("Cl&ose"), this);
+    closeAct->setStatusTip(tr("Close the active window"));
+    connect(closeAct, SIGNAL(triggered()), mdiArea, SLOT(closeActiveSubWindow()));
+
+    closeAllAct = new QAction(tr("Close &All"), this);
+    closeAllAct->setStatusTip(tr("Close all the windows"));
+    connect(closeAllAct, SIGNAL(triggered()), mdiArea, SLOT(closeAllSubWindows()));
+
+    tileAct = new QAction(tr("&Tile"), this);
+    tileAct->setStatusTip(tr("Tile the windows"));
+    connect(tileAct, SIGNAL(triggered()), mdiArea, SLOT(tileSubWindows()));
+
+    cascadeAct = new QAction(tr("&Cascade"), this);
+    cascadeAct->setStatusTip(tr("Cascade the windows"));
+    connect(cascadeAct, SIGNAL(triggered()), mdiArea, SLOT(cascadeSubWindows()));
+
+    nextAct = new QAction(tr("Ne&xt"), this);
+    nextAct->setShortcuts(QKeySequence::NextChild);
+    nextAct->setStatusTip(tr("Move the focus to the next window"));
+    connect(nextAct, SIGNAL(triggered()), mdiArea, SLOT(activateNextSubWindow()));
+
+    previousAct = new QAction(tr("Pre&vious"), this);
+    previousAct->setShortcuts(QKeySequence::PreviousChild);
+    previousAct->setStatusTip(tr("Move the focus to the previous window"));
+    connect(previousAct, SIGNAL(triggered()), mdiArea, SLOT(activatePreviousSubWindow()));
+
+    separatorAct = new QAction(this);
+    separatorAct->setSeparator(true);
 
     //LeftToolBar
     pointerButton = new QToolButton;
@@ -299,7 +327,7 @@ void TMyWindow::createActions()
 
     scaleCombo = new QComboBox;
     QStringList scales;
-    scales << tr("50%") << tr("75%") << tr("100%") << tr("125%") << tr("150%");
+    scales << tr("--") << tr("50%") << tr("75%") << tr("100%") << tr("125%") << tr("150%");
     scaleCombo->addItems(scales);
     connect(scaleCombo, SIGNAL(currentIndexChanged(QString)),
             this, SLOT(setFixedScale(QString)));
@@ -310,47 +338,16 @@ void TMyWindow::createActions()
     scaleSlider->setOrientation(Qt::Horizontal);
     scaleSlider->setMaximumWidth(100);
     connect(scaleSlider, SIGNAL(valueChanged(int)), this, SLOT(setFloatScale(int)));
-
-    //    showDataLayer = new QToolButton();
-    //    showDataLayer->setText(tr("Данные"));
-    //    showDataLayer ->setCheckable(true);
-    //    connect(showDataLayer, SIGNAL(clicked(bool)), this, SLOT(showDataLayerClicked(bool)));
 }
 
 TDrawWindow* TMyWindow::createDrawWindow()
 {
-    TDrawWindow *newDrawWindow = new TDrawWindow;
-    setCentralWidget(newDrawWindow);
-
-    connect(newDrawWindow, SIGNAL(sceneChanged()),
-            this, SLOT(sceneChanged()));
-    connect(newDrawWindow, SIGNAL(itemChanged(QGraphicsItem*)),
-            this, SLOT(getInfo(QGraphicsItem*)));
-    connect(newDrawWindow, SIGNAL(selectionChanged(QList<QGraphicsItem*>)),
-            this, SLOT(updateToolBar(QList<QGraphicsItem*>)));
-    connect(newDrawWindow, SIGNAL(graphLoaded(QString,QString)), this,
-            SLOT(graphLoaded(QString,QString)));
-    connect(newDrawWindow, SIGNAL(mouseScrollScaleChanged(float)), this, SLOT(updateScaleSlider(float)));
-    connect(newDrawWindow->undoStack, SIGNAL(canRedoChanged(bool)), redoAct, SLOT(setEnabled(bool)));
-    connect(newDrawWindow->undoStack, SIGNAL(canUndoChanged(bool)), undoAct, SLOT(setEnabled(bool)));
-
-    undoView->setStack(activeDrawWindow()->undoStack);
-
-    alignHLeftAct->setEnabled(false);
-    alignHCenterAct->setEnabled(false);
-    alignHRightAct->setEnabled(false);
-    alignVTopAct->setEnabled(false);
-    alignVCenterAct->setEnabled(false);
-    alignVBottomAct->setEnabled(false);
-    distribVerticallyAct->setEnabled(false);
-    distribHorizontallyAct->setEnabled(false);
-
-    globalInfoLabel->setText("\n\n\n\n\n\n\n");
-    scaleCombo->setCurrentIndex(2);
+    TDrawWindow *newDrawWindow = new TDrawWindow();
+    mdiArea->setActiveSubWindow(mdiArea->addSubWindow(newDrawWindow));
     return newDrawWindow;
 }
 
-void TMyWindow::createToolBar()
+void TMyWindow::createToolBars()
 {
     mainToolBar = addToolBar(tr("Инструменты"));
     mainToolBar->addAction(newGraphAct);
@@ -409,67 +406,34 @@ void TMyWindow::createToolBar()
     scaleToolBar = addToolBar(tr("Масштаб"));
     scaleToolBar->addWidget(new QLabel(tr("Масштаб: ")));
     scaleToolBar->addWidget(scaleCombo);
-
-    //    layerToolBar = addToolBar(tr("Слои"));
-    //    layerToolBar->addWidget(showDataLayer);
-    //    Если нужен ползунковый регулятор масштаба
-    //    scaleToolBar->addSeparator();
     scaleToolBar->addWidget(scaleSlider);
-}
-
-
-TDrawWindow *TMyWindow::activeDrawWindow()
-{
-    return qobject_cast<TDrawWindow *>(centralWidget());
 }
 
 void TMyWindow::pointerGroupClicked(int)
 {
-    TDrawWindow *drawWindow  = activeDrawWindow();
-    if (drawWindow != NULL)
-        drawWindow->setMode(QDiagramScene::Mode(pointerTypeGroup->checkedId()));
-}
-
-void TMyWindow::sceneChanged()
-{
-    if (activeDrawWindow())
-        pointerTypeGroup->button(int(activeDrawWindow()->mode()))->setChecked(true);
-    setWindowTitle(activeDrawWindow()->myGraphName.isEmpty() ?  tr("Untitled* - Граф-редактор") : activeDrawWindow()->myGraphExtName + tr("* - Граф-редактор"));
-    saveGraphAct->setEnabled(true);
+    Q_ASSERT(myCurrentDrawWindow);
+    myCurrentDrawWindow->setMode(QDiagramScene::Mode(pointerTypeGroup->checkedId()));
 }
 
 void TMyWindow::CMGNew()
 {
-    if (askForSaveBeforeClose() == false)
-        return;
-    TDrawWindow *newDrawWindow = createDrawWindow();
-    newDrawWindow->showMaximized();
-    buildMenu->setEnabled(false);
-    compileAct->setEnabled(false);
-    setWindowTitle(tr("Untitled - Граф-редактор"));
-    globalPredicateList.clear();
+    myCurrentDrawWindow = createDrawWindow();
+    myCurrentDrawWindow->showMaximized();
 }
 
 void TMyWindow::CMGSaveAsImage()
 {
+    Q_ASSERT(myCurrentDrawWindow);
     QString fileName = QFileDialog::getSaveFileName();
-    if (!fileName.isEmpty())
-        activeDrawWindow()->saveAsImage(fileName);
+    if (fileName.isEmpty())
+        return;
+    myCurrentDrawWindow->saveAsImage(fileName);
 }
 
 void TMyWindow::CMGSaveAs()
 {
-    QSaveGraphDialog dialog;
-    if (dialog.exec()){
-        const QString extName = dialog.getResult();
-        if (extName.isEmpty())
-            return;
-        if (activeDrawWindow()->saveGraphAs(extName)) {
-            setWindowTitle(activeDrawWindow()->myGraphExtName + tr(" - Граф-редактор"));
-            saveGraphAct->setEnabled(false);
-            statusBar()->showMessage(tr("Сохранено как ") + activeDrawWindow()->myGraphName, 3000);
-        }
-    }
+    Q_ASSERT(myCurrentDrawWindow);
+    myCurrentDrawWindow->saveGraphAs();
 }
 
 void TMyWindow::CMObjList()
@@ -492,10 +456,15 @@ void TMyWindow::CMEdtType()
 void TMyWindow::CMGOpen()
 {
     QOpenGraphDialog dialog;
-    if (dialog.exec()){
-        CMGNew();
-        activeDrawWindow()->loadGraph(dialog.getResult());
-        scaleSlider->setValue(100);
+    if (dialog.exec()) {
+        const QString graphName = dialog.getResult();
+        QMdiSubWindow *existing = findMdiChild(graphName);
+        if (existing) {
+            mdiArea->setActiveSubWindow(existing);
+            return;
+        }
+        openGraph(dialog.getResult());
+        updateMenues();
     }
 }
 
@@ -509,31 +478,18 @@ void TMyWindow::CMExit()
     QApplication::closeAllWindows();
 }
 
-void TMyWindow::CMSaveStruct()
-{
-    if (activeDrawWindow()->saveStruct())
-        statusBar()->showMessage(tr("Структура записана"), 2000);
-}
-
 void TMyWindow::CMGSave()
 {
-    const TDrawWindow *adw = activeDrawWindow();
-    if (adw->myGraphName.isEmpty()) {
-        CMGSaveAs();
-        return;
-    }
-    if (activeDrawWindow()->saveGraph()) {
-        setWindowTitle(activeDrawWindow()->myGraphExtName + tr(" - Граф-редактор"));
-        saveGraphAct->setEnabled(false);
-        statusBar()->showMessage(tr("Сохранено как ") + activeDrawWindow()->myGraphName, 3000);
-    }
+    Q_ASSERT(myCurrentDrawWindow);
+    myCurrentDrawWindow->saveGraph();
+    updateMenues();
 }
 
 void TMyWindow::CMHelpAbout()
 {
     QMessageBox::about(this, tr("O Граф-редакторе"),
                        tr("<h2>Граф-редактор 2.0</h2>"
-                          "<p>Внутренняя версия ") + QApplication::applicationVersion() +
+                          "<p>Internal version ") + QApplication::applicationVersion() +
                        tr("<p>Copyright &copy; 2000-2012 FuzzyLogic Team. All rights reserved.</p>"
                           "<p>The program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.</p>"));
 
@@ -542,11 +498,11 @@ void TMyWindow::CMHelpAbout()
 void TMyWindow::createDockWindows()
 {
     QDockWidget *dock = new QDockWidget(tr("Инфо"), this);
-    globalInfoLabel = new QLabel(dock);
-    globalInfoLabel->setWordWrap(true);
-    globalInfoLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+    infoPanelLabel = new QLabel(dock);
+    infoPanelLabel->setWordWrap(true);
+    infoPanelLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
     dock->setAllowedAreas(Qt::RightDockWidgetArea);
-    dock->setWidget(globalInfoLabel);
+    dock->setWidget(infoPanelLabel);
     dock->setMinimumWidth(250);
     addDockWidget(Qt::RightDockWidgetArea, dock);
 
@@ -560,48 +516,58 @@ void TMyWindow::createDockWindows()
 void TMyWindow::createOutputWindow()
 {
     QDockWidget *outputDock = new QDockWidget(tr("Сообщения"), this);
-    globalOutput->setParent(outputDock);
+    outputPanelList->setParent(outputDock);
     outputDock->setAllowedAreas(Qt::BottomDockWidgetArea);
-    outputDock->setWidget(globalOutput);
+    outputDock->setWidget(outputPanelList);
     addDockWidget(Qt::BottomDockWidgetArea, outputDock);
 }
 
 void TMyWindow::alignHLeft()
 {
-    activeDrawWindow()->alignHLeft();
+    Q_ASSERT(myCurrentDrawWindow);
+    myCurrentDrawWindow->alignHLeft();
 }
 
 void TMyWindow::alignHRight()
 {
-    activeDrawWindow()->alignHRight();
+    Q_ASSERT(myCurrentDrawWindow);
+    myCurrentDrawWindow->alignHRight();
 }
+
 void TMyWindow::alignHCenter()
 {
-    activeDrawWindow()->alignHCenter();
+    Q_ASSERT(myCurrentDrawWindow);
+    myCurrentDrawWindow->alignHCenter();
 }
 
 void TMyWindow::alignVTop()
 {
-    activeDrawWindow()->alignVTop();
+    Q_ASSERT(myCurrentDrawWindow);
+    myCurrentDrawWindow->alignVTop();
 }
 
 void TMyWindow::alignVCenter()
 {
-    activeDrawWindow()->alignVCenter();
+    Q_ASSERT(myCurrentDrawWindow);
+    myCurrentDrawWindow->alignVCenter();
 }
+
 void TMyWindow::alignVBottom()
 {
-    activeDrawWindow()->alignVBottom();
+    Q_ASSERT(myCurrentDrawWindow);
+    myCurrentDrawWindow->alignVBottom();
 }
 
 void TMyWindow::distribHorizontally()
 {
-    activeDrawWindow()->distribHorizontally();
+    Q_ASSERT(myCurrentDrawWindow);
+    myCurrentDrawWindow->distribHorizontally();
 }
 
 void TMyWindow::distribVertically()
 {
-    activeDrawWindow()->distribVertically();
+    Q_ASSERT(myCurrentDrawWindow);
+    myCurrentDrawWindow->distribVertically();
 }
 
 void TMyWindow::createUndoView()
@@ -612,11 +578,12 @@ void TMyWindow::createUndoView()
 
 void TMyWindow::getInfo(QGraphicsItem *item)
 {
+    Q_ASSERT(myCurrentDrawWindow);
     QArc *arc = NULL;
     QTop *top = NULL;
     QSyncArc *syncArc = NULL;
     if (item == NULL) {
-        globalInfoLabel->setText("");
+        infoPanelLabel->setText("");
         return;
     }
 
@@ -667,11 +634,13 @@ void TMyWindow::getInfo(QGraphicsItem *item)
         break;
     }
 
-    globalInfoLabel->setText(info);
+    infoPanelLabel->setText(info);
 }
 
 void TMyWindow::updateToolBar(QList<QGraphicsItem *> items)
 {
+    Q_ASSERT(myCurrentDrawWindow);
+
     alignHLeftAct->setEnabled(false);
     alignHCenterAct->setEnabled(false);
     alignHRightAct->setEnabled(false);
@@ -733,81 +702,55 @@ void TMyWindow::updateToolBar(QList<QGraphicsItem *> items)
 
 void TMyWindow::setFixedScale(const QString &scale)
 {
+    Q_ASSERT(myCurrentDrawWindow);
     int newScale = scale.left(scale.indexOf(tr("%"))).toInt();
-    activeDrawWindow()->scale(newScale/100.0);
+    myCurrentDrawWindow->scale(newScale/100.0);
     scaleSlider->setValue(newScale);
 }
 
 void TMyWindow::setFloatScale(const int scale)
 {
-    int idx = scaleCombo->findText(QString::number(scale) + "%");
+    Q_ASSERT(myCurrentDrawWindow);
+    QString scaleText = QString::number(scale) + "%";
+    int idx = scaleCombo->findText(scaleText);
     if (idx > 0)
         scaleCombo->setCurrentIndex(idx);
-    activeDrawWindow()->scale(scale/100.0);
+    else {
+        scaleCombo->blockSignals(true);
+        scaleCombo->setItemText(0, scaleText);
+        scaleCombo->setCurrentIndex(0);
+        scaleCombo->blockSignals(false);
+    }
+    myCurrentDrawWindow->scale(scale/100.0);
 }
 
 void TMyWindow::readSettings()
 {
-
 }
 
 void TMyWindow::writeSettings()
 {
-    //Сохраняем список недавних файлов
-}
-
-void TMyWindow::graphLoaded(QString name, QString extName)
-{
-    buildMenu->setEnabled(true);
-    compileAct->setEnabled(true);
-    setWindowTitle(extName + tr(" - Граф-редактор"));
-}
-
-bool TMyWindow::askForSaveBeforeClose() {
-    if (saveGraphAct != NULL && saveGraphAct->isEnabled()) {
-        int dialodResult = QMessageBox::question(this, tr("Сохранить"),
-                                          tr("Сохранить изменения в ") + activeDrawWindow()->myGraphExtName + tr("?"),
-                                          QMessageBox::Yes, QMessageBox::No, QMessageBox::Cancel);
-        if ( dialodResult == QMessageBox::Yes) {
-            CMGSave();
-            return true;
-        } else if (dialodResult == QMessageBox::No) {
-            return true;
-        } else if (dialodResult == QMessageBox::Cancel) {
-            return false;
-        }
-    }
-    return true;
 }
 
 void TMyWindow::closeEvent(QCloseEvent *event)
 {
-    writeSettings();
-    if (askForSaveBeforeClose())
-        event->accept();
-    else
+    mdiArea->closeAllSubWindows();
+    if (mdiArea->currentSubWindow()) {
         event->ignore();
-}
-
-void TMyWindow::grafMenuAboutToShow()
-{
-
+    } else {
+        writeSettings();
+        event->accept();
+    }
 }
 
 void TMyWindow::CMCompile()
 {
-    CMGSave();
-    const TDrawWindow *adw = activeDrawWindow();
-    if (adw->myGraphName.isEmpty())
-        return;
-    Compiler *c = Compiler::getCompiler();
-    c->compile(activeDrawWindow()->myGraphName);
-    delete c;
-}
-
-void TMyWindow::showDataLayerClicked(bool )
-{
-    //    activeDrawWindow()->showDataLayer(clicked);
+    Q_ASSERT(myCurrentDrawWindow);
+    if (myCurrentDrawWindow->saveGraph()) {
+        Compiler *c = Compiler::getCompiler();
+        c->compile(myCurrentDrawWindow->myGraphName);
+        delete c;
+    }
 }
 
 void TMyWindow::CMECopy()
@@ -832,9 +775,9 @@ void TMyWindow::CMCompileData()
     delete c;
 }
 
-void TMyWindow::updateScaleSlider(const float scale)
+void TMyWindow::updateScaleSlider(const float scaleIncrement)
 {
-    scaleSlider->setValue(scaleSlider->value() + scale);
+    scaleSlider->setValue(scaleSlider->value() + scaleIncrement);
 }
 
 void TMyWindow::CMBuild()
@@ -851,10 +794,150 @@ void TMyWindow::CMOtherFiles()
 
 void TMyWindow::CMERedo()
 {
-    activeDrawWindow()->undoStack->redo();
+    Q_ASSERT(myCurrentDrawWindow);
+    myCurrentDrawWindow->undoStack->redo();
 }
 
 void TMyWindow::CMEUndo()
 {
-    activeDrawWindow()->undoStack->undo();
+    Q_ASSERT(myCurrentDrawWindow);
+    myCurrentDrawWindow->undoStack->undo();
+}
+
+void TMyWindow::setActiveSubWindow(QWidget *window)
+{
+    if (!window)
+        return;
+    mdiArea->setActiveSubWindow(qobject_cast<QMdiSubWindow *>(window));
+}
+
+void TMyWindow::updateMenues()
+{
+    bool hasMdiChild = myCurrentDrawWindow != NULL;
+    bool graphNameIsNotEmpty = hasMdiChild && !myCurrentDrawWindow->myGraphName.isEmpty();
+
+    saveGraphAct->setEnabled(hasMdiChild && myCurrentDrawWindow->isWindowModified());
+    buildMenu->setEnabled(graphNameIsNotEmpty);
+    compileDataAct->setEnabled(graphNameIsNotEmpty);
+    compileAct->setEnabled(graphNameIsNotEmpty);
+    buildAct->setEnabled(graphNameIsNotEmpty);
+
+    saveAsGraphAct->setEnabled(hasMdiChild);
+    saveAsImageGraphAct->setEnabled(hasMdiChild);
+
+    leftToolBar->setEnabled(hasMdiChild);
+    layoutToolBar->setEnabled(hasMdiChild);
+    scaleToolBar->setEnabled(hasMdiChild);
+    if (hasMdiChild) {
+        int scale = myCurrentDrawWindow->getScale()*100;
+        scaleSlider->blockSignals(true);
+        scaleCombo->blockSignals(true);
+        scaleSlider->setValue(scale);
+        QString scaleText = QString::number(scale) + "%";
+        int idx = scaleCombo->findText(scaleText);
+        if (idx > 0)
+            scaleCombo->setCurrentIndex(idx);
+        else {
+            scaleCombo->setItemText(0, scaleText);
+            scaleCombo->setCurrentIndex(0);
+        }
+        scaleSlider->blockSignals(false);
+        scaleCombo->blockSignals(false);
+    }
+
+    undoAct->setEnabled(hasMdiChild && myCurrentDrawWindow->undoStack->canUndo());
+    redoAct->setEnabled(hasMdiChild && myCurrentDrawWindow->undoStack->canRedo());
+    undoView->setEnabled(hasMdiChild);
+    outputPanelList->setEnabled(hasMdiChild);
+    infoPanelLabel->setEnabled(hasMdiChild);
+
+    closeAct->setEnabled(hasMdiChild);
+    closeAllAct->setEnabled(hasMdiChild);
+    tileAct->setEnabled(hasMdiChild);
+    cascadeAct->setEnabled(hasMdiChild);
+    nextAct->setEnabled(hasMdiChild);
+    previousAct->setEnabled(hasMdiChild);
+    separatorAct->setVisible(hasMdiChild);
+}
+
+void TMyWindow::activeSubWindowChanged(QMdiSubWindow *window)
+{
+    if (myCurrentDrawWindow) {
+        myCurrentDrawWindow->disconnect(SIGNAL(documentModified()), this, SLOT(updateMenues()));
+        myCurrentDrawWindow->disconnect(SIGNAL(itemChanged(QGraphicsItem*)));
+        myCurrentDrawWindow->disconnect(SIGNAL(selectionChanged(QList<QGraphicsItem*>)));
+        myCurrentDrawWindow->disconnect(SIGNAL(mouseScrollScaleChanged(float)));
+        myCurrentDrawWindow->undoStack->disconnect(SIGNAL(canRedoChanged(bool)), redoAct, SLOT(setEnabled(bool)));
+        myCurrentDrawWindow->undoStack->disconnect(SIGNAL(canUndoChanged(bool)), undoAct, SLOT(setEnabled(bool)));
+    }
+    if (window == NULL) {
+        undoView->setStack(NULL);
+        myCurrentDrawWindow = NULL;
+    } else {
+        myCurrentDrawWindow = qobject_cast<TDrawWindow *>(window->widget());
+        connect(myCurrentDrawWindow, SIGNAL(openSubGraph(QString)), this, SLOT(openGraph(QString)));
+        connect(myCurrentDrawWindow, SIGNAL(documentModified()), this, SLOT(updateMenues()));
+        connect(myCurrentDrawWindow, SIGNAL(itemChanged(QGraphicsItem*)), this, SLOT(getInfo(QGraphicsItem*)));
+        connect(myCurrentDrawWindow, SIGNAL(selectionChanged(QList<QGraphicsItem*>)), this, SLOT(updateToolBar(QList<QGraphicsItem*>)));
+        connect(myCurrentDrawWindow, SIGNAL(mouseScrollScaleChanged(float)), this, SLOT(updateScaleSlider(float)));
+        connect(myCurrentDrawWindow->undoStack, SIGNAL(canRedoChanged(bool)), redoAct, SLOT(setEnabled(bool)));
+        connect(myCurrentDrawWindow->undoStack, SIGNAL(canUndoChanged(bool)), undoAct, SLOT(setEnabled(bool)));
+        undoView->setStack(myCurrentDrawWindow->undoStack);
+    }
+    updateMenues();
+}
+
+void TMyWindow::openGraph(const QString &name)
+{
+    Q_ASSERT(!name.isEmpty());
+    QMdiSubWindow *child = findMdiChild("");
+    if (child != NULL) {
+        TDrawWindow *mdiChild = qobject_cast<TDrawWindow *>(child->widget());
+        if (!mdiChild->isWindowModified() && mdiChild->myGraphName.isEmpty()) {
+            mdiArea->setActiveSubWindow(child);
+            myCurrentDrawWindow = mdiChild;
+        }
+    }
+    if (myCurrentDrawWindow == NULL)
+        CMGNew();
+    Q_ASSERT(myCurrentDrawWindow);
+    myCurrentDrawWindow->loadGraph(name);
+}
+
+QMdiSubWindow *TMyWindow::findMdiChild(const QString &graphName)
+{
+    foreach (QMdiSubWindow *window, mdiArea->subWindowList()) {
+        TDrawWindow *mdiChild = qobject_cast<TDrawWindow *>(window->widget());
+        if (mdiChild->myGraphName == graphName)
+            return window;
+    }
+    return NULL;
+}
+
+void TMyWindow::updateWindowMenu()
+{
+    windowMenu->clear();
+    windowMenu->addAction(closeAct);
+    windowMenu->addAction(closeAllAct);
+    windowMenu->addSeparator();
+    windowMenu->addAction(tileAct);
+    windowMenu->addAction(cascadeAct);
+    windowMenu->addSeparator();
+    windowMenu->addAction(nextAct);
+    windowMenu->addAction(previousAct);
+    windowMenu->addAction(separatorAct);
+
+    QList<QMdiSubWindow *> windows = mdiArea->subWindowList();
+    separatorAct->setVisible(!windows.isEmpty());
+
+    for (int i = 0; i < windows.size(); ++i) {
+        TDrawWindow *child = qobject_cast<TDrawWindow *>(windows.at(i)->widget());
+
+        QString text = i < 9 ? tr("&%1 %2") : tr("%1 %2");
+        QAction *action  = windowMenu->addAction(text.arg(i + 1).arg(child->myGraphExtName));
+        action->setCheckable(true);
+        action->setChecked(child == myCurrentDrawWindow);
+        connect(action, SIGNAL(triggered()), windowMapper, SLOT(map()));
+        windowMapper->setMapping(action, windows[i]);
+    }
 }
