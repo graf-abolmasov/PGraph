@@ -25,6 +25,7 @@ class TDrawWindow : public QMainWindow
 private:
     void createMenus();
     void createActions();
+    float myScale;
 
     QDiagramScene *scene;
     QGraphicsView *view;   
@@ -40,7 +41,6 @@ private:
     QAction *setTopPropertyAction;
     QAction *makeAsRootAction;
     QAction *viewSubGraphAct;
-    QAction *editSubGraphAct;
     QAction *setArcPropertyAction;
     QAction *deleteArcAction;
     QAction *rebuildArcAction;
@@ -56,16 +56,17 @@ private:
     QList<QSyncArc* > allSyncArcs() const;
     QList<QMultiProcTop* > allMultiProcTop() const;
 
+    bool maybeSave();
+
+protected:
+    void closeEvent(QCloseEvent *event);
+
 public:
-    enum ShowRole {NormalEditor, ReadOnly, SelectTop};
-
-    ShowRole myRole;
-
-    QUndoStack *undoStack;
     QString myGraphName;
     QString myGraphExtName;
+    QUndoStack *undoStack;
 
-    TDrawWindow(ShowRole role = NormalEditor, QWidget *parent = 0);
+    TDrawWindow(QWidget *parent = 0);
     void saveAsImage(QString filename);
     void setMode(QDiagramScene::Mode mode);
     void showDataLayer(bool );
@@ -74,7 +75,7 @@ public:
     Graph getGraph() const;
 
     void loadGraph(const QString &name);
-    bool saveGraphAs(QString extName);
+    bool saveGraphAs();
     bool saveGraph();
     bool saveStruct();
 
@@ -87,22 +88,24 @@ public:
     void distribVertically();
     void distribHorizontally();
     void scale(float s);
+    float getScale()
+        { return myScale; }
 
 signals:
-    void sceneChanged();
+    void documentModified();
     void mouseScrollScaleChanged(float);
     void itemChanged(QGraphicsItem *item);
     void selectionChanged(QList<QGraphicsItem *>);
-    void graphLoaded(QString, QString);
+    void openSubGraph(const QString &name);
 
 private slots:
+    void documentWasModified();
     void topMenuAboutToShow();
     void setItemIcon();
     void showTopPropDialog();
     void makeAsRoot();
     void deleteTop();
     void viewSubGraph();
-    void editSubGraph();
     void showArcPropDialog();
     void deleteArc();
     void rebuildArc();

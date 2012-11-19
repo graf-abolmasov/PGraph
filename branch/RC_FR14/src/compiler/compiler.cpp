@@ -3,7 +3,6 @@
 
 Compiler::Compiler()
 {
-    nativeCompiler = new NativeCompiler(NULL);
     sourceCompiler = new SourceCompiler();
     graphCompiler = new GraphCompiler();
 }
@@ -15,7 +14,6 @@ Compiler *Compiler::getCompiler()
 
 Compiler::~Compiler() {
     delete graphCompiler;
-    delete nativeCompiler;
     delete sourceCompiler;
 }
 

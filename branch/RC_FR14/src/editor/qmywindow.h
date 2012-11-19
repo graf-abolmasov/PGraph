@@ -3,6 +3,7 @@
 
 #include <QtGui/QMainWindow>
 #include <QtCore/QMap>
+#include "../../src/editor/qdrawwindow.h"
 #include "../../src/compiler/nativecompiler.h"
 
 QT_BEGIN_NAMESPACE
@@ -15,6 +16,8 @@ class QGraphicsItem;
 class QTextEdit;
 class QLabel;
 class QListWidget;
+class QMdiArea;
+class QMdiSubWindow;
 QT_END_NAMESPACE
 
 class TDrawWindow;
@@ -29,12 +32,17 @@ public:
 
 private:
 
+    QMdiArea *mdiArea;
+    QSignalMapper *windowMapper;
+    TDrawWindow *myCurrentDrawWindow;
+
     bool isParallel;
 
     QMenu *grafMenu;
     QMenu *objectMenu;
     QMenu *dataMenu;
     QMenu *buildMenu;
+    QMenu *windowMenu;
     QMenu *helpMenu;
 
     //Файл
@@ -55,13 +63,20 @@ private:
     //Запуск
     QAction *buildAct;
     QAction *compileAct;
-    QAction *saveStructAct;
-    QAction *manualInputAct;
 
     //Данные
     QAction *variablesAct;
     QAction *dataTypeAct;
     QAction *compileDataAct;
+
+    //Окно
+    QAction *closeAct;
+    QAction *closeAllAct;
+    QAction *tileAct;
+    QAction *cascadeAct;
+    QAction *nextAct;
+    QAction *previousAct;
+    QAction *separatorAct;
 
     //О программе
     QAction *aboutEditorAct;
@@ -104,32 +119,27 @@ private:
     QToolBar *leftToolBar;
     QToolBar *layoutToolBar;
     QToolBar *scaleToolBar;
-    QToolBar *layerToolBar;
 
     QUndoView *undoView;
 
     void createMenus();
     void createActions();
-    void createToolBar();
+    void createToolBars();
     void createUndoView();
     void createDockWindows();
     void createOutputWindow();
-    TDrawWindow *activeDrawWindow();
-
     TDrawWindow *createDrawWindow();
-    void CheckOption(){} 	// Установка/сброс галочки в пункте меню
+
     void CMHelp(){}		// Обработчик вызова помощи
     void readSettings();	//+ Загрузка конфигурации программы
     void writeSettings();	//+ Сохранение конфигурации программы
 
-    QMap<QString, QVariant> recentGraphs;
-
     NativeCompiler *nativeCompiler;
 
-    QListWidget *globalOutput;
-    QLabel *globalInfoLabel;
-private:
-    bool askForSaveBeforeClose();
+    QListWidget *outputPanelList;
+    QLabel *infoPanelLabel;
+
+    QMdiSubWindow *findMdiChild(const QString &graphName);
 
 protected:
     void closeEvent(QCloseEvent *); // реакция на закрытие окна
@@ -166,7 +176,6 @@ private slots:
     void CMFont(){}		// Настройки->Шрифт
     void CMSaveSetup(){}  	// Настройки->Сохранить
     void CMDoUserDialog(){}	//+ Запуск->Режим ручного ввода данных
-    void CMSaveStruct();        //+ Запуск->Запись структуры
     void CMCompile();           //+ Запуск->Компиляция
     void CMBuild();              //+ Запуск->Построение и запуск
     void CMHelpContents(){}	// Помощь->Содержание
@@ -179,10 +188,6 @@ private slots:
     void CMEUndo();             // Правка->Отменить
     void CMERedo();             // Правка->Вернуть
 
-    void grafMenuAboutToShow(); // Вызывается перед показом меню Граф
-
-    void sceneChanged();        // Действие при изменении сцены
-
     void alignHLeft();          // Выравниевание к самому левому объекту из группы
     void alignHCenter();        // Выравниевание к центральному объекту из группы
     void alignHRight();         // Выравниевание к самому правому объекту из группы
@@ -194,18 +199,21 @@ private slots:
 
     void setFixedScale(const QString &scale);
     void setFloatScale(const int scale);
-    void updateScaleSlider(const float scale);
+    void updateScaleSlider(const float scaleIncrement);
 
     void updateToolBar(QList<QGraphicsItem *> items);
     void getInfo(QGraphicsItem *item);
 
     void pointerGroupClicked(int id);  //Действие при выборе инструмента
 
-    void showDataLayerClicked(bool );
-
-    void graphLoaded(QString name, QString extName);
-
     void write2globalOutput(const QString &msg);
+
+    void updateMenues();
+    void setActiveSubWindow(QWidget *window);
+    void activeSubWindowChanged(QMdiSubWindow *window);
+    void updateWindowMenu();
+
+    void openGraph(const QString &name);
 };
 
 #endif // QMYWINDOW_H

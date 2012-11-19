@@ -144,7 +144,7 @@ void MultiProcTopPropertyDialog::on_buttonBox_accepted()
     }
     Top endTop(0, 85, theirTop->procCount*50 - 10, 30, theirTop->procCount + 1, -1, false, makeInlineActor(ui->collectDataEdt->document()->toPlainText()), Top::NormalTop);
     newGraph.topList.append(endTop);
-    globalDBManager->saveGraph(newGraph);
+    globalDBManager->saveGraphDB(newGraph);
     theirTop->actor = globalDBManager->getActor(name);
 }
 
