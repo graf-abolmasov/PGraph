@@ -31,6 +31,7 @@
 
 #define ERR_DATATYPE_EMPTY_NAME "Тип переменной %1: Нет названия."
 #define ERR_DATATYPE_EMPTY_TYPEDEF "Тип переменной %1: Нет описания."
+#define ERR_DATATYPE_BAD_TYPEDEF "Тип переменной %1: Ошибка в описание."
 
 #define ERR_GRAPH_UNDEF_ROOT "%1: Нет корневой вершины."
 

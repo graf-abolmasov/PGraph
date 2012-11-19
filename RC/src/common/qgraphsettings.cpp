@@ -12,20 +12,23 @@ QGraphSettings::QGraphSettings(const QString &configPath)
     myIsParallel = false;
 
     myOutputDirectorySet = false;
-    myOutputDirectory = "./Out";
+    myOutputDirectory = "Out/";
 
     myBaseDirectorySet = false;
-    myBaseDirectory = "./C";
+    myBaseDirectory = "C/";
 
     myTemplateDirectorySet = false;
-    myTemplateDirectory = "./Templates";
+    myTemplateDirectory = "./Templates/";
+
+    myProjectsDirectorySet = false;
+    myProjectsDirectory = "./Projects/";
 }
 
 QString QGraphSettings::getOutputDirectory()
 {
     if (myOutputDirectorySet == false) {
         QSettings c(myConfigPath, QSettings::IniFormat);
-        const QString outputDirectory = "projects/" + globalDBManager->getProjectName() + "/" + c.value("Location/OutputDir", myOutputDirectory).toString();
+        const QString outputDirectory = getProjectsDirectory() + "/" + globalDBManager->getProjectName() + "/" + c.value("Location/OutputDir", myOutputDirectory).toString();
         if (!QDir(outputDirectory).exists())
             QDir().mkpath(outputDirectory);
         myOutputDirectory = QFileInfo(outputDirectory).canonicalFilePath();
@@ -38,7 +41,7 @@ QString QGraphSettings::getBaseDirectory()
 {
     if (myBaseDirectorySet == false) {
         QSettings c(myConfigPath, QSettings::IniFormat);
-        const QString baseDirectory = "projects/" + globalDBManager->getProjectName() + "/" + c.value("Location/BaseDir", myBaseDirectory).toString();
+        const QString baseDirectory = getProjectsDirectory() + "/" + globalDBManager->getProjectName() + "/" + c.value("Location/BaseDir", myBaseDirectory).toString();
         if (!QDir(baseDirectory).exists())
             QDir().mkpath(baseDirectory);
         myBaseDirectory = QFileInfo(baseDirectory).canonicalFilePath();
@@ -55,6 +58,16 @@ QString QGraphSettings::getTemplateDirectory()
         myTemplateDirectorySet = true;
     }
     return myTemplateDirectory;
+}
+
+QString QGraphSettings::getProjectsDirectory()
+{
+    if (myProjectsDirectorySet == false) {
+        QSettings c(myConfigPath, QSettings::IniFormat);
+        myProjectsDirectory = QFileInfo(c.value("Location/ProjectsDir", myProjectsDirectory).toString()).canonicalFilePath();
+        myProjectsDirectorySet = true;
+    }
+    return myProjectsDirectory;
 }
 
 bool QGraphSettings::isParallel()

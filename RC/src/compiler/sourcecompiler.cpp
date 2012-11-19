@@ -71,7 +71,10 @@ QStringList SourceCompiler::compileTpoData(QList<const Variable *> variables)
             //Парсим тип элемента
             QRegExp r("(typedef\\s+(\\b.+\\b))");
             r.setMinimal(true);
-            Q_ASSERT(r.indexIn(type->typedefStr) != -1);
+            if (r.indexIn(type->typedefStr) == -1) {
+                errors.append(globalLogger->log(QObject::tr(ERR_DATATYPE_BAD_TYPEDEF).arg(QString(type->name)), Logger::Warning));
+                continue;
+            }
             QString intType = r.cap(2);
 
             setGetBlock.append("ptr" + var->type->name + " get_" + var->name + "();\n");
@@ -130,14 +133,6 @@ QStringList SourceCompiler::compileTpoData(QList<const Variable *> variables)
         Q_ASSERT(type != NULL);
         const QString tn = var->type->name;
         const QString vn = var->name;
-        QString intType = tn;
-        if (!type->typedefStr.isEmpty()) {
-            //Парсим тип элемента
-            QRegExp r("(typedef\\s+(\\b.+\\b))");
-            r.setMinimal(true);
-            Q_ASSERT(r.indexIn(type->typedefStr) != -1);
-            intType = r.cap(2);
-        }
         //Общее для всех типов
         if (var->isGlobal) {
             initIdBlock.append(vn + "_id = " + QString::number(i) + ";\n");
@@ -156,6 +151,14 @@ QStringList SourceCompiler::compileTpoData(QList<const Variable *> variables)
         if (var->isGlobal) {
             //Если встертился массив
             if (type->isArray()) {
+                //Парсим тип элемента
+                QRegExp r("(typedef\\s+(\\b.+\\b))");
+                r.setMinimal(true);
+                if (r.indexIn(type->typedefStr) == -1) {
+                    errors.append(globalLogger->log(QObject::tr(ERR_DATATYPE_BAD_TYPEDEF).arg(QString(type->name)), Logger::Warning));
+                    continue;
+                }
+                QString intType = r.cap(2);
                 initMemoryBlock.append("_" + vn + " = (" + tn + "*)" + "(new " + tn + ");\n");
                 assignSetterGetterBlock.append(vn + ".Assign(this, &TPOData::set_" + vn + ", &TPOData::get_" + vn + ", &TPOData::set_" + vn + ", &TPOData::get_" + vn + ", " + tn + "_LENGTH);\n");
                 getDataSizeBlock.append("case " + QString::number(i++) + ":\n"
@@ -245,7 +248,7 @@ QStringList SourceCompiler::compileUserTypes(QList<const DataType *> dataTypes)
     //Создаем типы
     QString userTypesBlock;
     foreach (const DataType *type, dataTypes)
-        userTypesBlock.append(compileDataType(type));
+        userTypesBlock.append(buildDataType(type));
     utypeText.replace("<#userTypes>", userTypesBlock);
 
     //Создаем типы MPI
@@ -256,9 +259,12 @@ QStringList SourceCompiler::compileUserTypes(QList<const DataType *> dataTypes)
             continue;
         QRegExp r("(typedef\\s+(\\b.+\\b))");
         r.setMinimal(true);
-        Q_ASSERT(r.indexIn(type->typedefStr) != -1);
+        if (r.indexIn(type->typedefStr) == -1) {
+            errors.append(globalLogger->log(QObject::tr(ERR_DATATYPE_BAD_TYPEDEF).arg(QString(type->name)), Logger::Warning));
+            continue;
+        }
         const QString intType = r.cap(2);
-        const QString baseMpiType = mpiTypes.contains(intType) ? mpiTypes[r.cap(2)] : "MPI_USER_TYPE_" + r.cap(2).toUpper();
+        const QString baseMpiType = mpiTypes.contains(intType) ? mpiTypes[intType] : "MPI_USER_TYPE_" + intType.toUpper();
         mpiTypesBlock.append("#define MPI_USER_TYPE_").append(type->name.toUpper()).append(" ").append(baseMpiType).append("\r\n");
     }
     utypeText.replace("<#mpiTypes>", mpiTypesBlock);
@@ -320,7 +326,7 @@ void SourceCompiler::compileEnvironment(int procsMax) const
     runme_f.close();
 
     QSettings c(globalSettings->getConfigPath(), QSettings::IniFormat);
-    QString root = c.value("SK/root", "/home").toString();
+    QString root = c.value("SK/root", "/home/<#user>/pgraph_out").toString();
     QString host = c.value("SK/host", "sk.ssau.ru").toString();
     QString port = c.value("SK/port", "22").toString();
     QString user = c.value("SK/user", "user").toString();
@@ -329,11 +335,11 @@ void SourceCompiler::compileEnvironment(int procsMax) const
     QString password = c.value("SK/password", "****").toString();
 
     QString runlocal = getTemplate(myTemplateDirectory + "/runlocal.bat.template");
+    runlocal.replace("<#root>", root);
     runlocal.replace("<#projectName>", globalDBManager->getProjectName());
     runlocal.replace("<#user>", user);
     runlocal.replace("<#host>", host);
     runlocal.replace("<#port>", port);
-    runlocal.replace("<#root>", root);
     runlocal.replace("<#password>", password);
     runlocal.replace("<#plink>", plink);
     runlocal.replace("<#pscp>", pscp);
@@ -521,7 +527,7 @@ QStringList SourceCompiler::compileActor(const Actor *actor) const
     return errors;
 }
 
-QString SourceCompiler::compileDataType(const DataType *dataType) const
+QString SourceCompiler::buildDataType(const DataType *dataType) const
 {
     QString result;
     if (dataType->typedefStr.isEmpty())
@@ -536,13 +542,15 @@ QString SourceCompiler::compileDataType(const DataType *dataType) const
         //Парсим количество элементов
         QRegExp r("(\\[(.+)\\])");
         r.setMinimal(true);
-        Q_ASSERT(r.indexIn(dataType->typedefStr) != -1);
+        if (r.indexIn(dataType->typedefStr) == -1)
+            return result;
         result.append("#define ").append(dataType->name).append("_LENGTH ").append(r.cap(2)).append("\r\n");
 
         //Парсим тип элемента
         QRegExp r2("(typedef\\s+(\\b.+\\b))");
         r2.setMinimal(true);
-        Q_ASSERT(r2.indexIn(dataType->typedefStr) != -1);
+        if (r2.indexIn(dataType->typedefStr) == -1)
+            return result;
         result.append("typedef ").append(r2.cap(2)).append("* ptr").append(dataType->name).append(";\r\n");
     }
 
