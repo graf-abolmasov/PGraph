@@ -867,6 +867,7 @@ void TMyWindow::activeSubWindowChanged(QMdiSubWindow *window)
         myCurrentDrawWindow->disconnect(SIGNAL(itemChanged(QGraphicsItem*)));
         myCurrentDrawWindow->disconnect(SIGNAL(selectionChanged(QList<QGraphicsItem*>)));
         myCurrentDrawWindow->disconnect(SIGNAL(mouseScrollScaleChanged(float)));
+        myCurrentDrawWindow->disconnect(SIGNAL(openSubGraph(QString)), this, SLOT(openGraph(QString)));
         myCurrentDrawWindow->undoStack->disconnect(SIGNAL(canRedoChanged(bool)), redoAct, SLOT(setEnabled(bool)));
         myCurrentDrawWindow->undoStack->disconnect(SIGNAL(canUndoChanged(bool)), undoAct, SLOT(setEnabled(bool)));
     }
@@ -890,6 +891,12 @@ void TMyWindow::activeSubWindowChanged(QMdiSubWindow *window)
 void TMyWindow::openGraph(const QString &name)
 {
     Q_ASSERT(!name.isEmpty());
+    mdiArea->setActiveSubWindow(NULL);
+    QMdiSubWindow *existing = findMdiChild(name);
+    if (existing) {
+        mdiArea->setActiveSubWindow(existing);
+        return;
+    }
     QMdiSubWindow *child = findMdiChild("");
     if (child != NULL) {
         TDrawWindow *mdiChild = qobject_cast<TDrawWindow *>(child->widget());
