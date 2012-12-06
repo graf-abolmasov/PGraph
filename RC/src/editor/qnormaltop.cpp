@@ -13,6 +13,7 @@ QNormalTop::QNormalTop(QMenu *contextMenu, QGraphicsItem *parent, QGraphicsScene
         : QTop(contextMenu, parent, scene)
 {
     setRect(-35, -25, 70, 50);
+    runInMemman = false;
 }
 
 void QNormalTop::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -20,6 +21,8 @@ void QNormalTop::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
     painter->setRenderHints(QPainter::TextAntialiasing |
                             QPainter::Antialiasing |
                             QPainter::HighQualityAntialiasing);
+
+
     painter->setPen(pen());
     painter->setBrush(brush());
     QGraphicsRectItem::paint(painter, option, widget);
@@ -38,7 +41,10 @@ void QNormalTop::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
         QTextOption opt;
         opt.setWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
         opt.setAlignment(Qt::AlignLeft);
-        painter->drawText(boundingRect().adjusted(7, 6, -6, -6), actor->extName, opt);
+        QFont f = painter->font();
+        f.setPointSize(8);
+        painter->setFont(f);
+        painter->drawText(boundingRect().adjusted(8, 8, -8, -8), actor->extName, opt);
     }
 }
 
@@ -226,4 +232,10 @@ Top QNormalTop::toTop() const
     float sizeX = rect().width();
     float sizeY = rect().height();
     return Top(pos.x(), pos.y(), sizeX, sizeY, number, -1, isRoot, actor, Top::NormalTop);
+}
+
+void QNormalTop::setRunInMemman(bool runInMemman)
+{
+    setBrush(runInMemman ? QBrush(QColor::fromRgb(245,245,20), Qt::SolidPattern) : QBrush(QColor::fromRgb(230,230,230), Qt::SolidPattern));
+    this->runInMemman = runInMemman;
 }

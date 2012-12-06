@@ -1,6 +1,7 @@
 #include "qterminatearctop.h"
 #include <QtGui>
 #include "qarc.h"
+#include "qtop.h"
 #include "dialogs/arcpropertydialog.h"
 
 void QTerminateArcTop::contextMenuEvent(QGraphicsSceneContextMenuEvent *event){
@@ -55,7 +56,14 @@ void QTerminateArcTop::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *)
 {
     QArc* arc = qgraphicsitem_cast<QArc *>(parentItem());
     ArcPropertyDialog *dlg = ArcPropertyDialog::getDialog(arc);
-    if (dlg->exec())
+    if (dlg->exec()) {
         arc = dlg->getResult();
+        QList<QArc *> outarcs = arc->startItem()->outArcs();
+        QList<QArc *> inarcs = arc->endItem()->inArcs();
+        foreach(QArc *qarc, outarcs)
+            qarc->setArcType(arc->arcType());
+        foreach(QArc *qarc, inarcs)
+            qarc->setArcType(arc->arcType());
+    }
     delete dlg;
 }

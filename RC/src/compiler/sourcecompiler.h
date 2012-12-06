@@ -5,6 +5,7 @@
 #include <QtGui>
 #include "abstractcompiler.h"
 #include "graphcompiler.h"
+#include "../../src/compiler/astylewrapper.h"
 #include "../../src/common/globalvariables.h"
 #include "../../src/common/VO/datatype.h"
 #include "../../src/common/VO/variable.h"
@@ -25,7 +26,6 @@ private:
 
     QStringList compileUserTypes(QList<const DataType *> dataTypes);
     QStringList compileTpoData(QList<const Variable *> variables);
-    void copyStaticTemplates();
     void compileEnvironment(int procsMax) const;
     void copyUsedFiles(const QList<const Actor *> &actors, const QList<const Predicate *> &predicates, const QList<const BaseModule *> &baseModules);
     void compileMain(const QString graphName, const QStringList &actors) const;
@@ -43,6 +43,8 @@ public:
 
     QStringList compileData(QList<const Variable *> variables);
     QStringList compileCode(const QList<GraphStruct> &graphStruct);
+    void copyStaticTemplates();
+    void beautifyCode();
 };
 
 #endif // SOURCECOMPILER_H

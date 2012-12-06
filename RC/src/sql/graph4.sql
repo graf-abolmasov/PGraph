@@ -2,15 +2,12 @@ SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
 
-DROP SCHEMA IF EXISTS `graph4` ;
 CREATE SCHEMA IF NOT EXISTS `graph4` DEFAULT CHARACTER SET utf8 ;
 USE `graph4` ;
 
 -- -----------------------------------------------------
 -- Table `graph4`.`project`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `graph4`.`project` ;
-
 CREATE  TABLE IF NOT EXISTS `graph4`.`project` (
   `PROJECT_ID` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT ,
   `PROJECT_NAME` VARCHAR(200) NOT NULL ,
@@ -23,8 +20,6 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `graph4`.`actor`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `graph4`.`actor` ;
-
 CREATE  TABLE IF NOT EXISTS `graph4`.`actor` (
   `PROJECT_ID` INT(11) UNSIGNED NOT NULL ,
   `NAMEPR` VARCHAR(9) NOT NULL DEFAULT '' ,
@@ -50,8 +45,6 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `graph4`.`arcpic`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `graph4`.`arcpic` ;
-
 CREATE  TABLE IF NOT EXISTS `graph4`.`arcpic` (
   `PROJECT_ID` INT(11) UNSIGNED NOT NULL ,
   `NAMEPR` VARCHAR(9) NOT NULL ,
@@ -75,8 +68,6 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `graph4`.`bazis`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `graph4`.`bazis` ;
-
 CREATE  TABLE IF NOT EXISTS `graph4`.`bazis` (
   `PROJECT_ID` INT(11) NOT NULL AUTO_INCREMENT ,
   `NAMEBAZ` CHAR(8) NOT NULL ,
@@ -90,8 +81,6 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `graph4`.`bazmod`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `graph4`.`bazmod` ;
-
 CREATE  TABLE IF NOT EXISTS `graph4`.`bazmod` (
   `PROJECT_ID` INT(11) UNSIGNED NOT NULL ,
   `PROTOTIP` VARCHAR(9) NOT NULL ,
@@ -116,8 +105,6 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `graph4`.`commentpic`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `graph4`.`commentpic` ;
-
 CREATE  TABLE IF NOT EXISTS `graph4`.`commentpic` (
   `PROJECT_ID` INT(11) UNSIGNED NOT NULL ,
   `NAMEPR` VARCHAR(9) NOT NULL ,
@@ -139,8 +126,6 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `graph4`.`data`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `graph4`.`data` ;
-
 CREATE  TABLE IF NOT EXISTS `graph4`.`data` (
   `PROJECT_ID` INT(11) UNSIGNED NOT NULL ,
   `data` VARCHAR(64) CHARACTER SET 'cp1251' COLLATE 'cp1251_bin' NOT NULL ,
@@ -163,8 +148,6 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `graph4`.`databaz`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `graph4`.`databaz` ;
-
 CREATE  TABLE IF NOT EXISTS `graph4`.`databaz` (
   `PROJECT_ID` INT(11) UNSIGNED NOT NULL ,
   `PROTOTIP` VARCHAR(9) NOT NULL ,
@@ -187,8 +170,6 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `graph4`.`graph`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `graph4`.`graph` ;
-
 CREATE  TABLE IF NOT EXISTS `graph4`.`graph` (
   `PROJECT_ID` INT(11) UNSIGNED NOT NULL ,
   `NAMEPR` VARCHAR(9) NOT NULL ,
@@ -212,8 +193,6 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `graph4`.`graphpre`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `graph4`.`graphpre` ;
-
 CREATE  TABLE IF NOT EXISTS `graph4`.`graphpre` (
   `PROJECT_ID` INT(11) UNSIGNED NOT NULL ,
   `NAMEPR` VARCHAR(9) NOT NULL ,
@@ -233,8 +212,6 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `graph4`.`graphtop`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `graph4`.`graphtop` ;
-
 CREATE  TABLE IF NOT EXISTS `graph4`.`graphtop` (
   `PROJECT_ID` INT(11) UNSIGNED NOT NULL ,
   `NAMEPR` VARCHAR(9) NOT NULL ,
@@ -255,8 +232,6 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `graph4`.`grh_err`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `graph4`.`grh_err` ;
-
 CREATE  TABLE IF NOT EXISTS `graph4`.`grh_err` (
   `PROJECT_ID` INT(11) NOT NULL AUTO_INCREMENT ,
   `namepr` VARCHAR(100) NULL DEFAULT NULL ,
@@ -270,8 +245,6 @@ DEFAULT CHARACTER SET = cp1251;
 -- -----------------------------------------------------
 -- Table `graph4`.`gsp_shab`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `graph4`.`gsp_shab` ;
-
 CREATE  TABLE IF NOT EXISTS `graph4`.`gsp_shab` (
   `PROJECT_ID` INT(11) NOT NULL AUTO_INCREMENT ,
   `NLEX` FLOAT NULL DEFAULT NULL ,
@@ -285,8 +258,6 @@ DEFAULT CHARACTER SET = cp1251;
 -- -----------------------------------------------------
 -- Table `graph4`.`pasport`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `graph4`.`pasport` ;
-
 CREATE  TABLE IF NOT EXISTS `graph4`.`pasport` (
   `PROJECT_ID` INT(11) UNSIGNED NOT NULL ,
   `NAMEPR` VARCHAR(9) NOT NULL ,
@@ -308,8 +279,6 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `graph4`.`syncpic`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `graph4`.`syncpic` ;
-
 CREATE  TABLE IF NOT EXISTS `graph4`.`syncpic` (
   `PROJECT_ID` INT(11) UNSIGNED NOT NULL ,
   `NAMEPR` VARCHAR(9) NOT NULL ,
@@ -322,8 +291,8 @@ CREATE  TABLE IF NOT EXISTS `graph4`.`syncpic` (
   CONSTRAINT `fk_syncpic_actor1`
     FOREIGN KEY (`PROJECT_ID` , `NAMEPR` )
     REFERENCES `graph4`.`actor` (`PROJECT_ID` , `NAMEPR` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
@@ -331,8 +300,6 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `graph4`.`toppic`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `graph4`.`toppic` ;
-
 CREATE  TABLE IF NOT EXISTS `graph4`.`toppic` (
   `PROJECT_ID` INT(11) UNSIGNED NOT NULL ,
   `NAMEPR` VARCHAR(9) NOT NULL ,
@@ -358,8 +325,6 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `graph4`.`typsys`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `graph4`.`typsys` ;
-
 CREATE  TABLE IF NOT EXISTS `graph4`.`typsys` (
   `PROJECT_ID` INT(11) UNSIGNED NOT NULL ,
   `TYPE` VARCHAR(64) NOT NULL ,
@@ -379,8 +344,6 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `graph4`.`othfls`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `graph4`.`othfls` ;
-
 CREATE  TABLE IF NOT EXISTS `graph4`.`othfls` (
   `name` VARCHAR(64) NOT NULL ,
   `PROJECT_ID` INT(11) UNSIGNED NOT NULL ,

@@ -698,7 +698,6 @@ QStringList SourceCompiler::compileCode(const QList<GraphStruct> &graphStructs) 
     compileMakefile("release", allActorsList, allPredicatesList, allBasemoduleList);
     copyUsedFiles(allActorsList, allPredicatesList, allBasemoduleList);
     compileEnvironment(graphStructs.last().procsMax);
-    copyStaticTemplates();
     return errors;
 }
 
@@ -719,6 +718,7 @@ QStringList SourceCompiler::compileStruct(const GraphStruct &graphStruct)
     foreach (QString key, keys)
         actorStr.append("int " + key + "(TPOData *D);\r\n");
 
+
     QString _ListGraph;
     _ListGraph.append("static DefineGraph ListGraf[" + QString::number(graphStruct.graphsTable.size()) + "] = {\r\n");
     QStringList listGraph;
@@ -728,10 +728,37 @@ QStringList SourceCompiler::compileStruct(const GraphStruct &graphStruct)
     _ListGraph.append("\r\n};\r\n");
 
     QStringList listTop;
-    foreach (DefineTop dt, graphStruct.topsTable)
-        listTop.append(dt.actor.isEmpty()
-                       ? "\tDefineTop(\"GHOST TOP\", -77, -77, NULL)"
-                       : "\tDefineTop(\"" + dt.actor + "\", " + QString::number(dt.firstIndex) + ", " + QString::number(dt.lastIndex) + ", &" + dt.actor + ")");
+    QStringList recvStr;
+    QStringList sendStr;
+    QStringList recv;
+    QStringList send;
+    int topNum = 0;
+    foreach (DefineTop dt, graphStruct.topsTable) {
+        if (!dt.recv.isEmpty()) {
+            QString signature = "int R" + graphStruct.namepr + "_" + QString::number(topNum) + "(TPOData *D)";
+            recvStr.append(signature);
+            recv.append(signature + "\r\n{\r\n\tD->recv(\"" + dt.recv.join("\");\r\nD->recv(\"") + "\");\r\n}\r\n");
+        }
+        if (!dt.send.isEmpty()) {
+            QString signature = "int S" + graphStruct.namepr + "_" + QString::number(topNum) + "(TPOData *D)";
+            sendStr.append(signature);
+            send.append(signature + "\r\n{\r\n\tD->send(\"" + dt.send.join("\");\r\nD->send(\"") + "\");\r\n}\r\n");
+        }
+        QString defineTop;
+        if (dt.actor.isEmpty()) {
+            defineTop = "\tDefineTop(\"GHOST TOP\", -77, -77, NULL)";
+        } else {
+            defineTop = "\tDefineTop(\"" + dt.actor + "\", "
+                    + QString::number(dt.firstIndex) + ", "
+                    + QString::number(dt.lastIndex) + ", "
+                    + "&" + dt.actor + ", "
+                    + (dt.send.isEmpty() ? "NULL, " : "&S" + graphStruct.namepr + "_" + QString::number(topNum) + ", ")
+                    + (dt.recv.isEmpty() ? "NULL" : "&R" + graphStruct.namepr + "_" + QString::number(topNum))
+                    + ")";
+        }
+        listTop.append(defineTop);
+        topNum++;
+    }
     QString _ListT;
     _ListT.append("static DefineTop ListTop[" + QString::number(listTop.size()) + "] = {\r\n");
     _ListT.append(listTop.join(",\r\n"));
@@ -742,9 +769,15 @@ QStringList SourceCompiler::compileStruct(const GraphStruct &graphStruct)
     main.append("PROJECT_BEGIN_NAMESPACE\r\n");
     main.append(predicateStr);
     main.append(actorStr);
+    main.append(recvStr.join(";\r\n"));
+    main.append(";\r\n");
+    main.append(sendStr.join(";\r\n"));
+    main.append(";\r\n");
 
     main.append(_ListT);
     main.append(_ListGraph);
+    main.append(send.join("\r\n"));
+    main.append(recv.join("\r\n"));
 
     foreach (QString key, keys)
         main.append(buildGraph(key, "", graphStruct.entries[key]));
@@ -799,4 +832,13 @@ QStringList SourceCompiler::compileBasemodule(const BaseModule *baseModule) cons
     source.write(baseModule->sourceCode.toUtf8());
     source.close();
     return QStringList();
+}
+
+void SourceCompiler::beautifyCode()
+{
+    QDir dir(myOutputDirectory);
+    QStringList filter;
+    filter << "*.cpp" << "*.h";
+    QFileInfoList files = dir.entryInfoList(filter, QDir::Files);
+    AStyleWrapper::beautify(files);
 }

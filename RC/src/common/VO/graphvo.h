@@ -86,6 +86,8 @@ public:
     QList<SyncArc>       syncArcList;
 
     QList<Arc> getOutArcs(int topNumber) const;
+    QList<SyncArc> getSyncSend(int topNumber) const;
+    QList<SyncArc> getSyncRecv(int topNumber) const;
     int getRootTop() const;
     QStringList validate() const;
 };

@@ -29,12 +29,13 @@ int main(int argc, char *argv[])
 	//printf("totalProc = %d\n", totalProc);
 	
 	//Для общения с менеждером памяти
-    int          len[4] = { 1, 1, 1, 1 };
-    MPI_Aint     pos[4] = { offsetof(MemoryPacket,id), offsetof(MemoryPacket,offset),
-                        offsetof(MemoryPacket,count), sizeof(MemoryPacket) };
-    MPI_Datatype typ[4] = { MPI_INT, MPI_LONG, MPI_LONG, MPI_UB };
+    int          len[5] = { 1, 1, 1, 64, 1 };
+    MPI_Aint     pos[5] = { offsetof(MemoryPacket,id), offsetof(MemoryPacket,offset),
+                            offsetof(MemoryPacket,count), offsetof(MemoryPacket,msg_id),
+                            sizeof(MemoryPacket) };
+    MPI_Datatype typ[5] = { MPI_INT, MPI_LONG, MPI_LONG, MPI_CHAR, MPI_UB };
 
-    MPI_Type_struct( 4, len, pos, typ, &memoryPacketDatatype );
+    MPI_Type_struct( 5, len, pos, typ, &memoryPacketDatatype );
     MPI_Type_commit( &memoryPacketDatatype );
 	
 	TPOData D(myProcNum);

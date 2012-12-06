@@ -53,6 +53,7 @@ void TopPropertyDialog::prepareForm(QNormalTop* top){
         top->actor = NULL;
     }
 
+    ui->runInMemmanCbx->setChecked(top->getRunInMemman());
     ui->spnBoxHeight->setProperty("value", top->rect().height());
     ui->spnBoxWidth->setProperty("value", top->rect().width());
 
@@ -68,6 +69,7 @@ QNormalTop* TopPropertyDialog::getResult(){
     int h = ui->spnBoxHeight->value();
     myTop->setRect(-w/2, -h/2, w, h);
     myTop->actor = myActorList[ui->actorsListWidget->currentRow()];
+    myTop->setRunInMemman(ui->runInMemmanCbx->isChecked());
     return myTop;
 }
 

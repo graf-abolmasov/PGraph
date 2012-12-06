@@ -70,6 +70,17 @@ void GraphDAO::persist(const Graph &graph)
         query.bindValue(":Predicate", arc.predicate == NULL ? "" : arc.predicate->name);
         execQuery(query);
     }
+
+    foreach(SyncArc arc, graph.syncArcList) {
+        query.prepare("INSERT INTO syncpic (PROJECT_ID, NAMEPR, FromTop, FromGraph, ToTop, ToGraph) VALUES (:PROJECT_ID, :NAMEPR, :FromTop, :FromGraph, :ToTop, :ToGraph)");
+        query.bindValue(":PROJECT_ID", myProjectId);
+        query.bindValue(":NAMEPR",     graph.name);
+        query.bindValue(":FromTop",    arc.startTop);
+        query.bindValue(":FromGraph",  graph.name);
+        query.bindValue(":ToTop",      arc.endTop);
+        query.bindValue(":ToGraph",    graph.name);
+        execQuery(query);
+    }
     myDb.close();
 }
 
@@ -178,6 +189,22 @@ Graph GraphDAO::findByName(const QString &name)
         commentList.append(comment);
     }
 
+    //получаем список дуг синхронизации
+    query.prepare("SELECT * FROM syncpic WHERE NAMEPR=:NAMEPR AND PROJECT_ID=:PROJECT_ID");
+    query.bindValue(":PROJECT_ID", globalDBManager->getProjectId());
+    query.bindValue(":NAMEPR", name);
+    execQuery(query);
+
+    QList<SyncArc> syncArcList;
+    while (query.next()) {
+        QSqlRecord record = query.record();
+        SyncArc arc(record.value("FromGraph").toString(),
+                    record.value("FromTop").toInt(),
+                    record.value("ToGraph").toString(),
+                    record.value("ToTop").toInt());
+        syncArcList.append(arc);
+    }
+
     //Получаем полное название агрегата
     query.prepare("SELECT NAMEPR, EXTNAME FROM actor WHERE NAMEPR=:NAMEPR AND PROJECT_ID=:PROJECT_ID");
     query.bindValue(":PROJECT_ID", globalDBManager->getProjectId());
@@ -185,7 +212,7 @@ Graph GraphDAO::findByName(const QString &name)
     execQuery(query);
     query.next();
     QSqlRecord record = query.record();
-    Graph result(record.value("NAMEPR").toString(), record.value("EXTNAME").toString(), topList, arcList, commentList, QList<SyncArc>());
+    Graph result(record.value("NAMEPR").toString(), record.value("EXTNAME").toString(), topList, arcList, commentList, syncArcList);
     myDb.close();
     return result;
 }
