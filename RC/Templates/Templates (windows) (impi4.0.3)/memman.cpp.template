@@ -9,7 +9,7 @@ int memman(TPOData *D)
     int Terminate = 0;
     MemoryPacket p;
     printf("memmanager: run\n");
-
+    
     bool *proc_loading = new bool[totalProc];
     proc_loading[0] = true;
     proc_loading[1] = true;
@@ -28,22 +28,23 @@ int memman(TPOData *D)
                 int i = 2;
                 while (i < totalProc && proc_loading[i])
                     i++;
-		if (i==totalProc) {
-		   printf("memmanaer: WARNING! No free process. Reserve one more.\r\n");
-		   exit(-1);
-		}
+                if (i==totalProc) {
+                    printf("memmanaer: WARNING! No free process. Reserve one more.\r\n");
+                    exit(-1);
+                }
                 proc_loading[i] = true;
                 MPI_Send(&i, 1, MPI_INT, status.MPI_SOURCE, MPI_TAG_LOCKPROC, MPI_COMM_WORLD);
             } else if (status.MPI_TAG == MPI_TAG_FREEPROC) {
                 proc_loading[p.id] = false;
             }
-
+            
         } else Terminate = true;
     }
-
+    
     printf("memmanager: terminated\n");
     delete proc_loading;
     return 1;
 }
 PROJECT_END_NAMESPACE
 #endif
+

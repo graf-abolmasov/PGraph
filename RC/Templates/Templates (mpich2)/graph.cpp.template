@@ -16,11 +16,15 @@ DefineGraph::DefineGraph(const char *name, int (*predicate)(TPOData *), int Namb
     this->name = name;
 }
 
-DefineTop::DefineTop(const char *NameTop, int FirstDef, int LastDef, int (*top)(TPOData *))
+DefineTop::DefineTop(const char *NameTop, int FirstDef, int LastDef, int (*top)(TPOData *), int (*send)(TPOData *), int (*recv)(TPOData *))
 {
+    this->send = send;
+    this->recv = recv;
     this->NameTop = NameTop;
     this->FirstDef = FirstDef;
     this->LastDef = LastDef;
     this->top = top;
+
 }
 PROJECT_END_NAMESPACE
+

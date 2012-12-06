@@ -161,7 +161,15 @@ GraphStruct GraphCompiler::compileStruct(const Graph &graph)
                 procsCounter[graph.name]--;
             graphStruct.graphsTable.append(DefineGraph(arc.predicate->name, endTop, arc.type));
         }
-        vecTopsDefine[top.number] = DefineTop(top.actor->name, first, last);
+        QList<SyncArc> sends = graph.getSyncSend(top.number);
+        QList<SyncArc> recvs = graph.getSyncRecv(top.number);
+        QStringList sendsList;
+        QStringList recvsList;
+        foreach (SyncArc arc, sends)
+            sendsList.append(arc.startGraph + "_" + QString::number(arc.startTop) + "/" + arc.endGraph + "_" + QString::number(arc.endTop));
+        foreach (SyncArc arc, recvs)
+            recvsList.append(arc.startGraph + "_" + QString::number(arc.startTop) + "/" + arc.endGraph + "_" + QString::number(arc.endTop));
+        vecTopsDefine[top.number] = DefineTop(top.actor->name, first, last, sendsList, recvsList);
     }
 
     foreach (DefineTop virtualTop, virtualTopsDefine)
@@ -188,9 +196,11 @@ DefineGraph::DefineGraph(QString predicate, int topIndex, int type)
     this->type = type;
 }
 
-DefineTop::DefineTop(QString actor, int firstIndex, int lastIndex)
+DefineTop::DefineTop(QString actor, int firstIndex, int lastIndex, const QStringList send, const QStringList recv)
 {
     this->actor = actor;
     this->firstIndex = firstIndex;
     this->lastIndex = lastIndex;
+    this->recv = recv;
+    this->send = send;
 }

@@ -2,6 +2,7 @@
 #define QSYNCARC_H
 
 #include <QtGui/QGraphicsLineItem>
+#include "../../src/common/VO/graphvo.h"
 
 #define SYNC_ARC_TYPE      UserType+7
 
@@ -31,6 +32,7 @@ public:
     QTop* endItem() const
         { return myEndTop; }
     bool remake(QTop* aMovedTop, float dx, float dy);
+    SyncArc toSyncArc() const;
 
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,

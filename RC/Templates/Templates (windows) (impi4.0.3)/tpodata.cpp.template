@@ -4,6 +4,7 @@ PROJECT_BEGIN_NAMESPACE
 #ifdef PARALLEL
 MPI_Datatype memoryPacketDatatype;
 
+MPI_Request req;
 MPI_Status status;
 int myProcNum, totalProc, parentProcNum;
 #endif

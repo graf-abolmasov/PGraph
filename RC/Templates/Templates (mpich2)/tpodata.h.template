@@ -25,6 +25,10 @@ public:
         void getData(int id, int offset, int count, void* recvBuf);
         void setData(int id, int offset, int count, const void* value);
 
+
+        bool recv(const char * msg, bool immediately = false);
+        bool send(const char * msg, bool acknowledgement = false);
+
         //Personal setter/getter
         <#setGet>
 

@@ -119,3 +119,8 @@ bool QSyncArc::remake(QTop *aMovedTop, float dx, float dy)
     }
     return true;
 }
+
+SyncArc QSyncArc::toSyncArc() const
+{
+    return SyncArc(myStartTop->actor->name, myStartTop->number, myEndTop->actor->name, myEndTop->number);
+}

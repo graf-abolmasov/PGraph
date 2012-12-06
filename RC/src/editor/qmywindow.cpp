@@ -423,11 +423,12 @@ void TMyWindow::CMGNew()
 
 void TMyWindow::CMGSaveAsImage()
 {
-    Q_ASSERT(myCurrentDrawWindow);
+    const TDrawWindow *drawWindow = myCurrentDrawWindow;
     QString fileName = QFileDialog::getSaveFileName();
     if (fileName.isEmpty())
         return;
-    myCurrentDrawWindow->saveAsImage(fileName);
+    Q_ASSERT(drawWindow);
+    drawWindow->saveAsImage(fileName);
 }
 
 void TMyWindow::CMGSaveAs()

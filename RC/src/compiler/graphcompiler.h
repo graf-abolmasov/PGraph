@@ -9,10 +9,12 @@
 class DefineTop {
 public:
     DefineTop(){}
-    DefineTop(QString actor, int firstIndex, int lastIndex);
+    DefineTop(QString actor, int firstIndex, int lastIndex, const QStringList send = QStringList(), const QStringList recv = QStringList());
     int firstIndex;
     int lastIndex;
     QString actor;
+    QStringList recv;
+    QStringList send;
 };
 
 class DefineGraph {

@@ -41,6 +41,28 @@ QList<Arc> Graph::getOutArcs(int topNumber) const
     return result;
 }
 
+
+QList<SyncArc> Graph::getSyncRecv(int topNumber) const
+{
+    QList<SyncArc> result;
+    foreach (SyncArc arc, syncArcList) {
+        if (arc.endTop == topNumber)
+            result.append(arc);
+    }
+    return result;
+}
+
+
+QList<SyncArc> Graph::getSyncSend(int topNumber) const
+{
+    QList<SyncArc> result;
+    foreach (SyncArc arc, syncArcList) {
+        if (arc.startTop == topNumber)
+            result.append(arc);
+    }
+    return result;
+}
+
 /*!
   Номер кореновой вершины.
   \return Номер кореневой вершины или -1, если вершина не задана

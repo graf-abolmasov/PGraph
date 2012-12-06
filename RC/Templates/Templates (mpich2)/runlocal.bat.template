@@ -1,2 +1,4 @@
-putty\pscp -l graf -pw ukorpot -P 2222 .\* graf@193.33.144.152:/home/graf/graph_uploads/test1/
-putty\plink  -ssh -l graf -pw ukorpot -P 2222 graf@193.33.144.152 -m runme.bat
+sshpass -p <#password> <#plink> <#user>@<#host> "mkdir -p <#root>/<#projectName>"
+sshpass -p <#password> <#pscp> * <#user>@<#host>:<#root>/<#projectName>/
+sshpass -p <#password> <#plink> <#user>@<#host> 'chmod +x <#root>/<#projectName>/runme.bat'
+sshpass -p <#password> <#plink> <#user>@<#host> <#root>/<#projectName>/runme.bat

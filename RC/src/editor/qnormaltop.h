@@ -7,7 +7,11 @@
 
 class QNormalTop : public QTop
 {
+    bool runInMemman;
 public:
+    void setRunInMemman(bool runInMemman);
+    bool getRunInMemman() const
+        { return runInMemman; }
     enum { Type = NORMAL_TOP_TYPE };
     QNormalTop(QMenu *contextMenu, QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
     int type() const

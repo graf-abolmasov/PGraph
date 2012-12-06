@@ -67,7 +67,7 @@ public:
     QUndoStack *undoStack;
 
     TDrawWindow(QWidget *parent = 0);
-    void saveAsImage(QString filename);
+    void saveAsImage(const QString &filename) const;
     void setMode(QDiagramScene::Mode mode);
     void showDataLayer(bool );
     QDiagramScene::Mode mode() const

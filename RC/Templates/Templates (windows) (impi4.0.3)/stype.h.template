@@ -8,11 +8,11 @@
 #endif
 
 #ifndef PROJECT_NAMESPACE
-	# define PROJECT_BEGIN_NAMESPACE
-	# define PROJECT_END_NAMESPACE
+# define PROJECT_BEGIN_NAMESPACE
+# define PROJECT_END_NAMESPACE
 #else 
-	# define PROJECT_BEGIN_NAMESPACE namespace PROJECT_NAMESPACE {
-	# define PROJECT_END_NAMESPACE }
+# define PROJECT_BEGIN_NAMESPACE namespace PROJECT_NAMESPACE {
+# define PROJECT_END_NAMESPACE }
 #endif
 
 
@@ -20,7 +20,7 @@
 
 PROJECT_BEGIN_NAMESPACE
 
-//Структура для общения с диспетчетом памяти
+//РЎС‚СЂСѓРєС‚СѓСЂР° РґР»СЏ РѕР±С‰РµРЅРёСЏ СЃ РґРёСЃРїРµС‚С‡РµС‚РѕРј РїР°РјСЏС‚Рё
 typedef struct {
     int   id;
     long  offset;
@@ -29,18 +29,19 @@ typedef struct {
 
 extern MPI_Datatype memoryPacketDatatype;
 
-//Служебные типы и переменные
+//РЎР»СѓР¶РµР±РЅС‹Рµ С‚РёРїС‹ Рё РїРµСЂРµРјРµРЅРЅС‹Рµ
 extern MPI_Status status;
+extern MPI_Request req;
 extern int myProcNum, totalProc, parentProcNum;
 
-//Идентификаторы сообщений отсчитываются от этого значения
+//РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂС‹ СЃРѕРѕР±С‰РµРЅРёР№ РѕС‚СЃС‡РёС‚С‹РІР°СЋС‚СЃСЏ РѕС‚ СЌС‚РѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ
 #define MPI_TAG_BASE             32740
 
-//Идентификаторы сообщений запуска/остановки процесса
+//РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂС‹ СЃРѕРѕР±С‰РµРЅРёР№ Р·Р°РїСѓСЃРєР°/РѕСЃС‚Р°РЅРѕРІРєРё РїСЂРѕС†РµСЃСЃР°
 #define MPI_TAG_TERMINATE        MPI_TAG_BASE + 1
 #define MPI_TAG_RUN              MPI_TAG_BASE + 2
 
-//Идентификаторы сообщений менеджера памяти
+//РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂС‹ СЃРѕРѕР±С‰РµРЅРёР№ РјРµРЅРµРґР¶РµСЂР° РїР°РјСЏС‚Рё
 #define MPI_TAG_GETDATA          MPI_TAG_BASE + 3
 #define MPI_TAG_PUTDATA          MPI_TAG_BASE + 4
 #define MPI_TAG_ACTUALDATA       MPI_TAG_BASE + 5
@@ -52,3 +53,4 @@ PROJECT_END_NAMESPACE
 
 #endif //PARALLEL
 #endif //STYPE_H
+

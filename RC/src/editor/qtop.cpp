@@ -17,7 +17,7 @@ QTop::QTop(QMenu *contextMenu,
     QPen p = pen();
     p.setWidth(2);
     setPen(p);
-    setBrush(QBrush(QColor::fromRgb(220, 220, 220), Qt::SolidPattern));
+    setBrush(QBrush(QColor::fromRgb(230, 230, 230), Qt::SolidPattern));
     setZValue(2);
 
     setFlag(QGraphicsItem::ItemIsMovable, true);
@@ -109,20 +109,20 @@ void QTop::removeSyncs(){
   @param arc - дуга
 */
 void QTop::addArc(QArc *arc){
-    if (!arcs.contains(arc)) {
-        arcs.append(arc);
+    if (arcs.contains(arc))
+        return;
+    arcs.append(arc);
 
-        //раздвигаем приоритет оставшихся исходящих дуг
-        if (arc->startItem() == this) {
-            QList<QArc *> outArcsList = outArcs();
-            for (int i = 0; i < outArcsList.count(); i++) {
-                if (arc == outArcsList.at(i))
-                    continue;
-                if (outArcsList.at(i)->priority() >= arc->priority()){
-                    outArcsList.at(i)->setPriority(outArcsList.at(i)->priority() + 1);
-                } else if (outArcsList.at(i)->priority() < arc->priority()){
-                    outArcsList.at(i)->setPriority(outArcsList.at(i)->priority());
-                }
+    //раздвигаем приоритет оставшихся исходящих дуг
+    if (arc->startItem() == this) {
+        QList<QArc *> outArcsList = outArcs();
+        for (int i = 0; i < outArcsList.count(); i++) {
+            if (arc == outArcsList.at(i))
+                continue;
+            if (outArcsList.at(i)->priority() >= arc->priority()){
+                outArcsList.at(i)->setPriority(outArcsList.at(i)->priority() + 1);
+            } else if (outArcsList.at(i)->priority() < arc->priority()){
+                outArcsList.at(i)->setPriority(outArcsList.at(i)->priority());
             }
         }
     }
@@ -244,7 +244,7 @@ QList<QArc *> QTop::inArcs() const
 QList<QArc *> QTop::outArcs() const
 {
     QList<QArc *> result;
-    foreach(QArc *arc, arcs){
+    foreach(QArc *arc, arcs) {
         if (arc->startItem() == this)
             result.append(arc);
     }

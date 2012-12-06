@@ -231,7 +231,7 @@ void TDrawWindow::showTopPropDialog(){
 /*!
   Реакция на нажатие пункта меню: Сохранить как картинку
 */
-void TDrawWindow::saveAsImage(QString filename)
+void TDrawWindow::saveAsImage(const QString &filename) const
 {
     QImage image(scene->itemsBoundingRect().size().toSize(), QImage::Format_ARGB32_Premultiplied);
     image.fill(0);
@@ -249,6 +249,12 @@ void TDrawWindow::showArcPropDialog()
     ArcPropertyDialog *dlg = ArcPropertyDialog::getDialog(arc);
     if (dlg->exec()) {
         arc = dlg->getResult();
+        QList<QArc *> outarcs = arc->startItem()->outArcs();
+        QList<QArc *> inarcs = arc->endItem()->inArcs();
+        foreach(QArc *qarc, outarcs)
+            qarc->setArcType(arc->arcType());
+        foreach(QArc *qarc, inarcs)
+            qarc->setArcType(arc->arcType());
         emit itemChanged(arc);
         emit documentModified();
     }
@@ -347,6 +353,9 @@ Graph TDrawWindow::getGraph() const
         commentList.append(comment->toComment());
 
     QList<SyncArc> syncArcList;// = allSyncArcs();
+    foreach (QSyncArc* arc, allSyncArcs())
+        syncArcList.append(arc->toSyncArc());
+
     return Graph(myGraphName, myGraphExtName, topList, arcList, commentList, syncArcList);
 }
 
@@ -424,6 +433,23 @@ void TDrawWindow::loadGraph(const QString &name)
             QComment *qcomment = new QComment(commentMenu, NULL, scene);
             qcomment->setPos(comment.x, comment.y);
             qcomment->setPlainText(comment.text);
+        }
+
+        foreach (SyncArc arc, graph.syncArcList) {
+            QTop *startTop = NULL;
+            QTop *endTop = NULL;
+            foreach(QTop *qtop, topList) {
+                if (startTop != NULL && endTop != NULL)
+                    break;
+                if (qtop->number == arc.startTop)
+                    startTop = qtop;
+                if (qtop->number == arc.endTop)
+                    endTop = qtop;
+            }
+            QSyncArc *qsyncArc = new QSyncArc(startTop, endTop, syncArcMenu, NULL, scene);
+            qsyncArc->setLine(QLineF(startTop->pos(), endTop->pos()));
+            startTop->addSync(qsyncArc);
+            endTop->addSync(qsyncArc);
         }
 
         myGraphName = graph.name;

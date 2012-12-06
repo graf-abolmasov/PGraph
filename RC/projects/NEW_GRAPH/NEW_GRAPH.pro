@@ -57,7 +57,8 @@ SOURCES += ../../src/editor/main.cpp \
     ../../src/compiler/graphcompiler.cpp \
     ../../src/compiler/abstractcompiler.cpp \
     ../../src/compiler/compiler.cpp \
-    ../../src/compiler/sourcecompiler.cpp
+    ../../src/compiler/sourcecompiler.cpp \
+    ../../src/compiler/astylewrapper.cpp
 HEADERS += ../../src/editor/qmywindow.h \
     ../../src/editor/qdrawwindow.h \
     ../../src/editor/qtop.h \
@@ -112,7 +113,8 @@ HEADERS += ../../src/editor/qmywindow.h \
     ../../src/compiler/graphcompiler.h \
     ../../src/compiler/abstractcompiler.h \
     ../../src/compiler/compiler.h \
-    ../../src/compiler/sourcecompiler.h
+    ../../src/compiler/sourcecompiler.h \
+    ../../src/compiler/astylewrapper.h
 RESOURCES += ../../src/resources.qrc
 FORMS += ../../src/editor/dialogs/toppropertydialog.ui \
     ../../src/editor/dialogs/qvariableeditor.ui \
@@ -130,3 +132,5 @@ FORMS += ../../src/editor/dialogs/toppropertydialog.ui \
     ../../src/editor/dialogs/arcpropertydialog.ui \
     ../../src/editor/dialogs/otherfilesdialog.ui
 RC_FILE = ../../images/resources.rc
+
+LIBS += ../../lib/libastyle.a

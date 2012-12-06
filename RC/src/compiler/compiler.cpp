@@ -27,6 +27,10 @@ QStringList Compiler::compile(const QString &graph)
             errors.append(sourceCompiler->compileCode(graphStructs));
             if (errors.isEmpty())
                 errors.append(sourceCompiler->compileData(globalDBManager->getVariableList()));
+            if (errors.isEmpty()) {
+                sourceCompiler->copyStaticTemplates();
+                sourceCompiler->beautifyCode();
+            }
         }
     } catch (...) {
 
