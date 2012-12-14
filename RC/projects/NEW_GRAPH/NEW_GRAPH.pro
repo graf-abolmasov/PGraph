@@ -133,4 +133,12 @@ FORMS += ../../src/editor/dialogs/toppropertydialog.ui \
     ../../src/editor/dialogs/otherfilesdialog.ui
 RC_FILE = ../../images/resources.rc
 
-LIBS += ../../lib/libastyle.a
+
+
+unix:!macx:!symbian|win32: LIBS += -L$$PWD/../../lib/ -lastyle
+
+INCLUDEPATH += $$PWD/../../
+DEPENDPATH += $$PWD/../../
+
+win32: PRE_TARGETDEPS += $$PWD/../../lib/astyle.lib
+else:unix:!macx:!symbian: PRE_TARGETDEPS += $$PWD/../../lib/libastyle.a
