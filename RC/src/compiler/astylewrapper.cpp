@@ -2,6 +2,7 @@
 #include "../../src/common/globalvariables.h"
 
 // allow for different calling conventions in Linux and Windows
+#define ASTYLE_STATIC
 #if defined(_WIN32) && !defined(ASTYLE_STATIC)
 #define STDCALL __stdcall
 #else
@@ -9,8 +10,7 @@
 #endif
 
 // functions to call AStyleMain
-extern "C"
-char* STDCALL AStyleMain(const char* pSourceIn,
+extern "C" char* STDCALL AStyleMain(const char* pSourceIn,
                          const char* pOptions,
                          void(STDCALL* fpError)(int, char*),
                          char*(STDCALL* fpAlloc)(unsigned long));
@@ -18,11 +18,10 @@ void  STDCALL ASErrorHandler(int errorNumber, char* errorMessage);
 char* STDCALL ASMemoryAlloc(unsigned long memoryNeeded);
 
 // other functions
-extern "C"
-char* STDCALL AStyleGetVersion();
+extern "C" char* STDCALL AStyleGetVersion();
 
 // Error handler for the Artistic Style formatter
-void  STDCALL ASErrorHandler(int errorNumber, char* errorMessage)
+void STDCALL ASErrorHandler(int errorNumber, char* errorMessage)
 {
     globalLogger->log(QString("AStyleBeautifier: Error %1 - %2").arg(errorNumber).arg(errorMessage), Logger::Error);
 }
