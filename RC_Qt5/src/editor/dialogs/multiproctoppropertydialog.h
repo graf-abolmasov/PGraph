@@ -1,7 +1,7 @@
 #ifndef MULTIPROCTOPPROPERTYDIALOG_H
 #define MULTIPROCTOPPROPERTYDIALOG_H
 
-#include <QtGui/QDialog>
+#include <QDialog>
 
 QT_BEGIN_NAMESPACE
 class QListWidgetItem;

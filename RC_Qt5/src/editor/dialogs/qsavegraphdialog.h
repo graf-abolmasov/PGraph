@@ -1,7 +1,7 @@
 #ifndef QSAVEGRAPHDIALOG_H
 #define QSAVEGRAPHDIALOG_H
 
-#include <QtGui/QDialog>
+#include <QDialog>
 
 namespace Ui {
     class QSaveGraphDialog;

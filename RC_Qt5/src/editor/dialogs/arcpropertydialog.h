@@ -1,7 +1,7 @@
 #ifndef ARCPROPERTYDIALOG_H
 #define ARCPROPERTYDIALOG_H
 
-#include <QtGui/QDialog>
+#include <QDialog>
 
 namespace Ui {
     class ArcPropertyDialog;

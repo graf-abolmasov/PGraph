@@ -1,6 +1,12 @@
 #include <QtCore>
 #include <QtGui>
 
+#include <QGraphicsRectItem>
+#include <QGraphicsScene>
+#include <QGraphicsItem>
+#include <QGraphicsDropShadowEffect>
+#include <QMenu>
+
 #include "../../src/editor/qtop.h"
 #include "../../src/editor/qarcline.h"
 #include "../../src/editor/qsyncarc.h"
@@ -8,9 +14,8 @@
 #include "../../src/common/VO/actor.h"
 #include "../../src/common/globalvariables.h"
 
-QTop::QTop(QMenu *contextMenu,
-             QGraphicsItem *parent, QGraphicsScene *scene)
-    : QGraphicsRectItem(parent, scene)
+QTop::QTop(QMenu *contextMenu, QGraphicsItem *parent)
+    : QGraphicsRectItem(parent)
 {
     myContextMenu = contextMenu;
 

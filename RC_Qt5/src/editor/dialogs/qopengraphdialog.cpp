@@ -1,4 +1,5 @@
 #include <QtGui>
+#include <QtWidgets>
 
 #include "qopengraphdialog.h"
 #include "ui_qopengraphdialog.h"

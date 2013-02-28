@@ -1,7 +1,7 @@
 #ifndef QDRAWWINDOW_H
 #define QDRAWWINDOW_H
 
-#include <QtGui/QMainWindow>
+#include <QMainWindow>
 
 #include "qdiagramscene.h"
 

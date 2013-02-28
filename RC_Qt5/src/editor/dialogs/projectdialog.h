@@ -3,6 +3,7 @@
 
 #include <QtGui>
 #include <QtSql>
+#include <QDialog>
 
 namespace Ui {
     class ProjectDialog;

@@ -1,7 +1,8 @@
 #include <QtGui>
-#include "../../src/editor/qarc.h"
+#include <QGraphicsScene>
 #include <math.h>
 #include <time.h>
+#include "../../src/editor/qarc.h"
 #include "../../src/editor/qparallelarctop.h"
 #include "../../src/editor/qserialarctop.h"
 #include "../../src/editor/qterminatearctop.h"
@@ -430,8 +431,8 @@ bool QArc::remake(QTop* aMovedTop, float dx, float dy){
   @param scene - указатель на контейнер (сцену)
 */
 QArc::QArc(QTop *startItem, QTop *endItem, QMenu *contextMenu,
-           QGraphicsItem *parent, QGraphicsScene *scene)
-    : QGraphicsLineItem(parent, scene){
+           QGraphicsItem *parent)
+    : QGraphicsLineItem(parent){
     //инициализация указателей
     arcTop          = NULL;
     currentLine     = NULL;
@@ -554,9 +555,9 @@ bool QArc::addLine(QArcLine *line)
 */
 QArcLine* QArc::newLine(QPointF p1, QPointF p2)
 {
-    if (currentLine == NULL)
-        currentLine = new QArcLine(QLineF(p1, p2), this, scene());
-    else {
+    if (currentLine == NULL) {
+        currentLine = new QArcLine(QLineF(p1, p2), this);
+    } else {
         addLine(currentLine);
 
         //высчитываем направление линии
@@ -585,8 +586,9 @@ QArcLine* QArc::newLine(QPointF p1, QPointF p2)
         }
 
         //добавляем отрезок дуги
-        currentLine = new QArcLine(QLineF(nLine), this, scene());
+        currentLine = new QArcLine(QLineF(nLine), this);
     }
+    scene()->addItem(currentLine);
     currentLine->setPen(pen());
     currentLine->setFlag(QGraphicsItem::ItemIsMovable, true);
     currentLine->setFlag(QGraphicsItem::ItemIsSelectable, true);
@@ -636,13 +638,13 @@ void QArc::setArcType(Arc::ArcType type)
     }
     switch (myArcType) {
     case Arc::SerialArc:
-        arcTop = new QSerialArcTop(myContextMenu, this, scene());
+        arcTop = new QSerialArcTop(myContextMenu, this);
         break;
     case Arc::ParallelArc:
-        arcTop = new QParallelArcTop(myContextMenu, this, scene());
+        arcTop = new QParallelArcTop(myContextMenu, this);
         break;
     case Arc::TerminateArc:
-        arcTop = new QTerminateArcTop(myContextMenu, this, scene());
+        arcTop = new QTerminateArcTop(myContextMenu, this);
         break;
     }
 }

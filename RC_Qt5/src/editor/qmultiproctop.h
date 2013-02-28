@@ -9,7 +9,7 @@ class QMultiProcTop : public QTop
 {
 public:
     enum { Type = MULTIPROC_TOP_TYPE };
-    QMultiProcTop(QMenu *contextMenu, QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
+    QMultiProcTop(QMenu *contextMenu, QGraphicsItem *parent = 0);
     int type() const
         { return Type; }
     Top toTop() const;

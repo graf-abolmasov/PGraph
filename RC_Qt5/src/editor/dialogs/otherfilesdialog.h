@@ -3,6 +3,7 @@
 
 #include <QtGui>
 #include <QtSql>
+#include <QtWidgets>
 
 namespace Ui {
 class OtherFilesDialog;

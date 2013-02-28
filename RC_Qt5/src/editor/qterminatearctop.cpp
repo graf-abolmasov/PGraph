@@ -1,5 +1,9 @@
-#include "qterminatearctop.h"
 #include <QtGui>
+#include <QGraphicsScene>
+#include <QGraphicsDropShadowEffect>
+#include <QMenu>
+
+#include "qterminatearctop.h"
 #include "qarc.h"
 #include "qtop.h"
 #include "dialogs/arcpropertydialog.h"
@@ -15,8 +19,8 @@ void QTerminateArcTop::contextMenuEvent(QGraphicsSceneContextMenuEvent *event){
         myContextMenu->exec(event->screenPos());
 }
 
-QTerminateArcTop::QTerminateArcTop(QMenu *contextMenu, QGraphicsItem *parent, QGraphicsScene *scene)
-    : QGraphicsLineItem(parent, scene)
+QTerminateArcTop::QTerminateArcTop(QMenu *contextMenu, QGraphicsItem *parent)
+    : QGraphicsLineItem(parent)
 {
     myContextMenu = contextMenu;
     setFlag(QGraphicsItem::ItemIsSelectable, true);

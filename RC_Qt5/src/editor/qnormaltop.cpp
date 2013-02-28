@@ -1,5 +1,6 @@
 #include <QtCore>
 #include <QtGui>
+#include <QGraphicsScene>
 
 #include "qnormaltop.h"
 #include "dialogs/toppropertydialog.h"
@@ -9,8 +10,8 @@
 #include "qsyncarc.h"
 #include "../../src/common/globalvariables.h"
 
-QNormalTop::QNormalTop(QMenu *contextMenu, QGraphicsItem *parent, QGraphicsScene *scene)
-        : QTop(contextMenu, parent, scene)
+QNormalTop::QNormalTop(QMenu *contextMenu, QGraphicsItem *parent)
+        : QTop(contextMenu, parent)
 {
     setRect(-35, -25, 70, 50);
     runInMemman = false;

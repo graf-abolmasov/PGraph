@@ -1,7 +1,7 @@
 #ifndef QMYWINDOW_H
 #define QMYWINDOW_H
 
-#include <QtGui/QMainWindow>
+#include <QMainWindow>
 #include <QtCore/QMap>
 #include "../../src/editor/qdrawwindow.h"
 #include "../../src/compiler/nativecompiler.h"

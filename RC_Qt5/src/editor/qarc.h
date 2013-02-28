@@ -1,7 +1,7 @@
 #ifndef QARC_H
 #define QARC_H
 
-#include <QtGui/QGraphicsLineItem>
+#include <QGraphicsLineItem>
 #include "../../src/common/VO/graphvo.h"
 
 #define ARC_TYPE      UserType+4
@@ -20,8 +20,7 @@ public:
     QGraphicsItem *arcTop;
     QArcLine *currentLine;
     const Predicate *predicate;
-    QArc(QTop *startItem, QTop *endItem, QMenu *contextMenu,
-      QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
+    QArc(QTop *startItem, QTop *endItem, QMenu *contextMenu, QGraphicsItem *parent = 0);
     ~QArc();
     bool addLine(QArcLine *line);
     QArcLine *newLine(QPointF p1, QPointF p2);

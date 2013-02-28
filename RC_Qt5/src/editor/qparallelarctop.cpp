@@ -1,4 +1,7 @@
 #include <QtGui>
+#include <QGraphicsScene>
+#include <QGraphicsDropShadowEffect>
+#include <QMenu>
 
 #include "qparallelarctop.h"
 #include "qarc.h"
@@ -17,8 +20,8 @@ void QParallelArcTop::contextMenuEvent(QGraphicsSceneContextMenuEvent *event){
         myContextMenu->exec(event->screenPos());
 }
 
-QParallelArcTop::QParallelArcTop(QMenu *contextMenu, QGraphicsItem *parent, QGraphicsScene *scene)
-    : QGraphicsEllipseItem(parent, scene)
+QParallelArcTop::QParallelArcTop(QMenu *contextMenu, QGraphicsItem *parent)
+    : QGraphicsEllipseItem(parent)
 {
     myContextMenu = contextMenu;
     setRect(-9, -9, 18, 18);

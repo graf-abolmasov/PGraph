@@ -1,5 +1,6 @@
 #include <QtCore>
 #include <QtGui>
+#include <QtWidgets>
 
 #include "qvariabledialog.h"
 #include "ui_qvariabledialog.h"

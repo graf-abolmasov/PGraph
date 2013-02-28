@@ -1,7 +1,8 @@
 #ifndef QTOP_H
 #define QTOP_H
 
-#include <QtGui/QGraphicsRectItem>
+#include <QGraphicsRectItem>
+#include <QGraphicsSceneContextMenuEvent>
 #include "../../src/common/VO/actor.h"
 #include "../../src/common/VO/graphvo.h"
 
@@ -15,7 +16,7 @@ class QTop : public QGraphicsRectItem
 {
 public:
     enum { Type = TOP_TYPE};
-    QTop(QMenu *contextMenu, QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
+    QTop(QMenu *contextMenu, QGraphicsItem *parent = 0);
     ~QTop();
     int number;
     bool isRoot;

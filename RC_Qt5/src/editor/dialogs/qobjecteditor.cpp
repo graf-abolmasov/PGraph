@@ -1,5 +1,5 @@
+#include "QMessageBox"
 #include "qobjecteditor.h"
-#include "QtGui/QMessageBox"
 
 #include "ui_qobjecteditor.h"
 #include <QPushButton>

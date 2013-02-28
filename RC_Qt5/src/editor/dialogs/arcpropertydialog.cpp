@@ -1,4 +1,5 @@
 #include <QtGui>
+#include <QtWidgets>
 
 #include "../../src/editor/dialogs/arcpropertydialog.h"
 #include "ui_arcpropertydialog.h"

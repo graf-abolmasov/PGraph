@@ -1,7 +1,7 @@
 #ifndef QPREDICATEEDITOR_H
 #define QPREDICATEEDITOR_H
 
-#include <QtGui/QDialog>
+#include <QDialog>
 #include <QtCore/QPointer>
 #include "../../src/common/VO/predicate.h"
 

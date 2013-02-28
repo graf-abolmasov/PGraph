@@ -1,5 +1,6 @@
 #include <QtCore>
 #include <QtGui>
+#include <QPushButton>
 
 #include "../../src/common/VO/variable.h"
 #include "../../src/common/VO/datatype.h"

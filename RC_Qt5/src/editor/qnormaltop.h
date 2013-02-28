@@ -13,7 +13,7 @@ public:
     bool getRunInMemman() const
         { return runInMemman; }
     enum { Type = NORMAL_TOP_TYPE };
-    QNormalTop(QMenu *contextMenu, QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
+    QNormalTop(QMenu *contextMenu, QGraphicsItem *parent = 0);
     int type() const
         { return Type; }
     float getMinWidth() const;

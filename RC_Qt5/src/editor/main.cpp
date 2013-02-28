@@ -1,5 +1,7 @@
 #include <QtGui>
 #include <QtCore>
+#include <QApplication>
+#include <QMessageBox>
 #include <time.h>
 #include "../../src/editor/qmywindow.h"
 #include "../../src/editor/qdrawwindow.h"
@@ -17,7 +19,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     a.setApplicationVersion("$Rev$");
 
-    QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
+//    QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
     QTranslator qtTranslator;
     qtTranslator.load("qt_" + QLocale::system().name(),
                       QLibraryInfo::location(QLibraryInfo::TranslationsPath));

@@ -1,7 +1,7 @@
 #ifndef UNDOCOMMAND_H
 #define UNDOCOMMAND_H
 
-#include <QtGui/QUndoCommand>
+#include <QUndoCommand>
 #include <QtCore/QLineF>
 
 #define MOVE_COMMAND_ID 1

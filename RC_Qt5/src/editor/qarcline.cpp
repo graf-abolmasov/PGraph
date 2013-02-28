@@ -1,11 +1,12 @@
 #include <QtCore>
 #include <QtGui>
+#include <QGraphicsDropShadowEffect>
 
 #include "qarcline.h"
 #include "qarc.h"
 
-QArcLine::QArcLine(QLineF line, QGraphicsItem *parent, QGraphicsScene *scene)
-    : QGraphicsLineItem(line, parent, scene)
+QArcLine::QArcLine(QLineF line, QGraphicsItem *parent)
+    : QGraphicsLineItem(line, parent)
 {
     QGraphicsDropShadowEffect *eff = new QGraphicsDropShadowEffect();
     eff->setOffset(2);

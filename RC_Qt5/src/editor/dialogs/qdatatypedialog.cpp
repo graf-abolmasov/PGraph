@@ -1,5 +1,6 @@
 #include <QtCore>
 #include <QtGui>
+#include <QtWidgets>
 
 #include "qdatatypedialog.h"
 #include "ui_qdatatypedialog.h"

@@ -1,7 +1,7 @@
 #ifndef QOBJECTEDITOR_H
 #define QOBJECTEDITOR_H
 
-#include <QtGui/QDialog>
+#include <QDialog>
 #include <QPointer>
 
 namespace Ui {

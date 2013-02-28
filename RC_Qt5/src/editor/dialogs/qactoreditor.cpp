@@ -1,4 +1,5 @@
 #include "qactoreditor.h"
+#include <QtWidgets>
 #include "ui_qactoreditor.h"
 #include "qvariabledialog.h"
 #include "../../src/common/databasemanager.h"

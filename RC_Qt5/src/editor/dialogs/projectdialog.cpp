@@ -1,4 +1,5 @@
 #include "projectdialog.h"
+#include <QtWidgets>
 #include "ui_projectdialog.h"
 #include "../../src/common/VO/graphvo.h"
 #include "../../src/common/globalvariables.h"

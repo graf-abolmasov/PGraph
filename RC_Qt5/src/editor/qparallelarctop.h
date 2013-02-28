@@ -1,7 +1,7 @@
 #ifndef QPARALLELARCTOP_H
 #define QPARALLELARCTOP_H
 
-#include <QtGui/QGraphicsEllipseItem>
+#include <QGraphicsEllipseItem>
 
 #define ARC_TOP_TYPE  UserType+5
 
@@ -9,7 +9,7 @@ class QParallelArcTop : public QGraphicsEllipseItem
 {
 public:
     enum { Type = ARC_TOP_TYPE };
-    QParallelArcTop(QMenu *contextMenu, QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
+    QParallelArcTop(QMenu *contextMenu, QGraphicsItem *parent = 0);
     int type() const
         { return Type;}
     QRectF boundingRect() const;

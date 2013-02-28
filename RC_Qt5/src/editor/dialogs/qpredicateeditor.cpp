@@ -1,4 +1,5 @@
 #include <QtGui>
+#include <QtWidgets>
 
 #include "qpredicateeditor.h"
 #include "ui_qpredicateeditor.h"

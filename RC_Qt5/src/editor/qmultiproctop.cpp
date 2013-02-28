@@ -1,14 +1,15 @@
 #include <QtCore>
 #include <QtGui>
+#include <QStyleOptionGraphicsItem>
+#include <QGraphicsScene>
 
 #include "qmultiproctop.h"
 #include "dialogs/multiproctoppropertydialog.h"
 #include "../../src/common/VO/actor.h"
 #include "qarc.h"
 
-QMultiProcTop::QMultiProcTop(QMenu *contextMenu,
-                             QGraphicsItem *parent, QGraphicsScene *scene)
-                                 : QTop(contextMenu, parent, scene)
+QMultiProcTop::QMultiProcTop(QMenu *contextMenu, QGraphicsItem *parent)
+    : QTop(contextMenu, parent)
 {
     setRect(-70, -50, 140, 100);
     procCount = 2;

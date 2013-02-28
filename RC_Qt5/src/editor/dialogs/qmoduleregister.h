@@ -1,7 +1,7 @@
 #ifndef QMODULEREGISTER_H
 #define QMODULEREGISTER_H
 
-#include <QtGui/QDialog>
+#include <QDialog>
 #include <QtCore/QDir>
 #include <QtCore/QFileInfoList>
 

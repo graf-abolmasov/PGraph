@@ -67,8 +67,10 @@ void QDiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
             addTop(mouseEvent->scenePos());
         break;
     case InsertLine:
-        if (newArc == NULL)
-            newArc = new QArc(NULL, NULL, myArcMenu, 0, this);
+        if (newArc == NULL) {
+            newArc = new QArc(NULL, NULL, myArcMenu);
+            addItem(newArc);
+        }
         newArcLine = newArc->newLine(mouseEvent->scenePos(), mouseEvent->scenePos());
         break;
     case InsertText:
@@ -80,11 +82,12 @@ void QDiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
         addItem(newArcLine);
         break;
     case MoveItem:
-        if (itemAt(mouseEvent->scenePos()) == NULL) {
+        if (itemAt(mouseEvent->scenePos(), QTransform()) == NULL) {
             clearSelection();
-            selectionRect = new QGraphicsRectItem(0, 0, 0, 0, NULL, this);
+            selectionRect = new QGraphicsRectItem(0, 0, 0, 0, NULL);
             selectionRect->setPos(mouseEvent->scenePos().x(), mouseEvent->scenePos().y());
             selectionRect->setPen(Qt::DashLine);
+            addItem(selectionRect);
         }
         break;
     }

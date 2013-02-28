@@ -1,7 +1,7 @@
 #ifndef QOPENGRAPHDIALOG_H
 #define QOPENGRAPHDIALOG_H
 
-#include <QtGui/QDialog>
+#include <QDialog>
 #include <QString>
 #include "../../src/common/VO/graphvo.h"
 

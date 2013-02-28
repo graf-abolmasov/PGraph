@@ -1,7 +1,7 @@
 #ifndef QSYNCARC_H
 #define QSYNCARC_H
 
-#include <QtGui/QGraphicsLineItem>
+#include <QGraphicsLineItem>
 #include "../../src/common/VO/graphvo.h"
 
 #define SYNC_ARC_TYPE      UserType+7
@@ -21,7 +21,7 @@ class QSyncArc : public QGraphicsLineItem
 {
 public:
     enum { Type = SYNC_ARC_TYPE };
-    QSyncArc(QTop *startItem, QTop *endItem, QMenu *contextMenu, QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
+    QSyncArc(QTop *startItem, QTop *endItem, QMenu *contextMenu, QGraphicsItem *parent = 0);
     ~QSyncArc();
     QRectF boundingRect() const;
     QPainterPath shape() const;

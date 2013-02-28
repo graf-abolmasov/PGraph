@@ -1,12 +1,16 @@
 #include <QtGui>
+#include <QGraphicsDropShadowEffect>
+#include <QGraphicsScene>
+#include <QMenu>
+
 #include <math.h>
 #include "qsyncarc.h"
 #include "qtop.h"
 
 const qreal Pi = 3.14;
 
-QSyncArc::QSyncArc(QTop *startItem, QTop *endItem, QMenu *contextMenu, QGraphicsItem *parent, QGraphicsScene *scene)
-    : QGraphicsLineItem(parent, scene){
+QSyncArc::QSyncArc(QTop *startItem, QTop *endItem, QMenu *contextMenu, QGraphicsItem *parent)
+    : QGraphicsLineItem(parent){
     myStartTop = startItem;
     myEndTop = endItem;
     setFlag(QGraphicsItem::ItemIsSelectable, true);

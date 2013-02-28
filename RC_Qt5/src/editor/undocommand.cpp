@@ -1,5 +1,6 @@
 #include <QtCore>
 #include <QtGui>
+#include <QGraphicsScene>
 
 #include "undocommand.h"
 #include "../../src/common/commonutils.h"
