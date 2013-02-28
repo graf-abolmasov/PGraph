@@ -1,7 +1,7 @@
 #ifndef QDIAGRAMSCENE_H
 #define QDIAGRAMSCENE_H
 
-#include <QtGui/QGraphicsScene>
+#include <QGraphicsScene>
 
 QT_BEGIN_NAMESPACE
 class QGraphicsSceneMouseEvent;

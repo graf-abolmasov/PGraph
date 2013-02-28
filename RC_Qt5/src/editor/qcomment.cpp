@@ -1,10 +1,13 @@
 #include <QtCore>
 #include <QtGui>
+#include <QGraphicsScene>
+#include <QMenu>
+#include <QGraphicsSceneContextMenuEvent>
 
 #include "qcomment.h"
 
-QComment::QComment(QMenu *menu, QGraphicsItem *parent, QGraphicsScene *scene)
-    : QGraphicsTextItem(parent, scene)
+QComment::QComment(QMenu *menu, QGraphicsItem *parent)
+    : QGraphicsTextItem(parent)
 {
     myContextMenu = menu;
     setZValue(2);

@@ -1,7 +1,7 @@
 #ifndef QVARIABLEDIALOG_H
 #define QVARIABLEDIALOG_H
 
-#include <QtGui/QDialog>
+#include <QDialog>
 #include <QtCore/QList>
 
 namespace Ui {

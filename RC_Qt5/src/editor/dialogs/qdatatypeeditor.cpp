@@ -1,5 +1,6 @@
 #include <QtGui>
 #include <QtCore>
+#include <QtWidgets>
 
 #include "qdatatypeeditor.h"
 #include "ui_qdatatypeeditor.h"

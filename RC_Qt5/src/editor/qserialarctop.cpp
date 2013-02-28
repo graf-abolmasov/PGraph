@@ -1,4 +1,8 @@
 #include <QtGui>
+#include <QGraphicsScene>
+#include <QGraphicsDropShadowEffect>
+#include <QMenu>
+
 #include "../../src/editor/qserialarctop.h"
 #include "../../src/editor/qarc.h"
 #include "../../src/editor/qtop.h"
@@ -16,8 +20,8 @@ void QSerialArcTop::contextMenuEvent(QGraphicsSceneContextMenuEvent *event){
         myContextMenu->exec(event->screenPos());
 }
 
-QSerialArcTop::QSerialArcTop(QMenu *contextMenu, QGraphicsItem *parent, QGraphicsScene *scene)
-    : QGraphicsRectItem(parent, scene)
+QSerialArcTop::QSerialArcTop(QMenu *contextMenu, QGraphicsItem *parent)
+    : QGraphicsRectItem(parent)
 {
     myContextMenu = contextMenu;
     setRect(-8, -8, 16, 16);

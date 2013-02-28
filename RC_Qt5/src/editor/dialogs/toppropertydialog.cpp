@@ -1,5 +1,6 @@
 #include <QtCore>
 #include <QtGui>
+#include <QMessageBox>
 
 #include "toppropertydialog.h"
 #include "ui_toppropertydialog.h"

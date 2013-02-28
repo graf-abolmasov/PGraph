@@ -23,7 +23,7 @@ QStringList SourceCompiler::compileData(QList<const Variable *> variables)
     QList<const DataType *> myTypeList = globalDBManager->getDataTypeList();
     errors.append(compileUserTypes(myTypeList));
     errors.append(compileTpoData(variables));
-    const int elapsed = qRound(t.elapsed()/1000);
+    const int elapsed = qRound(t.elapsed()/1000.0);
     if (errors.isEmpty())
         globalLogger->log(QObject::tr("Компиляция завершена без ошибок за %1 с").arg(QString::number(elapsed)), Logger::Compile);
     else

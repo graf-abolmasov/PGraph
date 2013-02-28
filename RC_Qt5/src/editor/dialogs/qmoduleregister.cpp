@@ -1,5 +1,6 @@
 #include <QtCore>
 #include <QtGui>
+#include <QtWidgets>
 
 #include "qmoduleregister.h"
 #include "ui_qmoduleregister.h"

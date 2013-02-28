@@ -2,6 +2,9 @@
 # Project created by QtCreator 2009-11-15T04:10:59
 # -------------------------------------------------
 QT += sql core
+
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+
 TARGET = NEW_GRAPH
 TEMPLATE = app
 SOURCES += ../../src/editor/main.cpp \

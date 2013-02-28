@@ -28,9 +28,9 @@ bool NativeCompiler::compile()
 void NativeCompiler::finished(int exitCode, QProcess::ExitStatus exitStatus)
 {
     if (exitCode == 0 && exitStatus != QProcess::CrashExit)
-        globalLogger->log(QObject::tr("Компиляция завершена без ошибок за %1 с.").arg(QString::number(qRound(t.elapsed()/1000))), Logger::Compile);
+        globalLogger->log(QObject::tr("Компиляция завершена без ошибок за %1 с.").arg(QString::number(qRound(t.elapsed()/1000.0))), Logger::Compile);
     else
-        globalLogger->log(QObject::tr("Компиляция провалилась.").arg(QString::number(qRound(t.elapsed()/1000))), Logger::Compile);
+        globalLogger->log(QObject::tr("Компиляция провалилась.").arg(QString::number(qRound(t.elapsed()/1000.0))), Logger::Compile);
     buildScript->close();
     delete buildScript;
     buildScript = NULL;

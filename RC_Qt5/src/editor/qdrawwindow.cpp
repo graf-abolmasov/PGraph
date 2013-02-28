@@ -1,5 +1,12 @@
 #include <QtGui>
 #include <QtCore>
+#include <QGraphicsView>
+#include <QGraphicsScene>
+#include <QMenu>
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QFontDialog>
+
 #include "../../src/editor/qdrawwindow.h"
 #include "../../src/editor/qtop.h"
 #include "../../src/editor/qsyncarc.h"
@@ -375,14 +382,14 @@ void TDrawWindow::loadGraph(const QString &name)
         foreach (Top top, graph.topList) {
             QTop *qtop = NULL;
             if (top.type == Top::NormalTop) {
-                qtop = new QNormalTop(topMenu, NULL, scene);
+                qtop = new QNormalTop(topMenu, NULL);
                 if (top.isRoot)
                     scene->setRootTop(qgraphicsitem_cast<QNormalTop *>(qtop));
                 double w = top.sizeX;
                 double h = top.sizeY;
                 qtop->setRect(-w/2, -h/2, w, h);
             } else if (top.type == Top::MultiProcTop) {
-                QMultiProcTop *qtop1 = new QMultiProcTop(multiProcMenu, NULL, scene);
+                QMultiProcTop *qtop1 = new QMultiProcTop(multiProcMenu, NULL);
                 qtop1->procCount = top.procCount;
                 qtop = qtop1;
             }
@@ -405,7 +412,7 @@ void TDrawWindow::loadGraph(const QString &name)
                     endTop = qtop;
             }
 
-            QArc *qarc = new QArc(startTop, endTop, arcMenu, NULL, scene);
+            QArc *qarc = new QArc(startTop, endTop, arcMenu, NULL);
             for (int i = 0; i < arc.lines.count(); i++){
                 QStringList nodes = arc.lines.at(i).split(" ");
                 QPointF startPoint = QPointF(nodes.at(0).toFloat(), nodes.at(1).toFloat());
@@ -430,7 +437,7 @@ void TDrawWindow::loadGraph(const QString &name)
         }
 
         foreach (Comment comment, graph.commentList) {
-            QComment *qcomment = new QComment(commentMenu, NULL, scene);
+            QComment *qcomment = new QComment(commentMenu, NULL);
             qcomment->setPos(comment.x, comment.y);
             qcomment->setPlainText(comment.text);
         }
@@ -446,7 +453,7 @@ void TDrawWindow::loadGraph(const QString &name)
                 if (qtop->number == arc.endTop)
                     endTop = qtop;
             }
-            QSyncArc *qsyncArc = new QSyncArc(startTop, endTop, syncArcMenu, NULL, scene);
+            QSyncArc *qsyncArc = new QSyncArc(startTop, endTop, syncArcMenu, NULL);
             qsyncArc->setLine(QLineF(startTop->pos(), endTop->pos()));
             startTop->addSync(qsyncArc);
             endTop->addSync(qsyncArc);

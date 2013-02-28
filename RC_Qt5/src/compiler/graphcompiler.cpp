@@ -50,7 +50,7 @@ QList<GraphStruct> GraphCompiler::compile(const Graph &graph)
         globalLogger->log(QObject::tr("Компиляция провалилась. Всего %1 ошибок.").arg(QString::number(errors.count())), Logger::Warning);
         return QList<GraphStruct>();
     }
-    globalLogger->log(QObject::tr("Компиляция завершена без ошибок за %1 с").arg(QString::number(qRound(t.elapsed()/1000))), Logger::Compile);
+    globalLogger->log(QObject::tr("Компиляция завершена без ошибок за %1 с").arg(QString::number(qRound(t.elapsed()/1000.0))), Logger::Compile);
     result[0].usedActors.insert(new Actor(graph));
     if (globalSettings->isParallel()) {
         result.last().procsMax += 2;

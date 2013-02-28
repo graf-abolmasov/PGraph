@@ -1,7 +1,7 @@
 #ifndef QActorEditor_H
 #define QActorEditor_H
 
-#include <QtGui/QDialog>
+#include <QDialog>
 #include <QtCore/QPointer>
 #include "../../src/common/VO/actor.h"
 #include "../../src/common/VO/basemodule.h"

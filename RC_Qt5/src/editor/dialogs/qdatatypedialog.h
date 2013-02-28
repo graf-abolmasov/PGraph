@@ -1,7 +1,7 @@
 #ifndef QDATATYPEDIALOG_H
 #define QDATATYPEDIALOG_H
 
-#include <QtGui/QDialog>
+#include <QDialog>
 #include <QtCore/QModelIndex>
 
 namespace Ui {

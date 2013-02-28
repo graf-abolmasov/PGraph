@@ -1,4 +1,5 @@
 #include <QtGui>
+#include <QtWidgets>
 
 #include "multiproctoppropertydialog.h"
 #include "ui_multiproctoppropertydialog.h"

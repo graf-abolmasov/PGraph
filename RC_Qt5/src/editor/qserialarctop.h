@@ -1,7 +1,7 @@
 #ifndef QSERIALARCTOP_H
 #define QSERIALARCTOP_H
 
-#include <QtGui/QGraphicsRectItem>
+#include <QGraphicsRectItem>
 
 #define ARC_TOP_TYPE  UserType+5
 
@@ -9,7 +9,7 @@ class QSerialArcTop : public QGraphicsRectItem
 {
 public:
     enum { Type = ARC_TOP_TYPE };
-    QSerialArcTop(QMenu *contextMenu, QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
+    QSerialArcTop(QMenu *contextMenu, QGraphicsItem *parent = 0);
     int type() const
         { return Type;}
     QRectF boundingRect() const;

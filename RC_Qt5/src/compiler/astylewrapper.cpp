@@ -35,7 +35,7 @@ char* STDCALL ASMemoryAlloc(unsigned long memoryNeeded)
 
 void AStyleWrapper::beautify(const QFileInfoList &files)
 {
-    char* options = "style=stroustrup align-pointer=name";
+    const char* options = "style=stroustrup align-pointer=name";
 
     QString version(AStyleGetVersion());
     globalLogger->log(QString("Beautify code with AStyle beautifier %1").arg(version), Logger::Compile);

@@ -1,7 +1,7 @@
 #ifndef QDATATYPEEDITOR_H
 #define QDATATYPEEDITOR_H
 
-#include <QtGui/QDialog>
+#include <QDialog>
 #include <QPointer>
 #include "../../src/common/VO/datatype.h"
 

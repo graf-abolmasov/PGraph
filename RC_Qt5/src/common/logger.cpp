@@ -1,4 +1,4 @@
-#include <QtGui/QListWidget>
+#include <QListWidget>
 #include <QtCore/QSettings>
 #include <QtCore/QStringList>
 #include <QtCore/QDebug>

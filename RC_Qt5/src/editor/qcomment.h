@@ -1,7 +1,7 @@
 #ifndef QCOMMENT_H
 #define QCOMMENT_H
 
-#include <QtGui/QGraphicsTextItem>
+#include <QGraphicsTextItem>
 #include <QtGui/QFont>
 #include "../../src/common/VO/graphvo.h"
 
@@ -19,7 +19,7 @@ class QComment : public QGraphicsTextItem
 
 public:
     enum { Type = UserType + 3 };
-    QComment(QMenu *menu, QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
+    QComment(QMenu *menu, QGraphicsItem *parent = 0);
     int type() const
         { return Type; }
     Comment toComment();

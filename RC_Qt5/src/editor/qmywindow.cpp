@@ -1,4 +1,19 @@
 ﻿#include <QtGui>
+#include <QMdiArea>
+#include <QListWidget>
+#include <QStatusBar>
+#include <QMenuBar>
+#include <QToolButton>
+#include <QToolBar>
+#include <QDockWidget>
+#include <QButtonGroup>
+#include <QLabel>
+#include <QFileDialog>
+#include <QApplication>
+#include <QMessageBox>
+#include <QUndoView>
+#include <QUndoStack>
+#include <QMdiSubWindow>
 
 #include "../../src/editor/qmywindow.h"
 #include "../../src/editor/qdrawwindow.h"

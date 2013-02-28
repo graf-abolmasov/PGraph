@@ -1,7 +1,7 @@
 #ifndef QVARIABLEEDITOR_H
 #define QVARIABLEEDITOR_H
 
-#include <QtGui/QDialog>
+#include <QDialog>
 
 namespace Ui {
     class QVariableEditor;
