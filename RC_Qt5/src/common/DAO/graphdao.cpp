@@ -46,16 +46,16 @@ void GraphDAO::persist(const Graph &graph)
         execQuery(query);
     }
 
-    foreach (Arc arc, graph.arcList){
+    foreach (GraphArc arc, graph.arcList){
         query.prepare("INSERT INTO arcpic (PROJECT_ID, NAMEPR, Nodes, Priority, FromTop, ToTop, Predicate, Type) VALUES (:PROJECT_ID, :NAMEPR, :Nodes, :Priority, :FromTop, :ToTop, :Predicate, :Type)");
         query.bindValue(":PROJECT_ID", myProjectId);
         query.bindValue(":NAMEPR",     graph.name);
         QString arcType;
         switch (arc.type){
-        case Arc::ParallelArc:
+        case GraphArc::ParallelArc:
             arcType = "P";
             break;
-        case Arc::TerminateArc:
+        case GraphArc::TerminateArc:
             arcType = "T";
             break;
         default:
@@ -103,7 +103,7 @@ QList<Graph> GraphDAO::findAll(bool loadContent)
         } else {
             QPixmap p;
             p.loadFromData(query.value(2).toByteArray(), "PNG");
-            Graph newGraph(query.value(0).toString(), query.value(1).toString(), QList<Top>(), QList<Arc>(), QList<Comment>(), QList<SyncArc>(), p);
+            Graph newGraph(query.value(0).toString(), query.value(1).toString(), QList<Top>(), QList<GraphArc>(), QList<Comment>(), QList<SyncArc>(), p);
             result.append(newGraph);
         }
     }
@@ -155,17 +155,17 @@ Graph GraphDAO::findByName(const QString &name)
     query.bindValue(":NAMEPR", name);
     execQuery(query);
 
-    QList<Arc> arcList;
+    QList<GraphArc> arcList;
     while (query.next()) {
         QSqlRecord record = query.record();
-        Arc::ArcType arcType;
+        GraphArc::ArcType arcType;
         if (record.value("Type").toString() == QObject::tr("T"))
-            arcType = Arc::TerminateArc;
+            arcType = GraphArc::TerminateArc;
         else if (record.value("Type").toString() == QObject::tr("P"))
-            arcType = Arc::ParallelArc;
-        else arcType = Arc::SerialArc;
+            arcType = GraphArc::ParallelArc;
+        else arcType = GraphArc::SerialArc;
         QStringList lines = record.value("Nodes").toString().split(";;");
-        arcList.append(Arc(arcType,
+        arcList.append(GraphArc(arcType,
                            record.value("Priority").toInt(),
                            record.value("FromTop").toInt(),
                            record.value("ToTop").toInt(),

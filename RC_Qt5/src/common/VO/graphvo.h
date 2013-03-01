@@ -29,11 +29,11 @@ public:
     QFont font;
 };
 
-class Arc
+class GraphArc
 {
 public:
     enum ArcType { SerialArc = 1, ParallelArc = 2, TerminateArc = 3};
-    Arc(ArcType type, int priority, int startTop, int endTop, const Predicate *predicate, const QStringList &lines);
+    GraphArc(ArcType type, int priority, int startTop, int endTop, const Predicate *predicate, const QStringList &lines);
     ArcType type;
     int priority;
     int startTop;
@@ -78,14 +78,14 @@ public:
 class Graph  : public Actor
 {
 public:
-    Graph(const QString &name, const QString &extName, const QList<Top> &topList, const QList<Arc> &arcList, const QList<Comment> &commentList, const QList<SyncArc> &syncArcList);
-    Graph(const QString &name, const QString &extName, const QList<Top> &topList, const QList<Arc> &arcList, const QList<Comment> &commentList, const QList<SyncArc> &syncArcList, const QPixmap &icon);
+    Graph(const QString &name, const QString &extName, const QList<Top> &topList, const QList<GraphArc> &arcList, const QList<Comment> &commentList, const QList<SyncArc> &syncArcList);
+    Graph(const QString &name, const QString &extName, const QList<Top> &topList, const QList<GraphArc> &arcList, const QList<Comment> &commentList, const QList<SyncArc> &syncArcList, const QPixmap &icon);
     QList<Top>           topList;
-    QList<Arc>           arcList;
+    QList<GraphArc>           arcList;
     QList<Comment>       commentList;
     QList<SyncArc>       syncArcList;
 
-    QList<Arc> getOutArcs(int topNumber) const;
+    QList<GraphArc> getOutArcs(int topNumber) const;
     QList<SyncArc> getSyncSend(int topNumber) const;
     QList<SyncArc> getSyncRecv(int topNumber) const;
     int getRootTop() const;

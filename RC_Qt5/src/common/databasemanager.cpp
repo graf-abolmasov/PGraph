@@ -344,7 +344,7 @@ void DataBaseManager::saveStructDB(const Graph &graph) throw (QString)
         throw QObject::tr("Не удалось удалить структуру.\n") + db.lastError().text();
     }
 
-    foreach (Arc arc, graph.arcList){
+    foreach (GraphArc arc, graph.arcList){
         if (!predicateList.contains(arc.predicate)){
             predicateList.append(arc.predicate);
             query.prepare("INSERT INTO graphpre (PROJECT_ID, NAMEPR, NPRED, NAME)"
@@ -370,13 +370,13 @@ void DataBaseManager::saveStructDB(const Graph &graph) throw (QString)
         query.bindValue(":PRIOR", arc.priority);
         int arcType;
         switch (arc.type){
-        case Arc::ParallelArc:
+        case GraphArc::ParallelArc:
             arcType = 2;
             break;
-        case Arc::TerminateArc:
+        case GraphArc::TerminateArc:
             arcType = 3;
             break;
-        case Arc::SerialArc:
+        case GraphArc::SerialArc:
         default:
             arcType = 1;
         }

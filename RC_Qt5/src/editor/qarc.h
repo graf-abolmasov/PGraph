@@ -39,9 +39,9 @@ public:
         { return myStartTop; }
     QTop *endItem() const
         { return myEndTop; }
-    Arc::ArcType arcType() const
+    GraphArc::ArcType arcType() const
         { return myArcType; }
-    void setArcType(Arc::ArcType type);
+    void setArcType(GraphArc::ArcType type);
     QArcLine *prevLine(){
         if (lines.count() > 0)
             return lines.last();
@@ -49,7 +49,7 @@ public:
     }
     void setPen(const QPen &pen);
 
-    Arc toArc() const;
+    GraphArc toArc() const;
     bool autoBuild(QTop* top, float dx, float dy);
     bool remake(QTop *, float dx, float dy);
     bool moveLine(QArcLine* line, float dx, float dy);
@@ -62,7 +62,7 @@ protected:
 
 private:
     bool freezed;
-    Arc::ArcType myArcType;
+    GraphArc::ArcType myArcType;
     QTop *myStartTop;
     QTop *myEndTop;
     QMenu *myContextMenu;

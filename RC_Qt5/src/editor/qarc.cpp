@@ -445,7 +445,7 @@ QArc::QArc(QTop *startItem, QTop *endItem, QMenu *contextMenu,
 
     setPen(QPen(Qt::black, 2, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
 
-    setArcType(Arc::SerialArc);
+    setArcType(GraphArc::SerialArc);
     myPriority = 0;
     arcTop->hide();
 }
@@ -617,7 +617,7 @@ void QArc::updateBounds() {
 void QArc::setPriority(int w) {
     myPriority = w;
     QPen myPen = pen();
-    if (myArcType == Arc::SerialArc)
+    if (myArcType == GraphArc::SerialArc)
         myPen.setWidth(myStartTop->outArcs().count() - myPriority + 2);
     setPen(myPen);
 }
@@ -628,7 +628,7 @@ void QArc::setPen(const QPen &pen){
     QGraphicsLineItem::setPen(pen);
 }
 
-void QArc::setArcType(Arc::ArcType type)
+void QArc::setArcType(GraphArc::ArcType type)
 {
     myArcType = type;
     if (arcTop != NULL){
@@ -636,13 +636,13 @@ void QArc::setArcType(Arc::ArcType type)
         arcTop = NULL;
     }
     switch (myArcType) {
-    case Arc::SerialArc:
+    case GraphArc::SerialArc:
         arcTop = new QSerialArcTop(myContextMenu, this);
         break;
-    case Arc::ParallelArc:
+    case GraphArc::ParallelArc:
         arcTop = new QParallelArcTop(myContextMenu, this);
         break;
-    case Arc::TerminateArc:
+    case GraphArc::TerminateArc:
         arcTop = new QTerminateArcTop(myContextMenu, this);
         break;
     }
@@ -651,13 +651,13 @@ void QArc::setArcType(Arc::ArcType type)
 /*!
   Преобразует в простой формат дуги для сохранения в базу данных.
 */
-Arc QArc::toArc() const
+GraphArc QArc::toArc() const
 {
     QStringList nodes;
     foreach(QArcLine* line, lines)
         nodes.append(QString::number(line->line().x1()) + " " + QString::number(line->line().y1()) + " " +
                      QString::number(line->line().x2()) + " " + QString::number(line->line().y2()));
-    return Arc(myArcType,
+    return GraphArc(myArcType,
                myPriority,
                myStartTop->number,
                myEndTop->number,
