@@ -352,7 +352,7 @@ Graph TDrawWindow::getGraph() const
     QList<Top> topList;
     foreach (QTop* top, allTops())
         topList.append(top->toTop());
-    QList<Arc> arcList;
+    QList<GraphArc> arcList;
     foreach (QArc* arc, allArcs())
         arcList.append(arc->toArc());
     QList<Comment> commentList;
@@ -401,7 +401,7 @@ void TDrawWindow::loadGraph(const QString &name)
         }
 
         QList<QPair<QArc *, int> > qarcList;
-        foreach (Arc arc, graph.arcList) {
+        foreach (GraphArc arc, graph.arcList) {
             QTop *startTop = NULL;
             QTop *endTop = NULL;
             foreach(QTop *qtop, topList) {

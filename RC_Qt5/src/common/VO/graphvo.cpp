@@ -1,7 +1,7 @@
 #include "graphvo.h"
 #include "actor.h"
 
-Graph::Graph(const QString &name, const QString &extName, const QList<Top> &topList, const QList<Arc> &arcList, const QList<Comment> &commentList, const QList<SyncArc> &syncArcList) :
+Graph::Graph(const QString &name, const QString &extName, const QList<Top> &topList, const QList<GraphArc> &arcList, const QList<Comment> &commentList, const QList<SyncArc> &syncArcList) :
     Actor(name, extName, Actor::GraphType)
 {
     this->arcList          = arcList;
@@ -11,12 +11,12 @@ Graph::Graph(const QString &name, const QString &extName, const QList<Top> &topL
     QMap<int, Top> topMap;
     foreach (Top top, topList)
         topMap[top.number] = top;
-    foreach (Arc arc, arcList)
-        topMap[arc.startTop].terminated = arc.type == Arc::TerminateArc;
+    foreach (GraphArc arc, arcList)
+        topMap[arc.startTop].terminated = arc.type == GraphArc::TerminateArc;
     this->topList = topMap.values();
 }
 
-Graph::Graph(const QString &name, const QString &extName, const QList<Top> &topList, const QList<Arc> &arcList, const QList<Comment> &commentList, const QList<SyncArc> &syncArcList, const QPixmap &icon) :
+Graph::Graph(const QString &name, const QString &extName, const QList<Top> &topList, const QList<GraphArc> &arcList, const QList<Comment> &commentList, const QList<SyncArc> &syncArcList, const QPixmap &icon) :
     Actor(name, extName, Actor::GraphType, NULL, QList<const Variable *>(), QStringList(), icon)
 {
     this->arcList          = arcList;
@@ -26,15 +26,15 @@ Graph::Graph(const QString &name, const QString &extName, const QList<Top> &topL
     QMap<int, Top> topMap;
     foreach (Top top, topList)
         topMap[top.number] = top;
-    foreach (Arc arc, arcList)
-        topMap[arc.startTop].terminated = arc.type == Arc::TerminateArc;
+    foreach (GraphArc arc, arcList)
+        topMap[arc.startTop].terminated = arc.type == GraphArc::TerminateArc;
     this->topList = topMap.values();
 }
 
-QList<Arc> Graph::getOutArcs(int topNumber) const
+QList<GraphArc> Graph::getOutArcs(int topNumber) const
 {
-    QList<Arc> result;
-    foreach (Arc arc, arcList) {
+    QList<GraphArc> result;
+    foreach (GraphArc arc, arcList) {
         if (arc.startTop == topNumber)
             result.append(arc);
     }
@@ -84,16 +84,16 @@ QStringList Graph::validate() const
 {
     QStringList msgs;
     msgs.append(Actor::validate());
-    foreach (Arc arc, arcList)
+    foreach (GraphArc arc, arcList)
         msgs.append(arc.validate());
     foreach (Top top, topList) {
         msgs.append(top.validate());
-        QList<Arc> outArcs = getOutArcs(top.number);
+        QList<GraphArc> outArcs = getOutArcs(top.number);
         if (outArcs.isEmpty())
             continue;
         bool outArcsCorrect = true;
         const int outArcType = outArcs.first().type;
-        foreach (Arc arc, outArcs) {
+        foreach (GraphArc arc, outArcs) {
             if (outArcType != arc.type) {
                 outArcsCorrect = false;
                 break;
@@ -158,7 +158,7 @@ SyncArc::SyncArc(QString startGraph, int startTop, QString endGraph, int endTop)
     this->startTop = startTop;
 }
 
-Arc::Arc(ArcType type, int priority, int startTop, int endTop, const Predicate *predicate, const QStringList &lines)
+GraphArc::GraphArc(ArcType type, int priority, int startTop, int endTop, const Predicate *predicate, const QStringList &lines)
 {
     this->type = type;
     this->priority = priority;
@@ -168,7 +168,7 @@ Arc::Arc(ArcType type, int priority, int startTop, int endTop, const Predicate *
     this->lines = lines;
 }
 
-QStringList Arc::validate() const
+QStringList GraphArc::validate() const
 {
     QStringList msgs;
     if (startTop == -1)

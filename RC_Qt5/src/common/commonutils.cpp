@@ -168,20 +168,20 @@ QString arcTypeToString(const QArc *arc)
 {
     QString result;
     switch (arc->arcType()) {
-    case Arc::SerialArc:
+    case GraphArc::SerialArc:
         result = QObject::tr("Последовательная");
         break;
-    case Arc::ParallelArc:
+    case GraphArc::ParallelArc:
         result = QObject::tr("Параллельная");
         break;
-    case Arc::TerminateArc:
+    case GraphArc::TerminateArc:
         result = QObject::tr("Терминирующая");
         break;
     }
     return result;
 }
 
-bool orderArcByPriorityAsc(const Arc &arc1, const Arc &arc2)
+bool orderArcByPriorityAsc(const GraphArc &arc1, const GraphArc &arc2)
 {
     return arc1.priority < arc2.priority;
 }

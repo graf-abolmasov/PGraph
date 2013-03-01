@@ -44,13 +44,13 @@ void ArcPropertyDialog::changeEvent(QEvent *e)
 void ArcPropertyDialog::prepareForm(QArc *arc)
 {
     switch (arc->arcType()) {
-    case Arc::SerialArc:
+    case GraphArc::SerialArc:
         ui->serialRadioBtn->setChecked(true);
         break;
-    case Arc::ParallelArc:
+    case GraphArc::ParallelArc:
         ui->parallelRadioBtn->setChecked(true);
         break;
-    case Arc::TerminateArc:
+    case GraphArc::TerminateArc:
         ui->terminateRadioBtn->setChecked(true);
         break;
     }
@@ -101,9 +101,9 @@ void ArcPropertyDialog::on_buttonBox_accepted()
 
 bool ArcPropertyDialog::makeResult()
 {
-    if (ui->serialRadioBtn->isChecked()) myArc->setArcType(Arc::SerialArc);
-    else if (ui->parallelRadioBtn->isChecked()) myArc->setArcType(Arc::ParallelArc);
-    else if (ui->terminateRadioBtn->isChecked()) myArc->setArcType(Arc::TerminateArc);
+    if (ui->serialRadioBtn->isChecked()) myArc->setArcType(GraphArc::SerialArc);
+    else if (ui->parallelRadioBtn->isChecked()) myArc->setArcType(GraphArc::ParallelArc);
+    else if (ui->terminateRadioBtn->isChecked()) myArc->setArcType(GraphArc::TerminateArc);
 
     int newPriority = ui->prioritySpnBox->value();
 

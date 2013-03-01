@@ -120,7 +120,7 @@ void MultiProcTopPropertyDialog::on_buttonBox_accepted()
     if (theirTop->actor == NULL) return;
     QString extName = theirTop->actor->extName + " " + QString::number(theirTop->procCount) + tr(" процессов");
     QString name = "G" + getCRC(extName.toUtf8());
-    Graph newGraph(name, extName, QList<Top>(),  QList<Arc>(), QList<Comment>(), QList<SyncArc>());
+    Graph newGraph(name, extName, QList<Top>(),  QList<GraphArc>(), QList<Comment>(), QList<SyncArc>());
     Top headTop(0, -85, theirTop->procCount*50 - 10, 30, 0, -1, true, makeInlineActor(ui->prepareDataEdt->document()->toPlainText()), Top::NormalTop);
     newGraph.topList.append(headTop);
     for (int i = 0; i < theirTop->procCount; i++) {
@@ -131,7 +131,7 @@ void MultiProcTopPropertyDialog::on_buttonBox_accepted()
                      QString::number(-85) + " " +
                      QString::number(-(theirTop->procCount-1)*25+i*50) + " " +
                      QString::number(-1));
-        Arc newArc(Arc::ParallelArc, i+1, 0, i+1, NULL, nodes);
+        GraphArc newArc(GraphArc::ParallelArc, i+1, 0, i+1, NULL, nodes);
         newArc.predicate = globalDBManager->getPredicate("P" + getCRC("1"));
         newGraph.arcList.append(newArc);
         nodes.clear();
@@ -139,7 +139,7 @@ void MultiProcTopPropertyDialog::on_buttonBox_accepted()
                      QString::number(1) + " " +
                      QString::number(-(theirTop->procCount-1)*25+i*50) + " " +
                      QString::number(85));
-        newArc = Arc(Arc::TerminateArc, 1, i+1, theirTop->procCount + 1, NULL, nodes);
+        newArc = GraphArc(GraphArc::TerminateArc, 1, i+1, theirTop->procCount + 1, NULL, nodes);
         newArc.predicate = globalDBManager->getPredicate("P" + getCRC("1"));
         newGraph.arcList.append(newArc);
     }
