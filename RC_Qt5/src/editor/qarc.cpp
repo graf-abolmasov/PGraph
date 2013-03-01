@@ -588,7 +588,6 @@ QArcLine* QArc::newLine(QPointF p1, QPointF p2)
         //добавляем отрезок дуги
         currentLine = new QArcLine(QLineF(nLine), this);
     }
-    scene()->addItem(currentLine);
     currentLine->setPen(pen());
     currentLine->setFlag(QGraphicsItem::ItemIsMovable, true);
     currentLine->setFlag(QGraphicsItem::ItemIsSelectable, true);

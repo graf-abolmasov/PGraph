@@ -383,8 +383,6 @@ void TDrawWindow::loadGraph(const QString &name)
             QTop *qtop = NULL;
             if (top.type == Top::NormalTop) {
                 qtop = new QNormalTop(topMenu, NULL);
-                if (top.isRoot)
-                    scene->setRootTop(qgraphicsitem_cast<QNormalTop *>(qtop));
                 double w = top.sizeX;
                 double h = top.sizeY;
                 qtop->setRect(-w/2, -h/2, w, h);
@@ -393,6 +391,9 @@ void TDrawWindow::loadGraph(const QString &name)
                 qtop1->procCount = top.procCount;
                 qtop = qtop1;
             }
+            scene->addItem(qtop);
+            if (top.isRoot)
+                scene->setRootTop(qgraphicsitem_cast<QNormalTop *>(qtop));
             qtop->number = top.number;
             qtop->setPos(top.x, top.y);
             qtop->actor = top.actor;
@@ -413,6 +414,7 @@ void TDrawWindow::loadGraph(const QString &name)
             }
 
             QArc *qarc = new QArc(startTop, endTop, arcMenu, NULL);
+            scene->addItem(qarc);
             for (int i = 0; i < arc.lines.count(); i++){
                 QStringList nodes = arc.lines.at(i).split(" ");
                 QPointF startPoint = QPointF(nodes.at(0).toFloat(), nodes.at(1).toFloat());
@@ -438,6 +440,7 @@ void TDrawWindow::loadGraph(const QString &name)
 
         foreach (Comment comment, graph.commentList) {
             QComment *qcomment = new QComment(commentMenu, NULL);
+            scene->addItem(qcomment);
             qcomment->setPos(comment.x, comment.y);
             qcomment->setPlainText(comment.text);
         }
@@ -455,6 +458,7 @@ void TDrawWindow::loadGraph(const QString &name)
             }
             QSyncArc *qsyncArc = new QSyncArc(startTop, endTop, syncArcMenu, NULL);
             qsyncArc->setLine(QLineF(startTop->pos(), endTop->pos()));
+            scene->addItem(qsyncArc);
             startTop->addSync(qsyncArc);
             endTop->addSync(qsyncArc);
         }
