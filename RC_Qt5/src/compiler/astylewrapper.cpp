@@ -2,7 +2,7 @@
 #include "../../src/common/globalvariables.h"
 
 // allow for different calling conventions in Linux and Windows
-#define ASTYLE_STATIC
+
 #if defined(_WIN32) && !defined(ASTYLE_STATIC)
 #define STDCALL __stdcall
 #else

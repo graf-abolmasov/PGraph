@@ -3,6 +3,8 @@
 # -------------------------------------------------
 QT += sql core
 
+CONFIG += static
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = NEW_GRAPH
@@ -136,12 +138,17 @@ FORMS += ../../src/editor/dialogs/toppropertydialog.ui \
     ../../src/editor/dialogs/otherfilesdialog.ui
 RC_FILE = ../../images/resources.rc
 
+win32 {
+    QMAKE_LFLAGS_RELEASE += -static-libgcc -static-libstdc++
+}
 
-
-unix:!macx:!symbian|win32: LIBS += -L$$PWD/../../lib/ -lastyle
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../lib/ -lastylelib
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../lib/ -lastylelibd
+else:unix:!macx: LIBS += -L$$PWD/../../lib/ -lastyle
 
 INCLUDEPATH += $$PWD/../../
 DEPENDPATH += $$PWD/../../
 
-win32: PRE_TARGETDEPS += $$PWD/../../lib/astyle.lib
-else:unix:!macx:!symbian: PRE_TARGETDEPS += $$PWD/../../lib/libastyle.a
+win32:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../lib/libastylelib.a
+else:win32:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../lib/libastylelibd.a
+else:unix:!macx: PRE_TARGETDEPS += $$PWD/../../lib/libastyle.a
