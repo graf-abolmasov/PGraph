@@ -620,21 +620,20 @@ void SourceCompiler::compileMakefile(QString target, const QList<const Actor *> 
         cFiles.insert(baseModule->name);
     }
 
-    foreach (QString  name, myOtherFilesList) {
-        if (cppFiles.contains(name) || cFiles.contains(name))
+    foreach (const QString name, myOtherFilesList) {
+        const QString shortName = name.left(name.lastIndexOf("."));
+        if (cppFiles.contains(shortName) || cFiles.contains(shortName))
             continue;
         if (name.endsWith(".c")) {
-            name = name.left(name.lastIndexOf(".c"));
-            objects.append(target + "/" + name + ".o");
+            objects.append(target + "/" + shortName + ".o");
 //            targets.append(target + "/" + name + ".o:\r\n\t$(CC) -c $(CFLAGS) $(INCPATH) -o " + target + QDir::separator() + name + ".o " + name + ".c" );
-            targets.append(target + "/" + name + ".o:\r\n\t$(CC) -c $(CFLAGS) $(INCPATH) -o " + target + "/" + name + ".o " + name + ".c" );
-            cFiles.insert(name);
+            targets.append(target + "/" + shortName + ".o:\r\n\t$(CC) -c $(CFLAGS) $(INCPATH) -o " + target + "/" + shortName + ".o " + shortName + ".c" );
+            cFiles.insert(shortName);
         } else if (name.endsWith(".cpp")) {
-            name = name.left(name.lastIndexOf(".cpp"));
-            objects.append(target + "/" + name + ".o");
+            objects.append(target + "/" + shortName + ".o");
 //            targets.append(target + "/" + name + ".o:\r\n\t$(CXX) -c $(CXXFLAGS) $(INCPATH) -o " + target + QDir::separator() + name + ".o " + name + ".cpp" );
-            targets.append(target + "/" + name + ".o:\r\n\t$(CXX) -c $(CXXFLAGS) $(INCPATH) -o " + target + "/" + name + ".o " + name + ".cpp" );
-            cppFiles.insert(name);
+            targets.append(target + "/" + shortName + ".o:\r\n\t$(CXX) -c $(CXXFLAGS) $(INCPATH) -o " + target + "/" + shortName + ".o " + shortName + ".cpp" );
+            cppFiles.insert(shortName);
         }
     }
 
