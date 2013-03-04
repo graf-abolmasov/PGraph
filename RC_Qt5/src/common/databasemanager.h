@@ -22,8 +22,8 @@ private:
     QList<const Predicate *>  myPredicateList;
     QList<const BaseModule *> myBaseModuleList;
 
-    QList<BaseModule> getBaseModuleListDB() throw (QString);
-    QList<Graph> getGraphListDB() throw (QString);
+    QList<BaseModule> getBaseModuleListDB();
+    QList<Graph> getGraphListDB();
 
     void openDB();
     void execQuery(QSqlQuery &query);
@@ -62,9 +62,9 @@ public:
     QList<const BaseModule *> getBaseModuleList() const;
     QList<const Graph *> getGraphList();
 
-    Graph getGraphDB(const QString &namepr) throw (QString);
-    void saveGraphDB(const Graph &graph) throw (QString);
-    void updateGraphDB(const Graph &graph) throw (QString);
+    Graph getGraphDB(const QString &namepr);
+    void saveGraphDB(const Graph &graph);
+    void updateGraphDB(const Graph &graph);
 
     void cloneProjectDB(int srcProjectId, QString projectName, QString author, QString description);
     QList<Project> getProjectListDB();
@@ -72,9 +72,9 @@ public:
     void removeProjectDB(int projectId);
     int createProjectDB(QString projectName, QString , QString );
 
-    void saveStructDB(const Graph &graph) throw (QString);
+    void saveStructDB(const Graph &graph);
 
-    void registerModuleDB(const BaseModule *baseModule) throw (QString);
+    void registerModuleDB(const BaseModule *baseModule);
 
     void saveActorPictute(const QString &actorName, const QPixmap &image);
 

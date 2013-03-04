@@ -44,7 +44,7 @@ DataBaseManager::DataBaseManager()
     myProjectId = -1;
 }
 
-Graph DataBaseManager::getGraphDB(const QString &name) throw (QString)
+Graph DataBaseManager::getGraphDB(const QString &name)
 {
     return GraphDAO(db).findByName(name);
 }
@@ -76,7 +76,7 @@ void DataBaseManager::setVariableList(const QList<const Variable *> &list)
     VariableDAO(db).persistList(myVariableList);
 }
 
-void DataBaseManager::saveGraphDB(const Graph &graph) throw (QString)
+void DataBaseManager::saveGraphDB(const Graph &graph)
 {
     GraphDAO(db).persist(graph);
 
@@ -99,13 +99,13 @@ void DataBaseManager::saveGraphDB(const Graph &graph) throw (QString)
 /*!
   Удалает и сохраняет заново агрегат
 */
-void DataBaseManager::updateGraphDB(const Graph &graph) throw (QString)
+void DataBaseManager::updateGraphDB(const Graph &graph)
 {
     GraphDAO(db).remove(graph);
     return saveGraphDB(graph);
 }
 
-QList<Graph> DataBaseManager::getGraphListDB() throw (QString)
+QList<Graph> DataBaseManager::getGraphListDB()
 {
     return GraphDAO(db).findAll();
 }
@@ -200,7 +200,7 @@ const Predicate *DataBaseManager::getPredicate(const QString &name) const
     return result;
 }
 
-void DataBaseManager::registerModuleDB(const BaseModule *baseModule) throw (QString)
+void DataBaseManager::registerModuleDB(const BaseModule *baseModule)
 {
     openDB();
     QSqlQuery query;
@@ -255,7 +255,7 @@ void DataBaseManager::registerModuleDB(const BaseModule *baseModule) throw (QStr
     db.close();
 }
 
-QList<BaseModule> DataBaseManager::getBaseModuleListDB() throw (QString)
+QList<BaseModule> DataBaseManager::getBaseModuleListDB()
 {
     openDB();
     QSqlQuery query1;
@@ -309,7 +309,7 @@ const BaseModule *DataBaseManager::getBaseModule(const QString &name) const
     return result;
 }
 
-void DataBaseManager::saveStructDB(const Graph &graph) throw (QString)
+void DataBaseManager::saveStructDB(const Graph &graph)
 {
     if (!db.open()) {
         globalLogger->log(db.lastError().text(), Logger::Critical);
