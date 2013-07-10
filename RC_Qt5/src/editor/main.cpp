@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
         TMyWindow w;
         w.showMaximized();
         result = a.exec();
-    } else QMessageBox::critical(NULL, QObject::tr(ERR_TITLE), QObject::tr("Не выбран проект (aka Предметная область)"));
+    };
 
     delete globalDBManager;
     delete globalLogger;

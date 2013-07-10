@@ -53,7 +53,7 @@ void AStyleWrapper::beautify(const QFileInfoList &files)
                                    options,
                                    ASErrorHandler,
                                    ASMemoryAlloc));
-        Q_ASSERT(!textOut.isEmpty());
+//        Q_ASSERT(!textOut.isEmpty());
         f.open(QIODevice::WriteOnly);
         f.write(textOut.toUtf8());
         f.close();

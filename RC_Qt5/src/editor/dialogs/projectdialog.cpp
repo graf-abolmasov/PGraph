@@ -15,10 +15,11 @@ ProjectDialog::ProjectDialog(QWidget *parent) :
     model->setEditStrategy(QSqlTableModel::OnFieldChange);
     model->select();
 
-    model->setHeaderData(1, Qt::Horizontal, tr("Название"));
+    model->setHeaderData(1, Qt::Horizontal, tr("Project name"));
 
     ui->projectsTable->setModel(model);
     ui->projectsTable->hideColumn(0);
+    ui->projectsTable->selectRow(0);
 }
 
 ProjectDialog::~ProjectDialog()
@@ -35,56 +36,48 @@ void ProjectDialog::on_createProjectBtn_clicked()
     q.next();
     const int max = q.value(0).toInt();
     QSqlField f("PROJECT_NAME", QVariant::String);
-    f.setValue(tr("Новый проект %1").arg(QString::number(max)));
+    f.setValue(tr("New project %1").arg(QString::number(max)));
     newRec.append(f);
-    model->insertRecord(-1, newRec);
+    model->insertRecord(0, newRec);
 }
 
-void ProjectDialog::on_projectsTable_doubleClicked(const QModelIndex &index)
-{
-//    openProject();
-}
-
-void ProjectDialog::openProject()
+bool ProjectDialog::openProject()
 {
     model->database().transaction();
     model->database().commit();
     const int cr = currentRow();
     if (cr < 0) {
-        QMessageBox::warning(this, tr(ERR_TITLE), tr("Выберите проект"));
-        return;
+        QMessageBox::warning(this, tr("Error"), tr("Select project"));
+        return false;
     }
     const int projectId = model->record(cr).value("PROJECT_ID").toInt();
     globalDBManager->openProjectDB(projectId);
-    accept();
+    return true;
 }
 
 void ProjectDialog::on_buttonBox_accepted()
 {
-    openProject();
+    if (openProject())
+        accept();
 }
 
 void ProjectDialog::on_delProjectBtn_clicked()
 {
-    model->removeRow(currentRow());
-    ui->projectsTable->selectRow(-1);
+    const int cr = currentRow();
+    const QString projectName = model->record(cr).value("PROJECT_NAME").toString();
+
+    if (QMessageBox::question(this, tr("Question"),
+                              tr("Do you want to remove project - \"%1\"?").arg(projectName),
+                              QMessageBox::Yes|QMessageBox::No,
+                              QMessageBox::No) == QMessageBox::Yes) {
+        ui->projectsTable->selectRow(-1);
+        ui->projectsTable->selectionModel()->reset();
+        ui->projectsTable->hideRow(cr);
+        model->removeRow(cr);
+    }
 }
 
 int ProjectDialog::currentRow() const
 {
     return ui->projectsTable->selectionModel()->currentIndex().row();
-}
-
-void ProjectDialog::on_cloneProjectBtn_clicked()
-{
-    const int cr = currentRow();
-    if (cr < 0) {
-        QMessageBox::warning(this, tr(ERR_TITLE), tr("Выберите проект"));
-        return;
-    }
-    const int projectId = model->record(cr).value("PROJECT_ID").toInt();
-    const QString projectName = model->record(cr).value("PROJECT_NAME").toString() + tr(" (копия)");
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    globalDBManager->cloneProjectDB(projectId, projectName, QString(), QString());
-    QApplication::restoreOverrideCursor();
 }
