@@ -3,7 +3,9 @@
 #include <stdio.h>
 
 #ifdef PARALLEL
+
 PROJECT_BEGIN_NAMESPACE
+
 int memman(TPOData *D)
 {
     int Terminate = 0;
@@ -45,6 +47,8 @@ int memman(TPOData *D)
     delete proc_loading;
     return 1;
 }
+
 PROJECT_END_NAMESPACE
+
 #endif
 

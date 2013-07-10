@@ -1,7 +1,9 @@
 #ifndef PROPERTY_H
 #define PROPERTY_H
 #include "stype.h"
+
 PROJECT_BEGIN_NAMESPACE
+
 template <class _T, class _ContainerClass> class __property_rw
 {
     typedef _T  (_ContainerClass:: * TGetFunc)(void);
@@ -104,5 +106,7 @@ public:
     __property_rw<_T, __property_rw_indexed> it;
     _I* index;
 };
+
 PROJECT_END_NAMESPACE
+
 #endif
