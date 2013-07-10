@@ -19,21 +19,14 @@ public:
 
 private slots:
     void on_createProjectBtn_clicked();
-
-    void on_projectsTable_doubleClicked(const QModelIndex &index);
-
     void on_buttonBox_accepted();
-
     void on_delProjectBtn_clicked();
-
-    void on_cloneProjectBtn_clicked();
-
 private:
     Ui::ProjectDialog *ui;
 
     QSqlTableModel *model;
 
-    void openProject();
+    bool openProject();
     int currentRow() const;
 };
 
