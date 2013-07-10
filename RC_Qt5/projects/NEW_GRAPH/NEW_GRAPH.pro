@@ -152,3 +152,5 @@ DEPENDPATH += $$PWD/../../
 win32:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../lib/libastylelib.a
 else:win32:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../lib/libastylelibd.a
 else:unix:!macx: PRE_TARGETDEPS += $$PWD/../../lib/libastyle.a
+
+VERSION = 2.0.1.$Rev: 321:
