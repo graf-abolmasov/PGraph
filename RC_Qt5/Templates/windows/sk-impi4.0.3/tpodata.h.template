@@ -2,7 +2,9 @@
 #define TPODATA_H
 #include "utype.h"
 #include "property.h"
+
 PROJECT_BEGIN_NAMESPACE
+
 class TPOData
 {
 public:
@@ -44,5 +46,7 @@ private:
         //Initialize iD's
         void initId();
 };
+
 PROJECT_END_NAMESPACE
+
 #endif

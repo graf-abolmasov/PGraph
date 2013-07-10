@@ -1,3 +1,0 @@
-<#plink> -ssh -l <#user> -pw <#password> -P <#port> <#user>@<#host> mkdir -p <#root>/<#projectName>
-<#pscp> -l <#user> -pw <#password> -P <#port> .\* <#user>@<#host>:<#root>/<#projectName>/
-<#plink> -ssh -l <#user> -pw <#password> -P <#port> <#user>@<#host> -m runme.bat

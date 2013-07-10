@@ -1,6 +1,7 @@
 #include "tpodata.h"
 
 PROJECT_BEGIN_NAMESPACE
+
 #ifdef PARALLEL
 MPI_Datatype memoryPacketDatatype;
 
