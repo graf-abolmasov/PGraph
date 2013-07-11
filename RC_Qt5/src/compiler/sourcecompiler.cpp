@@ -329,7 +329,7 @@ void SourceCompiler::compileEnvironment(int procsMax) const
 
     QString runme = getTemplate(myTemplateDirectory + "/runme.bat.template");
     runme.replace("<#projectName>", globalDBManager->getProjectName());
-    runlocal.replace("<#root>", root);
+    runme.replace("<#root>", root);
     QFile runme_f(myOutputDirectory + "/runme.bat");
     runme_f.open(QFile::WriteOnly);
     runme_f.write(runme.toUtf8());
