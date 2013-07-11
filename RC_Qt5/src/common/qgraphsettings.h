@@ -22,15 +22,19 @@ private:
     bool myProjectsDirectorySet;
     QString myProjectsDirectory;
 
-    QString myConfigPath;
+    QSettings ini;
+
+    QString getProjectsDirectory();
+
 public:
     QString getOutputDirectory();
     QString getBaseDirectory();
     QString getTemplateDirectory();
-    QString getProjectsDirectory();
 
     bool isParallel();
-    QString getConfigPath() { return myConfigPath; }
+    QString getConfigPath() {
+        return ini.fileName();
+    }
     QGraphSettings(const QString &configPath);
 };
 
