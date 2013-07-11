@@ -318,21 +318,22 @@ void SourceCompiler::copyStaticTemplates()
 
 void SourceCompiler::compileEnvironment(int procsMax) const
 {
-    QString runme = getTemplate(myTemplateDirectory + "/runme.bat.template");
-    runme.replace("<#projectName>", globalDBManager->getProjectName());
-    QFile runme_f(myOutputDirectory + "/runme.bat");
-    runme_f.open(QFile::WriteOnly);
-    runme_f.write(runme.toUtf8());
-    runme_f.close();
-
     QSettings c(globalSettings->getConfigPath(), QSettings::IniFormat);
-    QString root = c.value("SK/root", "/home/<#user>/pgraph_out").toString();
+    QString root = c.value("SK/root", "pgraph_out").toString();
     QString host = c.value("SK/host", "sk.ssau.ru").toString();
     QString port = c.value("SK/port", "22").toString();
     QString user = c.value("SK/user", "user").toString();
     QString plink = c.value("Compiler/plink", "plink.exe").toString();
     QString pscp = c.value("Compiler/pscp", "pscp.exe").toString();
     QString password = c.value("SK/password", "****").toString();
+
+    QString runme = getTemplate(myTemplateDirectory + "/runme.bat.template");
+    runme.replace("<#projectName>", globalDBManager->getProjectName());
+    runlocal.replace("<#root>", root);
+    QFile runme_f(myOutputDirectory + "/runme.bat");
+    runme_f.open(QFile::WriteOnly);
+    runme_f.write(runme.toUtf8());
+    runme_f.close();
 
     QString runlocal = getTemplate(myTemplateDirectory + "/runlocal.bat.template");
     runlocal.replace("<#root>", root);
