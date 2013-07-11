@@ -1,8 +1,7 @@
 #!/bin/sh -login
-cd ~/graph_uploads/<#projectName>
+module load impi/4
+cd ~/<#root>/<#projectName>
 rm -r release
 mkdir release
-module load impi/4
 make release
-
 qsub -V runmpi.pbs
