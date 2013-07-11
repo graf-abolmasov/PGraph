@@ -1,6 +1,4 @@
-pushd C:\
-call c:\MinGW\bin\mingw32env.bat
-popd
+set PATH=C:\MinGW\bin;%PATH%
 rmdir /S /Q release
 mkdir release
 mingw32-make release
