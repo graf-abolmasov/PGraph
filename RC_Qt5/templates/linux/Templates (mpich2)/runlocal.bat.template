@@ -1,0 +1,4 @@
+sshpass -p <#password> <#plink> <#user>@<#host> "mkdir -p <#root>/<#projectName>"
+sshpass -p <#password> <#pscp> * <#user>@<#host>:<#root>/<#projectName>/
+sshpass -p <#password> <#plink> <#user>@<#host> 'chmod +x <#root>/<#projectName>/runme.bat'
+sshpass -p <#password> <#plink> <#user>@<#host> <#root>/<#projectName>/runme.bat

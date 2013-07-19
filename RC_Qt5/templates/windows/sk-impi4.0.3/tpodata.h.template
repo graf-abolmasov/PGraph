@@ -1,0 +1,52 @@
+#ifndef TPODATA_H
+#define TPODATA_H
+#include "utype.h"
+#include "property.h"
+
+PROJECT_BEGIN_NAMESPACE
+
+class TPOData
+{
+public:
+
+        TPOData(int rank);
+        ~TPOData();
+		int myRank;
+		
+        //Размер выделенной памяти от id
+        int getDataSize(int id);
+#ifdef PARALLEL
+        //Тип MPI от id
+        MPI_Datatype getMpiType(int id);
+#endif
+
+        //Указатель на область памяти с данными
+        void* getDataAddr(int id);
+
+        //Common setter/getter
+        void getData(int id, int offset, int count, void* recvBuf);
+        void setData(int id, int offset, int count, const void* value);
+
+        //Personal setter/getter
+        <#setGet>
+
+        //Свойства для доступа к данным
+        <#varProperty>
+
+        //Указатели на память с данными
+        <#varPtr>
+
+private:
+        //Блок iD's
+        <#varId>
+
+        //Initialize memory
+        void initMemory();
+
+        //Initialize iD's
+        void initId();
+};
+
+PROJECT_END_NAMESPACE
+
+#endif

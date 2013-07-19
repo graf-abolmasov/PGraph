@@ -1,0 +1,4 @@
+<#plink> -batch -ssh -l <#user> -pw <#password> -P <#port> <#user>@<#host> mkdir -p ~/<#root>/<#projectName>
+<#pscp> -l <#user> -pw <#password> -P <#port> .\* <#user>@<#host>:<#root>/<#projectName>/
+<#plink> -batch -ssh -l <#user> -pw <#password> -P <#port> <#user>@<#host> chmod +x ~/<#root>/<#projectName>/runme.bat
+<#plink> -batch -ssh -l <#user> -pw <#password> -P <#port> <#user>@<#host> ~/<#root>/<#projectName>/runme.bat
