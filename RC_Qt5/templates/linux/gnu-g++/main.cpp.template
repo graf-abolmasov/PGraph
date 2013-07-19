@@ -1,0 +1,16 @@
+#include "tpodata.h"
+#include "unistd.h"
+#include <stdlib.h>
+#include <stddef.h>
+#include <time.h>
+
+int <#graphname>(TPOData *D);
+int main(int argc, char *argv[])
+{
+
+	TPOData D(1);
+
+   	 <#graphname>(&D);
+
+    	return 0;
+}

@@ -1,0 +1,56 @@
+#ifndef STYPE_H
+#define STYPE_H
+
+#include "defines.h"
+
+#ifdef PARALLEL
+#include "mpi.h"
+#endif
+
+#ifndef PROJECT_NAMESPACE
+# define PROJECT_BEGIN_NAMESPACE
+# define PROJECT_END_NAMESPACE
+#else 
+# define PROJECT_BEGIN_NAMESPACE namespace PROJECT_NAMESPACE {
+# define PROJECT_END_NAMESPACE }
+#endif
+
+
+#ifdef PARALLEL
+
+PROJECT_BEGIN_NAMESPACE
+
+//Структура для общения с диспетчетом памяти
+typedef struct {
+    int   id;
+    long  offset;
+    long  count;
+} MemoryPacket;
+
+extern MPI_Datatype memoryPacketDatatype;
+
+//Служебные типы и переменные
+extern MPI_Status status;
+extern MPI_Request req;
+extern int myProcNum, totalProc, parentProcNum;
+
+//Идентификаторы сообщений отсчитываются от этого значения
+#define MPI_TAG_BASE             32740
+
+//Идентификаторы сообщений запуска/остановки процесса
+#define MPI_TAG_TERMINATE        MPI_TAG_BASE + 1
+#define MPI_TAG_RUN              MPI_TAG_BASE + 2
+
+//Идентификаторы сообщений менеджера памяти
+#define MPI_TAG_GETDATA          MPI_TAG_BASE + 3
+#define MPI_TAG_PUTDATA          MPI_TAG_BASE + 4
+#define MPI_TAG_ACTUALDATA       MPI_TAG_BASE + 5
+#define MPI_TAG_COMPLETED        MPI_TAG_BASE + 6
+#define MPI_TAG_LOCKPROC         MPI_TAG_BASE + 7
+#define MPI_TAG_FREEPROC         MPI_TAG_BASE + 8
+
+PROJECT_END_NAMESPACE
+
+#endif //PARALLEL
+#endif //STYPE_H
+

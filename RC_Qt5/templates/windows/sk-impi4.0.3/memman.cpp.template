@@ -1,0 +1,54 @@
+#include "tpodata.h"
+#include <stdlib.h>
+#include <stdio.h>
+
+#ifdef PARALLEL
+
+PROJECT_BEGIN_NAMESPACE
+
+int memman(TPOData *D)
+{
+    int Terminate = 0;
+    MemoryPacket p;
+    printf("memmanager: run\n");
+    
+    bool *proc_loading = new bool[totalProc];
+    proc_loading[0] = true;
+    proc_loading[1] = true;
+    for (int i = 2; i < totalProc; i++)
+        proc_loading[i] = false;
+    
+    while (!Terminate) {
+        MPI_Recv(&p, 1, memoryPacketDatatype, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+        
+        if (status.MPI_TAG != MPI_TAG_TERMINATE) {
+            if (status.MPI_TAG == MPI_TAG_GETDATA) {
+                MPI_Send((char *)D->getDataAddr(p.id)+(p.offset*D->getDataSize(p.id)), p.count, D->getMpiType(p.id), status.MPI_SOURCE, MPI_TAG_ACTUALDATA, MPI_COMM_WORLD);
+            } else if (status.MPI_TAG == MPI_TAG_PUTDATA) {
+                MPI_Recv((char *)D->getDataAddr(p.id)+(p.offset*D->getDataSize(p.id)), p.count, D->getMpiType(p.id), status.MPI_SOURCE, MPI_TAG_ACTUALDATA, MPI_COMM_WORLD, &status);
+            } else if (status.MPI_TAG == MPI_TAG_LOCKPROC) {
+                int i = 2;
+                while (i < totalProc && proc_loading[i])
+                    i++;
+                if (i==totalProc) {
+                    printf("memmanaer: WARNING! No free process. Reserve one more.\r\n");
+                    exit(-1);
+                }
+                proc_loading[i] = true;
+                MPI_Send(&i, 1, MPI_INT, status.MPI_SOURCE, MPI_TAG_LOCKPROC, MPI_COMM_WORLD);
+            } else if (status.MPI_TAG == MPI_TAG_FREEPROC) {
+                proc_loading[p.id] = false;
+            }
+            
+        } else Terminate = true;
+    }
+    
+    printf("memmanager: terminated\n");
+    delete proc_loading;
+    return 1;
+}
+
+PROJECT_END_NAMESPACE
+
+#endif
+
