@@ -1,9 +1,0 @@
-#ifndef MEMMAN_H
-#define MEMMAN_H
-#include "tpodata.h"
-
-PROJECT_BEGIN_NAMESPACE
-int memman(TPOData *D);
-PROJECT_END_NAMESPACE
-
-#endif

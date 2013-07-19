@@ -1,7 +1,0 @@
-#!/bin/sh -login
-module load impi/4
-cd ~/<#root>/<#projectName>
-rm -r release
-mkdir release
-make release
-qsub -V runmpi.pbs

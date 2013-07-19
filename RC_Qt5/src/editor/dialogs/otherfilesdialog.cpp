@@ -24,7 +24,6 @@ OtherFilesDialog::~OtherFilesDialog()
 {
     delete ui;
     delete model;
-
 }
 
 void OtherFilesDialog::on_addButton_clicked()
@@ -33,7 +32,7 @@ void OtherFilesDialog::on_addButton_clicked()
     project_id.setValue(globalDBManager->getProjectId());
     QSqlRecord newRec;
     newRec.append(project_id);
-    model->insertRecord(-1, newRec);
+    model->insertRecord(0, newRec);
 }
 
 void OtherFilesDialog::on_removeButton_clicked()

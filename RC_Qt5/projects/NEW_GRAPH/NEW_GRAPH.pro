@@ -63,7 +63,8 @@ SOURCES += ../../src/editor/main.cpp \
     ../../src/compiler/abstractcompiler.cpp \
     ../../src/compiler/compiler.cpp \
     ../../src/compiler/sourcecompiler.cpp \
-    ../../src/compiler/astylewrapper.cpp
+    ../../src/compiler/astylewrapper.cpp \
+    ../../src/compiler/externalcompiler.cpp
 HEADERS += ../../src/editor/qmywindow.h \
     ../../src/editor/qdrawwindow.h \
     ../../src/editor/qtop.h \
@@ -119,7 +120,8 @@ HEADERS += ../../src/editor/qmywindow.h \
     ../../src/compiler/abstractcompiler.h \
     ../../src/compiler/compiler.h \
     ../../src/compiler/sourcecompiler.h \
-    ../../src/compiler/astylewrapper.h
+    ../../src/compiler/astylewrapper.h \
+    ../../src/compiler/externalcompiler.h
 RESOURCES += ../../src/resources.qrc
 FORMS += ../../src/editor/dialogs/toppropertydialog.ui \
     ../../src/editor/dialogs/qvariableeditor.ui \
@@ -152,3 +154,5 @@ DEPENDPATH += $$PWD/../../
 win32:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../lib/libastylelib.a
 else:win32:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../lib/libastylelibd.a
 else:unix:!macx: PRE_TARGETDEPS += $$PWD/../../lib/libastyle.a
+
+VERSION = 2.0.1.$Rev: 321 $

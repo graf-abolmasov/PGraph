@@ -402,7 +402,7 @@ QStringList SourceCompiler::compilePredicate(const Predicate *predicate) const
         // Инициализуем данные
         for (int i = 0; i < predicate->variableList.count(); i++) {
             BaseModuleParameter parameter = currentBaseModule->parameterList[i];
-            outputData.append(predicate->variableList[i]->isGlobal ? QString("\t%1%2 _%3 = D->%4;\r\n") : QObject::tr("\tconst %1 *_%2 = D->%3;\r\n")
+            outputData.append(predicate->variableList[i]->isGlobal ? QString("\t%1%2 _%3 = D->%4;\r\n") : QObject::tr("\t%1 *_%2 = D->%3;\r\n")
                               .arg(parameter.type)
                               .arg(parameter.name)
                               .arg(predicate->variableList[i]->name).toUtf8());
