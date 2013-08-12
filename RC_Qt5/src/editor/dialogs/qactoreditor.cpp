@@ -27,6 +27,23 @@ QActorEditor::QActorEditor(QWidget *parent) :
     ui->setupUi(this);
 }
 
+void QActorEditor::on_iconLabel_clicked() {
+    QString fileName = QFileDialog::getOpenFileName(0,
+                                                    tr("Открыть картинку..."),
+                                                    "",
+                                                    tr("Images (*.png *.xpm *.jpg *.jpeg)"));
+    if (fileName.isEmpty())
+        return;
+    QPixmap img(fileName);
+    if (!img.isNull() && QFileInfo(fileName).size() < 10000) {
+        if (tempActor != NULL) {
+            tempActor->icon = img;
+        }
+        ui->iconLabel->setPixmap(img);
+    } else QMessageBox::critical(NULL, tr("Ошибка"), tr("Размер картинки не должен превышать 10 кб"));
+}
+
+
 QActorEditor::QActorEditor(const Actor *actor, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::QActorEditor)
@@ -70,6 +87,7 @@ void QActorEditor::prepareForm(const Actor *actor)
 {
     myActor = actor;
     tempActor = new Actor(myActor->name, myActor->extName, myActor->type, myActor->baseModule, myActor->variableList, myActor->varAccModeList, myActor->icon);
+    tempActor->icon = myActor->icon;
 
     //заполняем форму
     myVariableList = globalDBManager->getVariableList();
@@ -124,6 +142,8 @@ void QActorEditor::prepareForm(const Actor *actor)
     }
     QRegExp regExp(tr("[A-Za-z1-9А-Яа-я ]{1,255}"));
     ui->actorNameEdt->setValidator(new QRegExpValidator(regExp, this));
+    if (!myActor->icon.isNull())
+        ui->iconLabel->setPixmap(myActor->icon);
 }
 
 const Actor *QActorEditor::getResult()
@@ -273,6 +293,8 @@ bool QActorEditor::makeResult()
     result->type = tempActor->type;
     result->varAccModeList = tempActor->varAccModeList;
     result->variableList = tempActor->variableList;
+    result->icon = tempActor->icon;
+    globalDBManager->saveActorPicture(result->name, tempActor->icon);
     delete tempActor;
     return true;
 }

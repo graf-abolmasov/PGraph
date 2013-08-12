@@ -138,7 +138,7 @@ float QNormalTop::getMinHeight() const
 void QNormalTop::setIcon(QPixmap &icon){
     if (actor != NULL) {
         const_cast<Actor *>(actor)->icon = icon;
-        globalDBManager->saveActorPictute(actor->name, icon);
+        globalDBManager->saveActorPicture(actor->name, icon);
     }
 }
 

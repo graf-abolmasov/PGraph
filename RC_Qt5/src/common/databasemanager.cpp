@@ -512,7 +512,7 @@ void DataBaseManager::removeProjectDB(int projectId)
     db.close();
 }
 
-void DataBaseManager::saveActorPictute(const QString &actorName, const QPixmap &image)
+void DataBaseManager::saveActorPicture(const QString &actorName, const QPixmap &image)
 {
     ActorDAO(db).saveIcon(actorName, image);
 }
