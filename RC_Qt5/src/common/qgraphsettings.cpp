@@ -59,7 +59,7 @@ QString QGraphSettings::getTemplateDirectory()
     if (myTemplateDirectorySet == false) {
         myTemplateDirectory = ini.value("Folders/templates", myTemplateDirectory).toString();
         QDir dir(myTemplateDirectory);
-        Q_ASSERT(dir.exists());
+//        Q_ASSERT(dir.exists());
         myTemplateDirectory = dir.canonicalPath();
         myTemplateDirectorySet = true;
     }

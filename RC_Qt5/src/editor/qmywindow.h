@@ -5,6 +5,7 @@
 #include <QtCore/QMap>
 #include "../../src/editor/qdrawwindow.h"
 #include "../../src/compiler/nativecompiler.h"
+#include "../../src/compiler/graphdebugger.h"
 
 QT_BEGIN_NAMESPACE
 class QToolButton;
@@ -63,6 +64,7 @@ private:
     //Запуск
     QAction *buildAct;
     QAction *compileAct;
+    QAction *runAct;
 
     //Данные
     QAction *variablesAct;
@@ -135,6 +137,7 @@ private:
     void writeSettings();	//+ Сохранение конфигурации программы
 
     NativeCompiler *nativeCompiler;
+    GraphDebugger *graphDebugger;
 
     QListWidget *outputPanelList;
     QLabel *infoPanelLabel;
@@ -178,6 +181,7 @@ private slots:
     void CMDoUserDialog(){}	//+ Запуск->Режим ручного ввода данных
     void CMCompile();           //+ Запуск->Компиляция
     void CMBuild();              //+ Запуск->Построение и запуск
+    void CMRun();              //Запуск
     void CMHelpContents(){}	// Помощь->Содержание
     void CMHelpAbout(); 	//+ Помощь->О программе
 
