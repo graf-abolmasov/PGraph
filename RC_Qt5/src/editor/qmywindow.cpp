@@ -24,6 +24,7 @@
 #include "../../src/editor/dialogs/qsavegraphdialog.h"
 #include "../../src/editor/dialogs/qopengraphdialog.h"
 #include "../../src/common/commonutils.h"
+#include "../../src/compiler/graphdebugger.h"
 #include "../../src/common/globalvariables.h"
 #include "../../src/compiler/graphcompiler.h"
 #include "../../src/compiler/compiler.h"
@@ -54,6 +55,7 @@ TMyWindow::TMyWindow()
     setUnifiedTitleAndToolBarOnMac(true);
 
     nativeCompiler = new NativeCompiler(this);
+    graphDebugger = new GraphDebugger(this);
     isParallel = globalSettings->isParallel();
     outputPanelList = new QListWidget();
     connect(globalLogger, SIGNAL(newMessage(QString)), this, SLOT(write2globalOutput(QString)));
@@ -78,6 +80,7 @@ void TMyWindow::write2globalOutput(const QString &msg)
 
 TMyWindow::~TMyWindow()
 {
+    delete graphDebugger;
     delete nativeCompiler;
 }
 
@@ -108,6 +111,7 @@ void TMyWindow::createMenus()
     buildMenu = menuBar()->addMenu(tr("Запуск"));
     buildMenu->addAction(buildAct);
     buildMenu->addAction(compileAct);
+//    buildMenu->addAction(runAct);
 
     windowMenu = menuBar()->addMenu(tr("&Window"));
     updateWindowMenu();
@@ -230,6 +234,11 @@ void TMyWindow::createActions()
     buildAct->setShortcut(QKeySequence(Qt::Key_F8));
     buildAct->setStatusTip(tr("Компилировать в exe (F8)"));
     connect(buildAct, SIGNAL(triggered()), this, SLOT(CMBuild()));
+
+    runAct = new QAction(QIcon(":/images/run.png"), tr("Запустить"), this);
+    runAct->setShortcut(QKeySequence(Qt::Key_F9));
+    runAct->setStatusTip(tr("Запустить (F9)"));
+    connect(runAct, SIGNAL(triggered()), this, SLOT(CMRun()));
 
     compileAct = new QAction(QIcon(":/images/compile.png"), tr("Компилировать граф-модель"), this);
     compileAct->setStatusTip(tr("Компилировать граф-модель (F6)"));
@@ -802,6 +811,11 @@ void TMyWindow::CMBuild()
     nativeCompiler->compile();
 }
 
+void TMyWindow::CMRun()
+{
+    graphDebugger->run();
+}
+
 void TMyWindow::CMOtherFiles()
 {
     OtherFilesDialog dlg;
@@ -836,6 +850,7 @@ void TMyWindow::updateMenues()
     buildMenu->setEnabled(graphNameIsNotEmpty);
     compileDataAct->setEnabled(graphNameIsNotEmpty);
     compileAct->setEnabled(graphNameIsNotEmpty);
+    runAct->setEnabled(graphNameIsNotEmpty);
     buildAct->setEnabled(graphNameIsNotEmpty);
 
     saveAsGraphAct->setEnabled(hasMdiChild);

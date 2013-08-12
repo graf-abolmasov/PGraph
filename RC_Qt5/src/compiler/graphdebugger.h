@@ -3,13 +3,22 @@
 
 #include <QtCore>
 
-class GraphDebugger
+class GraphDebugger: public QObject
 {
-private:
-    QProcess myProccess;
+    Q_OBJECT
 
+private:
+    QProcess *runScript;
+    QTime t;
+    QString sh;
 public:
-    GraphDebugger();
+    bool run();
+    GraphDebugger(QObject *parent);
+    ~GraphDebugger();
+
+private slots:
+    void finished(int exitCode, QProcess::ExitStatus);
+    void readyRead();
 };
 
 #endif // GRAPHDEBUGGER_H

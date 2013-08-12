@@ -6,3 +6,5 @@ mkdir debug
 mkdir release
 make debug
 make release
+
+./release/result

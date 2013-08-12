@@ -4,3 +4,5 @@ mkdir debug
 mkdir release
 mingw32-make debug
 mingw32-make release
+
+start ./release/result.exe
