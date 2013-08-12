@@ -58,6 +58,7 @@ private slots:
     void showVariableEditor();
     void on_buttonBox_accepted();
     void on_buttonBox_rejected();
+    void on_iconLabel_clicked();
 };
 
 #endif // QActorEditor_H

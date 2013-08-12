@@ -76,7 +76,7 @@ public:
 
     void registerModuleDB(const BaseModule *baseModule);
 
-    void saveActorPictute(const QString &actorName, const QPixmap &image);
+    void saveActorPicture(const QString &actorName, const QPixmap &image);
 
     QSqlError lastError();
 

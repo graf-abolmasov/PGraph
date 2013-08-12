@@ -64,7 +64,8 @@ SOURCES += ../../src/editor/main.cpp \
     ../../src/compiler/compiler.cpp \
     ../../src/compiler/sourcecompiler.cpp \
     ../../src/compiler/astylewrapper.cpp \
-    ../../src/compiler/externalcompiler.cpp
+    ../../src/compiler/externalcompiler.cpp \
+    ../../src/editor/qclickablelable.cpp
 HEADERS += ../../src/editor/qmywindow.h \
     ../../src/editor/qdrawwindow.h \
     ../../src/editor/qtop.h \
@@ -121,7 +122,8 @@ HEADERS += ../../src/editor/qmywindow.h \
     ../../src/compiler/compiler.h \
     ../../src/compiler/sourcecompiler.h \
     ../../src/compiler/astylewrapper.h \
-    ../../src/compiler/externalcompiler.h
+    ../../src/compiler/externalcompiler.h \
+    ../../src/editor/qclickablelable.h
 RESOURCES += ../../src/resources.qrc
 FORMS += ../../src/editor/dialogs/toppropertydialog.ui \
     ../../src/editor/dialogs/qvariableeditor.ui \
