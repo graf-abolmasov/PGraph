@@ -17,7 +17,7 @@ Graph::Graph(const QString &name, const QString &extName, const QList<Top> &topL
 }
 
 Graph::Graph(const QString &name, const QString &extName, const QList<Top> &topList, const QList<GraphArc> &arcList, const QList<Comment> &commentList, const QList<SyncArc> &syncArcList, const QPixmap &icon) :
-    Actor(name, extName, Actor::GraphType, NULL, QList<const Variable *>(), QStringList(), icon)
+    Actor(name, extName, Actor::GraphType, NULL, QList<const Variable *>(), QStringList(), icon, "")
 {
     this->arcList          = arcList;
     this->commentList      = commentList;

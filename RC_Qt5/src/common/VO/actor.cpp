@@ -5,7 +5,7 @@
 #include "variable.h"
 #include "../../src/common/globalvariables.h"
 
-Actor::Actor(const QString &name, const QString &extName, const Type &type, const BaseModule *baseModule, const QList<const Variable *> &variableList, const QStringList &varAccModeList, const QPixmap &icon)
+Actor::Actor(const QString &name, const QString &extName, const Type &type, const BaseModule *baseModule, const QList<const Variable *> &variableList, const QStringList &varAccModeList, const QPixmap &icon, QString info)
 {
     this->extName = extName;
     this->name = name;
@@ -14,6 +14,7 @@ Actor::Actor(const QString &name, const QString &extName, const Type &type, cons
     this->baseModule = baseModule;
     this->varAccModeList = varAccModeList;
     this->icon = icon;
+    this->info = info;
 }
 
 Actor::Actor(const Actor &actor)
@@ -25,6 +26,7 @@ Actor::Actor(const Actor &actor)
     this->varAccModeList = actor.varAccModeList;
     this->icon = actor.icon;
     this->variableList = actor.variableList;
+    this->info = actor.info;
 }
 
 Actor::Actor(const QString &name, const QString &extName, const Type &type)

@@ -57,7 +57,7 @@ QActorEditor::QActorEditor(const Actor::Type &mode, QWidget *parent) :
     ui(new Ui::QActorEditor)
 {
     ui->setupUi(this);
-    prepareForm(new Actor("", "", mode, NULL, QList<const Variable *>(), QStringList(), QPixmap()));
+    prepareForm(new Actor("", "", mode, NULL, QList<const Variable *>(), QStringList(), QPixmap(), ""));
 }
 
 QActorEditor::~QActorEditor()
@@ -86,7 +86,7 @@ void QActorEditor::changeEvent(QEvent *e)
 void QActorEditor::prepareForm(const Actor *actor)
 {
     myActor = actor;
-    tempActor = new Actor(myActor->name, myActor->extName, myActor->type, myActor->baseModule, myActor->variableList, myActor->varAccModeList, myActor->icon);
+    tempActor = new Actor(myActor->name, myActor->extName, myActor->type, myActor->baseModule, myActor->variableList, myActor->varAccModeList, myActor->icon, myActor->info);
     tempActor->icon = myActor->icon;
 
     //заполняем форму
@@ -142,6 +142,8 @@ void QActorEditor::prepareForm(const Actor *actor)
     }
     QRegExp regExp(tr("[A-Za-z1-9А-Яа-я ]{1,255}"));
     ui->actorNameEdt->setValidator(new QRegExpValidator(regExp, this));
+    if (!myActor->info.isEmpty())
+        ui->infoEditor->setHtml(myActor->info);
     if (!myActor->icon.isNull())
         ui->iconLabel->setPixmap(myActor->icon);
 }
@@ -278,6 +280,7 @@ bool QActorEditor::makeResult()
     case Actor::GraphType:;
     }
     tempActor->name = "A" + getCRC(tempActor->extName.toUtf8());
+    tempActor->info = ui->infoEditor->document()->toHtml();
 
     const QStringList errors = tempActor->validate();
     if (!errors.isEmpty()) {
@@ -294,6 +297,7 @@ bool QActorEditor::makeResult()
     result->varAccModeList = tempActor->varAccModeList;
     result->variableList = tempActor->variableList;
     result->icon = tempActor->icon;
+    result->info = tempActor->info;
     globalDBManager->saveActorPicture(result->name, tempActor->icon);
     delete tempActor;
     return true;

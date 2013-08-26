@@ -11,11 +11,12 @@ void ActorDAO::persist(const Actor &actor)
 {
     openDb();
     QSqlQuery query;
-    query.prepare("INSERT INTO actor (PROJECT_ID, NAMEPR, CLASPR, EXTNAME, DATE, TIME, PROTOTIP)"
-                  "VALUES (:PROJECT_ID, :NAMEPR, :CLASPR, :EXTNAME, CURDATE(), CURTIME(), :PROTOTIP);");
+    query.prepare("INSERT INTO actor (PROJECT_ID, NAMEPR, CLASPR, EXTNAME, DATE, TIME, PROTOTIP, INFO)"
+                  "VALUES (:PROJECT_ID, :NAMEPR, :CLASPR, :EXTNAME, CURDATE(), CURTIME(), :PROTOTIP, :INFO);");
     query.bindValue(":NAMEPR",     actor.name);
     query.bindValue(":CLASPR",     "a");
     query.bindValue(":EXTNAME",    actor.extName);
+    query.bindValue(":INFO",       actor.info.toUtf8());
     query.bindValue(":PROTOTIP",   actor.baseModule == NULL ? NULL : actor.baseModule->name);
     query.bindValue(":PROJECT_ID", globalDBManager->getProjectId());
     execQuery(query);
@@ -94,7 +95,7 @@ QList<Actor> ActorDAO::findAll()
                             globalDBManager->getBaseModule(actorRecord.value("PROTOTIP").toString()),
                             actorVariableList,
                             actorVarAccList,
-                            p));
+                            p, actorRecord.value("INFO").toString()));
     }
     myDb.close();
     return result;
